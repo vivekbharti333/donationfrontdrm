@@ -1,0 +1,95 @@
+.mat-tab-group {
+    margin-bottom: 20px;
+  }
+
+  .remarks-box {
+    width: 100%;    
+    height: 180px;
+    padding: 1px;
+    border: 3px solid rgb(247, 246, 246);
+    margin: 0;
+  }
+
+  .vl {
+    padding: 10px;
+    border-left: 3px solid rgb(198, 203, 198);
+    height: 150px;
+  }
+
+  .no-border {
+    border: none;
+  }
+
+  .bottom-border {
+    border: none;
+    border-bottom: 1px solid #c4c0c0; /* Adjust thickness and color as needed */
+  }
+  .no-border {
+    border: none;
+    margin: 0; /* Ensure no margin on inputs */
+    padding: 3px; /* Optional padding inside inputs */
+  }
+  .input-container {
+    display: flex;
+    align-items: center;
+    margin: 0; /* Remove margin between containers */
+    padding: 0; /* Remove padding between containers */
+  }
+  
+  .input-container label {
+    margin-right: 10px; /* Space between the label and the input */
+    font-weight: bold;
+  }
+  
+  .input-container input {
+    flex: 1; /* Allows the input to grow and fill the available space */
+  }
+
+
+
+  .badge-linesuccess {
+    color: #007BFF; /* Blue text */
+    border: 1px solid #007BFF; /* Optional border */
+  }
+  
+  .badge-linedanger {
+    color: #DC3545; /* Red text */
+    border: 1px solid #DC3545; /* Optional border */
+  }
+  
+  .badge-lineinfo {
+    color: #5BC0DE; /* Light Blue text */
+    border: 1px solid #5BC0DE; /* Optional border */
+  }
+  
+  .badge-linewarning {
+    color: #FD7E14; /* Orange text */
+    border: 1px solid #FD7E14; /* Optional border */
+  }
+  
+  .badge-linewin {
+    color: #28A745; /* Green text */
+    border: 1px solid #28A745; /* Optional border */
+  }
+  
+  .badge-lineassigned {
+    color: #6F42C1; /* Purple text */
+    border: 1px solid #6F42C1; /* Optional border */
+  }
+  
+  .badge-linereserved {
+    color: #FFC107; /* Yellow text */
+    border: 1px solid #FFC107; /* Optional border */
+  }
+  
+  .badge-default {
+    color: #6C757D; /* Gray text */
+    border: 1px solid #6C757D; /* Optional border */
+  }
+  
+  .badge-button {
+    background: none; /* Removes background */
+    border-radius: 4px; /* Optional rounded corners */
+    padding: 5px 10px; /* Optional padding */
+    font-size: 14px; /* Adjust as needed */
+  }
