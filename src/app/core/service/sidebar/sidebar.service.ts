@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { routes } from '../../core.index';
 
+// ['admin-dashboard','sale-dashboard','create-user','user-list','add-donation','all-donation-list','payment-mode-master','payment-mode','currency-master','currency','program','add-receipt-header','receipt-header-list','company-setting']
+
 @Injectable({
   providedIn: 'root',
 })
