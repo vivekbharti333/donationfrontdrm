@@ -1,1 +1,157 @@
-<p>add-donation works!</p>
+<p-toast></p-toast>
+
+<form [formGroup]="addDonationForm" (ngSubmit)="saveDonationDetails()">
+    <div class="card">
+        <div class="card-body">
+            <div class="new-employee-field">
+                <div class="card-title-head">
+                    <h6>
+                        <span><i class="feather icon-info feather-edit"></i></span>Add Donation Receipt
+                    </h6>
+                </div>
+                <div class="row">
+                    <div class="col-lg-4 col-md-4">
+                        <div class="mb-3">
+                            <label for="receiptType" class="form-label">Receipt Type</label>
+                            <select id="receiptType" class="form-control" formControlName="invoiceHeaderDetailsId"
+                                (change)="onProgramSelect($event)">
+                                <option value="" disabled selected>Select an option</option>
+                                <option *ngFor="let invoiceType of invoiceTypeList" [value]="invoiceType.id">
+                                    {{ invoiceType.companyFirstName + ' ' + invoiceType.companyLastName }}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-4">
+                        <div class="mb-3"> <label for="donorName" class="form-label">Donor Name</label>
+                            <input id="donorName" class="form-control" type="text" pInputText
+                                formControlName="donorName" maxlength="100" placeholder="Enter donor name" />
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-4">
+                        <div class="mb-3">
+                            <label class="form-label">Mobile Number</label>
+                            <input class="form-control" type="number" pInputText formControlName="mobileNumber"
+                                maxlength="100">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-4 col-md-4">
+                        <div class="mb-3">
+                            <label class="form-label">Email Id</label>
+                            <input class="form-control" type="text" pInputText formControlName="emailId"
+                                maxlength="100">
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-4">
+                        <div class="mb-3">
+                            <label class="form-label">Address</label>
+                            <input class="form-control" type="text" pInputText formControlName="address"
+                                maxlength="100">
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-4">
+                        <div class="mb-3">
+                            <label class="form-label">Pan</label>
+                            <input class="form-control" type="text" pInputText formControlName="panNumber"
+                                maxlength="100">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-4 col-md-4">
+                        <div class="mb-3">
+                            <label class="form-label">Program</label>
+                            <select class="form-control" formControlName="programName"
+                                (change)="onProgramSelect($event)">
+                                <option aria-readonly="true">Select Program</option>
+                                <option *ngFor="let donationOpt of donationTypeList">{{donationOpt.programName}}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-4" *ngIf="!showCurrencyBox">
+                        <div class="mb-3" *ngIf="!showCurrencyBox">
+                            <label class="form-label">Amount</label>
+                            <input class="form-control" type="number" pInputText pKeyFilter="int"
+                                formControlName="amount" maxlength="100">
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-3" *ngIf="showCurrencyBox">
+                        <div class="mb-3" *ngIf="showCurrencyBox">
+                            <label class="form-label">Amount</label>
+                            <input class="form-control" type="number" pInputText pKeyFilter="int"
+                                formControlName="amount" maxlength="100">
+                        </div>
+                    </div>
+                    <div class="col-lg-1 col-md-1" *ngIf="showCurrencyBox">
+                        <div class="mb-3" *ngIf="showCurrencyBox">
+                            <label class="form-label">Currency</label>
+                            <select class="form-control" formControlName="currencyCode" (change)="setCurrency($event)">
+                                <option *ngFor="let currency of currencyList" [ngValue]="currency.currencyCode">
+                                    {{currency.currencyCode+" "+currency.unicode}}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-4">
+                        <div class="mb-3">
+                            <label class="form-label">Transaction Id</label>
+                            <input class="form-control" type="text" pInputText formControlName="transactionId"
+                                maxlength="100">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-4 col-md-4">
+                        <div class="mb-3">
+                            <label class="form-label">Payment Mode</label>
+                            <select class="form-control" formControlName="paymentMode">
+                                <option aria-readonly="true">Select Payment Mode</option>
+                                <option *ngFor="let payModOpt of paymentModeList">{{payModOpt.paymentMode}}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-4">
+                        <div class="mb-3">
+                            <label class="form-label">Fundrising Officer</label>
+                            <select class="form-control" formControlName="createdBy">
+                                <option aria-readonly="true" value="N/A">Select Fundrising Officer</option>
+                                <option [value]="fundRisingOffcer.loginId"
+                                    *ngFor="let fundRisingOffcer of fundRisingOffcerList">
+                                    {{fundRisingOffcer.firstName}} {{fundRisingOffcer.lastName}}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    <!-- <div class="col-lg-4 col-md-4">
+                        <div class="mb-3">
+                            <label class="form-label">Pan</label>
+                            <input class="form-control" type="text" pInputText formControlName="panNumber"
+                                maxlength="100">
+                        </div>
+                    </div> -->
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-4 col-md-4">
+                        <div class="mb-3">
+                            <label class="form-label">Remarks</label>
+                            <textarea class="form-control"
+                                style=" float: left; width: 100%; margin-top: 6px; height:150px" formControlName="notes"
+                                placeholder="Write Notes.."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <div class="text-mid mb-3">
+        <button type="submit" class="btn btn-submit">Save Info</button>
+    </div>
+</form>

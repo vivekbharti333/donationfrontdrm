@@ -59,17 +59,18 @@ export class SigninComponent {
               expiredDate.setDate(expiredDate.getDate() + 1);
               this.cookieService.set('loginDetails', JSON.stringify(response['payload']), expiredDate);
 
-              this.cookieService.set('loginId', response['payload']['loginId'], expiredDate);
-              this.cookieService.set('firstName', response['payload']['firstName'], expiredDate);
-              this.cookieService.set('lastName', response['payload']['lastName'], expiredDate);
-              this.cookieService.set('roleType', response['payload']['roleType'], expiredDate);
-              this.cookieService.set('teamleaderId', response['payload']['teamleaderId'], expiredDate);
-              this.cookieService.set('superadminId', response['payload']['superadminId'], expiredDate);
-              this.cookieService.set('token', response['payload']['token'], expiredDate);
+              // this.cookieService.set('loginId', response['payload']['loginId'], expiredDate);
+              // this.cookieService.set('firstName', response['payload']['firstName'], expiredDate);
+              // this.cookieService.set('lastName', response['payload']['lastName'], expiredDate);
+              // this.cookieService.set('roleType', response['payload']['roleType'], expiredDate);
+              // this.cookieService.set('teamleaderId', response['payload']['teamleaderId'], expiredDate);
+              // this.cookieService.set('superadminId', response['payload']['superadminId'], expiredDate);
+              // this.cookieService.set('token', response['payload']['token'], expiredDate);
+
+            this.cookieService.set('loginDetails', JSON.stringify(response['payload']), expiredDate);
+            // this.router.navigate(['dashboard']);
               
 
-             
-              
               this.messageService.add({
                 summary: response['payload']['respCode'],
                 detail: response['payload']['respMesg'],

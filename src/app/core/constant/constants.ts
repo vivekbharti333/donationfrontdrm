@@ -10,13 +10,17 @@ export class Constant {
     public static superAdmin = 'SUPERADMIN';
     public static admin = 'ADMIN';
     public static teamLeader = 'TEAM_LEADER';
-    public static saleExecutive = 'SALE_EXECUTIVE';
+    public static fundraisingOfficer = 'FUNDRAISING_OFFICER';
+    public static donorExecutive = 'DONOR_EXECUTIVE';
 
     //Requested For
     public static TODAY = 'TODAY';
     public static YESTERDAY = 'YESTERDAY';
     public static MONTH = 'BYDATE';
     public static CUSTOM = 'CUSTOM'
+
+    //Service
+    public static donation = 'DONATION';
 
     //Code
     public static SUCCESS_CODE = 200;
@@ -25,6 +29,8 @@ export class Constant {
     public static INVALID_TOKEN_CODE = 401;
     public static ALREADY_EXISTS = 403;
     public static INTERNAL_SERVER_ERR = 500;
+
+
 
     public static ACTIVITY = 'ACTIVITY';
 
