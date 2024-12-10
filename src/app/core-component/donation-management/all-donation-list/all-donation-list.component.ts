@@ -103,7 +103,6 @@ export class AllDonationListComponent {
     this.getPaymentModeList();
     this.getFundrisingOfficerByTeamLeaderId();
     this.checkRoleType();
-    
   }
 
 
@@ -143,23 +142,23 @@ export class AllDonationListComponent {
   }
 
   public getDonationList(tabName: string) {
-    this.donationManagementService.getDonationList("TODAY").subscribe((apiRes: any) => {
+    this.donationManagementService.getDonationList(tabName).subscribe((apiRes: any) => {
       this.totalData = apiRes.totalNumber;
       // const stringRepresentation = JSON.stringify(apiRes);
       // const dataSize = stringRepresentation.length;
       this.pagination.tablePageSize.subscribe((res: tablePageSize) => {
         if (this.router.url == this.routes.allDonationList) {
-          this.getTableData({ skip: res.skip, limit: this.totalData }, 'ALL');
+          this.getTableData({ skip: res.skip, limit: this.totalData }, tabName);
           this.pageSize = res.pageSize;
         }
       });
     });
   }
 
-  private getTableData(pageOption: pageSelection, roleType: any): void {
+  private getTableData(pageOption: pageSelection, tabName: any): void {
     var api;
 
-    this.donationManagementService.getDonationList("TODAY").subscribe((apiRes: any) => {
+    this.donationManagementService.getDonationList(tabName).subscribe((apiRes: any) => {
       this.tableData = [];
       this.serialNumberArray = [];
       this.totalData = apiRes.totalNumber;

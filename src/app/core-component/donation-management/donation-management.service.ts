@@ -11,7 +11,6 @@ import { AuthenticationService } from 'src/app/auth/authentication.service';
 export class DonationManagementService {
 
   public loginUser: any;
-
   public details = false;
 
   constructor(

@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Component, Renderer2, ViewChild } from '@angular/core';
 import { CommonService, SidebarService, routes } from 'src/app/core/core.index';
+import { DashboardService } from '../dashboard.service';
+import { AuthenticationService } from 'src/app/auth/authentication.service';
 import {
   ChartComponent,
   ApexAxisChartSeries,
@@ -59,11 +61,33 @@ export class SalesDashboardComponent {
   @ViewChild('chart') chart!: ChartComponent;
   public chartOptionsOne: Partial<ChartOptions>;
 
+
+  public username!:string;
+  public loginUser: any;
+  public activeUserCount: any;
+  public inactiveUserCount: any;
+  public todaysCount: any;
+  public todaysAmount: any;
+  public yesterdayCount: any;
+  public yesterdayAmount: any;
+  public monthCount: any;
+  public monthAmount: any;
+
+  public currentMonthName!: string;
+  public FRToday: any;
+  public PaymentModeCountAmount: any;
+  public currencyType: any;
+
   constructor(
     private sidebar: SidebarService,
     private common: CommonService,
-    private renderer: Renderer2
+    private renderer: Renderer2,
+    private dashboardService: DashboardService,
+    private authenticationService: AuthenticationService,
   ) {
+
+    this.loginUser = this.authenticationService.getLoginUser();
+
     this.maxDate.setDate(this.maxDate.getDate() + 7);
     this.bsRangeValue = [this.bsValue, this.maxDate];
     this.chartOptionsOne = {
@@ -88,20 +112,7 @@ export class SalesDashboardComponent {
         curve: 'straight',
       },
       xaxis: {
-        categories: [
-          'Jan',
-          'Feb',
-          'Mar',
-          'Apr',
-          'May',
-          'Jun',
-          'Jul',
-          'Aug',
-          'Sep',
-          'Oct',
-          'Nov',
-          'Dec',
-        ],
+        categories: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec', ],
       },
       yaxis: {
         min: 10,
@@ -131,9 +142,156 @@ export class SalesDashboardComponent {
       this.renderer.addClass(document.body, 'date-picker-dashboard');
     }
   }
+
+
+  ngOnInit() {
+    this.username = this.loginUser['firstName']+" "+this.loginUser['lastName']
+    this.getCountAndSum();
+    this.getDonationCountAndAmountGroupByCurrency('TODAY');
+    this.getDonationCountAndAmountGroupByName('TODAY');
+    this.getDonationPaymentModeCountAndAmountGroupByName('TODAY');
+    // this.getDonationList('TODAY');
+    // this.getInvoiceTypeList();
+    // this.getDonationTypeList();
+    // this.getCurrencyDetailBySuperadmin();
+    // this.getPaymentModeList();
+    // this.getFundrisingOfficerByTeamLeaderId();
+    // this.checkRoleType();
+
+    const currentDate = new Date();
+    const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    this.currentMonthName = months[currentDate.getMonth()];
+    
+  }
+
+
+
+
   isCollapsed: boolean = false;
   toggleCollapse() {
     this.sidebar.toggleCollapse();
     this.isCollapsed = !this.isCollapsed;
   }
+
+
+  getCountAndSum() {
+    this.dashboardService.getCountAndSum()
+      .subscribe({
+        next: (response: any) => {
+          console.log("Response : "+response['payload']['todaysCount'])
+          if (response['responseCode'] == '200') {
+            if (response['payload']['respCode'] == '200') {
+               
+              this.activeUserCount = response['payload']['activeUserCount'];
+              this.inactiveUserCount = response['payload']['inactiveUserCount'];
+              this.todaysCount = response['payload']['todaysCount'];
+              this.todaysAmount = response['payload']['todaysAmount'];
+              this.yesterdayCount = response['payload']['yesterdayCount'];
+              this.yesterdayAmount = response['payload']['yesterdayAmount'];
+              this.monthCount = response['payload']['monthCount'];
+              this.monthAmount = response['payload']['monthAmount'];
+            } else {
+            }
+          } else {
+           // this.toastr.error(response['responseMessage'], response['responseCode']);
+          }
+        },
+        //error: (error: any) => this.toastr.error('Server Error', '500'),
+      });
+  }
+
+  getDonationCountAndAmountGroupByCurrency(tabName: string) {
+    this.currencyType= null;
+    this.dashboardService.getDonationCountAndAmountGroupByCurrency(tabName)
+      .subscribe({
+        next: (response: any) => {
+            if (response['responseCode'] == '200') {
+              let currency = response['listPayload'];
+              for(var i=0; i< currency.length; i++){
+                this.currencyType = currency;
+              }
+              // this.drawChart();
+            } else {
+              // this.toastr.error(response['payload']['respMesg'], response['payload']['respCode']);
+            }
+          // } else {
+          //   this.toastr.error(response['responseMessage'], response['responseCode']);
+          // }
+        },
+        //error: (error: any) => this.toastr.error('Server Error', '500'),
+      });
+  }
+
+  // getDonationCountAndAmountGroupByName(tabName: string) {
+  //   this.FRToday= null;
+  //   this.dashboardService.getDonationCountAndAmountGroupByName(tabName)
+  //     .subscribe({
+  //       next: (response: any) => {
+  //           if (response['responseCode'] == '200') {
+              
+  //             let frtoday = response['listPayload'];
+  //             for(var i=0; i< frtoday.length; i++){
+  //               this.FRToday = frtoday;
+  //             }
+  //           } else {  
+  //           }
+  //       },
+  //     });
+  // }
+
+  getDonationCountAndAmountGroupByName(tabName: string) {
+    this.dashboardService.getDonationCountAndAmountGroupByName(tabName).subscribe({
+      next: (response: any) => {
+        if (response['responseCode'] === 200) {
+          const listPayload = response['listPayload'];
+
+          // Group the data by the first element (name)
+          const groupedData = listPayload.reduce((acc: any, row: any[]) => {
+            const key = row[0]; // Extract the name (first element)
+            if (!acc[key]) {
+              acc[key] = []; // Initialize array for this name if it doesn't exist
+            }
+            acc[key].push(row); // Add the row to the corresponding group
+            return acc;
+          }, {});
+
+          // Assign grouped data to FRToday for display in the template
+          this.FRToday = groupedData;
+          console.log("jkh : "+JSON.stringify(this.FRToday));
+        } else {
+          console.error("Error: Response code is not 200");
+        }
+      },
+      error: (err) => {
+        console.error("Error while fetching data:", err);
+      }
+    });
+  }
+
+
+
+  getDonationPaymentModeCountAndAmountGroupByName(tabName: string) {
+    this.PaymentModeCountAmount = null;
+    this.dashboardService.getDonationPaymentModeCountAndAmountGroupByName(tabName)
+      .subscribe({
+        next: (response: any) => {
+            if (response['responseCode'] == '200') {
+              let paymentDetails = response['listPayload'];
+              for(var i=0; i< paymentDetails.length; i++){
+                this.PaymentModeCountAmount = paymentDetails;
+              }
+
+              // this.drawChart();
+
+            } else {
+              // this.toastr.error(response['payload']['respMesg'], response['payload']['respCode']);
+            }
+          // } else {
+          //   this.toastr.error(response['responseMessage'], response['responseCode']);
+          // }
+        },
+       // error: (error: any) => this.toastr.error('Server Error', '500'),
+      });
+  }
+
 }
