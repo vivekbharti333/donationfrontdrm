@@ -74,8 +74,11 @@ export class SalesDashboardComponent {
   public monthAmount: any;
 
   public currentMonthName!: string;
-  public FRToday: any;
-  public PaymentModeCountAmount: any;
+  public FRToday: any = {};
+  public objectKeys = Object.keys;
+
+  public objectKeys1 = Object.keys;
+  public PaymentModeCountAmount: any = {};
   public currencyType: any;
 
   constructor(
@@ -93,8 +96,9 @@ export class SalesDashboardComponent {
     this.chartOptionsOne = {
       series: [
         {
-          name: 'Sales Analysis',
-          data: [25, 30, 18, 15, 22, 20, 30, 20, 22, 18, 15, 20],
+          name: 'Donation Analysis',
+          // data: [25, 30, 18, 15, 22, 20, 30, 20, 22, 18, 15, 20],
+          data: [25, 30, 18, 15, 22, 20, 30, 0, 0, 0, 0, 0],
         },
       ],
       chart: {
@@ -240,11 +244,12 @@ export class SalesDashboardComponent {
   // }
 
   getDonationCountAndAmountGroupByName(tabName: string) {
+    this.FRToday= {};
     this.dashboardService.getDonationCountAndAmountGroupByName(tabName).subscribe({
       next: (response: any) => {
         if (response['responseCode'] === 200) {
           const listPayload = response['listPayload'];
-
+  
           // Group the data by the first element (name)
           const groupedData = listPayload.reduce((acc: any, row: any[]) => {
             const key = row[0]; // Extract the name (first element)
@@ -254,10 +259,9 @@ export class SalesDashboardComponent {
             acc[key].push(row); // Add the row to the corresponding group
             return acc;
           }, {});
-
+  
           // Assign grouped data to FRToday for display in the template
           this.FRToday = groupedData;
-          console.log("jkh : "+JSON.stringify(this.FRToday));
         } else {
           console.error("Error: Response code is not 200");
         }
@@ -269,29 +273,65 @@ export class SalesDashboardComponent {
   }
 
 
+  // getDonationPaymentModeCountAndAmountGroupByName(tabName: string) {
+  //   this.PaymentModeCountAmount = null;
+  //   this.dashboardService.getDonationPaymentModeCountAndAmountGroupByName(tabName)
+  //     .subscribe({
+  //       next: (response: any) => {
+  //           if (response['responseCode'] == '200') {
+  //             let paymentDetails = response['listPayload'];
+  //             for(var i=0; i< paymentDetails.length; i++){
+  //               this.PaymentModeCountAmount = paymentDetails;
+  //             }
+  //           } else {
+  //             // this.toastr.error(response['payload']['respMesg'], response['payload']['respCode']);
+  //           }
+  //         // } else {
+  //         //   this.toastr.error(response['responseMessage'], response['responseCode']);
+  //         // }
+  //       },
+  //      // error: (error: any) => this.toastr.error('Server Error', '500'),
+  //     });
+  // }
 
   getDonationPaymentModeCountAndAmountGroupByName(tabName: string) {
-    this.PaymentModeCountAmount = null;
+    this.PaymentModeCountAmount = {}; // Initialize as an empty object
     this.dashboardService.getDonationPaymentModeCountAndAmountGroupByName(tabName)
-      .subscribe({
-        next: (response: any) => {
-            if (response['responseCode'] == '200') {
-              let paymentDetails = response['listPayload'];
-              for(var i=0; i< paymentDetails.length; i++){
-                this.PaymentModeCountAmount = paymentDetails;
-              }
+        .subscribe({
+            next: (response: any) => {
+             
+                // if (response['responseCode'] === 200) {
+                    const listPayload = response['listPayload'];
 
-              // this.drawChart();
+                    // Grouping data by the first element (payment mode)
+                    const groupedData = listPayload.reduce((acc: any, row: any[]) => {
+                        const key = row[0]; // Extract the payment mode (first element)
 
-            } else {
-              // this.toastr.error(response['payload']['respMesg'], response['payload']['respCode']);
+                        if (!acc[key]) {
+                            acc[key] = []; // Initialize array for this payment mode if it doesn't exist
+                        }
+
+                        // Push the remaining data (starting from index 1) to the respective group
+                        acc[key].push(row.slice(1));
+
+                        return acc;
+                    }, {});
+
+                    // Now assign the grouped data to PaymentModeCountAmount
+                    this.PaymentModeCountAmount = groupedData;
+
+                    // For debugging, check the structure of grouped data
+                    
+                // } else {
+                //     alert('Error: ' + response['responseMessage']);
+                // }
+            },
+            error: (error: any) => {
+                console.error('Server Error', error);
             }
-          // } else {
-          //   this.toastr.error(response['responseMessage'], response['responseCode']);
-          // }
-        },
-       // error: (error: any) => this.toastr.error('Server Error', '500'),
-      });
-  }
+        });
+}
+
+  
 
 }

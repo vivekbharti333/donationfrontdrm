@@ -127,7 +127,6 @@ export class AllDonationListComponent {
   }
 
   checkRoleType(){
-    console.log("user role : "+this.loginUser['roleType']);
     if(this.loginUser['roleType'] == Constant.mainAdmin){
       this.isMainAdmin = true;
     }else if(this.loginUser['roleType'] == Constant.superAdmin){

@@ -7,6 +7,7 @@ import { CommonComponentService } from '../common-component.service';
 import { AuthenticationService } from 'src/app/auth/authentication.service';
 import { CookieService } from 'ngx-cookie-service';
 
+
 @Component({
   selector: 'app-header',
   templateUrl: './header.component.html',
@@ -43,6 +44,7 @@ export class HeaderComponent  {
     private authenticationService: AuthenticationService,
     private cookieService: CookieService,
   ) {
+
     this.activePath = this.router.url.split('/')[2];
     this.router.events.subscribe((data: RouterEvent) => {
       if (data instanceof NavigationStart) {
@@ -106,10 +108,12 @@ export class HeaderComponent  {
   }
 
   public getApplicaionHeaderDetails() {
-    let firstName = this.cookieService.get('firstName');
-    let lastName = this.cookieService.get('lastName');
+    let firstName = this.loginUser['firstName'];
+    let lastName = this.loginUser['lastName'];
     this.userName = firstName+" "+lastName
-    this.userRole = this.cookieService.get('roleType');
+    this.userRole = this.loginUser['roleType'];
+
+
 
     //  this.displayLogo =localStorage.getItem('displayLogo');
     //  this.userPicture = 'data:image/jpeg;base64,'+localStorage.getItem('userPicture');

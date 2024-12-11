@@ -52,8 +52,8 @@ export class SigninComponent {
               this.getApplicaionHeaderDetails();
               let permission = response['payload']['permissions'];
               localStorage.setItem('menuPermission', JSON.stringify(permission));
-              localStorage.setItem('userPicture', JSON.stringify(response['payload']['userPicture']));
-              
+              localStorage.setItem('userPicture', (response['payload']['userPicture']));
+
               // Get a cookie
               let expiredDate = new Date();
               expiredDate.setDate(expiredDate.getDate() + 1);
@@ -76,7 +76,7 @@ export class SigninComponent {
                 detail: response['payload']['respMesg'],
                 styleClass: 'success-background-popover',
               });
-              this.router.navigate([routes.adminDashboard]);
+              this.router.navigate([routes.salesDashboard]);
             } else {
               this.messageService.add({
                 summary: response['payload']['respCode'],

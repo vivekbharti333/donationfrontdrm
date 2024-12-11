@@ -44,6 +44,17 @@ export class UserManagementService {
     return  this.http.post<any>(Constant.Site_Url+"getUserDetails",request);
   }
 
+  getUserDetailsByLoginId(): Observable<any> {
+    let request: any = {
+      payload: {
+        token:  this.loginUser['token'],
+        loginId: this.loginUser['loginId'],
+        superadminId:  this.loginUser['superadminId'],
+      }
+    };
+    return  this.http.post<any>(Constant.Site_Url+"getUserDetailsByLoginId",request);
+  }
+
   getUserDetailsByRoleType(roleType:any): Observable<any> {
     // this.loginUser = JSON.parse(this.cookieService.get('loginDetails'));
     let request: any = {

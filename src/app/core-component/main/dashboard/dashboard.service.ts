@@ -59,7 +59,7 @@ export class DashboardService {
         superadminId: this.loginUser['superadminId'],
       }
     };
-    return  this.http.post<any>(Constant.Site_Url+"getDonationCountAndAmountGroupByNameNew",request);
+    return  this.http.post<any>(Constant.Site_Url+"getDonationCountAndAmountGroupByName",request);
   }
 
   getDonationPaymentModeCountAndAmountGroupByName(tabName:string){
@@ -77,4 +77,6 @@ export class DashboardService {
     };
     return  this.http.post<any>(Constant.Site_Url+"getDonationPaymentModeCountAndAmountGroupByName",request);
   }
+
+
 }

@@ -14,15 +14,15 @@
             <div class="profile-top">
                 <div class="profile-content">
                     <div class="profile-contentimg">
-                        <img src="assets/img/customer/customer5.jpg" alt="img" id="blah">
+                        <img src="data:image/png;base64,{{userDetails.userPicture}}" height="300" width="350" alt="img" id="blah">
                         <div class="profileupload">
                             <input type="file" id="imgInp">
                             <a href="javascript:void(0);"><img src="assets/img/icons/edit-set.svg" alt="img"></a>
                         </div>
                     </div>
                     <div class="profile-contentname">
-                        <h2>William Castillo</h2>
-                        <h4>Updates Your Photo and Personal Details.</h4>
+                        <h2>{{userDetails['firstName']}} {{userDetails['lastName']}}</h2>
+                        <h4>This is Your Photo and Personal Details.</h4>
                     </div>
                 </div>
             </div>
@@ -31,47 +31,50 @@
             <div class="col-lg-6 col-sm-12">
                 <div class="input-blocks">
                     <label class="form-label">First Name</label>
-                    <input type="text" class="form-control" value="William">
+                    <input type="text" class="form-control" value="{{userDetails['firstName']}}" readonly>
                 </div>
             </div>
             <div class="col-lg-6 col-sm-12">
                 <div class="input-blocks">
                     <label class="form-label">Last Name</label>
-                    <input type="text" class="form-control" value="Castilo">
+                    <input type="text" class="form-control" value="{{userDetails['lastName']}}" readonly>
                 </div>
             </div>
             <div class="col-lg-6 col-sm-12">
                 <div class="input-blocks">
                     <label>Email</label>
-                    <input type="email" class="form-control" value="william@example.com">
+                    <input type="email" class="form-control" value="{{userDetails['emailId']}}" readonly>
                 </div>
             </div>
             <div class="col-lg-6 col-sm-12">
                 <div class="input-blocks">
                     <label class="form-label">Phone</label>
-                    <input type="text" value="+1452 876 5432">
+                    <input type="text"  class="form-control" value="{{userDetails['mobileNo']}}" readonly>
                 </div>
             </div>
             <div class="col-lg-6 col-sm-12">
                 <div class="input-blocks">
-                    <label class="form-label">User Name</label>
-                    <input type="text" class="form-control" value="William Castilo">
+                    <label class="form-label">Role</label>
+                    <input type="text" class="form-control" value="{{userDetails['roleType']}}" readonly>
                 </div>
             </div>
             <div class="col-lg-6 col-sm-12">
                 <div class="input-blocks">
-                    <label class="form-label">Password</label>
-                    <div class="pass-group">
+                    
+                    <label class="form-label">Team Leader</label>
+                    <input type="text" class="form-control" value="{{userDetails['teamLeaderId']}}" readonly>
+                    
+                    <!-- <div class="pass-group">
                         <input [type]="password[1] ? 'text' : 'password' " class="pass-input form-control">
                         <span class="fas toggle-password" [ngClass]=" password[1] ? 'fa-eye' : 'fa-eye-slash'"
                             (click)="togglePassword(1)"></span>
-                    </div>
+                    </div> -->
                 </div>
             </div>
-            <div class="col-12">
+            <!-- <div class="col-12">
                 <a href="javascript:void(0);" class="btn btn-submit me-2">Submit</a>
                 <a href="javascript:void(0);" class="btn btn-cancel">Cancel</a>
-            </div>
+            </div> -->
         </div>
     </div>
 </div>
