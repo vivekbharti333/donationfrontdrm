@@ -149,6 +149,7 @@ export class SalesDashboardComponent {
 
 
   ngOnInit() {
+    console.log("this.loginUser "+this.loginUser['lastName'] );
     this.username = this.loginUser['firstName']+" "+this.loginUser['lastName']
     this.getCountAndSum();
     this.getDonationCountAndAmountGroupByCurrency('TODAY');
