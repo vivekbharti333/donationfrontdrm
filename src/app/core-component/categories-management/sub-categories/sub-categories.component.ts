@@ -275,10 +275,8 @@ export class SubCategoriesComponent {
       createdAt: rowDate[10],
       status: rowDate[9],
     };
-    console.log('rowData+++++', rowDate, this.editSubCategory);
     this.editSubCategoryDialog = this.dialog.open(templateRef);
     setTimeout(() => {
-      console.log('++++Item', this.superCategoryList);
     }, 1000);
     // this.categoryType.categoryTypeName = rowDate.categoryTypeName;
     // this.categoryType.status = rowDate.status; // Assign the value to user.firstName

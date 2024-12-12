@@ -13,6 +13,8 @@ import { MatTabsModule} from '@angular/material/tabs';
 import { MatIconModule } from '@angular/material/icon';
 import { CalendarModule } from 'primeng/calendar';
 
+import { MessageService } from 'primeng/api';
+
 
 @NgModule({
   declarations: [
@@ -30,7 +32,8 @@ import { CalendarModule } from 'primeng/calendar';
     MatDialogModule,
     MatTabsModule,
     MatIconModule,
-    CalendarModule
-  ]
+    CalendarModule,
+    
+  ], providers: [MessageService],
 })
 export class ProgramManagementModule { }

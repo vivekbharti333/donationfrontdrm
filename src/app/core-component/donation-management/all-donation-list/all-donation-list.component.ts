@@ -41,6 +41,8 @@ export class AllDonationListComponent {
   public selectedLoginId: string | null = null;
   public donationReceiptId : any;
 
+  public tabName: any;
+
   public loginUser: any;
   public isMainAdmin: boolean = false;
   public isSuperadmin: boolean = false;
@@ -141,6 +143,7 @@ export class AllDonationListComponent {
   }
 
   public getDonationList(tabName: string) {
+    this.tabName = tabName;
     this.donationManagementService.getDonationList(tabName).subscribe((apiRes: any) => {
       this.totalData = apiRes.totalNumber;
       // const stringRepresentation = JSON.stringify(apiRes);
@@ -323,6 +326,30 @@ export class AllDonationListComponent {
       });
   }
 
-  updateDonationDetails(){}
+  updateDonationDetails(){
+    this.donationManagementService.updateDonationDetails(this.editDonationForm.value)
+      .subscribe({
+        next: (response: any) => {
+          if (response['responseCode'] == '200') {
+            if (response['payload']['respCode'] == '200') {
+              // console.log("ok hai")
+              // this.toastr.success(response['payload']['respMesg'], response['payload']['respCode']);
+              this.editDonationForm.reset();
+              this.getDonationList(this.tabName);
+              // this.setValueInForm();
+              // this.isLoading = false;
+            } else {
+              // this.toastr.error(response['payload']['respMesg'], response['payload']['respCode']);
+              // this.isLoading = false;
+            }
+          } else {
+            // this.toastr.error(response['responseMessage'], response['responseCode']);
+            // this.isLoading = false;
+          }
+        },
+        // error: (error: any) => this.toastr.error('Server Error', '500'),
+        
+      });
+  }
 
 }

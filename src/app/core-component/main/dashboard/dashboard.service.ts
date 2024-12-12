@@ -3,6 +3,7 @@ import { Observable } from 'rxjs';
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Constant } from 'src/app/core/constant/constants';
 import { AuthenticationService } from 'src/app/auth/authentication.service';
+import { CookieService } from 'ngx-cookie-service';
 
 @Injectable({
   providedIn: 'root'
@@ -15,6 +16,7 @@ export class DashboardService {
   constructor(
     private http: HttpClient,
     private authenticationService: AuthenticationService,
+    private cookieService: CookieService,
   ) {
     this.loginUser = this.authenticationService.getLoginUser();
   }
@@ -25,11 +27,10 @@ export class DashboardService {
 
     let request: any = {
       payload: {
-
-        roleType: this.loginUser['roleType'],
-        token: this.loginUser['token'],
-        createdBy: this.loginUser['loginId'],
-        superadminId: this.loginUser['superadminId'],
+        roleType: this.cookieService.get('roleType'),
+        token: this.cookieService.get('token'),
+        createdBy: this.cookieService.get('loginId'),
+        superadminId: this.cookieService.get('superadminId'),
       }
     };
     return this.http.post<any>(Constant.Site_Url + "getCountAndSum", request);
@@ -39,11 +40,10 @@ export class DashboardService {
     let request: any = {
       payload: {
         requestedFor: tabName,
-        // requestedFor: 'YESTERDAY',
-        roleType: this.loginUser['roleType'],
-        token: this.loginUser['token'],
-        createdBy: this.loginUser['loginId'],
-        superadminId: this.loginUser['superadminId'],
+        roleType: this.cookieService.get('roleType'),
+        token: this.cookieService.get('token'),
+        createdBy: this.cookieService.get('loginId'),
+        superadminId: this.cookieService.get('superadminId'),
       }
     };
     return  this.http.post<any>(Constant.Site_Url+"getDonationCountAndAmountGroupByCurrency",request);
@@ -53,10 +53,10 @@ export class DashboardService {
     let request: any = {
       payload: {
         requestedFor: tabName,
-        roleType: this.loginUser['roleType'],
-        token: this.loginUser['token'],
-        createdBy: this.loginUser['loginId'],
-        superadminId: this.loginUser['superadminId'],
+        roleType: this.cookieService.get('roleType'),
+        token: this.cookieService.get('token'),
+        createdBy: this.cookieService.get('loginId'),
+        superadminId: this.cookieService.get('superadminId'),
       }
     };
     return  this.http.post<any>(Constant.Site_Url+"getDonationCountAndAmountGroupByName",request);
@@ -69,10 +69,10 @@ export class DashboardService {
     let request: any = {
       payload: {
         requestedFor: tabName,
-        roleType: this.loginUser['roleType'],
-        token: this.loginUser['token'],
-        createdBy: this.loginUser['loginId'],
-        superadminId: this.loginUser['superadminId'],
+        roleType: this.cookieService.get('roleType'),
+        token: this.cookieService.get('token'),
+        createdBy: this.cookieService.get('loginId'),
+        superadminId: this.cookieService.get('superadminId'),
       }
     };
     return  this.http.post<any>(Constant.Site_Url+"getDonationPaymentModeCountAndAmountGroupByName",request);

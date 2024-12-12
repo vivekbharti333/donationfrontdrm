@@ -3,6 +3,7 @@ import { Component, Renderer2, ViewChild } from '@angular/core';
 import { CommonService, SidebarService, routes } from 'src/app/core/core.index';
 import { DashboardService } from '../dashboard.service';
 import { AuthenticationService } from 'src/app/auth/authentication.service';
+import { CookieService } from 'ngx-cookie-service';
 import {
   ChartComponent,
   ApexAxisChartSeries,
@@ -87,6 +88,7 @@ export class SalesDashboardComponent {
     private renderer: Renderer2,
     private dashboardService: DashboardService,
     private authenticationService: AuthenticationService,
+    private cookieService: CookieService
   ) {
 
     this.loginUser = this.authenticationService.getLoginUser();
@@ -149,8 +151,7 @@ export class SalesDashboardComponent {
 
 
   ngOnInit() {
-    console.log("this.loginUser "+this.loginUser['lastName'] );
-    this.username = this.loginUser['firstName']+" "+this.loginUser['lastName']
+    this.username = this.cookieService.get('firstName')+" "+this.cookieService.get('lastName');
     this.getCountAndSum();
     this.getDonationCountAndAmountGroupByCurrency('TODAY');
     this.getDonationCountAndAmountGroupByName('TODAY');
@@ -183,7 +184,6 @@ export class SalesDashboardComponent {
     this.dashboardService.getCountAndSum()
       .subscribe({
         next: (response: any) => {
-          console.log("Response : "+response['payload']['todaysCount'])
           if (response['responseCode'] == '200') {
             if (response['payload']['respCode'] == '200') {
                

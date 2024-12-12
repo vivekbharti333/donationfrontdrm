@@ -108,18 +108,16 @@ export class HeaderComponent  {
   }
 
   public getApplicaionHeaderDetails() {
-    let firstName = this.loginUser['firstName'];
-    let lastName = this.loginUser['lastName'];
+    let firstName = this.cookieService.get('firstName');
+    let lastName =  this.cookieService.get('lastName');
     this.userName = firstName+" "+lastName
-    this.userRole = this.loginUser['roleType'];
+    this.userRole =  this.cookieService.get('roleType');
 
 
 
     //  this.displayLogo =localStorage.getItem('displayLogo');
     //  this.userPicture = 'data:image/jpeg;base64,'+localStorage.getItem('userPicture');
     this.userPicture = localStorage.getItem('userPicture') || '';
-
-     console.log(this.userPicture);
   }
 
   logOut() {
@@ -132,6 +130,7 @@ export class HeaderComponent  {
     this.cookieService.delete('teamleaderId');
     this.cookieService.delete('superadminId');
     this.cookieService.delete('token');
+    this.cookieService.delete('userDetails');
 
     // Remove 'displayLogo' from localStorage
     localStorage.removeItem('displayLogo');

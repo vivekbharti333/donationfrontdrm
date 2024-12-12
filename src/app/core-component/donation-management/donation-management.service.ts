@@ -4,6 +4,7 @@ import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Constant } from 'src/app/core/constant/constants'; 
 import { DonationDetailsRequest, DonationDetails } from '../interface/donation-management';
 import { AuthenticationService } from 'src/app/auth/authentication.service';
+import { CookieService } from 'ngx-cookie-service';
 
 @Injectable({
   providedIn: 'root'
@@ -16,6 +17,7 @@ export class DonationManagementService {
   constructor(
     private http: HttpClient,
     private authenticationService: AuthenticationService,
+    private cookieService: CookieService
   ) {
     this.loginUser = this.authenticationService.getLoginUser();
   }
@@ -25,10 +27,10 @@ export class DonationManagementService {
     let request: DonationDetailsRequest = {
       payload: {
         requestedFor: "OPTION",
-        roleType: this.loginUser['roleType'],
-        token: this.loginUser['token'],
-        loginId: this.loginUser['loginId'],
-        superadminId: this.loginUser['superadminId'],
+        roleType: this.cookieService.get('roleType'),
+        loginId: this.cookieService.get('userId'),
+        token: this.cookieService.get('token'),
+        superadminId: this.cookieService.get('superadminId'),
       }
     };
     return this.http.post<DonationDetailsRequest>(Constant.Site_Url + "getFundRisingOfficersBySuperadminId", request);
@@ -61,11 +63,10 @@ export class DonationManagementService {
         paymentMode: donationDetails.paymentMode,
         notes: donationDetails.notes,
         paymentType: 'OFFLINE',
-        roleType: this.loginUser['roleType'],
-        token: this.loginUser['token'],
-        loginId: this.loginUser['loginId'],
-        // loginId: createdBy,
-        superadminId: this.loginUser['superadminId'],
+        roleType: this.cookieService.get('roleType'),
+        loginId: this.cookieService.get('userId'),
+        token: this.cookieService.get('token'),
+        superadminId: this.cookieService.get('superadminId'),
 
       }
     };
@@ -78,12 +79,41 @@ export class DonationManagementService {
     let request: DonationDetailsRequest = {
       payload: {
         requestedFor: tabName,
-        token: this.loginUser['token'],
-        createdBy: this.loginUser['loginId'],
-        superadminId: this.loginUser['superadminId'],
-        roleType: this.loginUser['roleType'],
+        roleType: this.cookieService.get('roleType'),
+        createdBy: this.cookieService.get('userId'),
+        token: this.cookieService.get('token'),
+        superadminId: this.cookieService.get('superadminId'),
       }
     };
     return this.http.post<DonationDetailsRequest>(Constant.Site_Url + "getDonationList", request);
   }
+
+  updateDonationDetails(donationDetails: DonationDetails): Observable<DonationDetailsRequest> {
+    let request: DonationDetailsRequest = {
+      payload: {
+        id: donationDetails.id,
+        invoiceHeaderDetailsId: donationDetails.invoiceHeaderDetailsId,
+        donorName: donationDetails.donorName,
+        mobileNumber: donationDetails.mobileNumber,
+        emailId: donationDetails.emailId,
+        address: donationDetails.address,
+        panNumber: donationDetails.panNumber,
+        programName: donationDetails.programName,
+        amount: donationDetails.amount,
+        transactionId: donationDetails.transactionId,
+        paymentMode: donationDetails.paymentMode,
+        notes: donationDetails.notes,
+        paymentType: 'OFFLINE',
+        roleType: this.cookieService.get('roleType'),
+        createdBy: this.cookieService.get('userId'),
+        token: this.cookieService.get('token'),
+        superadminId: this.cookieService.get('superadminId'),
+      }
+    };
+  
+    // Ensure the function returns the Observable
+    return this.http.post<DonationDetailsRequest>(Constant.Site_Url + "updateDonation", request);
+  }
+ 
+
 }
