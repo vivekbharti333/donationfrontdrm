@@ -10,9 +10,7 @@ const routes: Routes = [
   {
     path: '',
     loadChildren: () =>
-      import('./core-component/core-component.module').then(
-        (m) => m.CoreComponentModule
-      ),
+      import('./core-component/core-component.module').then((m) => m.CoreComponentModule),
   },
   {
     path: '',
@@ -21,16 +19,14 @@ const routes: Routes = [
   {
     path: 'error-pages',
     loadChildren: () =>
-      import('./error-pages/error-pages.module').then(
-        (m) => m.ErrorPagesModule
-      ),
+      import('./error-pages/error-pages.module').then((m) => m.ErrorPagesModule),
   },
 
-  // {
-  //   path: '**',
-  //   redirectTo: 'errorpages/error404',
-  //   pathMatch: 'full',
-  // },
+  {
+    path: '**',
+    redirectTo: 'error-pages/error404',
+    pathMatch: 'full',
+  },
 ];
 
 @NgModule({

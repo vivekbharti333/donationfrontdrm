@@ -1,10 +1,11 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { RouterModule, Routes } from '@angular/router';
 import { ReceiptManagementComponent } from './receipt-management.component';
 import { AddReceiptHeaderComponent } from './add-receipt-header/add-receipt-header.component'; 
 import { ReceiptHeaderListComponent } from './receipt-header-list/receipt-header-list.component'; 
-import { AuthGuard } from 'src/app/core/core.index';
+import { DownloadReceiptComponent } from './download-receipt/download-receipt.component';
+
+
 
 const routes: Routes = [
   {
@@ -19,6 +20,11 @@ const routes: Routes = [
         path: 'receipt-header-list',
         component: ReceiptHeaderListComponent,
       },
+      {
+        path: 'receipt',
+        component: DownloadReceiptComponent,
+      },
+      
     ],
   },
 ];

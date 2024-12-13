@@ -19,6 +19,9 @@ import { ComingSoonComponent } from './coming-soon/coming-soon.component';
     BlankPageComponent,
     ComingSoonComponent
   ],
-  imports: [CommonModule, PagesRoutingModule, sharedModule],
+  imports: [
+    PagesRoutingModule, 
+    CommonModule, 
+    sharedModule],
 })
 export class PagesModule {}

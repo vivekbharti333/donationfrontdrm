@@ -70,6 +70,13 @@ const routes: Routes = [
         loadChildren: () =>
           import('./pages/pages.module').then((m) => m.PagesModule),
       },
+
+      {
+        path: 'receipt-management',
+        loadChildren: () =>
+          import('./receipt-management/receipt-management.module').then((m) => m.ReceiptManagementModule),
+      },
+
       {
         path: 'dashboard',
         loadChildren: () =>
@@ -112,13 +119,13 @@ const routes: Routes = [
             (m) => m.CurrencyManagementModule
           ),
       },
-      {
-        path: 'receipt-management',
-        loadChildren: () =>
-          import('./receipt-management/receipt-management.module').then(
-            (m) => m.ReceiptManagementModule
-          ),
-      },
+      // {
+      //   path: 'receipt-management',
+      //   loadChildren: () =>
+      //     import('./receipt-management/receipt-management.module').then(
+      //       (m) => m.ReceiptManagementModule
+      //     ),
+      // },
       {
         path: 'lead-management',
         loadChildren: () =>

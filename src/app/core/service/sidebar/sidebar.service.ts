@@ -210,6 +210,11 @@ export class SidebarService {
               route: routes.receiptHeaderList,
               permission: 'receipt-header-list',
             }, 
+            {
+              menuValue: 'Receipt',
+              route: routes.receipt,
+              permission: 'receipt-header-list',
+            }, 
           ],
         },
         {

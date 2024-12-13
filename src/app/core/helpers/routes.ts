@@ -992,7 +992,7 @@ export class routes {
     return this.currencyManagement + '/currency';
   }
 
-  //Currency Management
+  //Receipt Management
   public static get receiptManagement(): string {
     return this.core + '/receipt-management';
   }
@@ -1001,6 +1001,9 @@ export class routes {
   }
   public static get receiptHeaderList(): string {
     return this.receiptManagement + '/receipt-header-list';
+  }
+  public static get receipt(): string {
+    return this.receiptManagement + '/receipt';
   }
   
   
