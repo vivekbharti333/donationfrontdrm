@@ -1760,9 +1760,16 @@ body .dark .page-wrapper-new {
   background-color: #141432;
 }
 
-.dark-select .login-wrapper.bg-img .login-content {
-  background: #092C4C;
-  opacity: 0.9;
+// .dark-select .login-wrapper.bg-img .login-content {
+//   background: #092C4C;
+//   opacity: 0.9;
+// }
+
+.login-wrapper.bg-img {
+  background-image: url(assets/img/login.png);
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center
 }
 
 .dark-select .login-wrapper .login-content .login-logo {
