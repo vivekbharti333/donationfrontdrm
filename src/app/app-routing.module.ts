@@ -19,14 +19,15 @@ const routes: Routes = [
   {
     path: 'error-pages',
     loadChildren: () =>
-      import('./error-pages/error-pages.module').then((m) => m.ErrorPagesModule),
+      import('./error-pages/error-pages.module').then((m) => m.ErrorPagesModule
+      ),
   },
 
-  {
-    path: '**',
-    redirectTo: 'error-pages/error404',
-    pathMatch: 'full',
-  },
+  // {
+  //   path: '**',
+  //   redirectTo: 'errorpages/error404',
+  //   pathMatch: 'full',
+  // },
 ];
 
 @NgModule({

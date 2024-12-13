@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { CoreComponentComponent } from './core-component.component';
-
+import { AuthGuard } from '../core/core.index'; 
 const routes: Routes = [
   {
     path: '',
@@ -75,6 +75,7 @@ const routes: Routes = [
         path: 'receipt-management',
         loadChildren: () =>
           import('./receipt-management/receipt-management.module').then((m) => m.ReceiptManagementModule),
+        canActivate: [AuthGuard],
       },
 
       {
