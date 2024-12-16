@@ -28,7 +28,8 @@ export class DonationManagementService {
       payload: {
         requestedFor: "OPTION",
         roleType: this.cookieService.get('roleType'),
-        loginId: this.cookieService.get('userId'),
+        createdBy: this.cookieService.get('loginId'),
+        loginId: this.cookieService.get('loginId'),
         token: this.cookieService.get('token'),
         superadminId: this.cookieService.get('superadminId'),
       }
@@ -64,7 +65,7 @@ export class DonationManagementService {
         notes: donationDetails.notes,
         paymentType: 'OFFLINE',
         roleType: this.cookieService.get('roleType'),
-        loginId: this.cookieService.get('userId'),
+        loginId: this.cookieService.get('loginId'),
         token: this.cookieService.get('token'),
         superadminId: this.cookieService.get('superadminId'),
 

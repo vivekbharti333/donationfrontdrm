@@ -81,24 +81,23 @@
           <div class="col-lg-3 col-sm-6 col-12">
             <div class="input-blocks">
               <i class="feather icon-user info-img"></i>
-              <!-- <mat-select [(ngModel)]="selectedValue3" [ngModelOptions]="{ standalone: true }"
-                  class="space-select select" placeholder="Choose Name">
-                  <mat-option value="Choose Name">Choose Name</mat-option>
-                  <mat-option value="Lilly">Lilly</mat-option>
-                  <mat-option value="Benjamin">Benjamin</mat-option>
-                </mat-select> -->
+              <mat-select class="space-select select" placeholder="Choose User" (selectionChange)="getDonationListByUser($event)">
+                <!-- <mat-option value="Choose Name">Choose Name</mat-option> -->
+                <mat-option *ngFor="let user of userList" [value]="user.loginId">
+                  {{user.firstName}} {{user.lastName}}
+                </mat-option>
+              </mat-select>
+                 
             </div>
           </div>
           <div class="col-lg-3 col-sm-6 col-12">
             <div class="input-blocks">
               <i class="feather icon-stop-circle info-img"></i>
-              <!-- <mat-select [(ngModel)]="selectedValue4" [ngModelOptions]="{ standalone: true }"
-                  class="space-select select" placeholder="Select User Role" (selectionChange)="onRoleTypeChange($event)">
-                  <mat-option value="ALL">ALL</mat-option>
-                  <mat-option *ngFor="let data of roleTypes" [value]="data.name">
-                    {{ data.name }}
-                  </mat-option>
-                </mat-select> -->
+              <mat-select class="space-select select"  placeholder="Choose Teamleader" (selectionChange)="getDonationListByUser($event)">
+                <mat-option *ngFor="let teamLeader of teamLeaderList" [value]="teamLeader.loginId">
+                  {{teamLeader.firstName}} {{teamLeader.lastName}}
+                </mat-option>
+              </mat-select>
 
               <!-- <mat-select name="gender" [(ngModel)]="user.gender" [ngModelOptions]="{standalone: true}" class="select"  placeholder="Choose Status" (selectionChange)="onGenderChange($event)">
                     <mat-option *ngFor="let data of genderType" [value]="data.name">
@@ -133,7 +132,7 @@
 
     <mat-tab-group>
       <mat-tab>
-        <!-- <ng-template mat-tab-label> Today's </ng-template> -->
+        
         <ng-template mat-tab-label>
           <span (click)="getDonationList('TODAY')" style="cursor: pointer;">Today's</span>
         </ng-template>
@@ -147,10 +146,10 @@
                 <th mat-sort-header="role">Payment Mode</th>
                 <th mat-sort-header="createdOn">Received By</th>
                 <th mat-sort-header="invoiceFor">Invoice For</th>
-                <th mat-sort-header="program">Program</th>
+                <!-- <th mat-sort-header="program">Program</th>
                 <th mat-sort-header="date&Time">Date & Time</th>
-                <th mat-sort-header="invoiceNumber">Invoice Number</th>
-                <th mat-sort-header="invoiceDownload">Invoice Download</th>
+                <th mat-sort-header="invoiceNumber">Invoice Number</th>-->
+                <th mat-sort-header="invoiceDownload">Invoice Download</th> 
                 <th class="no-sort">Action</th>
               </tr>
             </thead>
@@ -163,11 +162,11 @@
                 <td>{{ data.paymentMode }}</td>
                 <td>{{ data.createdbyName }}</td>
                 <td>{{ data.invoiceHeaderName }}</td>
-                <td>{{ data.programName }}</td>
+                <!-- <td>{{ data.programName }}</td>
                 <td>{{ data.createdAt | date : "dd-MM-yyyy | HH:mm" }}</td>
-                <td>{{ data.invoiceNumber}}</td>
+                <td>{{ data.invoiceNumber}}</td> -->
                 <td>
-                  <!-- <span _ngcontent-ng-c3466200865="" class="badge badge-bgdanger">40% Offer</span> -->
+                
                   <button class="badge-button"
                     [ngClass]="{'badge-linesuccess': data.invoiceDownloadStatus === 'NO','badge-linedanger': data.invoiceDownloadStatus === 'YES'}">
                     {{ data.invoiceDownloadStatus }}
@@ -180,8 +179,7 @@
                     <a class="me-2 p-2 mb-0" data-bs-toggle="modal" data-bs-target="#edit-units"
                       (click)="openEditModal(dialogTemplate, data)">
                       <i class="feather icon-edit feather-edit"></i></a>
-                    <!-- <a class="me-2 confirm-text p-2 mb-0" href="javascript:void(0);" (click)="confirmColor()">
-                      <i class="feather icon-trash-2 feather-trash-2"></i></a> -->
+                   
                   </div>
                 </td>
               </tr>
@@ -281,7 +279,7 @@
                 <td>{{ data.createdAt | date : "dd-MM-yyyy | HH:mm" }}</td>
                 <td>{{ data.invoiceNumber}}</td>
                 <td>
-                  <!-- <span _ngcontent-ng-c3466200865="" class="badge badge-bgdanger">40% Offer</span> -->
+                 
                   <button class="badge-button"
                     [ngClass]="{'badge-linesuccess': data.invoiceDownloadStatus === 'NO','badge-linedanger': data.invoiceDownloadStatus === 'YES'}">
                     {{ data.invoiceDownloadStatus }}
@@ -294,8 +292,7 @@
                     <a class="me-2 p-2 mb-0" data-bs-toggle="modal" data-bs-target="#edit-units"
                       (click)="openEditModal(dialogTemplate, data)">
                       <i class="feather icon-edit feather-edit"></i></a>
-                    <!-- <a class="me-2 confirm-text p-2 mb-0" href="javascript:void(0);" (click)="confirmColor()">
-                      <i class="feather icon-trash-2 feather-trash-2"></i></a> -->
+                  
                   </div>
                 </td>
               </tr>
@@ -342,13 +339,11 @@
                 <div class="col-lg-4 col-md-4">
                   <div class="mb-3">
                     <label for="receiptType" class="form-label">Receipt Type</label>
-                    <select class="form-control" formControlName="invoiceHeaderDetailsId"
-                      (change)="onProgramSelect($event)">
-                      <option value="" disabled selected>Select an option</option>
-                      <option [value]="invoiceType.id" *ngFor="let invoiceType of invoiceTypeList">
+                    <mat-select class="space-select select" formControlName="invoiceHeaderDetailsId"  placeholder="Select Receipt Type">
+                      <mat-option *ngFor="let invoiceType of invoiceTypeList" [value]="invoiceType.companyFirstName + ' ' + invoiceType.companyLastName">
                         {{ invoiceType.companyFirstName + ' ' + invoiceType.companyLastName }}
-                      </option>
-                    </select>
+                      </mat-option>
+                    </mat-select>
                   </div>
                 </div>
 
@@ -391,12 +386,17 @@
                 <div class="col-lg-4 col-md-4">
                   <div class="mb-3">
                     <label class="form-label">Program</label>
-                    <select class="form-control" formControlName="programName" (change)="onProgramSelect($event)">
+                    <!-- <select class="form-control" formControlName="programName" (change)="onProgramSelect($event)">
                       <option value="" disabled selected>Select Program</option>
                       <option [value]="donationOpt.programName" *ngFor="let donationOpt of donationTypeList">
                         {{donationOpt.programName}}
                       </option>
-                    </select>
+                    </select> -->
+                    <mat-select class="space-select select" formControlName="programName" (change)="onProgramSelect($event)" placeholder="Select Program">
+                      <mat-option *ngFor="let donationOpt of donationTypeList" [value]="donationOpt.programName">
+                        {{donationOpt.programName}}
+                      </mat-option>
+                    </mat-select>
                   </div>
                 </div>
                 <div class="col-lg-4 col-md-4" *ngIf="!showCurrencyBox">
@@ -406,20 +406,26 @@
                       maxlength="100">
                   </div>
                 </div>
-                <div class="col-lg-3 col-md-3" *ngIf="showCurrencyBox">
-                  <div class="mb-3" *ngIf="showCurrencyBox">
+                <div class="col-lg-2 col-md-2" *ngIf="showCurrencyBox">
+                  <div class="mb-2" *ngIf="showCurrencyBox">
                     <label class="form-label">Amount</label>
                     <input class="form-control" type="number" pInputText pKeyFilter="int" formControlName="amount"
                       maxlength="100">
                   </div>
                 </div>
-                <div class="col-lg-1 col-md-1" *ngIf="showCurrencyBox">
-                  <div class="mb-3" *ngIf="showCurrencyBox">
+                <div class="col-lg-2 col-md-2" *ngIf="showCurrencyBox">
+                  <div class="mb-2" *ngIf="showCurrencyBox">
                     <label class="form-label">Currency</label>
-                    <select class="form-control" formControlName="currencyCode" (change)="setCurrency($event)">
+                    <!-- <select class="form-control" formControlName="currencyCode" (change)="setCurrency($event)">
                       <option *ngFor="let currency of currencyList" [ngValue]="currency.currencyCode">
                         {{currency.currencyCode+" "+currency.unicode}}</option>
-                    </select>
+                    </select> -->
+                    <mat-select class="space-select select" formControlName="currencyCode" (change)="setCurrency($event)" placeholder="Select Fundrising Officer">
+                      <mat-option *ngFor="let currency of currencyList" [value]="currency.currencyCode">
+                        {{currency.currencyCode+" "+currency.unicode}}
+                      </mat-option>
+                    </mat-select>
+
                   </div>
                 </div>
                 <div class="col-lg-4 col-md-4">
@@ -434,22 +440,32 @@
                 <div class="col-lg-4 col-md-4">
                   <div class="mb-3">
                     <label class="form-label">Payment Mode</label>
-                    <select class="form-control" formControlName="paymentMode">
+                    <!-- <select class="form-control" formControlName="paymentMode">
                       <option>Select Payment Mode</option>
                       <option [value]="payModOpt.paymentMode" *ngFor="let payModOpt of paymentModeList">
                         {{payModOpt.paymentMode}}</option>
-                    </select>
+                    </select> -->
+                    <mat-select class="space-select select" formControlName="paymentMode"  placeholder="Payment Mode">
+                      <mat-option *ngFor="let payModOpt of paymentModeList" [value]="payModOpt.paymentMode">
+                        {{payModOpt.paymentMode}}
+                      </mat-option>
+                    </mat-select>
                   </div>
                 </div>
                 <div class="col-lg-4 col-md-4">
                   <div class="mb-3">
                     <label class="form-label">Fundrising Officer</label>
-                    <select class="form-control" formControlName="createdBy">
+                    <!-- <select class="form-control" formControlName="createdBy">
                       <option aria-readonly="true" value="N/A">Select Fundrising Officer</option>
                       <option [value]="fundRisingOffcer.loginId" *ngFor="let fundRisingOffcer of fundRisingOffcerList">
                         {{fundRisingOffcer.firstName}} {{fundRisingOffcer.lastName}}
                       </option>
-                    </select>
+                    </select> -->
+                    <mat-select class="space-select select" formControlName="createdBy"  placeholder="Select Fundrising Officer">
+                      <mat-option *ngFor="let fundRisingOffcer of fundRisingOffcerList" [value]="fundRisingOffcer.loginId">
+                        {{fundRisingOffcer.firstName}} {{fundRisingOffcer.lastName}}
+                      </mat-option>
+                    </mat-select>
                   </div>
                 </div>
 

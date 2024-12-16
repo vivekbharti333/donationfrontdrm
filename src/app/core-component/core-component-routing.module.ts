@@ -81,9 +81,8 @@ const routes: Routes = [
       {
         path: 'dashboard',
         loadChildren: () =>
-          import('./main/dashboard/dashboard.module').then(
-            (m) => m.DashboardModule
-          ),
+          import('./main/dashboard/dashboard.module').then((m) => m.DashboardModule),
+        canActivate: [AuthGuard],
       },
       {
         path: 'user-management',
@@ -91,6 +90,7 @@ const routes: Routes = [
           import('./user-management/user-management.module').then(
             (m) => m.UserManagementModule
           ),
+          canActivate: [AuthGuard],
       },
       {
         path: 'donation-management',
@@ -98,6 +98,7 @@ const routes: Routes = [
           import('./donation-management/donation-management.module').then(
             (m) => m.DonationManagementModule
           ),
+          canActivate: [AuthGuard],
       },
       {
         path: 'payment-mode-management',
@@ -105,6 +106,7 @@ const routes: Routes = [
           import('./payment-mode-management/payment-mode-management.module').then(
             (m) => m.PaymentModeManagementModule
           ),
+          canActivate: [AuthGuard],
       },
       {
         path: 'program-management',
@@ -112,6 +114,7 @@ const routes: Routes = [
           import('./program-management/program-management.module').then(
             (m) => m.ProgramManagementModule
           ),
+          canActivate: [AuthGuard],
       },
       {
         path: 'currency-management',
@@ -133,6 +136,7 @@ const routes: Routes = [
           import('./lead-management/lead-management.module').then(
             (m) => m.LeadManagementModule
           ),
+          
       },
       {
         path: 'category-management',

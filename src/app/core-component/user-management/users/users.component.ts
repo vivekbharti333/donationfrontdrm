@@ -13,6 +13,7 @@ import { users } from 'src/app/shared/model/page.model';
 import { PaginationService, tablePageSize } from 'src/app/shared/shared.index';
 import Swal from 'sweetalert2';
 import { UserManagementService } from '../user-management.service';
+import { UserDetails } from '../../interface/user-management';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { MatDialog } from '@angular/material/dialog';
@@ -130,11 +131,11 @@ export class UsersComponent {
   public routes = routes;
   // pagination variables
   public tableData: Array<any> = [];
-  public pageSize = 10;
+  public pageSize = 2;
   public serialNumberArray: Array<number> = [];
   public totalData = 0;
   showFilter = false;
-  dataSource!: MatTableDataSource<users>;
+  dataSource!: MatTableDataSource<UserDetails>;
   public searchDataValue = '';
   //** / pagination variables
 
@@ -229,7 +230,7 @@ export class UsersComponent {
           this.serialNumberArray.push(serialNumber);
         }
       });
-      this.dataSource = new MatTableDataSource<users>(this.tableData);
+      this.dataSource = new MatTableDataSource<UserDetails>(this.tableData);
       const dataSize = this.tableData.length;
       this.pagination.calculatePageSize.next({
         totalData: this.totalData,

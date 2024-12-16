@@ -23,6 +23,12 @@ const routes: Routes = [
       ),
   },
 
+  {
+    path: '**',
+    redirectTo: 'signin',
+    pathMatch: 'full',
+  },
+
   // {
   //   path: '**',
   //   redirectTo: 'errorpages/error404',

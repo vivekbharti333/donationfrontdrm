@@ -215,6 +215,13 @@ export class SidebarService {
               route: routes.receipt,
               permission: 'receipt-header-list',
             }, 
+            // {
+            //   menuValue: 'Under Maintenance',
+            //   hasSubRoute: false,
+            //   showSubRoute: false,
+            //   route: routes.underMaintanance,
+            //   permission: 'receipt-header-list',
+            // },
           ],
         },
         {

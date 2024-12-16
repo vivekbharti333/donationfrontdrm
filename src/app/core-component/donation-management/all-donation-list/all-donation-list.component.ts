@@ -7,6 +7,7 @@ import { ReceiptHeaderListService } from '../../receipt-management/receipt-heade
 import { ProgramManagementService } from '../../program-management/program-management.service';
 import { CurrencyService } from '../../currency-management/currency/currency.service';
 import { PaymentModeService } from '../../payment-mode-management/payment-mode/payment-mode.service';
+import { UserManagementService } from '../../user-management/user-management.service';
 import {
   DataService,
   pageSelection,
@@ -17,7 +18,7 @@ import { routes } from 'src/app/core/helpers/routes';
 import { users } from 'src/app/shared/model/page.model';
 import { PaginationService, tablePageSize } from 'src/app/shared/shared.index';
 import Swal from 'sweetalert2';
-import { DonationManagementService } from '../donation-management.service'; 
+import { DonationManagementService } from '../donation-management.service';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { MatDialog } from '@angular/material/dialog';
@@ -39,7 +40,8 @@ export class AllDonationListComponent {
   public displayStyle = "none";
   public cancelDisplayStyle = "none"
   public selectedLoginId: string | null = null;
-  public donationReceiptId : any;
+  public donationReceiptId: any;
+  public userList: any
 
   public tabName: any;
 
@@ -60,26 +62,26 @@ export class AllDonationListComponent {
   public donationTypeList: any;
   public programNames: string = '';
   public selectedProgramAmount: number | null = null;
- 
+
 
   activeTab: string = 'TODAY';
   firstDate: any;
   lastDate: any
 
 
-   // pagination variables
-   public routes = routes;
-   public tableData: Array<any> = [];
-   public pageSize = 10;
-   public serialNumberArray: Array<number> = [];
-   public totalData = 0;
-   showFilter = false;
-   dataSource!: MatTableDataSource<users>;
-   public searchDataValue = '';
-   //** / pagination variables
+  // pagination variables
+  public routes = routes;
+  public tableData: Array<any> = [];
+  public pageSize = 10;
+  public serialNumberArray: Array<number> = [];
+  public totalData = 0;
+  showFilter = false;
+  dataSource!: MatTableDataSource<users>;
+  public searchDataValue = '';
+  //** / pagination variables
 
 
-   constructor(
+  constructor(
     private data: DataService,
     private pagination: PaginationService,
     private router: Router,
@@ -91,13 +93,16 @@ export class AllDonationListComponent {
     private currencyService: CurrencyService,
     private paymentModeService: PaymentModeService,
     private donationManagementService: DonationManagementService,
+    private userManagementService: UserManagementService,
     private dialog: MatDialog
   ) {
-    
+
   }
 
   ngOnInit() {
     this.createForms();
+    this.getUserList();
+    this.getTeamleaderList();
     this.getDonationList('TODAY');
     this.getInvoiceTypeList();
     this.getDonationTypeList();
@@ -128,26 +133,56 @@ export class AllDonationListComponent {
     });
   }
 
-  checkRoleType(){
-    if(this.loginUser['roleType'] == Constant.mainAdmin){
+  checkRoleType() {
+    if (this.loginUser['roleType'] == Constant.mainAdmin) {
       this.isMainAdmin = true;
-    }else if(this.loginUser['roleType'] == Constant.superAdmin){
+    } else if (this.loginUser['roleType'] == Constant.superAdmin) {
       this.isSuperadmin = true;
-    }else if(this.loginUser['roleType'] == Constant.admin){
+    } else if (this.loginUser['roleType'] == Constant.admin) {
       this.isAdmin = true;
-    }else if(this.loginUser['roleType'] == Constant.teamLeader){
+    } else if (this.loginUser['roleType'] == Constant.teamLeader) {
       this.isTeamLeader = true;
-    }else if(this.loginUser['roleType'] == Constant.donorExecutive){
+    } else if (this.loginUser['roleType'] == Constant.donorExecutive) {
       this.isDonationExecutive = true;
     }
+  }
+
+  public getUserList() {
+    this.userManagementService.getUserDetailsList()
+      .subscribe({
+        next: (response: any) => {
+          if (response['responseCode'] == '200') {
+            this.userList = JSON.parse(JSON.stringify(response['listPayload']));
+          } else {
+          }
+        },
+        //   error: (error: any) => this.toastr.error('Server Error', '500'),
+      });
+  }
+
+  public getTeamleaderList() {
+    this.userManagementService.getTeamleaderList()
+      .subscribe({
+        next: (response: any) => {
+          if (response['responseCode'] == '200') {
+            this.teamLeaderList = JSON.parse(JSON.stringify(response['listPayload']));
+          } else {
+          }
+        },
+        // error: (error: any) => this.toastr.error('Server Error', '500'),
+      });
+  }
+
+
+  getDonationListByUser(event: any): void {
+    alert('Selected User ID:' + event.value); // Logs the selected user ID
+    // Add your logic here
   }
 
   public getDonationList(tabName: string) {
     this.tabName = tabName;
     this.donationManagementService.getDonationList(tabName).subscribe((apiRes: any) => {
       this.totalData = apiRes.totalNumber;
-      // const stringRepresentation = JSON.stringify(apiRes);
-      // const dataSize = stringRepresentation.length;
       this.pagination.tablePageSize.subscribe((res: tablePageSize) => {
         if (this.router.url == this.routes.allDonationList) {
           this.getTableData({ skip: res.skip, limit: this.totalData }, tabName);
@@ -158,8 +193,6 @@ export class AllDonationListComponent {
   }
 
   private getTableData(pageOption: pageSelection, tabName: any): void {
-    var api;
-
     this.donationManagementService.getDonationList(tabName).subscribe((apiRes: any) => {
       this.tableData = [];
       this.serialNumberArray = [];
@@ -214,6 +247,7 @@ export class AllDonationListComponent {
     this.editDonationForm.patchValue({
       id: rowData['id'],
       invoiceHeaderDetailsId: rowData['invoiceHeaderDetailsId'],
+      invoiceHeaderName: rowData['invoiceHeaderName'],
       createdBy: rowData['createdBy'],
       donorName: rowData['donorName'],
       mobileNumber: rowData['mobileNumber'],
@@ -228,7 +262,7 @@ export class AllDonationListComponent {
       paymentMode: rowData['paymentMode'],
       notes: rowData['notes'],
     });
-   
+
     // this.dialog.open(templateRef);
     this.dialog.open(templateRef, {
       width: '1400px', // Set your desired width
@@ -236,7 +270,7 @@ export class AllDonationListComponent {
       disableClose: true, // Optional: prevent closing by clicking outside
       panelClass: 'custom-modal', // Optional: add custom class for additional styling
     });
-    
+
   }
 
   public getInvoiceTypeList() {
@@ -326,7 +360,7 @@ export class AllDonationListComponent {
       });
   }
 
-  updateDonationDetails(){
+  updateDonationDetails() {
     this.donationManagementService.updateDonationDetails(this.editDonationForm.value)
       .subscribe({
         next: (response: any) => {
@@ -347,8 +381,6 @@ export class AllDonationListComponent {
             // this.isLoading = false;
           }
         },
-        // error: (error: any) => this.toastr.error('Server Error', '500'),
-        
       });
   }
 

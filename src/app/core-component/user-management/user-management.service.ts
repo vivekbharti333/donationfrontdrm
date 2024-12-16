@@ -5,6 +5,7 @@ import { Constant } from 'src/app/core/constant/constants';
 import { CookieService } from 'ngx-cookie-service';
 // import { UserDetails, UserDetailsRequest } from '../interface/user-management';
 import { AuthenticationService } from 'src/app/auth/authentication.service';
+import { UserDetailsRequest } from '../interface/user-management';
 @Injectable({
   providedIn: 'root'
 })
@@ -43,6 +44,19 @@ export class UserManagementService {
     };
     return  this.http.post<any>(Constant.Site_Url+"getUserDetails",request);
   }
+
+  getTeamleaderList(): Observable<UserDetailsRequest> {
+    let request: UserDetailsRequest = {
+      payload: {
+        roleType: Constant.teamLeader,
+        token:  this.cookieService.get('token'),
+        createdBy: this.cookieService.get('loginId'),
+        superadminId:  this.cookieService.get('superadminId'),
+      }
+    };
+    return this.http.post<UserDetailsRequest>(Constant.Site_Url + "getUserListForDropDown", request);
+  }
+
 
   getUserDetailsByLoginId(): Observable<any> {
     let request: any = {

@@ -5,7 +5,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
   templateUrl: './download-receipt.component.html',
   styleUrl: './download-receipt.component.scss'
 })
-export class DownloadReceiptComponent {
+export class DownloadReceiptComponent implements OnInit, OnDestroy {
   days: number = 0;
   hours: number = 0;
   minutes: number = 0;
