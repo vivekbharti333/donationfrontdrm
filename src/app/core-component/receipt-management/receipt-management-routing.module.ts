@@ -5,25 +5,15 @@ import { AddReceiptHeaderComponent } from './add-receipt-header/add-receipt-head
 import { ReceiptHeaderListComponent } from './receipt-header-list/receipt-header-list.component'; 
 import { DownloadReceiptComponent } from './download-receipt/download-receipt.component';
 
-
-
 const routes: Routes = [
   {
     path: '',
     component: ReceiptManagementComponent,
     children: [
-      {
-        path: 'add-receipt-header',
-        component: AddReceiptHeaderComponent,
-      },
-      {
-        path: 'receipt-header-list',
-        component: ReceiptHeaderListComponent,
-      },
-      {
-        path: 'receipt',
-        component: DownloadReceiptComponent,
-      },
+      { path: 'add-receipt-header', component: AddReceiptHeaderComponent },
+      { path: 'receipt-header-list', component: ReceiptHeaderListComponent },
+      // { path: 'receipt', component: DownloadReceiptComponent },
+      { path: 'receipt/:receiptNo', component: DownloadReceiptComponent },
       
     ],
   },

@@ -1,6 +1,6 @@
 export interface DonationManagement {}
 
-export class DonationDetailsRequest {
+export interface DonationDetailsRequest {
   payload: {
     receiptNumber?: string;
     id?: number;
@@ -31,11 +31,11 @@ export class DonationDetailsRequest {
     requestFor?: string;
     respCode?: number;
     respMesg?: string;
-  } = {}; // Initialized to an empty object
+  } 
   responseCode?: string;
 }
 
-export class DonationDetails {
+export interface DonationDetails {
   id?: number;
   sessionId?: string;
   donorName?: string;
@@ -43,9 +43,9 @@ export class DonationDetails {
   emailId?: string;
   address?: string;
   panNumber?: string;
+  currencyCode?: string;
   amount?: number;
   currency?: string;
-  currencyCode?: string;
   transactionId?: string;
   paymentMode?: string;
   paymentType?: string;
@@ -56,3 +56,26 @@ export class DonationDetails {
   superadminId?: string;
   invoiceHeaderDetailsId?: string;
 }
+
+export interface DonationListForExcel {
+  fromDate: string | Date;
+  toDate: string | Date;
+  createdAt: string | Date;
+  donorName: string;
+  mobileNumber: string;
+  emailId: string;
+  panNumber: string;
+  address: string;
+  programName: string;
+  currencyCode?: string;
+  amount: number;
+  transactionId: string;
+  paymentMode: string;
+  receiptNumber: string;
+  invoiceNumber: string;
+  createdbyName: string;
+  teamLeaderId: string;
+  invoiceHeaderName: string;
+  superadminId: string;
+}
+

@@ -1,16 +1,15 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { DownloadReceiptService } from './download-receipt.service'; 
-import { ToastrService } from 'ngx-toastr';
+import { Component, OnInit } from '@angular/core';
+import { ThankYouService } from '../thank-you.service'; 
 import { ActivatedRoute, Router } from '@angular/router';
 import { Constant } from 'src/app/core/constant/constants'; 
 import { HttpResponse } from '@angular/common/http';
 
 @Component({
-  selector: 'app-download-receipt',
-  templateUrl: './download-receipt.component.html',
-  styleUrl: './download-receipt.component.scss'
+  selector: 'app-letter',
+  templateUrl: './letter.component.html',
+  styleUrl: './letter.component.scss'
 })
-export class DownloadReceiptComponent implements OnInit {
+export class LetterComponent implements OnInit{
   days: number = 0;
   hours: number = 0;
   minutes: number = 0;
@@ -33,7 +32,7 @@ export class DownloadReceiptComponent implements OnInit {
 
 
   constructor(
-    private downloadReceiptService: DownloadReceiptService,
+    private thankYouService: ThankYouService,
     // private toastr: ToastrService,
     private router: Router, // Change routerAct to router
     private route: ActivatedRoute, // Renamed router to route
@@ -51,7 +50,7 @@ export class DownloadReceiptComponent implements OnInit {
       console.log("Receipt No. : "+this.receiptNo);
 
       if (this.receiptNo) {
-        this.downloadReceiptService.getDonationListByReceiptNumber(this.receiptNo)
+        this.thankYouService.getDonationListByReceiptNumber(this.receiptNo)
           .subscribe({
             next: (response: any) => {
               console.log(response['responseCode'] + " response");
@@ -85,7 +84,7 @@ export class DownloadReceiptComponent implements OnInit {
   downloadPdf(receiptNo:any): void {
     // this.receiptNo = this.route.snapshot.params['receiptNo'];
     console.log("receiptNo : "+receiptNo);
-    this.downloadReceiptService.downloadPdf(receiptNo).subscribe(
+    this.thankYouService.downloadPdf(receiptNo).subscribe(
       (response: any) => {
         const filename = this.getFileNameFromHttpResponse(response);
         console.log("filename : "+filename);

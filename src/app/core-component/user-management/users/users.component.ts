@@ -181,8 +181,6 @@ export class UsersComponent {
   getUserDetails() {
     this.userManagementService.getUserDetailsList().subscribe((apiRes: any) => {
       this.totalData = apiRes.totalNumber;
-      // const stringRepresentation = JSON.stringify(apiRes);
-      // const dataSize = stringRepresentation.length;
       this.pagination.tablePageSize.subscribe((res: tablePageSize) => {
         if (this.router.url == this.routes.users) {
           this.getTableData({ skip: res.skip, limit: this.totalData }, 'ALL');
@@ -193,12 +191,8 @@ export class UsersComponent {
   }
 
   getUserDetailsByRoleType(roleType: any) {
-    this.userManagementService
-      .getUserDetailsByRoleType(roleType)
-      .subscribe((apiRes: any) => {
+    this.userManagementService.getUserDetailsByRoleType(roleType).subscribe((apiRes: any) => {
         this.totalData = apiRes.totalNumber;
-        // const stringRepresentation = JSON.stringify(apiRes);
-        // const dataSize = stringRepresentation.length;
         this.pagination.tablePageSize.subscribe((res: tablePageSize) => {
           if (this.router.url == this.routes.users) {
             this.getTableData(

@@ -1,21 +1,21 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
-import { Constant } from 'src/app/core/constant/constants'; 
-import { DonationDetailsRequest } from '../../interface/donation-management';
+import { Constant } from 'src/app/core/constant/constants';
+import { DonationDetailsRequest } from '../interface/donation-management';
 import { CookieService } from 'ngx-cookie-service';
+
 
 @Injectable({
   providedIn: 'root'
 })
-export class DownloadReceiptService {
+export class ThankYouService {
 
   constructor(
     private http: HttpClient,
-     private cookieService: CookieService
-    // private authenticationService: AuthenticationService,
+    private cookieService: CookieService
+   
   ) {
-    // this.loginUser = this.authenticationService.getLoginUser();
   }
 
   getDonationListByReceiptNumber(receiptNum: any): Observable<any> {
@@ -31,10 +31,11 @@ export class DownloadReceiptService {
   }
 
   downloadPdf(reffNo: string): Observable<HttpResponse<Blob>> {
-    const url = Constant.Site_Url+"donationinvoice/"+reffNo;
+    const url = Constant.Site_Url + "donationinvoice/" + reffNo;
     return this.http.get(url, {
       responseType: 'blob',
       observe: 'response'
     });
   }
 }
+

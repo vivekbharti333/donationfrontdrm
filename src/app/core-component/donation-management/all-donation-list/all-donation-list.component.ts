@@ -23,6 +23,13 @@ import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { MatDialog } from '@angular/material/dialog';
 import { Constant } from 'src/app/core/constant/constants';
+import { DonationDetails, DonationListForExcel } from '../../interface/donation-management';
+
+import * as fileSaver from 'file-saver';
+import * as XLSX from 'xlsx-js-style'
+// import * as XLSX from 'xlsx';
+declare var $: any;
+import { DatePipe } from '@angular/common';
 
 interface data {
   value: string;
@@ -36,6 +43,11 @@ interface data {
 })
 export class AllDonationListComponent {
 
+  donationList: DonationListForExcel[] =[]; // Use the defined interface
+  datePipe = new DatePipe('en-US'); // Inject the DatePipe
+
+
+  public donationUpdateDialog: any;
   public editDonationForm!: FormGroup;
   public displayStyle = "none";
   public cancelDisplayStyle = "none"
@@ -76,7 +88,7 @@ export class AllDonationListComponent {
   public serialNumberArray: Array<number> = [];
   public totalData = 0;
   showFilter = false;
-  dataSource!: MatTableDataSource<users>;
+  dataSource!: MatTableDataSource<DonationDetails>;
   public searchDataValue = '';
   //** / pagination variables
 
@@ -109,7 +121,7 @@ export class AllDonationListComponent {
     this.getCurrencyDetailBySuperadmin();
     this.getPaymentModeList();
     this.getFundrisingOfficerByTeamLeaderId();
-    this.checkRoleType();
+    // this.checkRoleType();
   }
 
 
@@ -117,6 +129,7 @@ export class AllDonationListComponent {
     this.editDonationForm = this.fb.group({
       id: [''],
       invoiceHeaderDetailsId: [''],
+      invoiceHeaderName:[''],
       createdBy: [''],
       donorName: ['', [Validators.required, Validators.pattern("[0-9A-Za-z ]{3,150}")]],
       mobileNumber: ['', Validators.pattern('^[0-9]*$')],
@@ -185,7 +198,7 @@ export class AllDonationListComponent {
       this.totalData = apiRes.totalNumber;
       this.pagination.tablePageSize.subscribe((res: tablePageSize) => {
         if (this.router.url == this.routes.allDonationList) {
-          this.getTableData({ skip: res.skip, limit: this.totalData }, tabName);
+          this.getTableData({ skip: res.skip, limit: (res.skip)+ this.pageSize }, tabName);
           this.pageSize = res.pageSize;
         }
       });
@@ -194,18 +207,18 @@ export class AllDonationListComponent {
 
   private getTableData(pageOption: pageSelection, tabName: any): void {
     this.donationManagementService.getDonationList(tabName).subscribe((apiRes: any) => {
+      this.donationList = apiRes.listPayload;
       this.tableData = [];
       this.serialNumberArray = [];
       this.totalData = apiRes.totalNumber;
-      apiRes.listPayload.map((res: any, index: number) => {
+      apiRes.listPayload.map((res: DonationDetails, index: number) => {
         const serialNumber = index + 1;
         if (index >= pageOption.skip && serialNumber <= pageOption.limit) {
           this.tableData.push(res);
           this.serialNumberArray.push(serialNumber);
         }
       });
-      this.dataSource = new MatTableDataSource<users>(this.tableData);
-      const dataSize = this.tableData.length;
+      this.dataSource = new MatTableDataSource<DonationDetails>(this.tableData);
       this.pagination.calculatePageSize.next({
         totalData: this.totalData,
         pageSize: this.pageSize,
@@ -263,8 +276,8 @@ export class AllDonationListComponent {
       notes: rowData['notes'],
     });
 
-    // this.dialog.open(templateRef);
-    this.dialog.open(templateRef, {
+   
+    this.donationUpdateDialog = this.dialog.open(templateRef, {
       width: '1400px', // Set your desired width
       // height: '600px', // Set your desired height
       disableClose: true, // Optional: prevent closing by clicking outside
@@ -366,22 +379,69 @@ export class AllDonationListComponent {
         next: (response: any) => {
           if (response['responseCode'] == '200') {
             if (response['payload']['respCode'] == '200') {
-              // console.log("ok hai")
-              // this.toastr.success(response['payload']['respMesg'], response['payload']['respCode']);
+             
               this.editDonationForm.reset();
               this.getDonationList(this.tabName);
-              // this.setValueInForm();
-              // this.isLoading = false;
+              this.donationUpdateDialog.close();
+
+              this.messageService.add({
+                summary: response['payload']['respCode'],
+                detail: response['payload']['respMesg'],
+                styleClass: 'success-background-popover',
+              });
+             
             } else {
-              // this.toastr.error(response['payload']['respMesg'], response['payload']['respCode']);
-              // this.isLoading = false;
+              this.messageService.add({
+                summary: response['payload']['respCode'],
+                detail: response['payload']['respMesg'],
+                styleClass: 'danger-background-popover',
+              });
             }
           } else {
-            // this.toastr.error(response['responseMessage'], response['responseCode']);
-            // this.isLoading = false;
           }
         },
       });
+  }
+
+  exportAsExcelFile(): void {
+    let filteredArrayList: any[] = []; // Initialize as an empty array
+
+    console.log("this.donationList + "+this.donationList);
+
+    this.donationList.forEach((element: DonationListForExcel) => { // Explicitly type 'element'
+      let fromDate = this.datePipe.transform(element.fromDate, 'dd-MM-yyyy');
+      let toDate = this.datePipe.transform(element.toDate, 'dd-MM-yyyy');
+      let createdAt = this.datePipe.transform(element.createdAt, 'dd-MM-yyyy');
+
+      let data: any = {
+        'Donor Name': element.donorName,
+        'Mobile Number': element.mobileNumber,
+        'Email ID': element.emailId,
+        'Pan Number': element.panNumber,
+        'Address': element.address,
+        'Donation For': element.programName,
+        'Currency': element.currencyCode,
+        'Amount': element.amount,
+        'Transaction ID': element.transactionId,
+        'Payment Mode': element.paymentMode,
+        'Receipt': element.receiptNumber,
+        'Invoice Number': element.invoiceNumber,
+        'Received By': element.createdbyName,
+        'Team Leader ID': element.teamLeaderId,
+        'Invoice For': element.invoiceHeaderName,
+        'Super Admin ID': element.superadminId,
+        'Donation Date': createdAt,
+      };
+
+      filteredArrayList.push(data);
+    });
+
+    const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(filteredArrayList);
+    const workbook: XLSX.WorkBook = { Sheets: { data: worksheet }, SheetNames: ['data'] };
+    const excelBuffer: any = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+    const EXCEL_TYPE = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
+    const blob: Blob = new Blob([excelBuffer], { type: EXCEL_TYPE });
+    fileSaver.saveAs(blob, 'Donation Report.xlsx');
   }
 
 }

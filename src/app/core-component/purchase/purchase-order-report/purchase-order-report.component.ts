@@ -62,9 +62,7 @@ export class PurchaseOrderReportComponent {
           this.serialNumberArray.push(serialNumber);
         }
       });
-      this.dataSource = new MatTableDataSource<purchaseOrderReport>(
-        this.tableData
-      );
+      this.dataSource = new MatTableDataSource<purchaseOrderReport>( this.tableData);
       this.pagination.calculatePageSize.next({
         totalData: this.totalData,
         pageSize: this.pageSize,

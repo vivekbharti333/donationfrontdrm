@@ -10,7 +10,7 @@
   </div>
   }
   <!-- Main Wrapper -->
-  @if (page !== 'coming-soon' && page !== 'under-maintenance') {
+  @if (page !== 'coming-soon' && page !== 'under-maintenance' && page !== 'letter') {
   <div class="main-wrapper" [ngClass]="{
         'light': themeMode === 'light_mode', 
         'dark': themeMode === 'dark_mode',
@@ -55,7 +55,7 @@
   }
   <!-- Main Wrapper -->
 
-  @if (page === 'coming-soon' || page === 'under-maintenance') {
+  @if (page === 'coming-soon' || page === 'under-maintenance' || page === 'letter') {
   <div class="main-wrapper">
     <router-outlet></router-outlet>
   </div>

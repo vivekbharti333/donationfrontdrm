@@ -1,4 +1,4 @@
-<div class="comming-soon-pg w-100">
+<!-- <div class="comming-soon-pg w-100">
     <div class="coming-soon-box">
         <div class="pos-logo">
             <img src="assets/img/logo-small.png" alt="">
@@ -30,4 +30,11 @@
             <li><a href="javascript:void(0);"><i class="fab fa-linkedin"></i></a></li>
         </ul>
     </div>
-</div>
+</div> -->
+
+
+<div class="container">
+    <p class="error-message">{{ successMessageVisible }}
+      <span *ngIf="countShow">{{ countdownValue }}</span>
+    </p>
+  </div>

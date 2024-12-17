@@ -10,18 +10,19 @@
     </div>
   </div>
   <ul class="table-top-head">
-    <li>
+    <!-- <li>
       <a data-bs-toggle="tooltip" data-bs-placement="top" matTooltip="Pdf" matTooltipPosition="above"><img
           src="assets/img/icons/pdf.svg" alt="img" /></a>
-    </li>
+    </li> -->
     <li>
-      <a data-bs-toggle="tooltip" data-bs-placement="top" matTooltip="Excel" matTooltipPosition="above"><img
-          src="assets/img/icons/excel.svg" alt="img" /></a>
+      <a matTooltip="Export to Excel" matTooltipPosition="above" (click)="exportAsExcelFile()">
+        <img src="assets/img/icons/xls.svg" alt="Export to Excel" />
+      </a>
     </li>
-    <li>
+    <!-- <li>
       <a data-bs-toggle="tooltip" data-bs-placement="top" matTooltip="Print" matTooltipPosition="above"><i
           class="feather icon-printer feather-rotate-ccw"></i></a>
-    </li>
+    </li> -->
     <li>
       <!-- <a data-bs-toggle="tooltip" data-bs-placement="top" matTooltip="Refresh" matTooltipPosition="above"
           (click)="getUserDetails()"><i class="feather icon-rotate-ccw feather-rotate-ccw"></i></a> -->
@@ -338,8 +339,9 @@
               <div class="row">
                 <div class="col-lg-4 col-md-4">
                   <div class="mb-3">
-                    <label for="receiptType" class="form-label">Receipt Type</label>
-                    <mat-select class="space-select select" formControlName="invoiceHeaderDetailsId"  placeholder="Select Receipt Type">
+                    <label for="receiptType" class="form-label">Receipt</label>
+                    <!-- <input id="donorName" class="form-control" type="text" pInputText formControlName="invoiceHeaderName" readonly> -->
+                    <mat-select class="space-select select" formControlName="invoiceHeaderName"  placeholder="Select Receipt Type">
                       <mat-option *ngFor="let invoiceType of invoiceTypeList" [value]="invoiceType.companyFirstName + ' ' + invoiceType.companyLastName">
                         {{ invoiceType.companyFirstName + ' ' + invoiceType.companyLastName }}
                       </mat-option>
@@ -440,11 +442,6 @@
                 <div class="col-lg-4 col-md-4">
                   <div class="mb-3">
                     <label class="form-label">Payment Mode</label>
-                    <!-- <select class="form-control" formControlName="paymentMode">
-                      <option>Select Payment Mode</option>
-                      <option [value]="payModOpt.paymentMode" *ngFor="let payModOpt of paymentModeList">
-                        {{payModOpt.paymentMode}}</option>
-                    </select> -->
                     <mat-select class="space-select select" formControlName="paymentMode"  placeholder="Payment Mode">
                       <mat-option *ngFor="let payModOpt of paymentModeList" [value]="payModOpt.paymentMode">
                         {{payModOpt.paymentMode}}
