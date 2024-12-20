@@ -7,9 +7,9 @@ import { LeadManagementService } from '../../lead-management.service';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { ReceiptHeaderListService } from 'src/app/core-component/receipt-management/receipt-header-list/receipt-header-list.service';
-import { ProgramManagementService } from 'src/app/core-component/program-management/program-management.service'; 
-import { CurrencyService } from 'src/app/core-component/currency-management/currency/currency.service'; 
-import { PaymentModeService } from 'src/app/core-component/payment-mode-management/payment-mode/payment-mode.service'; 
+import { ProgramManagementService } from 'src/app/core-component/program-management/program-management.service';
+import { CurrencyService } from 'src/app/core-component/currency-management/currency/currency.service';
+import { PaymentModeService } from 'src/app/core-component/payment-mode-management/payment-mode/payment-mode.service';
 import { DonationManagementService } from 'src/app/core-component/donation-management/donation-management.service';
 import { Constant } from 'src/app/core/constant/constants';
 import { ToastModule } from 'primeng/toast';
@@ -33,25 +33,26 @@ interface listData {
 export class CreateLeadComponent {
 
   public selectedOption: string = 'lead';
-   public addDonationForm!: FormGroup;
-   public leadForm!: FormGroup;
-    public isLoading = false;
-    public loginUser : any;
-    public userList: any
-    public showFundrisingOfficerList: boolean = false;
-  
-    public donationList: any;
-    public showCurrencyBox: boolean = false;
-    public currencyList: any;
-    public fundRisingOffcerList: any;
-    public invoiceTypeList: any;
-    public invoiceType: any;
-    public paymentModeList: any;
-    public donationTypeList: any;
-    public programNames: string = '';
-    public selectedProgramAmount: number | null = null;
+  public addDonationForm!: FormGroup;
+  public leadForm!: FormGroup;
+  public isLoading = false;
+  public loginUser: any;
+  public userList: any
+  public showFundrisingOfficerList: boolean = false;
+  public showFollowupDateBox: boolean =false;
 
-    leadStatus: listData[] = Constant.LEAD_STATUS_LIST;
+  public donationList: any;
+  public showCurrencyBox: boolean = false;
+  public currencyList: any;
+  public fundRisingOffcerList: any;
+  public invoiceTypeList: any;
+  public invoiceType: any;
+  public paymentModeList: any;
+  public donationTypeList: any;
+  public programNames: string = '';
+  public selectedProgramAmount: number | null = null;
+
+  leadStatus: listData[] = Constant.LEAD_STATUS_LIST;
 
 
   constructor(
@@ -66,18 +67,19 @@ export class CreateLeadComponent {
     private categoriesManagementService: CategoriesManagementService,
     private userManagementService: UserManagementService,
     private cookiesService: CookieService,
-      private receiptHeaderListService: ReceiptHeaderListService,
-        private programManagementService: ProgramManagementService,
-        private currencyService: CurrencyService,
-        private paymentModeService: PaymentModeService,
-        private donationManagementService: DonationManagementService,
-        private messageService: MessageService,
+    private receiptHeaderListService: ReceiptHeaderListService,
+    private programManagementService: ProgramManagementService,
+    private currencyService: CurrencyService,
+    private paymentModeService: PaymentModeService,
+    private donationManagementService: DonationManagementService,
+    private messageService: MessageService,
   ) {
 
   }
 
   ngOnInit() {
-    this.getDonationListForLead();
+    this.getUserList();
+    this.getDonationListForLead('JH');
     this.createForms();
     this.getInvoiceTypeList();
     this.getDonationTypeList();
@@ -88,7 +90,7 @@ export class CreateLeadComponent {
 
   createForms() {
     this.leadForm = this.fb.group({
-      id:[''],
+      id: [''],
       donorName: ['', [Validators.required, Validators.pattern('[A-Za-z ]{3,150}')]],
       mobileNumber: ['', [Validators.pattern('^[0-9]{10}$')]], // Assuming a 10-digit phone number
       programName: [''],
@@ -96,6 +98,7 @@ export class CreateLeadComponent {
       amount: ['', [Validators.required, Validators.pattern('^[0-9]+$')]],
       currency: ['', [Validators.required]],
       status: ['', [Validators.required]],
+      followupDate: [''],
       notes: [''],
     });
 
@@ -117,6 +120,13 @@ export class CreateLeadComponent {
     });
   }
 
+  checkStatus(status: any){
+    this.showFollowupDateBox = false;
+    if( status.value == "FOLLOWUP"){
+      this.showFollowupDateBox = true;
+    }
+  }
+
   public getUserList() {
     this.userManagementService.getUserDetailsList()
       .subscribe({
@@ -130,8 +140,9 @@ export class CreateLeadComponent {
       });
   }
 
-  public getDonationListForLead() {
-    this.donationManagementService.getDonationListForLead()
+  public getDonationListForLead(event: any) {
+
+    this.donationManagementService.getDonationListForLead(event.value)
       .subscribe({
         next: (response: any) => {
           if (response['responseCode'] == '200') {
@@ -150,7 +161,7 @@ export class CreateLeadComponent {
       });
   }
 
-  setDonationDetailsToLeadForm(){
+  setDonationDetailsToLeadForm() {
     this.leadForm.patchValue({
       id: this.donationList['id'],
       donorName: this.donationList['donorName'],
@@ -163,7 +174,7 @@ export class CreateLeadComponent {
     });
   }
 
-  setDonationDetailsToNewDonationForm(){
+  setDonationDetailsToNewDonationForm() {
     this.addDonationForm.patchValue({
       id: this.donationList['id'],
       invoiceHeaderDetailsId: this.donationList['invoiceHeaderDetailsId'],
@@ -280,45 +291,14 @@ export class CreateLeadComponent {
       });
   }
 
-  saveLeadDetails(){
+  saveLeadDetails() {
     this.donationManagementService.saveLeadDetails(this.leadForm.value)
       .subscribe({
         next: (response: any) => {
           if (response['responseCode'] == '200') {
             let payload = response['payload'];
             if (response['payload']['respCode'] == '200') {
-              
-              this.messageService.add({ severity: 'success', summary: 'Success', detail: response['payload']['respMesg'] });
-              this.addDonationForm.reset();
-              this.addDonationForm.controls['currencyCode'].setValue(this.currencyList[0].currencyCode);
 
-              if (payload['paymentMode'] == 'PAYMENT_GATEWAY') {
-                let url = payload['paymentGatewayPageRedirectUrl'];
-                console.log(" URL : " + url)
-                this.router.navigate(['donation/donationlist']);
-                window.open(url, '_blank');
-              }
-
-            } else {   
-             
-            }
-          } else {
-          }
-        },
-        
-      });
-  }
-
-  public saveDonationDetails() {
-   
-    this.donationManagementService.saveDonationDetails(this.addDonationForm.value)
-      .subscribe({
-        next: (response: any) => {
-          if (response['responseCode'] == '200') {
-            let payload = response['payload'];
-            if (response['payload']['respCode'] == '200') {
-              
-              
               this.messageService.add({ severity: 'success', summary: 'Success', detail: response['payload']['respMesg'] });
               this.addDonationForm.reset();
               this.addDonationForm.controls['currencyCode'].setValue(this.currencyList[0].currencyCode);
@@ -331,18 +311,49 @@ export class CreateLeadComponent {
               }
 
             } else {
-              
-             
+
             }
           } else {
-            
-
           }
         },
-        
+
       });
   }
 
-  
+  public saveDonationDetails() {
+
+    this.donationManagementService.saveDonationDetails(this.addDonationForm.value)
+      .subscribe({
+        next: (response: any) => {
+          if (response['responseCode'] == '200') {
+            let payload = response['payload'];
+            if (response['payload']['respCode'] == '200') {
+
+
+              this.messageService.add({ severity: 'success', summary: 'Success', detail: response['payload']['respMesg'] });
+              this.addDonationForm.reset();
+              this.addDonationForm.controls['currencyCode'].setValue(this.currencyList[0].currencyCode);
+
+              if (payload['paymentMode'] == 'PAYMENT_GATEWAY') {
+                let url = payload['paymentGatewayPageRedirectUrl'];
+                console.log(" URL : " + url)
+                this.router.navigate(['donation/donationlist']);
+                window.open(url, '_blank');
+              }
+
+            } else {
+
+
+            }
+          } else {
+
+
+          }
+        },
+
+      });
+  }
+
+
 
 }

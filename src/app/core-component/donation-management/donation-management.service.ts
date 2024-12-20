@@ -49,6 +49,7 @@ export class DonationManagementService {
         emailId: donationDetails.emailId,
         notes: donationDetails.notes,
         status: donationDetails.status,
+        followupDate: donationDetails.followupDate,
         createdBy: this.cookieService.get('loginId'),
         loginId: this.cookieService.get('loginId'),
         token: this.cookieService.get('token'),
@@ -111,12 +112,12 @@ export class DonationManagementService {
     return this.http.post<DonationDetailsRequest>(Constant.Site_Url + "getDonationList", request);
   }
 
-  getDonationListForLead(){
+  getDonationListForLead(event:any){
     let request: DonationDetailsRequest = {
       payload: {
         // requestedFor: tabName,
         roleType: this.cookieService.get('roleType'),
-        createdBy: this.cookieService.get('userId'),
+        createdBy: event,
         token: this.cookieService.get('token'),
         superadminId: this.cookieService.get('superadminId'),
       }

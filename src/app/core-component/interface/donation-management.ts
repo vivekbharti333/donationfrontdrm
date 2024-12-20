@@ -24,6 +24,7 @@ export interface DonationDetailsRequest {
     lastDate?: any;
     roleType?: string;
     createdBy?: string;
+    followupDate?: number;
     createdbyName?: string;
     loginId?: string;
     invoiceHeaderDetailsId?: string;
@@ -57,6 +58,7 @@ export interface DonationDetails {
   loginId?: string;
   superadminId?: string;
   invoiceHeaderDetailsId?: string;
+  followupDate?: number;
 }
 
 export interface DonationListForExcel {
