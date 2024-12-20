@@ -1,4 +1,4 @@
-<!-- <div class="page-header"> 
+ <!-- <div class="page-header"> 
      <div class="add-item d-flex">
         <div class="page-title">
             <h4>New Lead</h4>
@@ -18,9 +18,51 @@
                 }</a>
         </li>
     </ul> 
- </div>  -->
+ </div>   -->
 
 <p-toast></p-toast>
+
+<div class="card">
+  <div class="card-body pb-0">
+    <div class="row">
+      <div class="col-lg-3 col-sm-6 col-12">
+        <div class="input-blocks">
+          <i class="feather icon-user info-img"></i>
+          <mat-select class="space-select select" placeholder="Choose User" (selectionChange)="getDonationListForLead()">
+            <!-- <mat-option value="Choose Name">Choose Name</mat-option> -->
+            <mat-option *ngFor="let user of userList" [value]="user.loginId">
+              {{user.firstName}} {{user.lastName}}
+            </mat-option>
+          </mat-select>
+             
+        </div>
+      </div>
+      <div class="col-lg-3 col-sm-6 col-12">
+        <!-- <div class="input-blocks">
+          <i class="feather icon-stop-circle info-img"></i>
+          <mat-select class="space-select select"  placeholder="Choose Teamleader" (selectionChange)="getDonationListByUser($event)">
+            <mat-option *ngFor="let teamLeader of teamLeaderList" [value]="teamLeader.loginId">
+              {{teamLeader.firstName}} {{teamLeader.lastName}}
+            </mat-option>
+          </mat-select>
+        </div> -->
+      </div>
+      <div class="col-lg-3 col-sm-6 col-12">
+        <div class="input-blocks">
+          <i class="feather icon-zap info-img"></i>
+        </div>
+      </div>
+      <div class="col-lg-3 col-sm-6 col-12">
+        <div class="input-blocks">
+          <a class="btn btn-filters ms-auto">
+            <i class="feather icon-search feather-search"></i> Search
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 
 <div class="row">
   <div class="col-lg-5 col-md-5 form-check"></div>
@@ -37,62 +79,227 @@
   <div class="col-lg-5 col-md-5 form-check"></div>
 </div>
 
-<div *ngIf="selectedOption === 'info'">
-  <form #leadForm="ngForm" (ngSubmit)="submitLeadForm(leadForm)">
+  <div *ngIf="selectedOption === 'lead'">
+
+  <form [formGroup]="leadForm" (ngSubmit)="saveLeadDetails()">
     <div class="card">
       <div class="card-body">
         <div class="new-employee-field">
           <div class="card-title-head">
             <h6>
-              <span><i class="feather icon-info feather-edit"></i></span>Customer Details
+              <span><i class="feather icon-info feather-edit"></i></span>Add New Lead
+            </h6>
+          </div>
+
+          <div class="row">
+            <div class="col-lg-2 col-md-2">
+              <div class="mb-3"> <label for="donorName" class="form-label">Donor Name</label>
+                <input id="donorName" class="form-control" type="text" pInputText formControlName="donorName"
+                  maxlength="100" placeholder="Enter donor name" />
+              </div>
+            </div>
+            <div class="col-lg-2 col-md-2">
+              <div class="mb-3">
+                <label class="form-label">Mobile Number</label>
+                <input class="form-control" type="number" pInputText formControlName="mobileNumber" maxlength="100">
+              </div>
+            </div>
+
+            <div class="col-lg-4 col-md-4">
+              <div class="mb-3">
+                <label class="form-label">Program</label>
+                <input class="form-control" type="text" pInputText formControlName="programName" maxlength="100">
+              </div>
+            </div>
+            <div class="col-lg-2 col-md-2">
+              <div class="mb-3">
+                <label class="form-label">Amount</label>
+                <input class="form-control" type="number" pInputText pKeyFilter="int" formControlName="amount"
+                  maxlength="100">
+              </div>
+            </div>
+            <div class="col-lg-1 col-md-1">
+              <div class="mb-3">
+                <label class="form-label">Currency</label>
+                <input class="form-control" type="text" pInputText formControlName="currencyCode" maxlength="100">
+              </div>
+            </div>
+
+
+            <div class="col-lg-2 col-md-2">
+              <div class="mb-2">
+                <label class="form-label">Status</label>
+                <mat-select class="space-select select" formControlName="status" placeholder="Payment Mode">
+                  <mat-option *ngFor="let listData of leadStatus" [value]="listData.value">
+                    {{listData.name}}
+                  </mat-option>
+                </mat-select>
+              </div>
+            </div>
+
+
+          </div>
+
+          <div class="row">
+            <div class="col-lg-4 col-md-4">
+              <div class="mb-3">
+                <label class="form-label">Remarks</label>
+                <textarea class="form-control" style=" float: left; width: 100%; margin-top: 6px; height:150px"
+                 formControlName="notes" placeholder="Write Notes.."></textarea>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="text-mid mb-3">
+      <button type="submit" class="btn btn-submit">Save Lead</button>
+    </div>
+  </form>
+
+</div>
+
+
+<div *ngIf="selectedOption === 'info'">
+
+  <form [formGroup]="addDonationForm" (ngSubmit)="saveDonationDetails()">
+    <div class="card">
+      <div class="card-body">
+        <div class="new-employee-field">
+          <div class="card-title-head">
+            <h6>
+              <span><i class="feather icon-info feather-edit"></i></span>Add Donation Receipt
             </h6>
           </div>
           <div class="row">
             <div class="col-lg-4 col-md-4">
               <div class="mb-3">
-                <label class="form-label requiredField">Customer Name</label>
-                <input type="text" class="form-control" name="customeName" [(ngModel)]="lead.customeName" required
-                  #customeName="ngModel" />
-                @if(customeName?.errors?.['required'] && customeName?.touched) {
-                <div class="errorMessage">Customer Name is required</div>
-                }
+                <label for="receiptType" class="form-label">Receipt Type</label>
+                <mat-select class="space-select select" formControlName="invoiceHeaderDetailsId"
+                  placeholder="Select Fundrising Officer" (change)="onProgramSelect($event)">
+                  <mat-option *ngFor="let invoiceType of invoiceTypeList" [value]="invoiceType.id">
+                    {{ invoiceType.companyFirstName + ' ' + invoiceType.companyLastName }}
+                  </mat-option>
+                </mat-select>
               </div>
             </div>
-            <div class="col-lg-1 col-md-1">
-              <div class="mb-3">
-                <label class="form-label requiredField">Dial Code</label>
-                <input type="text" class="form-control" name="countryDialCode" [(ngModel)]="lead.countryDialCode"
-                  required #countryDialCode="ngModel" />
-                @if(countryDialCode?.errors?.['required'] &&
-                countryDialCode?.touched) {
-                <div class="errorMessage">Dial Code is required</div>
-                }
-              </div>
-            </div>
-            <div class="col-lg-3 col-md-3">
-              <div class="mb-3">
-                <label class="form-label requiredField">Customer Mobile</label>
-                <input type="text" class="form-control" name="customerMobile" [(ngModel)]="lead.customerMobile" required
-                  #customerMobile="ngModel" />
-                @if(customerMobile?.errors?.['required'] &&
-                customerMobile?.touched) {
-                <div class="errorMessage">Customer Mobile is required</div>
-                }
+
+            <div class="col-lg-4 col-md-4">
+              <div class="mb-3"> <label for="donorName" class="form-label">Donor Name</label>
+                <input id="donorName" class="form-control" type="text" pInputText formControlName="donorName"
+                  maxlength="100" placeholder="Enter donor name" />
               </div>
             </div>
             <div class="col-lg-4 col-md-4">
               <div class="mb-3">
-                <label class="form-label requiredField">Customer EmailId</label>
-                <input type="text" class="form-control" name="customerEmailId" [(ngModel)]="lead.customerEmailId"
-                  required #customerEmailId="ngModel" />
-                @if(customerEmailId?.errors?.['required'] &&
-                customerEmailId?.touched) {
-                <div class="errorMessage">Customer EmailId is required</div>
-                }
+                <label class="form-label">Mobile Number</label>
+                <input class="form-control" type="number" pInputText formControlName="mobileNumber" maxlength="100">
               </div>
             </div>
-            <input type="text" class="form-control" name="status" value="INFO"/>
           </div>
+
+          <div class="row">
+            <div class="col-lg-4 col-md-4">
+              <div class="mb-3">
+                <label class="form-label">Email Id</label>
+                <input class="form-control" type="text" pInputText formControlName="emailId" maxlength="100">
+              </div>
+            </div>
+            <div class="col-lg-4 col-md-4">
+              <div class="mb-3">
+                <label class="form-label">Address</label>
+                <input class="form-control" type="text" pInputText formControlName="address" maxlength="100">
+              </div>
+            </div>
+            <div class="col-lg-4 col-md-4">
+              <div class="mb-3">
+                <label class="form-label">Pan</label>
+                <input class="form-control" type="text" pInputText formControlName="panNumber" maxlength="100">
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-lg-4 col-md-4">
+              <div class="mb-3">
+                <label class="form-label">Program</label>
+                <mat-select class="space-select select" formControlName="programName" placeholder="Select Program">
+                  <mat-option *ngFor="let donationOpt of donationTypeList" [value]="donationOpt.programName">
+                    {{donationOpt.programName}}
+                  </mat-option>
+                </mat-select>
+              </div>
+            </div>
+            <div class="col-lg-4 col-md-4" *ngIf="!showCurrencyBox">
+              <div class="mb-3" *ngIf="!showCurrencyBox">
+                <label class="form-label">Amount</label>
+                <input class="form-control" type="number" pInputText pKeyFilter="int" formControlName="amount"
+                  maxlength="100">
+              </div>
+            </div>
+            <div class="col-lg-3 col-md-3" *ngIf="showCurrencyBox">
+              <div class="mb-3" *ngIf="showCurrencyBox">
+                <label class="form-label">Amount</label>
+                <input class="form-control" type="number" pInputText pKeyFilter="int" formControlName="amount"
+                  maxlength="100">
+              </div>
+            </div>
+            <div class="col-lg-1 col-md-1" *ngIf="showCurrencyBox">
+              <div class="mb-3" *ngIf="showCurrencyBox">
+                <label class="form-label">Currency</label>
+                <mat-select class="space-select select" formControlName="currencyCode" placeholder="Currency">
+                  <mat-option *ngFor="let currency of currencyList" [value]="currency.currencyCode">
+                    {{currency.currencyCode+" "+currency.unicode}}
+                  </mat-option>
+                </mat-select>
+              </div>
+            </div>
+            <div class="col-lg-4 col-md-4">
+              <div class="mb-3">
+                <label class="form-label">Transaction Id</label>
+                <input class="form-control" type="text" pInputText formControlName="transactionId" maxlength="100">
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-lg-4 col-md-4">
+              <div class="mb-3">
+                <label class="form-label">Payment Mode</label>
+                <mat-select class="space-select select" formControlName="paymentMode" placeholder="Payment Mode">
+                  <mat-option *ngFor="let payModOpt of paymentModeList" [value]="payModOpt.paymentMode">
+                    {{payModOpt.paymentMode}}
+                  </mat-option>
+                </mat-select>
+              </div>
+            </div>
+            <div class="col-lg-4 col-md-4">
+              <div class="mb-3">
+                <label class="form-label">Fundrising Officer</label>
+
+                <mat-select class="space-select select" formControlName="createdBy"
+                  placeholder="Select Fundrising Officer">
+                  <mat-option *ngFor="let fundRisingOffcer of fundRisingOffcerList" [value]="fundRisingOffcer.loginId">
+                    {{fundRisingOffcer.firstName}} {{fundRisingOffcer.lastName}}
+                  </mat-option>
+                </mat-select>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="row">
+            <div class="col-lg-4 col-md-4">
+              <div class="mb-3">
+                <label class="form-label">Remarks</label>
+                <textarea class="form-control" style=" float: left; width: 100%; margin-top: 6px; height:150px"
+                  formControlName="notes" placeholder="Write Notes.."></textarea>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
     </div>
@@ -100,535 +307,5 @@
       <button type="submit" class="btn btn-submit">Save Info</button>
     </div>
   </form>
-</div>
 
-<!-- //////////////////////////////////////////////////////////// -->
-
-<div *ngIf="selectedOption === 'lead'">
-  <form #leadForm="ngForm" (ngSubmit)="submitLeadForm(leadForm)">
-    <div class="card">
-      <div class="card-body">
-        <div class="new-employee-field">
-          <!-- <table class="center-table">
-            <tr></tr>
-          </table> -->
-
-          <br />
-
-          <div class="row">
-            <div class="col-lg-3 col-md-6">
-              <div class="mb-3">
-                <label class="form-label requiredField">Category Type</label>
-                <mat-select [(ngModel)]="lead.categoryTypeId" class="select" name="categoryTypeId"
-                  placeholder="Select Category Type" (selectionChange)="getSuperCategory($event.value)" required
-                  #categoryTypeId="ngModel">
-                  <app-mat-select-search (filteredList)="setFilterList($event, 'categoryType')"
-                    [originalList]="categoryTypeList" [categoryName]="'categoryTypeName'"></app-mat-select-search>
-                  <mat-option *ngFor="let cateType of filteredCategoryTypeList" [value]="cateType">
-                    {{ cateType.categoryTypeName }}
-                  </mat-option>
-                </mat-select>
-                @if(categoryTypeId?.errors?.['required'] &&
-                categoryTypeId?.touched) {
-                <div class="errorMessage">Category Type is required</div>
-                }
-              </div>
-            </div>
-
-            <div class="col-lg-3 col-md-6">
-              <div class="mb-3">
-                <label class="form-label requiredField">Super Category</label>
-                <mat-select [(ngModel)]="lead.superCategoryId" class="select custom-mat-select" name="superCategoryId"
-                  placeholder="Select a Super Category" (selectionChange)="getCategory($event.value)" required
-                  #superCategoryId="ngModel">
-                  <app-mat-select-search (filteredList)="setFilterList($event, 'superCategory')"
-                    [originalList]="superCategoryList" [categoryName]="'superCategory'"></app-mat-select-search>
-                  <mat-option *ngFor="let supCate of filteredSuperCategoryList" [value]="supCate">
-                    {{ supCate.superCategory }}
-                  </mat-option>
-                </mat-select>
-                @if(superCategoryId?.errors?.['required'] &&
-                superCategoryId?.touched) {
-                <div class="errorMessage">Super Category is required</div>
-                }
-              </div>
-            </div>
-
-            <div class="col-lg-3 col-md-6">
-              <div class="mb-3">
-                <label class="form-label requiredField">Category</label>
-                <mat-select [(ngModel)]="lead.categoryId" class="select custom-mat-select" name="categoryId"
-                  placeholder="Select a Category" (selectionChange)="getSubCategory($event.value)" required
-                  #categoryId="ngModel">
-                  <app-mat-select-search (filteredList)="setFilterList($event, 'category')"
-                    [originalList]="categoryList" [categoryName]="'category'"></app-mat-select-search>
-                  <mat-option *ngFor="let cate of filteredCategoryList" [value]="cate">
-                    {{ cate.category }}
-                  </mat-option>
-                </mat-select>
-                @if(categoryId?.errors?.['required'] && categoryId?.touched) {
-                <div class="errorMessage">Category is required</div>
-                }
-              </div>
-            </div>
-
-            <div class="col-lg-3 col-md-6">
-              <div class="mb-3">
-                <label class="form-label requiredField">Sub Category</label>
-                <mat-select [(ngModel)]="lead.subCategoryId" class="select custom-mat-select" name="subCategoryId"
-                  placeholder="Select a Sub Category" required #subCategoryId="ngModel">
-                  <app-mat-select-search (filteredList)="setFilterList($event, 'subCategory')"
-                    [originalList]="subCategoryList" [categoryName]="'subCategory'"></app-mat-select-search>
-                  <mat-option *ngFor="let subCate of filteredSubCategoryList" [value]="subCate">
-                    {{ subCate.subCategory }}
-                  </mat-option>
-                </mat-select>
-                @if(subCategoryId?.errors?.['required'] &&
-                subCategoryId?.touched) {
-                <div class="errorMessage">Sub Category is required</div>
-                }
-              </div>
-            </div>
-          </div>
-
-          <div class="row">
-            <div class="col-lg-2 col-md-2">
-              <div class="mb-2">
-                <label class="form-label requiredField">Pickup Date & Time</label> <!--[(ngModel)]="lead.pickupDateTime" -->
-                <input type="datetime-local" class="form-control" name="pickupDateTime" [(ngModel)]="lead.pickupDateTime" min="{{selectedDateTime}}" required #pickupDateTime="ngModel" />
-                <!-- @if(pickupDateTime?.errors?.['required'] &&
-                pickupDateTime?.touched) {
-                <div class="errorMessage">Pickup Date & Time is required</div>
-                } -->
-
-                <div *ngIf="pickupDateTime?.errors?.['required'] && pickupDateTime?.touched" class="errorMessage">
-                  Pickup Location is required
-                </div>
-              </div>
-            </div>
-            <div class="col-lg-2 col-md-2">
-              <div class="mb-2">
-                <label class="form-label requiredField">Pickup Location</label>
-                <mat-select [(ngModel)]="lead.pickupLocation" class="select custom-mat-select" name="pickupLocation"
-                  placeholder="Select Pickup Location" required #pickupLocation="ngModel">
-                  <app-mat-select-search (filteredList)="setFilterList($event, 'pickLocation')"
-                    [originalList]="pickLocationList" [categoryName]="'pickLocation'"></app-mat-select-search>
-                  <mat-option *ngFor="let pickList of filteredPickLocationList" [value]="pickList.location">
-                    {{ pickList.location }}
-                  </mat-option>
-                </mat-select>
-            
-                <div *ngIf="pickupLocation?.errors?.['required'] && pickupLocation?.touched" class="errorMessage">
-                  Pickup Location is required
-                </div>
-              </div>
-            </div>
-
-            <div class="col-lg-2 col-md-2">
-              <div class="mb-2">
-                <label class="form-label requiredField">Pickup Point</label>
-                <input type="text" class="form-control" name="pickupPoint" [(ngModel)]="lead.pickupPoint" required
-                  #pickupPoint="ngModel" />
-                <div *ngIf="pickupPoint?.errors?.['required'] && pickupPoint?.touched" class="errorMessage">
-                  Pickup Point is required
-                </div>
-              </div>
-            </div>
-
-            <div class="col-lg-2 col-md-2">
-              <div class="mb-2">
-                <label class="form-label requiredField">Drop Date & Time</label> 
-                <input type="datetime-local" 
-                       class="form-control" 
-                       name="dropDateTime" 
-                       [(ngModel)]="lead.dropDateTime" 
-                       [min]="selectedDateTime" 
-                       step="00:15"
-                       required 
-                       #dropDateTime="ngModel" />
-                <div *ngIf="dropDateTime?.errors?.['required'] && dropDateTime?.touched" 
-                     class="errorMessage">
-                  Drop Date & Time is required
-                </div>
-              </div>
-            </div>
-            <div class="col-lg-2 col-md-2">
-              <div class="mb-2">
-                <label class="form-label requiredField">Drop Location</label>
-                <mat-select [(ngModel)]="lead.dropLocation" class="select custom-mat-select" name="dropLocation"
-                  placeholder="Select a Drop Location" required #superCategoryId="ngModel">
-                  <app-mat-select-search (filteredList)="setFilterList($event, 'dropLocation')"
-                    [originalList]="dropLocationList" [categoryName]="'dropLocation'"></app-mat-select-search>
-                  <mat-option *ngFor="let dropList of filteredDropLocationList" [value]="dropList.location">
-                    {{ dropList.location }}
-                  </mat-option>
-                </mat-select>
-                <div *ngIf="dropLocation?.errors?.['required'] && dropLocation?.touched" class="errorMessage">
-                  Drop Location is required
-                </div>
-              </div>
-            </div>
-
-            <div class="col-lg-2 col-md-2">
-              <div class="mb-2">
-                <label class="form-label requiredField">Drop Point</label>
-                <input type="text" class="form-control" name="dropPoint" [(ngModel)]="lead.dropPoint" required
-                  #dropLocation="ngModel" />
-                <div *ngIf="dropLocation?.errors?.['required'] && dropLocation?.touched" class="errorMessage">
-                  Drop Point is required
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="row">
-            <div class="col-lg-2 col-md-2">
-              <div class="mb-1">
-                <label class="form-label requiredField">Quantity</label>
-                <input type="number" class="form-control" name="quantity" [(ngModel)]="lead.quantity" min="0" required
-                  #quantity="ngModel" />
-                <div *ngIf="quantity?.errors?.['required'] && quantity?.touched" class="errorMessage">
-                  Quantity is required
-                </div>
-              </div>
-            </div>
-            
-              <div class="col-lg-2 col-md-2" *ngIf="isActivities">
-                <div class="mb-1">
-                  <label class="form-label requiredField">Child Quantity</label>
-                  <input type="number" class="form-control" name="childrenQuantity" [(ngModel)]="lead.childrenQuantity" min="0" required
-                    #childrenQuantity="ngModel" />
-                  <div *ngIf="childrenQuantity?.errors?.['required'] && childrenQuantity?.touched" class="errorMessage">
-                    Quantity is required
-                  </div>
-                </div>
-              </div>
-            
-              <div class="col-lg-2 col-md-2" *ngIf="isActivities">
-                <div class="mb-1">
-                  <label class="form-label requiredField">Infant Quantity</label>
-                  <input type="number" class="form-control" name="infantQuantity" [(ngModel)]="lead.infantQuantity" min="0" required
-                    #infantQuantity="ngModel" />
-                  <div *ngIf="infantQuantity?.errors?.['required'] && infantQuantity?.touched" class="errorMessage">
-                    Infant Quantity is required
-                  </div>
-                </div>
-              </div>
-            
-
-            <div class="col-lg-2 col-md-2"  *ngIf="!isActivities">
-              <div class="mb-1">
-                <label class="form-label requiredField">Total Days</label>
-                <input type="number" class="form-control" name="totalDays" [(ngModel)]="lead.totalDays" required
-                  #totalDays="ngModel" />
-                <div *ngIf="totalDays?.errors?.['required'] && totalDays?.touched" class="errorMessage">
-                  Total Days is required
-                </div>
-              </div>
-            </div>
-
-            <div class="col-lg-2 col-md-2">
-              <div class="mb-2">
-                <label class="form-label requiredField">Company Rate</label>
-                <input type="text" class="form-control" name="companyRate" [(ngModel)]="lead.companyRate" required
-                  #companyRate="ngModel" />
-                <div *ngIf="companyRate?.errors?.['required'] && companyRate?.touched" class="errorMessage">
-                  Company Rate is required
-                </div>
-              </div>
-            </div>
-            <div class="col-lg-2 col-md-2">
-              <div class="mb-2">
-                <label class="form-label requiredField">Vendor Rate</label>
-                <input type="text" class="form-control" name="vendorRate" [(ngModel)]="lead.vendorRate" required
-                  #vendorRate="ngModel" />
-                <div *ngIf="vendorRate?.errors?.['required'] && vendorRate?.touched" class="errorMessage">
-                  Vendor Rate is required
-                </div>
-              </div>
-            </div>
-
-            <div class="col-lg-2 col-md-2" *ngIf="!isActivities">
-              <div class="mb-2">
-                <label class="form-label requiredField">Total Delivery</label>
-                <input type="text" class="form-control" name="deliveryAmountToCompany"
-                  [(ngModel)]="lead.deliveryAmountToCompany" required #deliveryAmountToCompany="ngModel" />
-                <div *ngIf="deliveryAmountToCompany?.errors?.['required'] && deliveryAmountToCompany?.touched" class="errorMessage">
-                  Total Delivery is required
-                </div>
-              </div>
-            </div>
-
-            <div class="col-lg-2 col-md-2">
-              <div class="mb-2">
-                <label class="form-label requiredField">Delivery To Vendor</label>
-                <input type="text" class="form-control" name="deliveryAmountToVendor"
-                  [(ngModel)]="lead.deliveryAmountToVendor" required #deliveryAmountToVendor="ngModel" />
-                <!-- @if(deliveryAmountToVendor?.errors?.['required'] &&
-                deliveryAmountToVendor?.touched) {
-                <div class="errorMessage">Delivery To Vendor is required</div>
-                } -->
-                <div *ngIf="deliveryAmountToVendor?.errors?.['required'] && deliveryAmountToVendor?.touched" class="errorMessage">
-                  Delivery To Vendor is required
-                </div>
-              </div>
-            </div>
-            <div class="col-lg-2 col-md-2"></div>
-          </div>
-
-          <div class="row">
-            <div class="col-lg-2 col-md-2"></div>
-            <div class="col-lg-2 col-md-2">
-              <div class="mb-2">
-                <label class="form-label requiredField">Booking Amount</label>
-                <input type="number" class="form-control" name="bookingAmount" [(ngModel)]="lead.bookingAmount" required #bookingAmount="ngModel" />
-                <div *ngIf="bookingAmount?.errors?.['required'] && bookingAmount?.touched" class="errorMessage">
-                  Booking Amount is required
-                </div>
-              </div>
-            </div>
-
-            <div class="col-lg-2 col-md-2">
-              <div class="mb-2">
-                <label class="form-label requiredField">Balance Amount</label>
-                <input type="number" class="form-control" name="balanceAmount" [(ngModel)]="lead.balanceAmount" required #balanceAmount="ngModel" />
-                <div *ngIf="balanceAmount?.errors?.['required'] && balanceAmount?.touched" class="errorMessage">
-                  Balance Amount is required
-                </div>
-              </div>
-            </div>
-            <div class="col-lg-2 col-md-2">
-              <div class="mb-2">
-                <label class="form-label requiredField">Total Amount</label>
-                <input type="number" class="form-control" name="totalAmount" [(ngModel)]="lead.totalAmount" required #totalAmount="ngModel" />
-                <div *ngIf="totalAmount?.errors?.['required'] && totalAmount?.touched" class="errorMessage">
-                  Total Amount is required
-                </div>
-              </div>
-            </div>
-            <div class="col-lg-2 col-md-2" *ngIf="!isActivities">
-              <div class="mb-2">
-                <label class="form-label requiredField">Security Amount</label>
-                <input type="number" class="form-control" name="securityAmount" [(ngModel)]="lead.securityAmount"
-                  required #securityAmount="ngModel" />
-                <div *ngIf="securityAmount?.errors?.['required'] && securityAmount?.touched" class="errorMessage">
-                  Security Amount is required
-                </div>
-              </div>
-            </div>
-            <div class="col-lg-2 col-md-2"></div>
-          </div>
-
-          <div class="row">
-            <div class="col-lg-2 col-md-2"></div>
-            <div class="col-lg-2 col-md-2">
-              <label class="form-label requiredField">Pay to Vendor</label>
-              <input type="text" class="form-control" name="payToVendor" [(ngModel)]="lead.payToVendor" required
-                #payToVendor="ngModel" />
-              <div *ngIf="payToVendor?.errors?.['required'] && payToVendor?.touched" class="errorMessage">
-                Pay to Vendor is required
-              </div>
-            </div>
-            <div class="col-lg-2 col-md-2">
-              <div class="mb-2">
-                <label class="form-label requiredField">Pay To Company</label>
-                <input type="text" class="form-control" name="payToCompany" [(ngModel)]="lead.payToCompany" required
-                  #payToCompany="ngModel" />
-                <div *ngIf="payToCompany?.errors?.['required'] && payToCompany?.touched" class="errorMessage">
-                  Pay to Company is required
-                </div>
-              </div>
-            </div>
-            <div class="col-lg-2 col-md-2">
-              <div class="mb-2">
-                <label class="form-label requiredField">Lead Origine</label>
-                <mat-select name="leadOrigine" [(ngModel)]="lead.leadOrigine" class="select"
-                  placeholder="Select Lead Origine">
-                  @for (listData of leadOrigine; track listData) {
-                  <mat-option [value]="listData.name">
-                    {{ listData.name }}
-                  </mat-option>
-                  }
-                </mat-select>
-              </div>
-            </div>
-            <div class="col-lg-2 col-md-2">
-              <div class="mb-2">
-                <label class="form-label requiredField">Lead Type</label>
-                <mat-select name="leadType" [(ngModel)]="lead.leadType" class="select" placeholder="Select Lead Type">
-                  @for (listData of leadType; track listData) {
-                  <mat-option [value]="listData.name">
-                    {{ listData.name }}
-                  </mat-option>
-                  }
-                </mat-select>
-              </div>
-            </div>
-            <div class="col-lg-2 col-md-2"></div>
-          </div>
-
-          <div class="row">
-            <div class="col-lg-2 col-md-2"></div>
-            <div class="col-lg-2 col-md-2">
-              <div class="mb-2">
-                <label class="form-label requiredField">Created By</label>
-                @if(roleType === 'SUPERADMIN') {
-                <mat-select [(ngModel)]="lead.createdBy" class="select custom-mat-select" name="createdBy"
-                  placeholder="Select Agent Name" #createdBy="ngModel">
-                  <mat-option *ngFor="let user of userList" [value]="user.loginId">
-                    {{ user.firstName }}
-                  </mat-option>
-                </mat-select>
-                @if(createdBy?.errors?.['required'] && createdBy?.touched) {
-                <div class="errorMessage">Created By is required</div>
-                } } @else {
-                <input type="text" class="form-control" name="createdBy" [(ngModel)]="lead.createdBy"
-                  #createdBy="ngModel" readonly />
-                @if(createdBy?.errors?.['required'] && createdBy?.touched) {
-                <div class="errorMessage">Created By is required</div>
-                } }
-              </div>
-            </div>
-            <div class="col-lg-2 col-md-2">
-              <div class="mb-2">
-                <label class="form-label">Status</label>
-                <mat-select name="status" [(ngModel)]="lead.status" class="select" placeholder="Select Status">
-                  @for (listData of leadStatus; track listData) {
-                  <mat-option [value]="listData.value">
-                    {{ listData.name }}
-                  </mat-option>
-                  }
-                </mat-select>
-              </div>
-            </div>
-          </div>
-
-          <div class="card-title-head">
-            <h6>
-              <span><i class="feather icon-info feather-edit"></i></span>Customer Details
-            </h6>
-          </div>
-          <div class="row">
-            <div class="col-lg-3 col-md-3">
-              <div class="mb-3">
-                <input type="text" class="form-control bottom-border" placeholder="Custome Name" name="customeName"
-                  [(ngModel)]="lead.customeName" required #customeName="ngModel" />
-                @if(customeName?.errors?.['required'] && customeName?.touched) {
-                <div class="errorMessage">Customer Name is required</div>
-                }
-              </div>
-            </div>
-            <div class="col-lg-1 col-md-3">
-              <div class="mb-3">
-                <input type="text" class="form-control bottom-border" placeholder="Dial Code" name="countryDialCode"
-                  [(ngModel)]="lead.countryDialCode" required #countryDialCode="ngModel" />
-                @if(customeName?.errors?.['required'] && customeName?.touched) {
-                <div class="errorMessage">Dial Code is required</div>
-                }
-              </div>
-            </div>
-            <div class="col-lg-2 col-md-6">
-              <div class="mb-3">
-                <input type="text" class="form-control bottom-border" placeholder="Mobile" name="customerMobile"
-                  [(ngModel)]="lead.customerMobile" required #customerMobile="ngModel" />
-                @if(customerMobile?.errors?.['required'] &&
-                customerMobile?.touched) {
-                <div class="errorMessage">Customer Mobile is required</div>
-                }
-              </div>
-            </div>
-            <div class="col-lg-2 col-md-6">
-              <div class="mb-3">
-                <input type="text" class="form-control bottom-border" placeholder="Alternate Mobile"
-                  name="customerAlternateMobile" [(ngModel)]="lead.customerAlternateMobile"
-                  #customerAlternateMobile="ngModel" />
-              </div>
-            </div>
-            <div class="col-lg-4 col-md-6">
-              <div class="mb-3">
-                <input type="text" class="form-control bottom-border" placeholder="Customer EmailId"
-                  name="customerEmailId" [(ngModel)]="lead.customerEmailId" required #customerEmailId="ngModel" />
-                @if(customerEmailId?.errors?.['required'] &&
-                customerEmailId?.touched) {
-                <div class="errorMessage">Customer EmailId is required</div>
-                }
-              </div>
-            </div>
-          </div>
-
-          <div class="row ">
-            <div class="remarks-box">
-            <p></p>
-            <div class="col-lg-4 col-md-4">
-              <div class="input-container">
-                <label for="reports"><b>Report: </b></label>{{ lead.vendorRate }}
-              </div>
-              <div class="input-container">
-                <label for="delivery"><b>Delivery: </b></label>{{ lead.deliveryAmountToCompany }}
-              </div>
-              <div class="input-container">
-                <label for="remarks" class="requiredField"><b>Remarks:</b></label>
-                <input type="text" id="remarks" class="form-control no-border" placeholder=" Write Remarks..."
-                  name="remarks" [(ngModel)]="lead.remarks" required #remarks="ngModel" />
-                @if(remarks?.errors?.['required'] && remarks?.touched) {
-                <div class="errorMessage">Remarks is required</div>
-                }
-              </div>
-              <div class="input-container">
-                <label for="pay-to-vendor"><b>Pay to vendor:</b></label>{{ lead.payToVendor }}
-              </div>
-              <div class="input-container">
-                <label for="pay-to-company"><b>Pay to company:</b></label>
-                {{ lead.payToCompany }}
-                <!-- <input type="text" id="pay-to-company" class="form-control no-border" placeholder="Pay to company" name="customerEmailId" [(ngModel)]="lead.customerEmailId" required> -->
-              </div>
-            </div>
-
-            <div class="col-lg-4 col-md-4 vl">
-              <input class="form-check-input" type="radio" name="companyName" [(ngModel)]="lead.companyName"
-                value="Notes" id="notes1" checked />
-              <label class="form-check-label" for="notes1" style="margin-right: 20px; margin-left: 20px">
-                Notes
-              </label>
-              <input class="form-check-input" type="radio" name="companyName" [(ngModel)]="lead.companyName"
-                value="Reminders" id="notes2" />
-              <label class="form-check-label" for="notes2" style="margin-left: 20px">
-                Reminders
-              </label>
-
-              <div *ngIf="lead.companyName === 'Notes'">
-                <textarea class="form-control no-border" name="notes" [(ngModel)]="lead.notes" rows="4"
-                  placeholder="___________________________________________________________________________________________________________________________________________________________________________________________________________"></textarea>
-              </div>
-              <P></P>
-              <div *ngIf="lead.companyName === 'Reminders'">
-                <input type="datetime-local" class="form-control" name="reminderDate"
-                  [(ngModel)]="lead.followupDateTime" required #reminderDate="ngModel" />
-                @if(reminderDate?.errors?.['required'] && reminderDate?.touched)
-                {
-                <div class="errorMessage">Reminder Date is required</div>
-                }
-                <textarea class="form-control no-border" name="notes" [(ngModel)]="lead.notes" rows="2"
-                  placeholder="___________________________________________________________________________________________"></textarea>
-              </div>
-            </div>
-            <div class="col-lg-4 col-md-4 vl">
-              <h4>Records</h4>
-              <textarea class="form-control no-border" name="records" [(ngModel)]="lead.records" rows="4"
-                placeholder="No Records Found"></textarea>
-            </div>
-          </div></div>
-        </div>
-      </div>
-      <div class="text-mid mb-3">
-        <!-- <button type="submit" class="btn btn-submit" [disabled]="!leadForm.form.valid">Save User</button> -->
-        <button type="submit" class="btn btn-submit">Save Lead</button>
-      </div>
-    </div>
-
-    <div class="text-mid mb-3">
-      <!-- <button type="submit" class="btn btn-submit" [disabled]="!leadForm.form.valid">Save User</button> -->
-      <button type="submit" class="btn btn-submit">Save Lead</button>
-    </div>
-  </form>
 </div>

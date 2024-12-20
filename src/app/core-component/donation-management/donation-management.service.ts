@@ -37,6 +37,28 @@ export class DonationManagementService {
     return this.http.post<DonationDetailsRequest>(Constant.Site_Url + "getFundRisingOfficersBySuperadminId", request);
   }
 
+  
+  saveLeadDetails(donationDetails: DonationDetails): Observable<DonationDetailsRequest> {
+    this.loginUser = this.authenticationService.getLoginUser();
+
+    let request: DonationDetailsRequest = {
+      payload: {
+        id: donationDetails.id,
+        donorName: donationDetails.donorName,
+        mobileNumber: donationDetails.mobileNumber,
+        emailId: donationDetails.emailId,
+        notes: donationDetails.notes,
+        status: donationDetails.status,
+        createdBy: this.cookieService.get('loginId'),
+        loginId: this.cookieService.get('loginId'),
+        token: this.cookieService.get('token'),
+        superadminId: this.cookieService.get('superadminId'),
+        createdbyName: (this.cookieService.get('firstName')+" "+this.cookieService.get('lastName'))
+
+      }
+    };
+    return this.http.post<DonationDetailsRequest>(Constant.Site_Url + "createLead", request);
+  }
 
   saveDonationDetails(donationDetails: DonationDetails): Observable<DonationDetailsRequest> {
     this.loginUser = this.authenticationService.getLoginUser();
@@ -87,6 +109,19 @@ export class DonationManagementService {
       }
     };
     return this.http.post<DonationDetailsRequest>(Constant.Site_Url + "getDonationList", request);
+  }
+
+  getDonationListForLead(){
+    let request: DonationDetailsRequest = {
+      payload: {
+        // requestedFor: tabName,
+        roleType: this.cookieService.get('roleType'),
+        createdBy: this.cookieService.get('userId'),
+        token: this.cookieService.get('token'),
+        superadminId: this.cookieService.get('superadminId'),
+      }
+    };
+    return this.http.post<DonationDetailsRequest>(Constant.Site_Url + "getDonationListForLead", request);
   }
 
   updateDonationDetails(donationDetails: DonationDetails): Observable<DonationDetailsRequest> {

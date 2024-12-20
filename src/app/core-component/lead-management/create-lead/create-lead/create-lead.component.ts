@@ -1,9 +1,16 @@
 import { Component } from '@angular/core';
-import { FormsModule, NgForm } from '@angular/forms'; // Import FormsModule and NgForm
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { SidebarService, routes } from 'src/app/core/core.index'; // Ensure correct import path
 import { MessageService } from 'primeng/api';
 import { AuthenticationService } from 'src/app/auth/authentication.service';
 import { LeadManagementService } from '../../lead-management.service';
+import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
+import { ReceiptHeaderListService } from 'src/app/core-component/receipt-management/receipt-header-list/receipt-header-list.service';
+import { ProgramManagementService } from 'src/app/core-component/program-management/program-management.service'; 
+import { CurrencyService } from 'src/app/core-component/currency-management/currency/currency.service'; 
+import { PaymentModeService } from 'src/app/core-component/payment-mode-management/payment-mode/payment-mode.service'; 
+import { DonationManagementService } from 'src/app/core-component/donation-management/donation-management.service';
 import { Constant } from 'src/app/core/constant/constants';
 import { ToastModule } from 'primeng/toast';
 import { SpinnerService } from 'src/app/core/core.index';
@@ -11,16 +18,6 @@ import { CategoriesManagementService } from 'src/app/core-component/categories-m
 import { UserManagementService } from 'src/app/core-component/user-management/user-management.service';
 import { CookieService } from 'ngx-cookie-service';
 import { CalendarModule } from 'primeng/calendar';
-
-interface data {
-  id: number;
-  name: string;
-}
-
-interface su {
-  id: number;
-  name: string;
-}
 
 interface listData {
   value: string;
@@ -34,164 +31,157 @@ interface listData {
   providers: [MessageService, ToastModule, CalendarModule],
 })
 export class CreateLeadComponent {
-  public loginUser: any;
+
   public selectedOption: string = 'lead';
-  public categoryTypeList: any[] = [];
-  public superCategoryList: any[] = [];
-  public categoryList: any[] = [];
-  public subCategoryList: any[] = [];
-  public pickLocationList: any[] = [];
-  public dropLocationList: any[] = [];
-  public userList: any[] = [];
+   public addDonationForm!: FormGroup;
+   public leadForm!: FormGroup;
+    public isLoading = false;
+    public loginUser : any;
+    public userList: any
+    public showFundrisingOfficerList: boolean = false;
+  
+    public donationList: any;
+    public showCurrencyBox: boolean = false;
+    public currencyList: any;
+    public fundRisingOffcerList: any;
+    public invoiceTypeList: any;
+    public invoiceType: any;
+    public paymentModeList: any;
+    public donationTypeList: any;
+    public programNames: string = '';
+    public selectedProgramAmount: number | null = null;
 
-  selectedDateTime: string = '';
+    leadStatus: listData[] = Constant.LEAD_STATUS_LIST;
 
-  roleType: string = '';
-  fullName: string = '';
-  lead = {
-    companyName: 'Notes',
-    enquirySource: 'Call',
-    categoryTypeId: '',
-    superCategoryId: '',
-    categoryId: '',
-    subCategoryId: '',
-    categoryTypeName: '', 
-    superCategory: '', 
-    category: '', 
-    subCategory: '', 
-    itemName: '',
-    pickupDateTime: '',
-    pickupLocation: '',
-    pickupPoint: '',
-    dropDateTime: '',
-    dropLocation: '',
-    dropPoint: '',
-    customeName: '',
-    countryDialCode: '',
-    customerMobile: '',
-    customerAlternateMobile: '',
-    customerEmailId: '',
-    totalDays: '',
-    quantity: '',
-    childrenQuantity: '',
-    infantQuantity: '',
-    vendorRate: '',
-    payToVendor: '',
-    companyRate: '',
-    payToCompany: '',
-    bookingAmount: '',
-    balanceAmount: '',
-    totalAmount: '',
-    securityAmount: '',
-    deliveryAmountToCompany: '',
-    deliveryAmountToVendor: '',
-    status: '',
-    leadOrigine: '',
-    leadType: '',
-    createdBy: '',
-    notes: '',
-    followupDateTime: '',
-    remarks: '',
-    preValue: `    Reports : 
-    Delivery : 
-    Comments : 
-    Pay to vendor : 
-    Pay to company :`,
-    reminderDate: '',
-    records: '',
-  };
-
-  public isActivities:Boolean = false;
-
-  filteredCategoryTypeList: any[] = [];
-  filteredSuperCategoryList: any[] = [];
-  filteredCategoryList: any[] = [];
-  filteredSubCategoryList: any[] = [];
-  filteredPickLocationList: any[] =[];
-  filteredDropLocationList: any[] =[];
 
   constructor(
+    private fb: FormBuilder,
+    private http: HttpClient,
+    private router: Router,
     private sidebar: SidebarService,
+
     private leadManagementService: LeadManagementService,
     private authenticationService: AuthenticationService,
-    private messageService: MessageService,
     private spinnerService: SpinnerService,
     private categoriesManagementService: CategoriesManagementService,
     private userManagementService: UserManagementService,
-    private cookiesService: CookieService
+    private cookiesService: CookieService,
+      private receiptHeaderListService: ReceiptHeaderListService,
+        private programManagementService: ProgramManagementService,
+        private currencyService: CurrencyService,
+        private paymentModeService: PaymentModeService,
+        private donationManagementService: DonationManagementService,
+        private messageService: MessageService,
   ) {
-    this.loginUser = this.authenticationService.getLoginUser();
-    this.roleType = this.cookiesService.get('roleType');
-    this.fullName =
-      this.cookiesService.get('firstName') +
-      ' ' +
-      this.cookiesService.get('lastName');
 
-      this.setDefaultDateTime();
-  }
-
-  setDefaultDateTime1(): void {
-    const currentDate = new Date();
-
-    // Adjust to local time zone
-    const timeZoneOffset = currentDate.getTimezoneOffset() * 60000; // offset in milliseconds
-    const localDate = new Date(currentDate.getTime() - timeZoneOffset);
-
-    // Round minutes to the nearest 15-minute interval
-    const minutes = localDate.getMinutes();
-    const roundedMinutes = Math.ceil(minutes / 15) * 15;
-    localDate.setMinutes(roundedMinutes);
-    localDate.setSeconds(0);
-    localDate.setMilliseconds(0);
-
-    // Format the date to the required input format: YYYY-MM-DDTHH:MM
-    const year = localDate.getFullYear();
-    const month = String(localDate.getMonth() + 1).padStart(2, '0');
-    const day = String(localDate.getDate()).padStart(2, '0');
-    const hours = String(localDate.getHours()).padStart(2, '0');
-    const minutesFormatted = String(localDate.getMinutes()).padStart(2, '0');
-
-    this.selectedDateTime = `${year}-${month}-${day}T${hours}:${minutesFormatted}`;
-  }
-
-  setDefaultDateTime(): void {
-    const currentDate = new Date();
-  
-    // Get the local date and time values
-    const year = currentDate.getFullYear();
-    const month = String(currentDate.getMonth() + 1).padStart(2, '0');  // Months are zero-indexed
-    const day = String(currentDate.getDate()).padStart(2, '0');
-    const hours = String(currentDate.getHours()).padStart(2, '0');
-    const minutes = String(currentDate.getMinutes()).padStart(2, '0');
-  
-    // Combine into the required format: YYYY-MM-DDTHH:MM
-    // this.selectedDateTime = `${year}-${month}-${day}T${hours}:${minutes}`;
-    this.lead.dropDateTime = `${year}-${month}-${day}T${hours}:${minutes}`;
-    this.lead.pickupDateTime = `${year}-${month}-${day}T${hours}:${minutes}`;
   }
 
   ngOnInit() {
-    this.setDefaultDateTime();
-    this.getCategoryType();
-    this.getUserList();
-    this.getPickLocation();
-    this.getDropLocation();
-    this.roleType === 'SUPERADMIN'
-      ? (this.lead.createdBy = '')
-      : (this.lead.createdBy = this.fullName);
-
-      // if (this.filteredPickLocationList.length > 0) {
-      //   this.lead.pickupLocation = this.filteredPickLocationList[0];
-      // }
+    this.getDonationListForLead();
+    this.createForms();
+    this.getInvoiceTypeList();
+    this.getDonationTypeList();
+    this.getCurrencyDetailBySuperadmin();
+    this.getPaymentModeList();
+    this.getFundrisingOfficerByTeamLeaderId();
   }
 
-  checkCategoryType(categoryType: any) {
-    console.log(categoryType.categoryTypeName, Constant.ACTIVITY); // For debugging
-    if (categoryType.categoryTypeName === Constant.ACTIVITY) {
-      this.isActivities = true;
-    } else {
-      this.isActivities = false;
-    }
+  createForms() {
+    this.leadForm = this.fb.group({
+      id:[''],
+      donorName: ['', [Validators.required, Validators.pattern('[A-Za-z ]{3,150}')]],
+      mobileNumber: ['', [Validators.pattern('^[0-9]{10}$')]], // Assuming a 10-digit phone number
+      programName: [''],
+      emailId: ['', [Validators.required, Validators.email]],
+      amount: ['', [Validators.required, Validators.pattern('^[0-9]+$')]],
+      currency: ['', [Validators.required]],
+      status: ['', [Validators.required]],
+      notes: [''],
+    });
+
+    this.addDonationForm = this.fb.group({
+      createdBy: ['N/A'],
+      invoiceHeaderDetailsId: [''],
+      donorName: ['', [Validators.required, Validators.pattern('[A-Za-z ]{3,150}')]],
+      mobileNumber: ['', [Validators.pattern('^[0-9]{10}$')]], // Assuming a 10-digit phone number
+      emailId: ['', [Validators.required, Validators.email]],
+      address: ['', [Validators.required, Validators.pattern('[A-Za-z0-9 ,.-]{3,150}')]],
+      panNumber: ['', [Validators.pattern('[A-Z]{5}[0-9]{4}[A-Z]{1}')]],
+      programName: [''],
+      amount: ['', [Validators.required, Validators.pattern('^[0-9]+$')]],
+      currency: ['', [Validators.required]],
+      currencyCode: ['', [Validators.required]],
+      transactionId: ['', [Validators.pattern('[A-Za-z0-9]{3,150}')]],
+      paymentMode: ['', [Validators.required]],
+      notes: [''],
+    });
+  }
+
+  public getUserList() {
+    this.userManagementService.getUserDetailsList()
+      .subscribe({
+        next: (response: any) => {
+          if (response['responseCode'] == '200') {
+            this.userList = JSON.parse(JSON.stringify(response['listPayload']));
+          } else {
+          }
+        },
+        //   error: (error: any) => this.toastr.error('Server Error', '500'),
+      });
+  }
+
+  public getDonationListForLead() {
+    this.donationManagementService.getDonationListForLead()
+      .subscribe({
+        next: (response: any) => {
+          if (response['responseCode'] == '200') {
+            this.donationList = JSON.parse(JSON.stringify(response['listPayload']));
+
+            this.donationList = this.donationList[0];
+            this.setDonationDetailsToLeadForm();
+            this.setDonationDetailsToNewDonationForm();
+
+            // this.toastr.success(response['responseMessage'], response['responseCode']);
+          } else {
+            //  this.toastr.error(response['responseMessage'], response['responseCode']);
+          }
+        },
+        //error: (error: any) => this.toastr.error('Server Error', '500'),
+      });
+  }
+
+  setDonationDetailsToLeadForm(){
+    this.leadForm.patchValue({
+      id: this.donationList['id'],
+      donorName: this.donationList['donorName'],
+      mobileNumber: this.donationList['mobileNumber'],
+      emailId: this.donationList['emailId'],
+      programName: this.donationList['programName'],
+      amount: this.donationList['amount'],
+      currency: this.donationList['currency'],
+      notes: this.donationList['notes'],
+    });
+  }
+
+  setDonationDetailsToNewDonationForm(){
+    this.addDonationForm.patchValue({
+      id: this.donationList['id'],
+      invoiceHeaderDetailsId: this.donationList['invoiceHeaderDetailsId'],
+      invoiceHeaderName: this.donationList['invoiceHeaderName'],
+      createdBy: this.donationList['createdBy'],
+      donorName: this.donationList['donorName'],
+      mobileNumber: this.donationList['mobileNumber'],
+      emailId: this.donationList['emailId'],
+      address: this.donationList['address'],
+      panNumber: this.donationList['panNumber'],
+      programName: this.donationList['programName'],
+      amount: this.donationList['amount'],
+      currency: this.donationList['currency'],
+      currencyCode: this.donationList['currencyCode'],
+      transactionId: this.donationList['transactionId'],
+      paymentMode: this.donationList['paymentMode'],
+      notes: this.donationList['notes'],
+    });
   }
 
   onSelectionChange(event: Event): void {
@@ -200,243 +190,159 @@ export class CreateLeadComponent {
     console.log('Selected option:', this.selectedOption);
   }
 
-  public routes = routes;
-  public selectedValue1 = '';
-  public selectedValue2 = '';
-  public selectedValue3 = '';
-  public selectedValue4 = '';
-  public selectedValue5 = '';
-  public selectedValue6 = '';
-  public selectedValue7 = '';
-  public selectedValue8 = '';
-  public selectedValue9 = '';
-  public selectedValue10 = '';
-  public selectedValue11 = '';
-
-  selectedList1: data[] = [
-    { id: 1, name: 'Car' },
-    { id: 2, name: 'Bike' },
-  ];
-
-  selectedList2: data[] = [
-    { id: 1, name: 'Car' },
-    { id: 2, name: 'Bike' },
-  ];
-
-  selectedList3: data[] = [
-    { id: 1, name: 'Car' },
-    { id: 2, name: 'Bike' },
-  ];
-
-  // leadOrigine: listData[] = [{ value: 'CALL', name: 'Call'}, {value: 'WHATSAPP', name: 'Whats App'}, {value: 'EMAIL', name: 'Email'},{value: 'OTHER', name: 'Other'}];
-  leadOrigine: listData[] = Constant.LEAD_ORIGINE_LIST;
-  leadType: listData[] = Constant.LEAD_TYPE_LIST;
-  leadStatus: listData[] = Constant.LEAD_STATUS_LIST;
-
-  submitLeadForm(form: NgForm) {
-    this.leadManagementService.saveLeadDetails(this.lead).subscribe({
-      next: (response: any) => {
-        alert("response : "+response.responseCode);
-        if (response['responseCode'] == '200') {
-          if (response['payload']['respCode'] == '200') {
-            form.reset();
-            this.setDefaultDateTime();
-            this.messageService.add({
-              summary: response['payload']['respCode'],
-              detail: response['payload']['respMesg'],
-              styleClass: 'success-background-popover',
-            });
+  public getInvoiceTypeList() {
+    this.receiptHeaderListService.getInvoiceHeaderList()
+      .subscribe({
+        next: (response: any) => {
+          if (response['responseCode'] == '200') {
+            this.invoiceTypeList = JSON.parse(JSON.stringify(response['listPayload']));
+            console.log(this.invoiceTypeList)
+            // this.toastr.success(response['responseMessage'], response['responseCode']);
           } else {
-            this.messageService.add({
-              summary: response['payload']['respCode'],
-              detail: response['payload']['respMesg'],
-              styleClass: 'danger-background-popover',
-            });
-          }
-        } else {
-          this.messageService.add({
-            summary: response['payload']['respCode'],
-            detail: response['payload']['respMesg'],
-            styleClass: 'danger-background-popover',
-          });
-        }
-      },
-      error: () =>
-        this.messageService.add({
-          summary: '500',
-          detail: 'Server Error',
-        }),
-    });
-  }
-
-  isCollapsed: boolean = false;
-
-  toggleCollapse() {
-    this.sidebar.toggleCollapse();
-    this.isCollapsed = !this.isCollapsed;
-  }
-
-  public getCategoryType() {
-    this.categoriesManagementService.getCategoryTypeList().subscribe({
-      next: (response: any) => {
-        if (response['responseCode'] == '200') {
-          this.categoryTypeList = JSON.parse(
-            JSON.stringify(response.listPayload)
-          );
-          this.filteredCategoryTypeList = this.categoryTypeList;
-        }
-      },
-      error: (error: any) =>
-        this.messageService.add({
-          summary: '500',
-          detail: 'Server Error',
-          styleClass: 'danger-background-popover',
-        }),
-    });
-  }
-
-  public getPickLocation() {
-    this.categoriesManagementService.getLocationByType('PICK').subscribe({
-      next: (response: any) => {
-        if (response['responseCode'] == '200') {
-          this.pickLocationList = JSON.parse(
-            JSON.stringify(response.listPayload)
-          );
-          this.filteredPickLocationList = this.pickLocationList;
-        }
-      },
-      error: (error: any) =>
-        this.messageService.add({
-          summary: '500',
-          detail: 'Server Error',
-          styleClass: 'danger-background-popover',
-        }),
-    });
-  }
-
-  public getDropLocation() {
-    this.categoriesManagementService.getLocationByType('DROP').subscribe({
-      next: (response: any) => {
-        if (response['responseCode'] == '200') {
-          this.dropLocationList = JSON.parse(
-            JSON.stringify(response.listPayload)
-          );
-          this.filteredDropLocationList = this.dropLocationList;
-        }
-      },
-      error: (error: any) =>
-        this.messageService.add({
-          summary: '500',
-          detail: 'Server Error',
-          styleClass: 'danger-background-popover',
-        }),
-    });
-  }
-
-  public getSuperCategory(superCateId: any) {
-    this.checkCategoryType(superCateId);
-    const categoryId = superCateId?.id;
-    this.categoriesManagementService
-      .getSuperCategoryListByCategoryTypeId(categoryId)
-      .subscribe({
-        next: (response: any) => {
-          if (response['responseCode'] == '200') {
-            this.superCategoryList = JSON.parse(
-              JSON.stringify(response.listPayload)
-            );
-            this.filteredSuperCategoryList = this.superCategoryList;
+            //this.toastr.error(response['responseMessage'], response['responseCode']);
           }
         },
-        error: (error: any) =>
-          this.messageService.add({
-            summary: '500',
-            detail: 'Server Error',
-            styleClass: 'danger-background-popover',
-          }),
+        // error: (error: any) => this.toastr.error('Server Error', '500'),
       });
   }
 
-  public getCategory(categoryId: any) {
-    const superCatId = categoryId?.id;
-    this.categoriesManagementService
-      .getCategoryBySuperCatId(superCatId)
+  public getDonationTypeList() {
+    this.programManagementService.getDonationTypeList()
       .subscribe({
         next: (response: any) => {
           if (response['responseCode'] == '200') {
-            this.categoryList = JSON.parse(
-              JSON.stringify(response.listPayload)
-            );
-            this.filteredCategoryList = this.categoryList;
+            this.donationTypeList = JSON.parse(JSON.stringify(response['listPayload']));
+
+            console.log("This one :" + this.donationTypeList.value)
+            this.programNames = this.donationTypeList.listPayload.map((item: any) => item.programName);
+
+            // this.toastr.success(response['responseMessage'], response['responseCode']);
+          } else {
+            //  this.toastr.error(response['responseMessage'], response['responseCode']);
           }
         },
-        error: (error: any) =>
-          this.messageService.add({
-            summary: '500',
-            detail: 'Server Error',
-            styleClass: 'danger-background-popover',
-          }),
+        //error: (error: any) => this.toastr.error('Server Error', '500'),
       });
   }
 
-  public getSubCategory(subCategoryId: any) {
-    const categoryId = subCategoryId?.id;
-    this.categoriesManagementService
-      .getSubCategoryListByCatId(categoryId)
+  onProgramSelect(program: any) {
+    this.selectedProgramAmount = program['programAmount'];
+  }
+
+  public getCurrencyDetailBySuperadmin() {
+    this.currencyService.getCurrencyDetailBySuperadmin()
       .subscribe({
         next: (response: any) => {
           if (response['responseCode'] == '200') {
-            this.subCategoryList = JSON.parse(
-              JSON.stringify(response.listPayload)
-            );
-            this.filteredSubCategoryList = this.subCategoryList;
+            this.currencyList = JSON.parse(JSON.stringify(response['listPayload']));
+
+            if (this.currencyList.length > 1) {
+              this.showCurrencyBox = true;
+
+            }
+            this.addDonationForm.controls['currencyCode'].setValue(this.currencyList[0].currencyCode);
+          } else {
           }
         },
-        error: (error: any) =>
-          this.messageService.add({
-            summary: '500',
-            detail: 'Server Error',
-            styleClass: 'danger-background-popover',
-          }),
+        //error: (error: any) => this.toastr.error('Server Error', '500'),
       });
   }
 
-  public getUserList() {
-    this.userManagementService.getUserDetailsList().subscribe({
-      next: (response: any) => {
-        if (response['responseCode'] == '200') {
-          this.userList = JSON.parse(JSON.stringify(response.listPayload));
-        }
-      },
-      error: (error: any) =>
-        this.messageService.add({
-          summary: '500',
-          detail: 'Server Error',
-          styleClass: 'danger-background-popover',
-        }),
-    });
+  setCurrency(rawData: any) {
+    const selectedCurrency = rawData['unicode'];
+    console.log('Selected Currency:', rawData.currencyCode, selectedCurrency);
   }
-  setFilterList(listVal: any, typeOfList: any) {
-    switch (typeOfList) {
-      case 'categoryType':
-        this.filteredCategoryTypeList = listVal;
-        break;
-      case 'superCategory':
-        this.filteredSuperCategoryList = listVal;
-        break;
-      case 'category':
-        this.filteredCategoryList = listVal;
-        break;
-      case 'subCategory':
-        this.filteredSubCategoryList = listVal;
-        break;
-      case 'pickLocation':
-        this.filteredPickLocationList = listVal;
-        break;
-        case 'dropLocation':
-        this.filteredDropLocationList = listVal;
-        break;
-      default:
-        break;
-    }
+
+  public getPaymentModeList() {
+    this.paymentModeService.getPaymentModeList()
+      .subscribe({
+        next: (response: any) => {
+          if (response['responseCode'] == '200') {
+            this.paymentModeList = JSON.parse(JSON.stringify(response['listPayload']));
+          } else {
+          }
+        },
+        // error: (error: any) => this.toastr.error('Server Error', '500'),
+      });
   }
+
+  public getFundrisingOfficerByTeamLeaderId() {
+    this.donationManagementService.getFundrisingOfficerByTeamLeaderId()
+      .subscribe({
+        next: (response: any) => {
+          if (response['responseCode'] == '200') {
+            this.fundRisingOffcerList = JSON.parse(JSON.stringify(response['listPayload']));
+          } else {
+            //this.toastr.error(response['responseMessage'], response['responseCode']);
+          }
+        },
+        // error: (error: any) => this.toastr.error('Server Error', '500'),
+      });
+  }
+
+  saveLeadDetails(){
+    this.donationManagementService.saveLeadDetails(this.leadForm.value)
+      .subscribe({
+        next: (response: any) => {
+          if (response['responseCode'] == '200') {
+            let payload = response['payload'];
+            if (response['payload']['respCode'] == '200') {
+              
+              this.messageService.add({ severity: 'success', summary: 'Success', detail: response['payload']['respMesg'] });
+              this.addDonationForm.reset();
+              this.addDonationForm.controls['currencyCode'].setValue(this.currencyList[0].currencyCode);
+
+              if (payload['paymentMode'] == 'PAYMENT_GATEWAY') {
+                let url = payload['paymentGatewayPageRedirectUrl'];
+                console.log(" URL : " + url)
+                this.router.navigate(['donation/donationlist']);
+                window.open(url, '_blank');
+              }
+
+            } else {   
+             
+            }
+          } else {
+          }
+        },
+        
+      });
+  }
+
+  public saveDonationDetails() {
+   
+    this.donationManagementService.saveDonationDetails(this.addDonationForm.value)
+      .subscribe({
+        next: (response: any) => {
+          if (response['responseCode'] == '200') {
+            let payload = response['payload'];
+            if (response['payload']['respCode'] == '200') {
+              
+              
+              this.messageService.add({ severity: 'success', summary: 'Success', detail: response['payload']['respMesg'] });
+              this.addDonationForm.reset();
+              this.addDonationForm.controls['currencyCode'].setValue(this.currencyList[0].currencyCode);
+
+              if (payload['paymentMode'] == 'PAYMENT_GATEWAY') {
+                let url = payload['paymentGatewayPageRedirectUrl'];
+                console.log(" URL : " + url)
+                this.router.navigate(['donation/donationlist']);
+                window.open(url, '_blank');
+              }
+
+            } else {
+              
+             
+            }
+          } else {
+            
+
+          }
+        },
+        
+      });
+  }
+
+  
+
 }

@@ -24,6 +24,7 @@ export interface DonationDetailsRequest {
     lastDate?: any;
     roleType?: string;
     createdBy?: string;
+    createdbyName?: string;
     loginId?: string;
     invoiceHeaderDetailsId?: string;
     superadminId?: string;
@@ -49,6 +50,7 @@ export interface DonationDetails {
   transactionId?: string;
   paymentMode?: string;
   paymentType?: string;
+  status?: string;
   notes?: string;
   programName?: string;
   createdBy?: string;

@@ -34,9 +34,6 @@ export class AddDonationComponent {
   public selectedProgramAmount: number | null = null;
 
 
-
-
-
   ngOnInit() {
     this.createForms();
     this.getInvoiceTypeList();
