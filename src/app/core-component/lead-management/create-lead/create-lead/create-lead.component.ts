@@ -170,7 +170,7 @@ export class CreateLeadComponent {
       programName: this.donationList['programName'],
       amount: this.donationList['amount'],
       currency: this.donationList['currency'],
-      notes: this.donationList['notes'],
+      // notes: this.donationList['notes'],
     });
   }
 
@@ -299,19 +299,22 @@ export class CreateLeadComponent {
             let payload = response['payload'];
             if (response['payload']['respCode'] == '200') {
 
+              this.getDonationListForLead("hk");
+
               this.messageService.add({ severity: 'success', summary: 'Success', detail: response['payload']['respMesg'] });
               this.addDonationForm.reset();
-              this.addDonationForm.controls['currencyCode'].setValue(this.currencyList[0].currencyCode);
+              this.leadForm.reset();
+              // this.addDonationForm.controls['currencyCode'].setValue(this.currencyList[0].currencyCode);
 
-              if (payload['paymentMode'] == 'PAYMENT_GATEWAY') {
-                let url = payload['paymentGatewayPageRedirectUrl'];
-                console.log(" URL : " + url)
-                this.router.navigate(['donation/donationlist']);
-                window.open(url, '_blank');
-              }
+              // if (payload['paymentMode'] == 'PAYMENT_GATEWAY') {
+              //   let url = payload['paymentGatewayPageRedirectUrl'];
+              //   console.log(" URL : " + url)
+              //   this.router.navigate(['donation/donationlist']);
+              //   window.open(url, '_blank');
+              // }
 
             } else {
-
+              this.messageService.add({ severity: 'danger', summary: 'Failed', detail: response['payload']['respMesg'] });
             }
           } else {
           }

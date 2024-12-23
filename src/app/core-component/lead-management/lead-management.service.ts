@@ -261,18 +261,18 @@ export class LeadManagementService {
     );
   }
 
-  getAllLeadList(roleType:string): Observable<any> {
+  getAllLeadList(roleType:string, tabName:string): Observable<any> {
     const request: any = {
       payload: {
-        requestedFor: 'ALL',
-        roleType: roleType,
+        requestedFor: tabName,
+        roleType: this.cookieService.get('roleType'),
         token: this.cookieService.get('token'),
         createdBy: this.cookieService.get('loginId'),
         adminId: this.cookieService.get('adminId'),
         superadminId: this.cookieService.get('superadminId'),
       },
     };
-    return this.http.post<any>(Constant.Site_Url + 'getAllLeadList', request);
+    return this.http.post<any>(Constant.Site_Url + 'getLeadList', request);
   }
 
   getAllLeadListByDate(firstDate: string, lastDate: string): Observable<any> {

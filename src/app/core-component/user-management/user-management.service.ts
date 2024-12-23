@@ -87,10 +87,11 @@ export class UserManagementService {
     let request: any = {
       payload: {
         requestedFor: 'ALL',
-        roleType: this.loginUser['roleType'],
-        token: this.loginUser['token'],
-        createdBy: this.loginUser['loginId'],
-        superadminId: this.loginUser['superadminId'],
+        roleType: this.cookieService.get('roleType'),
+        token: this.cookieService.get('token'),
+        createdBy: this.cookieService.get('loginId'),
+        adminId: this.cookieService.get('adminId'),
+        superadminId: this.cookieService.get('superadminId'),
       }
     };
     return  this.http.post<any>(Constant.Site_Url+"getUserListForDropDown",request);

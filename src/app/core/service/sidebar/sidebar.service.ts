@@ -92,9 +92,9 @@ export class SidebarService {
               permission: 'admin-dashboard',
             },
             {
-              menuValue: 'Sales Dashboard',
+              menuValue: 'Dashboard',
               route: routes.salesDashboard,
-              permission: 'sale-dashboard',
+              permission: 'dashboard',
             },
           ],
         },
@@ -103,7 +103,6 @@ export class SidebarService {
           hasSubRoute: true,
           showSubRoute: false,
           icon: 'users',
-          // base1: 'usermang',
           subMenus: [
             {
               menuValue: 'Add user',
@@ -127,7 +126,6 @@ export class SidebarService {
           hasSubRoute: true,
           showSubRoute: false,
           icon: 'users',
-          // base1: 'usermang',
           subMenus: [
             {
               menuValue: 'Add Receipt',
@@ -244,57 +242,57 @@ export class SidebarService {
             {
               menuValue: 'All Lead',
               route: routes.allLead,
-              permission: 'create-lead',
+              permission: 'lead-list',
             },
             {
               menuValue: 'Info',
               route: routes.infoLead,
-              permission: 'create-lead',
+              permission: 'info',
             },
             {
               menuValue: 'Enquiry',
               route: routes.enquiry,
-              permission: 'create-lead',
+              permission: 'enquiry',
             },
             {
               menuValue: 'Hot Lead',
               route: routes.hotLead,
-              permission: 'create-lead',
+              permission: 'hot-lead',
             },
             {
               menuValue: 'Follow Up',
               route: routes.folloupLead,
-              permission: 'create-lead',
+              permission: 'followup',
             },
             {
               menuValue: 'importaint Lead',
               route: routes.importaintLead,
-              permission: 'create-lead',
+              permission: 'importaint-lead',
             },
             {
               menuValue: 'Pending Paymnt',
               route: routes.pendingPayment,
-              permission: 'create-lead',
+              permission: 'pending-payment',
             },
             {
               menuValue: 'Won Lead',
               route: routes.wonLead,
-              permission: 'create-lead',
+              permission: 'won-lead',
             },
             {
               menuValue: 'Lost Lead',
               route: routes.lost,
-              permission: 'create-lead',
+              permission: 'lost-lead',
             },
             {
               menuValue: 'Assigned Lead',
               route: routes.assignedLead,
-              permission: 'create-lead',
+              permission: 'assigned-lead',
             },
             {
               menuValue: 'Reserved',
               route: routes.reserved,
-              permission: 'create-lead',
+              permission: 'reserved',
             },
             
             
@@ -310,22 +308,22 @@ export class SidebarService {
             {
               menuValue: 'Category Type',
               route: routes.categoryType,
-              permission: 'create-lead',
+              permission: 'category-type',
             },
             {
               menuValue: 'Super Category',
               route: routes.superCategory,
-              permission: 'create-lead',
+              permission: 'super-category',
             },
             {
               menuValue: 'Category',
               route: routes.category,
-              permission: 'create-lead',
+              permission: 'category',
             },
             {
               menuValue: 'Sub category',
               route: routes.subCategory,
-              permission: 'create-lead',
+              permission: 'sub-category',
             },
             
           ],

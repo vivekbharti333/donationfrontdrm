@@ -47,7 +47,7 @@ export class Constant {
     
 
 
-    public static LEAD_STATUS_LIST = [{value: 'FOLLOWUP', name: 'Follow Up'}, {value: 'WON', name: 'Won'},{value: 'LOST', name: 'Lost'},{value: 'OTHER', name: 'Other'}];
+    public static LEAD_STATUS_LIST = [{value: 'FOLLOWUP', name: 'Follow Up'}, {value: 'WIN', name: 'Win'},{value: 'LOST', name: 'Lost'},{value: 'OTHER', name: 'Other'}];
     public static LEAD_ORIGINE_LIST = [{ value: 'CALL', name: 'Call'}, {value: 'WHATSAPP', name: 'Whats App'}, {value: 'EMAIL', name: 'Email'},{value: 'OTHER', name: 'Other'}];
     public static LEAD_TYPE_LIST = [{ value: 'NEW', name: 'New'}, {value: 'REPEAT', name: 'Repeat'}, {value: 'REFERRED', name: 'Referred'},{value: 'AGENT', name: 'Agent'}, {value: 'AGENT-REPEAT', name: 'Agent Repeat'}];
 

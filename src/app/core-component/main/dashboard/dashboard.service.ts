@@ -21,10 +21,20 @@ export class DashboardService {
     this.loginUser = this.authenticationService.getLoginUser();
   }
 
-  getCountAndSum(): Observable<any> {
-    // this.loginId = localStorage.getItem('loginId');
-    // this.superadminId = localStorage.getItem('superadminId');
+  getCountByStatus(): Observable<any> {
+    let request: any = {
+      payload: {
+        requestedFor: 'TODAY',
+        roleType: this.cookieService.get('roleType'),
+        token: this.cookieService.get('token'),
+        createdBy: this.cookieService.get('loginId'),
+        superadminId: this.cookieService.get('superadminId'),
+      }
+    };
+    return this.http.post<any>(Constant.Site_Url + "getCountByStatus", request);
+  }
 
+  getCountAndSum(): Observable<any> {
     let request: any = {
       payload: {
         roleType: this.cookieService.get('roleType'),

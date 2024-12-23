@@ -63,3 +63,7 @@
 //   margin: 0; /* Ensure no margin on inputs */
 //   padding: 8px; /* Optional padding inside inputs */
 // }
+
+.ui-messages-danger, .p-message-danger, .p-toast-message-danger {
+  color: red !important;
+}

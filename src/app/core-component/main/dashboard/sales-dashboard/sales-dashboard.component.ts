@@ -181,7 +181,24 @@ export class SalesDashboardComponent {
 
 
   getCountAndSum() {
-    this.dashboardService.getCountAndSum()
+    // if(this.cookieService.get('roleType') === "DONOR_EXECUTIVE"){
+      if(this.cookieService.get('roleType') != "DONOR_EXECUTIVE"){
+      
+      this.dashboardService.getCountByStatus()
+      .subscribe({
+        next: (response: any) => {
+          if (response['responseCode'] == '200') {
+            if (response['payload']['respCode'] == '200') {
+               
+              this.todaysCount = response['payload']['todaysCount'];
+              this.yesterdayCount = response['payload']['yesterdayCount'];
+              this.monthCount = response['payload']['monthCount'];
+            } 
+          } 
+        },
+      });
+    }else {
+      this.dashboardService.getCountAndSum()
       .subscribe({
         next: (response: any) => {
           if (response['responseCode'] == '200') {
@@ -198,11 +215,11 @@ export class SalesDashboardComponent {
             } else {
             }
           } else {
-           // this.toastr.error(response['responseMessage'], response['responseCode']);
           }
         },
-        //error: (error: any) => this.toastr.error('Server Error', '500'),
       });
+    }
+    
   }
 
   getDonationCountAndAmountGroupByCurrency(tabName: string) {

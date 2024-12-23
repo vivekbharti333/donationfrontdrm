@@ -23,6 +23,8 @@ import {MatTabsModule} from '@angular/material/tabs';
 import { CookieService } from 'ngx-cookie-service';
 import { Constant } from 'src/app/core/constant/constants';
 import { DatePipe } from '@angular/common';
+import { DonationDetails } from 'src/app/core-component/interface/donation-management'; 
+
 
 interface listData {
   value: string;
@@ -45,6 +47,7 @@ export class AllLeadComponent {
   filteredDropLocationList: any[] =[];
 
   public routes = routes;
+  public leadList: any;
 
   // pagination variables
   public tableData: Array<any> = [];
@@ -56,7 +59,7 @@ export class AllLeadComponent {
   public serialNumberArray: Array<number> = [];
   public totalData = 0;
   showFilter = false;
-  dataSource!: MatTableDataSource<users>;
+  dataSource!: MatTableDataSource<DonationDetails>;
   public searchDataValue = '';
   roleType: string = '';
   //** / pagination variables
@@ -136,30 +139,18 @@ export class AllLeadComponent {
   ) {}
 
   ngOnInit() {
-    this.getAllLeadList();
+    this.getAllLeadList("MONTH");
     this.getUserListForDropDown();
-    this.getCategoryType();
-    this.getPickLocation();
-    this.getDropLocation();
+    // this.getCategoryType();
+    // this.getPickLocation();
+    // this.getDropLocation();
     
   }
 
-  downloadInvoice(receiptNo : string) {
-    window.open(Constant.Site_Url+"paymentreceipt/"+receiptNo, '_blank');
-    // console.log(Constant.Site_Url+"paymentreceipt/"+receiptNo);
-  }
-
-  // getAllLeadList() {
-  //   this.leadManagementService.getAllLeadList().subscribe((apiRes: any) => {
-  //     this.totalData = apiRes.totalNumber;
-  //     this.pagination.tablePageSize.subscribe((res: tablePageSize) => {
-  //       if (this.router.url == this.routes.allLead) {
-  //         this.getTableData({ skip: res.skip, limit: this.totalData });
-  //         this.pageSize = res.pageSize;
-  //       }
-  //     });
-  //   });
+  // downloadInvoice(receiptNo : string) {
+  //   window.open(Constant.Site_Url+"paymentreceipt/"+receiptNo, '_blank');
   // }
+
 
   public getUserListForDropDown() {
     this.userManagementService.getUserListForDropDown().subscribe({
@@ -177,42 +168,45 @@ export class AllLeadComponent {
   }
 
   onAgentSelectionChange(dd:any){
-    this.leadManagementService.getAllLeadList('AGENT').subscribe((apiRes: any) => {
-      this.setTableData(apiRes);
+    // this.leadManagementService.getAllLeadList('AGENT').subscribe((apiRes: any) => {
+      // this.setTableData(apiRes);
+    // });
+  }
+
+  getAllLeadList(tabName:any) {
+    this.leadManagementService.getAllLeadList(this.cookieService.get('roleType'), tabName).subscribe((apiRes: any) => {
+      this.totalData = apiRes.totalNumber;
+      this.pagination.tablePageSize.subscribe((res: tablePageSize) => {
+        if (this.router.url == this.routes.allLead) {
+          this.getTableData({ skip: res.skip, limit: (res.skip)+ this.pageSize },tabName);
+          this.pageSize = res.pageSize;
+        }
+      });
     });
   }
 
-  getAllLeadList() {
-    this.leadManagementService.getAllLeadList(this.cookieService.get('roleType')).subscribe((apiRes: any) => {
-      this.setTableData(apiRes);
-    });
-  }
-
-  setTableData(apiRes: any) {
-    this.tableData = [];
-    this.serialNumberArray = [];
-    this.totalData = apiRes.totalNumber;
-    this.pagination.tablePageSize.subscribe((pageRes: tablePageSize) => {
-      if (this.router.url == this.routes.allLead) {
-        apiRes.listPayload.map((res: any, index: number) => {
+   private getTableData(pageOption: pageSelection, tabName: any): void {
+    this.leadManagementService.getAllLeadList(this.cookieService.get('roleType'), tabName).subscribe((apiRes: any) => {
+        this.leadList = apiRes.listPayload;
+        this.tableData = [];
+        this.serialNumberArray = [];
+        this.totalData = apiRes.totalNumber;
+        apiRes.listPayload.map((res: DonationDetails, index: number) => {
           const serialNumber = index + 1;
-          if (index >= pageRes.skip && serialNumber <= this.totalData) {
+          if (index >= pageOption.skip && serialNumber <= pageOption.limit) {
             this.tableData.push(res);
-            this.setIsDataCopied(false, index);
             this.serialNumberArray.push(serialNumber);
           }
         });
-        this.dataSource = new MatTableDataSource<users>(this.tableData);
-        const dataSize = this.tableData.length;
+        this.dataSource = new MatTableDataSource<DonationDetails>(this.tableData);
         this.pagination.calculatePageSize.next({
           totalData: this.totalData,
           pageSize: this.pageSize,
           tableData: this.tableData,
           serialNumberArray: this.serialNumberArray,
         });
-      }
-    });
-  }
+      });
+    }
 
   public sortData(sort: Sort) {
     const data = this.tableData.slice();
@@ -227,52 +221,52 @@ export class AllLeadComponent {
     }
   }
 
-  async openEditModal(
-    templateRef: TemplateRef<any>,
-    rawData: any,
-    isEditable: boolean
-  ) {
-    this.isEditForm = isEditable;
-    await this.getDropdownOnEditModal(rawData);
-    this.saveLeadData(rawData);
-    this.viewLeadDetailsDialog = this.dialog.open(templateRef, {
-      width: '80%',
-    });
-  }
+  // async openEditModal(
+  //   templateRef: TemplateRef<any>,
+  //   rawData: any,
+  //   isEditable: boolean
+  // ) {
+  //   this.isEditForm = isEditable;
+  //   await this.getDropdownOnEditModal(rawData);
+  //   // this.saveLeadData(rawData);
+  //   this.viewLeadDetailsDialog = this.dialog.open(templateRef, {
+  //     width: '80%',
+  //   });
+  // }
 
-  async getDropdownOnEditModal(rawData: any) {
-    const filterCategoryType: any = this.categoryTypeList.filter((item) => {
-      if (item?.categoryTypeName === rawData?.categoryTypeName) {
-        return item;
-      }
-    });
-    await this.getSuperCategory({
-      value: filterCategoryType[0]?.id,
-    });
-    const filterSuperCategory: any = this.superCategoryList.filter((item) => {
-      if (item?.superCategory === rawData?.superCategory) {
-        return item;
-      }
-    });
-    await this.getCategory({ value: filterSuperCategory[0]?.id });
-    const filterCategory: any = this.categoryList.filter((item) => {
-      if (item?.category === rawData?.category) {
-        return item;
-      }
-    });
-    await this.getSubCategory({ value: filterSuperCategory[0]?.id });
-    const filterSubCategory: any = this.categoryList.filter((item) => {
-      if (item?.category === rawData?.subCategory) {
-        return item;
-      }
-      console.log(
-        filterCategoryType,
-        filterSuperCategory,
-        filterCategory,
-        filterSubCategory
-      );
-    });
-  }
+  // async getDropdownOnEditModal(rawData: any) {
+  //   const filterCategoryType: any = this.categoryTypeList.filter((item) => {
+  //     if (item?.categoryTypeName === rawData?.categoryTypeName) {
+  //       return item;
+  //     }
+  //   });
+  //   await this.getSuperCategory({
+  //     value: filterCategoryType[0]?.id,
+  //   });
+  //   const filterSuperCategory: any = this.superCategoryList.filter((item) => {
+  //     if (item?.superCategory === rawData?.superCategory) {
+  //       return item;
+  //     }
+  //   });
+  //   await this.getCategory({ value: filterSuperCategory[0]?.id });
+  //   const filterCategory: any = this.categoryList.filter((item) => {
+  //     if (item?.category === rawData?.category) {
+  //       return item;
+  //     }
+  //   });
+  //   await this.getSubCategory({ value: filterSuperCategory[0]?.id });
+  //   const filterSubCategory: any = this.categoryList.filter((item) => {
+  //     if (item?.category === rawData?.subCategory) {
+  //       return item;
+  //     }
+  //     console.log(
+  //       filterCategoryType,
+  //       filterSuperCategory,
+  //       filterCategory,
+  //       filterSubCategory
+  //     );
+  //   });
+  // }
 
   setDateTime(date: any): string {
     // const currentDate = new Date(date);
@@ -310,64 +304,9 @@ export class AllLeadComponent {
     return formattedDateTime;
   }
 
-  saveLeadData(rawData: any) {
-    this.leadDetails = {
-      categoryType: rawData?.categoryTypeName,
-      superCategory: rawData?.superCategory,
-      category: rawData?.category,
-      subCategory: rawData?.subCategory,
-      pickupDateTime: this.setDateTime(rawData?.pickupDateTime),
-      pickupLocation: rawData?.pickupLocation,
-      pickupPoint: rawData?.pickupPoint,
-      dropDateTime: this.setDateTime(rawData?.dropDateTime),
-      // dropDateTime: this.datePipe.transform(rawData?.dropDateTime, 'yyyy-MM-ddTHH:mm');
-      dropLocation: rawData?.dropLocation,
-      dropPoint: rawData?.dropPoint,
-      totalDays: rawData?.totalDays,
-      quantity: rawData?.quantity,
-      vendorRate: rawData?.vendorRate,
-      companyRate: rawData?.companyRate,
-      bookingAmount: rawData?.bookingAmount,
-      balanceAmount: rawData?.balanceAmount,
-      totalAmount: rawData?.totalAmount,
-      securityAmount: rawData?.securityAmount,
-      payToVendor: rawData?.payToVendor,
-      payToCompany: rawData?.payToCompany,
-      deliveryToCompany: rawData?.deliveryAmountToCompany,
-      deliveryToVendor: rawData?.deliveryAmountToVendor,
-      customerName: rawData?.customeName,
-      dialCode: rawData?.countryDialCode,
-      mobile: rawData?.customerMobile,
-      alternateMobile: '',
-      emailId: rawData?.customerEmailId,
-      id: rawData?.id,
-      companyName: rawData?.companyName,
-      enquirySource: rawData?.enquirySource,
-      status: rawData?.status,
-      leadOrigine: rawData?.leadOrigine,
-      leadType: rawData?.leadType,
-      createdBy: rawData?.createdBy,
-      notes: rawData?.notes,
-      records: rawData?.records,
-      remarks: rawData?.remarks,
-      reminderDate: rawData?.reminderDate,
-    };
-
-    this.getCategoryType();
-
-    const superCategory = this.categoryTypeList.find(item => item.categoryTypeName === this.leadDetails.categoryType);
-    this.getSuperCategory(superCategory.id);
-    this.allIds.superCategoryId = superCategory.id;
-
-   // const category = this.superCategoryList.find(item => item.superCategory === this.leadDetails.superCategory);
-  //  alert("superCategory "+this.leadDetails.superCategory +"category id "+this.superCategoryList);
-    //this.getCategory(category.id)
-          
-
-  }
-
+  
   async copyData(data: any, idx: number) {
-    this.saveLeadData(data);
+    // this.saveLeadData(data);
     this.helper.copyData(this.leadDetails);
     this.setIsDataCopied(true, idx);
   }
@@ -385,136 +324,124 @@ export class AllLeadComponent {
   }
 
 
-  public getPickLocation() {
-    this.categoriesManagementService.getLocationByType('PICK').subscribe({
-      next: (response: any) => {
-        if (response['responseCode'] == '200') {
-          this.pickLocationList = JSON.parse(
-            JSON.stringify(response.listPayload)
-          );
-          this.filteredPickLocationList = this.pickLocationList;
-        }
-      },
-      error: (error: any) =>
-        this.messageService.add({
-          summary: '500',
-          detail: 'Server Error',
-          styleClass: 'danger-background-popover',
-        }),
-    });
-  }
+  // public getPickLocation() {
+  //   this.categoriesManagementService.getLocationByType('PICK').subscribe({
+  //     next: (response: any) => {
+  //       if (response['responseCode'] == '200') {
+  //         this.pickLocationList = JSON.parse(
+  //           JSON.stringify(response.listPayload)
+  //         );
+  //         this.filteredPickLocationList = this.pickLocationList;
+  //       }
+  //     },
+  //     error: (error: any) =>
+  //       this.messageService.add({
+  //         summary: '500',
+  //         detail: 'Server Error',
+  //         styleClass: 'danger-background-popover',
+  //       }),
+  //   });
+  // }
 
-  public getDropLocation() {
-    this.categoriesManagementService.getLocationByType('DROP').subscribe({
-      next: (response: any) => {
-        if (response['responseCode'] == '200') {
-          this.dropLocationList = JSON.parse(
-            JSON.stringify(response.listPayload)
-          );
-          this.filteredDropLocationList = this.dropLocationList;
-        }
-      },
-      error: (error: any) =>
-        this.messageService.add({
-          summary: '500',
-          detail: 'Server Error',
-          styleClass: 'danger-background-popover',
-        }),
-    });
-  }
+  // public getDropLocation() {
+  //   this.categoriesManagementService.getLocationByType('DROP').subscribe({
+  //     next: (response: any) => {
+  //       if (response['responseCode'] == '200') {
+  //         this.dropLocationList = JSON.parse(
+  //           JSON.stringify(response.listPayload)
+  //         );
+  //         this.filteredDropLocationList = this.dropLocationList;
+  //       }
+  //     },
+  //     error: (error: any) =>
+  //       this.messageService.add({
+  //         summary: '500',
+  //         detail: 'Server Error',
+  //         styleClass: 'danger-background-popover',
+  //       }),
+  //   });
+  // }
 
-  public getCategoryType() {
-// alert("getCategoryType ");
-    this.categoriesManagementService.getCategoryTypeList().subscribe({
-      next: (response: any) => {
-        if (response['responseCode'] == '200') {
-          this.categoryTypeList = JSON.parse(JSON.stringify(response.listPayload));
-          this.filteredCategoryTypeList = this.categoryTypeList;
+  // public getCategoryType() {
+  //   this.categoriesManagementService.getCategoryTypeList().subscribe({
+  //     next: (response: any) => {
+  //       if (response['responseCode'] == '200') {
+  //         this.categoryTypeList = JSON.parse(JSON.stringify(response.listPayload));
+  //         this.filteredCategoryTypeList = this.categoryTypeList;
+  //       }
+  //     },
+  //     error: (error: any) =>
+  //       this.messageService.add({
+  //         summary: '500',
+  //         detail: 'Server Error',
+  //         styleClass: 'danger-background-popover',
+  //       }),
+  //   });
+  // }
 
-    // const superCategory = this.categoryTypeList.find(item => item.categoryTypeName === this.leadDetails.categoryType);
-    // this.getSuperCategory(superCategory.id);
-    // this.allIds.categoryTypeId = superCategory.id
-        }
-      },
-      error: (error: any) =>
-        this.messageService.add({
-          summary: '500',
-          detail: 'Server Error',
-          styleClass: 'danger-background-popover',
-        }),
-    });
-  }
+  // public getSuperCategory(superCateId: any) {
+  //   this.categoriesManagementService.getSuperCategoryListByCategoryTypeId(superCateId)
+  //     .subscribe({
+  //       next: (response: any) => {
+  //         if (response['responseCode'] == '200') {
+  //           this.superCategoryList = JSON.parse(JSON.stringify(response.listPayload));
 
-  public getSuperCategory(superCateId: any) {
-    // alert("getSuperCategory :"+superCateId);
-    this.categoriesManagementService.getSuperCategoryListByCategoryTypeId(superCateId)
-      .subscribe({
-        next: (response: any) => {
-          if (response['responseCode'] == '200') {
-            this.superCategoryList = JSON.parse(JSON.stringify(response.listPayload));
+  //           this.filteredSuperCategoryList = this.superCategoryList;
 
-            this.filteredSuperCategoryList = this.superCategoryList;
-
-            const category = this.superCategoryList.find(item => item.superCategory === this.leadDetails.superCategory);
-            this.getCategory(category.id)
-          }
-        },
-        error: (error: any) =>
-          this.messageService.add({
-            summary: '500',
-            detail: 'Server Error',
-            styleClass: 'danger-background-popover',
-          }),
-      });
-  }
+  //           const category = this.superCategoryList.find(item => item.superCategory === this.leadDetails.superCategory);
+  //           this.getCategory(category.id)
+  //         }
+  //       },
+  //       error: (error: any) =>
+  //         this.messageService.add({
+  //           summary: '500',
+  //           detail: 'Server Error',
+  //           styleClass: 'danger-background-popover',
+  //         }),
+  //     });
+  // }
   
 
-  public getCategory(categoryId: any) {
-    //const superCatId = categoryId?.id;
-    // alert("getCategory :"+categoryId);
-    this.categoriesManagementService.getCategoryBySuperCatId(categoryId)
-      .subscribe({
-        next: (response: any) => {
-          if (response['responseCode'] == '200') {
-            this.categoryList = JSON.parse( JSON.stringify(response.listPayload));
-            this.filteredCategoryList = this.categoryList;
+  // public getCategory(categoryId: any) {
+  //   this.categoriesManagementService.getCategoryBySuperCatId(categoryId)
+  //     .subscribe({
+  //       next: (response: any) => {
+  //         if (response['responseCode'] == '200') {
+  //           this.categoryList = JSON.parse( JSON.stringify(response.listPayload));
+  //           this.filteredCategoryList = this.categoryList;
 
-            const subCategory = this.categoryList.find(item => item.category === this.leadDetails.category);
-            this.getSubCategory(subCategory.id);
-          }
-        },
-        error: (error: any) =>
-          this.messageService.add({
-            summary: '500',
-            detail: 'Server Error',
-            styleClass: 'danger-background-popover',
-          }),
-      });
-  }
+  //           const subCategory = this.categoryList.find(item => item.category === this.leadDetails.category);
+  //           this.getSubCategory(subCategory.id);
+  //         }
+  //       },
+  //       error: (error: any) =>
+  //         this.messageService.add({
+  //           summary: '500',
+  //           detail: 'Server Error',
+  //           styleClass: 'danger-background-popover',
+  //         }),
+  //     });
+  // }
 
-  public getSubCategory(subCategoryId: any) {
-    // const categoryId = subCategoryId?.id;
-    // alert("enter into getSubCategory")
-    this.categoriesManagementService.getSubCategoryListByCatId(subCategoryId)
-      .subscribe({
-        next: (response: any) => {
-          if (response['responseCode'] == '200') {
-            this.subCategoryList = JSON.parse(JSON.stringify(response.listPayload));
-            this.subCategoryList.forEach(subCategory => {
-              console.log(subCategory); // Access each item
-              // You can perform actions on each subCategory here
-            });
-            this.filteredSubCategoryList = this.subCategoryList;
-          }
-        },
-        error: (error: any) =>
-          this.messageService.add({
-            summary: '500',
-            detail: 'Server Error',
-            styleClass: 'danger-background-popover',
-          }),
-      });
-  }
+  // public getSubCategory(subCategoryId: any) {
+  //   this.categoriesManagementService.getSubCategoryListByCatId(subCategoryId)
+  //     .subscribe({
+  //       next: (response: any) => {
+  //         if (response['responseCode'] == '200') {
+  //           this.subCategoryList = JSON.parse(JSON.stringify(response.listPayload));
+  //           this.subCategoryList.forEach(subCategory => {
+  //           });
+  //           this.filteredSubCategoryList = this.subCategoryList;
+  //         }
+  //       },
+  //       error: (error: any) =>
+  //         this.messageService.add({
+  //           summary: '500',
+  //           detail: 'Server Error',
+  //           styleClass: 'danger-background-popover',
+  //         }),
+  //     });
+  // }
 
   isCollapsed: boolean = false;
   toggleCollapse() {
@@ -547,7 +474,7 @@ export class AllLeadComponent {
     this.leadManagementService
       .getAllLeadListByDate(this.firstDate, this.lastDate)
       .subscribe((apiRes: any) => {
-        this.setTableData(apiRes);
+        // this.setTableData(apiRes);
       });
   }
   setFilterDate(eve: any, date: any) {
@@ -598,19 +525,19 @@ export class AllLeadComponent {
 
   getBadgeClass(status: string): string {
     switch (status.toLowerCase()) {
-      case 'enquiry':
-        return 'badge-linesuccess';
+      case 'win':
+        return 'badge-linewin';
       case 'lost':
         return 'badge-linedanger';
       case 'info':
         return 'badge-lineinfo';
       case 'followup':
         return 'badge-linewarning';
-      case 'win':
-        return 'badge-linewin';
-      case 'assigned':
-        return 'badge-lineassigned';
-      case 'reserved':
+      // case 'win':
+      //   return 'badge-linewin';
+      // case 'assigned':
+      //   return 'badge-lineassigned';
+      case 'OTHER':
         return 'badge-linereserved';
       default:
         return 'badge-default'; // Default class if no match

@@ -28,6 +28,7 @@ export interface DonationDetailsRequest {
     createdbyName?: string;
     loginId?: string;
     invoiceHeaderDetailsId?: string;
+    teamLeaderId?: string;
     superadminId?: string;
     requestedFor?: string;
     requestFor?: string;
@@ -57,6 +58,7 @@ export interface DonationDetails {
   createdBy?: string;
   loginId?: string;
   superadminId?: string;
+  teamLeaderId?: string;
   invoiceHeaderDetailsId?: string;
   followupDate?: number;
 }
