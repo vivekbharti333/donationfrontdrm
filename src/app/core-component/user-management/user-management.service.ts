@@ -11,7 +11,9 @@ import { UserDetailsRequest } from '../interface/user-management';
 })
 export class UserManagementService {
 
-  public loginUser;
+  public loginId: any;
+  public superadminId: any;
+  public loginUser: any;
 
   constructor(
     private http: HttpClient,
@@ -124,39 +126,72 @@ export class UserManagementService {
   }
 
 
-  saveUserDetails(user: any): Observable<any> {
+  // saveUserDetails(user: any): Observable<any> {
     
+  //   let request: any = {
+  //     payload: {
+  //       userPicture: user.userPicture,
+  //       firstName: user.firstName,
+  //       lastName: user.lastName,
+  //       emailId: user.emailId,
+  //       gender: user.gender,
+  //       roleType: user.roleType,
+  //       // permissions: "'"+user.permissions+"'",
+  //       permissions: JSON.stringify(user.permissions),
+  //       mobileNo: user.mobileNo,
+  //       dob: user.dob,
+  //       alternateMobile: user.alternateMobile,
+  //       idDocumentType: user.idDocumentType,
+  //       idDocumentPicture: user.idDocumentPicture,
+  //       panNumber: user.panNumber,
+        
+  //       emergencyContactRelation1: user.emergencyContactRelation1,
+  //       emergencyContactName1: user.emergencyContactName1,
+  //       emergencyContactNo1: user.emergencyContactNo1,
+  //       emergencyContactRelation2: user.emergencyContactRelation2,
+  //       emergencyContactName2: user.emergencyContactName2,
+  //       emergencyContactNo2: user.emergencyContactNo2,
+  //       addressList: user.addressList,
+
+  //       token: this.loginUser['token'],
+  //       adminId: '',
+  //       teamleaderId: '',
+  //       createdBy: this.loginUser['loginId'],
+  //       superadminId: this.loginUser['superadminId'],
+
+  //     }
+  //   };
+  //   return  this.http.post<any>(Constant.Site_Url+"userRegistration",request);
+  // }
+
+  saveUserDetails(userDetails: any): Observable<UserDetailsRequest> {
+    this.loginId = this.cookieService.get('loginId');
+    this.superadminId = this.cookieService.get('superadminId');
+    var creatBy ="";
+    if(userDetails.roleType === Constant.fundraisingOfficer){
+      creatBy = userDetails.createdBy;
+    }else {
+      creatBy = this.loginUser['roleType'];
+    }
+
     let request: any = {
       payload: {
-        userPicture: user.userPicture,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        emailId: user.emailId,
-        gender: user.gender,
-        roleType: user.roleType,
-        // permissions: "'"+user.permissions+"'",
-        permissions: JSON.stringify(user.permissions),
-        mobileNo: user.mobileNo,
-        dob: user.dob,
-        alternateMobile: user.alternateMobile,
-        idDocumentType: user.idDocumentType,
-        idDocumentPicture: user.idDocumentPicture,
-        panNumber: user.panNumber,
-        
-        emergencyContactRelation1: user.emergencyContactRelation1,
-        emergencyContactName1: user.emergencyContactName1,
-        emergencyContactNo1: user.emergencyContactNo1,
-        emergencyContactRelation2: user.emergencyContactRelation2,
-        emergencyContactName2: user.emergencyContactName2,
-        emergencyContactNo2: user.emergencyContactNo2,
-        addressList: user.addressList,
-
-        token: this.loginUser['token'],
-        adminId: '',
-        teamleaderId: '',
-        createdBy: this.loginUser['loginId'],
-        superadminId: this.loginUser['superadminId'],
-
+        userPicture: userDetails.userPicture,
+        firstName: userDetails.firstName,
+        lastName: userDetails.lastName,
+        roleType: userDetails.roleType,
+        // permissions: JSON.stringify(userDetails.permissions),
+        permissions: userDetails.permissions,
+        mobileNo: userDetails.mobileNo,
+        alternateMobile: userDetails.alternateMobile,
+        emailId: userDetails.emailId,
+        service: userDetails.service,
+        dob: userDetails.dob,
+        addressList: userDetails.addressList,
+        requestedFor: 'WEB',
+        token: this.cookieService.get('token'),
+        createdBy: creatBy,
+        superadminId: this.cookieService.get('superadminId'),
       }
     };
     return  this.http.post<any>(Constant.Site_Url+"userRegistration",request);

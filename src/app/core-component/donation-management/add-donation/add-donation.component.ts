@@ -205,7 +205,6 @@ export class AddDonationComponent {
 
               if (payload['paymentMode'] == 'PAYMENT_GATEWAY') {
                 let url = payload['paymentGatewayPageRedirectUrl'];
-                console.log(" URL : " + url)
                 this.router.navigate(['donation/donationlist']);
                 window.open(url, '_blank');
               }

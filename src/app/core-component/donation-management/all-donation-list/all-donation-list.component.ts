@@ -136,13 +136,13 @@ export class AllDonationListComponent {
       emailId: ['', [Validators.required, Validators.pattern('^[0-9]*$')]],
       address: ['', [Validators.required, Validators.pattern("[0-9A-Za-z ]{3,150}")]],
       panNumber: ['', [Validators.required, Validators.pattern("[0-9A-Za-z ]{3,150}")]],
-      programName: [''],
+      programName: ['', [Validators.required, Validators.pattern("[0-9A-Za-z ]{3,150}")]],
       amount: ['', [Validators.required, Validators.pattern('^[0-9]*$')]],
       currency: [''],
       currencyCode: [''],
       transactionId: ['', [Validators.required, Validators.pattern("[0-9A-Za-z ]{3,150}")]],
       paymentMode: ['', [Validators.required, Validators.pattern("[0-9A-Za-z ]{3,150}")]],
-      notes: ['']
+      notes: ['', [Validators.required, Validators.pattern("[0-9A-Za-z ]{3,150}")]]
     });
   }
 

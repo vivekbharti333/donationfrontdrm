@@ -250,7 +250,7 @@
                 <th mat-sort-header="invoiceFor">Invoice For</th>
                 <th mat-sort-header="program">Program</th>
                 <th mat-sort-header="date&Time">Date & Time</th>
-                <th mat-sort-header="invoiceNumber">Invoice Number</th>
+                <!-- <th mat-sort-header="invoiceNumber">Invoice Number</th> -->
                 <th mat-sort-header="invoiceDownload">Invoice Download</th>
                 <th class="no-sort">Action</th>
               </tr>
@@ -266,7 +266,7 @@
                 <td>{{ data.invoiceHeaderName }}</td>
                 <td>{{ data.programName }}</td>
                 <td>{{ data.createdAt | date : "dd-MM-yyyy | HH:mm" }}</td>
-                <td>{{ data.invoiceNumber}}</td>
+                <!-- <td>{{ data.invoiceNumber}}</td> -->
                 <td>
                  
                   <button class="badge-button"
@@ -328,12 +328,12 @@
                 <div class="col-lg-4 col-md-4">
                   <div class="mb-3">
                     <label for="receiptType" class="form-label">Receipt</label>
-                    <!-- <input id="donorName" class="form-control" type="text" pInputText formControlName="invoiceHeaderName" readonly> -->
-                    <mat-select class="space-select select" formControlName="invoiceHeaderName"  placeholder="Select Receipt Type">
+                    <input id="donorName" class="form-control" type="text" pInputText formControlName="invoiceHeaderName" readonly>
+                    <!-- <mat-select class="space-select select" formControlName="invoiceHeaderName"  placeholder="Select Receipt Type">
                       <mat-option *ngFor="let invoiceType of invoiceTypeList" [value]="invoiceType.companyFirstName + ' ' + invoiceType.companyLastName">
                         {{ invoiceType.companyFirstName + ' ' + invoiceType.companyLastName }}
                       </mat-option>
-                    </mat-select>
+                    </mat-select> -->
                   </div>
                 </div>
 

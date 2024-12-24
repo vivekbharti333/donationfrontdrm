@@ -281,8 +281,8 @@
                 <div class="col-lg-4 col-md-6">
                   <div class="mb-3">
                     <label class="form-label">Role</label>
-                    <mat-select name="roleType" [(ngModel)]="user.roleType" multiple
-                      [ngModelOptions]="{ standalone: true }" class="select" placeholder="Select User Role">
+                    <mat-select name="roleType" [(ngModel)]="user.roleType"
+                     class="select" placeholder="Select User Role">
                       @for (data of userType; track data) {
                       <mat-option [value]="data.value">
                         {{ data.name }}

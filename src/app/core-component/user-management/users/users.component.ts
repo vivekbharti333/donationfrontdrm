@@ -17,6 +17,8 @@ import { UserDetails } from '../../interface/user-management';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { MatDialog } from '@angular/material/dialog';
+import { CookieService } from 'ngx-cookie-service';
+import { Constant } from 'src/app/core/constant/constants';
 
 interface data {
   value: string;
@@ -30,6 +32,13 @@ interface data {
   providers: [MessageService, ToastModule],
 })
 export class UsersComponent {
+
+  public isMainAdmin: boolean = false;
+  public isSuperadmin: boolean = false;
+  public isAdmin: boolean = false;
+  public isTeamLeader: boolean = false;
+
+
   public addressList: any;
 
   public user = {
@@ -86,6 +95,23 @@ export class UsersComponent {
     this.getUserDetailsByRoleType(event.value);
     // Additional logic can be added here
   }
+
+
+  checkRoleType(){
+    
+    if( this.cookieService.get('roleType') === Constant.mainAdmin){
+      this.isMainAdmin = true;
+      // this.isSuperadmin = true;
+    }else if( this.cookieService.get('roleType') === Constant.superAdmin){
+      this.isSuperadmin = true;
+    }else if( this.cookieService.get('roleType') === Constant.admin){
+      this.isAdmin = true;
+      this.isSuperadmin = true;
+    }else if( this.cookieService.get('roleType') === Constant.teamLeader){
+      this.isTeamLeader = true;
+    }
+  }
+
 
   openEditModal(templateRef: TemplateRef<any>, rowDate: any) {
     this.user.userPicture = rowDate.userPicture;
@@ -146,7 +172,8 @@ export class UsersComponent {
     private sidebar: SidebarService,
     private messageService: MessageService,
     private userManagementService: UserManagementService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private cookieService: CookieService
   ) {
     //   this.userManagementService.getUserDetailsList().subscribe((apiRes: any) => {
     //   this.totalData = apiRes.totalNumber;
