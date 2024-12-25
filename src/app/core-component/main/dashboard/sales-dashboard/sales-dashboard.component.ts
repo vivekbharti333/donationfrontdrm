@@ -268,17 +268,16 @@ export class SalesDashboardComponent {
         if (response['responseCode'] === 200) {
           const listPayload = response['listPayload'];
   
-          // Group the data by the first element (name)
+          
           const groupedData = listPayload.reduce((acc: any, row: any[]) => {
-            const key = row[0]; // Extract the name (first element)
+            const key = row[0]; 
             if (!acc[key]) {
-              acc[key] = []; // Initialize array for this name if it doesn't exist
+              acc[key] = []; 
             }
-            acc[key].push(row); // Add the row to the corresponding group
+            acc[key].push(row); 
             return acc;
           }, {});
   
-          // Assign grouped data to FRToday for display in the template
           this.FRToday = groupedData;
         } else {
           console.error("Error: Response code is not 200");

@@ -235,9 +235,9 @@ export class SidebarService {
               permission: 'create-lead',
             },
             {
-              menuValue: 'Follow up one',
+              menuValue: 'Follow up',
               route: routes.followupOne,
-              permission: 'create-lead',
+              permission: 'follow-up',
             },
             {
               menuValue: 'All Lead',

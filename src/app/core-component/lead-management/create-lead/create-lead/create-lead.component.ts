@@ -40,6 +40,7 @@ export class CreateLeadComponent {
   public userList: any
   public showFundrisingOfficerList: boolean = false;
   public showFollowupDateBox: boolean =false;
+  public showUserList:  boolean =false;
 
   public donationList: any;
   public showCurrencyBox: boolean = false;
@@ -86,6 +87,13 @@ export class CreateLeadComponent {
     this.getCurrencyDetailBySuperadmin();
     this.getPaymentModeList();
     this.getFundrisingOfficerByTeamLeaderId();
+  }
+
+  checkRoleType(){
+    const roleType = this.cookiesService.get('roleType');
+    if(roleType == 'SUPERADMIN'){
+      this.showUserList = true;
+    }
   }
 
   createForms() {
@@ -141,7 +149,6 @@ export class CreateLeadComponent {
   }
 
   public getDonationListForLead(event: any) {
-
     this.donationManagementService.getDonationListForLead(event.value)
       .subscribe({
         next: (response: any) => {
@@ -314,7 +321,11 @@ export class CreateLeadComponent {
               // }
 
             } else {
-              this.messageService.add({ severity: 'danger', summary: 'Failed', detail: response['payload']['respMesg'] });
+              this.messageService.add({
+                summary: response['payload']['respCode'],
+                detail: response['payload']['respMesg'],
+                styleClass: 'danger-background-popover',
+              });
             }
           } else {
           }

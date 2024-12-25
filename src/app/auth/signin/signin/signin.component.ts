@@ -67,7 +67,7 @@ export class SigninComponent {
               this.cookieService.set('firstName', response['payload']['firstName'], expiredDate);
               this.cookieService.set('lastName', response['payload']['lastName'], expiredDate);
               this.cookieService.set('roleType', response['payload']['roleType'], expiredDate);
-              this.cookieService.set('teamleaderId', response['payload']['teamleaderId'], expiredDate);
+              this.cookieService.set('teamLeaderId', response['payload']['teamLeaderId'], expiredDate);
               this.cookieService.set('superadminId', response['payload']['superadminId'], expiredDate);
               this.cookieService.set('token', response['payload']['token'], expiredDate);
 

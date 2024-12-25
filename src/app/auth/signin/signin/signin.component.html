@@ -4,11 +4,11 @@
       <form #loginForm="ngForm" (ngSubmit)="validateUser()">
         <div class="login-userset">
           <div class="login-logo logo-normal">
-            <img src="assets/img/logo.png" alt="img">
+            <!-- <img src="assets/img/logo.png" alt="img"> -->
           </div>
-          <a [routerLink]="routes.adminDashboard" class="login-logo logo-white">
+          <!-- <a [routerLink]="routes.adminDashboard" class="login-logo logo-white">
             <img src="assets/img/login.png" alt="">
-          </a>
+          </a> -->
 
           <div class="card-body">
             <p-toast></p-toast>
@@ -17,10 +17,10 @@
 
           <div class="login-userheading">
             <h3>Sign In</h3>
-            <h4>Access the Dreamspos panel using your email and passcode.</h4>
+            <h4>Access the CRM panel using your Login and Password.</h4>
           </div>
           <div class="form-login mb-3">
-            <label class="form-label">Email Address</label> <!-- Corrected typo -->
+            <label class="form-label">Login Id</label> <!-- Corrected typo -->
             <div class="form-addons">
               <input type="text" class="form-control" name="loginId" [(ngModel)]="login.loginId">
               <img src="assets/img/icons/user-icon.svg" alt="img">
@@ -36,14 +36,14 @@
           <div class="form-login authentication-check">
             <div class="row">
               <div class="col-12 d-flex align-items-center justify-content-between">
-                <div class="custom-control custom-checkbox custom-class-check">
+                <!-- <div class="custom-control custom-checkbox custom-class-check">
                   <label class="checkboxs ps-4 mb-0 pb-0 line-height-1">
                     <input type="checkbox" class="form-control">
                     <span class="checkmarks"></span>Remember me
                   </label>
-                </div>
+                </div> -->
                 <div class="text-end">
-                  <a class="forgot-link" [routerLink]="routes.forgotPassword">Forgot Password?</a>
+                  <!-- <a class="forgot-link" [routerLink]="routes.forgotPassword">Forgot Password?</a> -->
                 </div>
               </div>
             </div>
@@ -52,14 +52,14 @@
             <button type="submit" class="btn btn-login">Sign In</button> <!-- Changed type to submit -->
           </div>
           <div class="signinform">
-            <h4>New on our platform?<a [routerLink]="routes.register" class="hover-a"> Create an account</a></h4>
+            <!-- <h4>New on our platform?<a [routerLink]="routes.register" class="hover-a"> Create an account</a></h4> -->
           </div>
           <div class="form-setlogin or-text">
-            <h4>OR</h4>
+            <!-- <h4>OR</h4> -->
           </div>
           <div class="form-sociallink">
             <ul class="d-flex">
-              <li>
+              <!-- <li>
                 <a href="javascript:void(0);" class="facebook-logo">
                   <img src="assets/img/icons/facebook-logo.svg" alt="Facebook">
                 </a>
@@ -73,10 +73,10 @@
                 <a href="javascript:void(0);" class="apple-logo">
                   <img src="assets/img/icons/apple-logo.svg" alt="Apple">
                 </a>
-              </li>
+              </li> -->
             </ul>
             <div class="my-4 d-flex justify-content-center align-items-center copyright-text">
-              <p>Copyright &copy; 2023 DreamsPOS. All rights reserved</p>
+              <p>Copyright &copy; 2025 Datfuslab Technologies. All rights reserved</p>
             </div>
           </div>
         </div>

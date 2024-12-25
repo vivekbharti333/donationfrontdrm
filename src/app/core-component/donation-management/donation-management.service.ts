@@ -114,11 +114,21 @@ export class DonationManagementService {
   }
 
   getDonationListForLead(event:any){
+    const createdBy = this.cookieService.get('teamLeaderId');
+    alert("createdBy : "+createdBy);
+    const roleType = this.cookieService.get('roleType');
+    if(roleType === 'SUPERADMIN'){
+        createdBy == event;
+        roleType == roleType
+    } else {
+      roleType == 'elsepart';
+    }
+
     let request: DonationDetailsRequest = {
       payload: {
         // requestedFor: tabName,
-        roleType: this.cookieService.get('roleType'),
-        createdBy: event,
+        roleType: roleType,
+        createdBy: createdBy,
         token: this.cookieService.get('token'),
         superadminId: this.cookieService.get('superadminId'),
       }
