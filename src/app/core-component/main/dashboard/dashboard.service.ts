@@ -21,7 +21,7 @@ export class DashboardService {
     this.loginUser = this.authenticationService.getLoginUser();
   }
 
-  getCountByStatus(): Observable<any> {
+  getLeadCountByStatus(): Observable<any> {
     let request: any = {
       payload: {
         requestedFor: 'TODAY',
@@ -31,7 +31,7 @@ export class DashboardService {
         superadminId: this.cookieService.get('superadminId'),
       }
     };
-    return this.http.post<any>(Constant.Site_Url + "getCountByStatus", request);
+    return this.http.post<any>(Constant.Site_Url + "getLeadCountByStatus", request);
   }
 
   getCountAndSum(): Observable<any> {

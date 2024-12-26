@@ -120,27 +120,27 @@ export class HeaderComponent  {
     this.userPicture = localStorage.getItem('userPicture') || '';
   }
 
-  logOut() {
+  // logOut() {
 
-    this.cookieService.delete('loginDetails');
-    this.cookieService.delete('loginId');
-    this.cookieService.delete('firstName');
-    this.cookieService.delete('lastName');
-    this.cookieService.delete('roleType');
-    this.cookieService.delete('teamleaderId');
-    this.cookieService.delete('superadminId');
-    this.cookieService.delete('token');
-    this.cookieService.delete('userDetails');
-
-    // Remove 'displayLogo' from localStorage
-    localStorage.removeItem('displayLogo');
-
-    // Remove 'userPicture' from localStorage
-    localStorage.removeItem('userPicture');
+  //   this.cookieService.delete('loginDetails');
+  //   this.cookieService.delete('loginId');
+  //   this.cookieService.delete('firstName');
+  //   this.cookieService.delete('lastName');
+  //   this.cookieService.delete('roleType');
+  //   this.cookieService.delete('teamleaderId');
+  //   this.cookieService.delete('superadminId');
+  //   this.cookieService.delete('token');
+  //   this.cookieService.delete('userDetails');
+  //   localStorage.removeItem('displayLogo');
+  //   localStorage.removeItem('userPicture');
     
-    this.router.navigate([routes.signIn]);
-    // this.router.navigate([routes.signIn]);
-    // window.location.href = "/signin";
+  //   this.router.navigate([routes.signIn]);
+
+  // }
+
+  logOut(){
+    this.authenticationService.logOut();
+    // window.location.href = "";
     // window.location.reload();
   }
 

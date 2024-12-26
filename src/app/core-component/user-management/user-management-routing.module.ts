@@ -7,7 +7,7 @@ import { DeleteAccountComponent } from './delete-account/delete-account.componen
 import { CreateUserComponent } from './create-user/create-user.component';
 import { UsersComponent } from './users/users.component';
 import { PermissionsComponent } from './permissions/permissions.component'; 
-import { AuthGuard } from 'src/app/core/core.index';
+import { AuthGuard } from 'src/app/core/core.index'; 
 
 const routes: Routes = [
   {
@@ -29,7 +29,7 @@ const routes: Routes = [
       {
         path: 'create-users',
         component: CreateUserComponent,
-        // canActivate: [AuthGuard]
+        canActivate: [AuthGuard]
       },
       {
         path: 'users',

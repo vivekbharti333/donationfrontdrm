@@ -20,6 +20,9 @@ import { CommonService } from 'src/app/core/service/common/common.service';
 import { DataService } from 'src/app/core/service/data/data.service';
 import { SettingsService } from 'src/app/core/service/settings/settings.service';
 import { expiredproduct } from 'src/app/shared/model/page.model';
+import { DashboardService } from '../dashboard.service';
+import { AuthenticationService } from 'src/app/auth/authentication.service';
+import { CookieService } from 'ngx-cookie-service';
 import {
   PaginationService,
   pageSelection,
@@ -60,13 +63,23 @@ export class AdminDashboardComponent {
   @ViewChild('chart') chart!: ChartComponent;
   public chartOptions: Partial<ChartOptions>;
 
+  public todayWin: any;
+  public todayLost: any;
+  public todayFollowup: any;
+  public todayLead: any;
+
   constructor(
     private common: CommonService,
     private setting: SettingsService,
     private data: DataService,
     private pagination: PaginationService,
-    private router: Router
+    private router: Router,
+
+    private dashboardService: DashboardService,
+    private authenticationService: AuthenticationService,
+
   ) {
+    this.getLeadCountByStatus();
     this.chartOptions = {
       series: [
         {
@@ -225,4 +238,31 @@ export class AdminDashboardComponent {
       });
     }
   }
+
+  ngOnInit() {
+    this.getLeadCountByStatus();
+  }
+
+
+  getLeadCountByStatus() {
+    // if(this.cookieService.get('roleType') === "DONOR_EXECUTIVE"){
+    
+      this.dashboardService.getLeadCountByStatus()
+      .subscribe({
+        next: (response: any) => {
+          if (response['responseCode'] == '200') {
+            if (response['payload']['respCode'] == '200') {
+               
+              this.todayWin = response['payload']['todayWin'];
+              this.todayLost = response['payload']['todayLost'];
+              this.todayFollowup = response['payload']['todayFollowup'];
+              this.todayLead = response['payload']['todayLead'];
+     
+            } 
+          } 
+        },
+      });
+    }
+
+
 }

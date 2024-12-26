@@ -151,6 +151,7 @@ export class SalesDashboardComponent {
 
 
   ngOnInit() {
+
     this.username = this.cookieService.get('firstName')+" "+this.cookieService.get('lastName');
     this.getCountAndSum();
     this.getDonationCountAndAmountGroupByCurrency('TODAY');
@@ -171,8 +172,6 @@ export class SalesDashboardComponent {
   }
 
 
-
-
   isCollapsed: boolean = false;
   toggleCollapse() {
     this.sidebar.toggleCollapse();
@@ -182,22 +181,7 @@ export class SalesDashboardComponent {
 
   getCountAndSum() {
     // if(this.cookieService.get('roleType') === "DONOR_EXECUTIVE"){
-      if(this.cookieService.get('roleType') != "DONOR_EXECUTIVE"){
-      
-      this.dashboardService.getCountByStatus()
-      .subscribe({
-        next: (response: any) => {
-          if (response['responseCode'] == '200') {
-            if (response['payload']['respCode'] == '200') {
-               
-              this.todaysCount = response['payload']['todaysCount'];
-              this.yesterdayCount = response['payload']['yesterdayCount'];
-              this.monthCount = response['payload']['monthCount'];
-            } 
-          } 
-        },
-      });
-    }else {
+  
       this.dashboardService.getCountAndSum()
       .subscribe({
         next: (response: any) => {
@@ -217,9 +201,7 @@ export class SalesDashboardComponent {
           } else {
           }
         },
-      });
-    }
-    
+      }); 
   }
 
   getDonationCountAndAmountGroupByCurrency(tabName: string) {

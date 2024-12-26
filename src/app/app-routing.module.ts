@@ -23,17 +23,17 @@ const routes: Routes = [
       ),
   },
 
-  {
-    path: '**',
-    redirectTo: 'signin',
-    pathMatch: 'full',
-  },
-
   // {
   //   path: '**',
-  //   redirectTo: 'errorpages/error404',
+  //   redirectTo: 'signin',
   //   pathMatch: 'full',
   // },
+
+  {
+    path: '**',
+    redirectTo: 'errorpages/error404',
+    pathMatch: 'full',
+  },
 ];
 
 @NgModule({

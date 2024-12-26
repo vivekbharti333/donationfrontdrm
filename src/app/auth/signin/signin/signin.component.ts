@@ -5,6 +5,7 @@ import { UserManagementService } from 'src/app/core-component/user-management/us
 import { MessageService } from 'primeng/api';
 import { CommonComponentService } from 'src/app/common-component/common-component.service';
 import { CookieService } from 'ngx-cookie-service';
+import { Constant } from 'src/app/core/constant/constants';
 
 @Component({
   selector: 'app-signin',
@@ -46,10 +47,7 @@ export class SigninComponent {
       .subscribe({
         next: (response: any) => {
           if (response['responseCode'] == '200') {
-            // alert(" response['responseCode'] "+response['responseCode']);
             if (response['payload']['respCode'] == '200') {
-              // alert("response['payload']['respCode'] "+response['payload']['respCode']);
-              
               // this.getApplicaionHeaderDetails();
 
               localStorage.setItem('authorized', 'true');
@@ -62,21 +60,25 @@ export class SigninComponent {
               expiredDate.setDate(expiredDate.getDate() + 1);
               this.cookieService.set('loginDetails', JSON.stringify(response['payload']), expiredDate);
               
-
-              this.cookieService.set('loginId', response['payload']['loginId'], expiredDate);
-              this.cookieService.set('firstName', response['payload']['firstName'], expiredDate);
-              this.cookieService.set('lastName', response['payload']['lastName'], expiredDate);
-              this.cookieService.set('roleType', response['payload']['roleType'], expiredDate);
-              this.cookieService.set('teamLeaderId', response['payload']['teamLeaderId'], expiredDate);
-              this.cookieService.set('superadminId', response['payload']['superadminId'], expiredDate);
-              this.cookieService.set('token', response['payload']['token'], expiredDate);
+              // this.cookieService.set('loginId', response['payload']['loginId'], expiredDate);
+              // this.cookieService.set('firstName', response['payload']['firstName'], expiredDate);
+              // this.cookieService.set('lastName', response['payload']['lastName'], expiredDate);
+              // this.cookieService.set('roleType', response['payload']['roleType'], expiredDate);
+              // this.cookieService.set('teamLeaderId', response['payload']['teamLeaderId'], expiredDate);
+              // this.cookieService.set('superadminId', response['payload']['superadminId'], expiredDate);
+              // this.cookieService.set('token', response['payload']['token'], expiredDate);
 
               this.messageService.add({
                 summary: response['payload']['respCode'],
                 detail: response['payload']['respMesg'],
                 styleClass: 'success-background-popover',
               });
-              this.router.navigate([routes.salesDashboard]);
+              if('DONOR_EXECUTIVE' == Constant.donorExecutive){
+                this.router.navigate([routes.adminDashboard]);
+              }else{
+                this.router.navigate([routes.salesDashboard]);
+              }
+              
             } else {
               this.messageService.add({
                 summary: response['payload']['respCode'],

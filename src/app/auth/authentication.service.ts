@@ -27,13 +27,17 @@ export class AuthenticationService {
     if (details) {
       return JSON.parse(details);
     } else {
-      return { 'userId': '', 'fullName': '', 'mobileNo': '', 'memberType': '' };
+      return;
     }
   }
 
 
   logOut() {
     this.cookieService.delete('loginDetails');
+    this.cookieService.deleteAll();
+    alert("Cookies : "+this.cookieService.get('loginDetails'));
+    sessionStorage.clear();
+    alert("Deleted");
   }
 
 }

@@ -3,21 +3,22 @@ import { RouterModule, Routes } from '@angular/router';
 import { DashboardComponent } from './dashboard.component';
 import { AdminDashboardComponent } from './admin-dashboard/admin-dashboard.component';
 import { SalesDashboardComponent } from './sales-dashboard/sales-dashboard.component';
+import { AuthGuard } from 'src/app/core/core.index';
 
 const routes: Routes = [{ path: '', component: DashboardComponent,
 children: [
   {
     path: '',
     pathMatch: 'full',
-    redirectTo: 'admin-dashboard'
+    redirectTo: 'admin-dashboard',  
   },
   {
     path: 'admin-dashboard',
-    component: AdminDashboardComponent
+    component: AdminDashboardComponent, canActivate: [AuthGuard]
   },
   {
     path: 'sales-dashboard',
-    component: SalesDashboardComponent
+    component: SalesDashboardComponent, canActivate: [AuthGuard]
   }
 ]
 }];
