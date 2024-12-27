@@ -42,6 +42,8 @@ export class CreateLeadComponent {
   public showFollowupDateBox: boolean =false;
   public showUserList:  boolean =false;
 
+  public createdBy: any;
+
   public donationList: any;
   public showCurrencyBox: boolean = false;
   public currencyList: any;
@@ -80,7 +82,7 @@ export class CreateLeadComponent {
 
   ngOnInit() {
     this.getUserList();
-    this.getDonationListForLead('JH');
+    this.getDonationListForLead(this.createdBy);
     this.createForms();
     // this.getInvoiceTypeList();
     this.getDonationTypeList();
@@ -149,7 +151,10 @@ export class CreateLeadComponent {
   }
 
   public getDonationListForLead(event: any) {
-    this.donationManagementService.getDonationListForLead(event.value)
+    // alert("jhg : "+event);
+    // alert(this.createdBy);
+    this.createdBy=event;
+    this.donationManagementService.getDonationListForLead(this.createdBy)
       .subscribe({
         next: (response: any) => {
           if (response['responseCode'] == '200') {
@@ -306,7 +311,7 @@ export class CreateLeadComponent {
             let payload = response['payload'];
             if (response['payload']['respCode'] == '200') {
 
-              this.getDonationListForLead("hk");
+              this.getDonationListForLead(this.createdBy);
 
               this.messageService.add({ severity: 'success', summary: 'Success', detail: response['payload']['respMesg'] });
               this.addDonationForm.reset();

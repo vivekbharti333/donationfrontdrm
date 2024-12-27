@@ -35,7 +35,7 @@
             <div class="col-lg-3 col-sm-6 col-12">
               <div class="input-blocks">
                 <i class="feather icon-user info-img"></i>
-                <mat-select class="space-select select" placeholder="Choose Data" (selectionChange)="getDonationListForLead($event)">   
+                <mat-select class="space-select select" placeholder="Choose Data" (selectionChange)="getDonationListForLead($event.value)">   
                   <mat-option *ngFor="let user of userList" [value]="user.loginId">
                     {{user.firstName}} {{user.lastName}}
                   </mat-option>
