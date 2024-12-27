@@ -47,6 +47,19 @@ export class UserManagementService {
     return  this.http.post<any>(Constant.Site_Url+"getUserDetails",request);
   }
 
+  getUserListToGetDataForCall(): Observable<any> {
+    let request: any = {
+      payload: {
+        requestedFor: 'ALL',
+        roleType:  Constant.superAdmin,
+        token:  this.cookieService.get('token'),
+        createdBy: this.cookieService.get('superadminId'),
+        superadminId:  this.cookieService.get('superadminId'),
+      }
+    };
+    return  this.http.post<any>(Constant.Site_Url+"getUserDetails",request);
+  }
+
   getTeamleaderList(): Observable<UserDetailsRequest> {
     let request: UserDetailsRequest = {
       payload: {

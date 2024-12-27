@@ -35,9 +35,7 @@ export class AuthenticationService {
   logOut() {
     this.cookieService.delete('loginDetails');
     this.cookieService.deleteAll();
-    alert("Cookies : "+this.cookieService.get('loginDetails'));
     sessionStorage.clear();
-    alert("Deleted");
   }
 
 }

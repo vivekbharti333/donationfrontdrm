@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { routes } from '../core/helpers/routes';
+import { CookieService } from 'ngx-cookie-service';
 
 
 @Injectable({
@@ -8,7 +9,10 @@ import { routes } from '../core/helpers/routes';
 })
 export class WebstorgeService {
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private cookieService: CookieService,
+  ) {}
 
   public login(): void {
     localStorage.setItem('authenticated', 'true');
@@ -21,6 +25,7 @@ export class WebstorgeService {
   public Logout(): void {
     localStorage.removeItem('authorized');
     localStorage.removeItem('loginTime');
+    this.cookieService.deleteAll();
     this.router.navigate(['/auth/signin']);
   }
 }

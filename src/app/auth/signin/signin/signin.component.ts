@@ -60,20 +60,20 @@ export class SigninComponent {
               expiredDate.setDate(expiredDate.getDate() + 1);
               this.cookieService.set('loginDetails', JSON.stringify(response['payload']), expiredDate);
               
-              // this.cookieService.set('loginId', response['payload']['loginId'], expiredDate);
-              // this.cookieService.set('firstName', response['payload']['firstName'], expiredDate);
-              // this.cookieService.set('lastName', response['payload']['lastName'], expiredDate);
-              // this.cookieService.set('roleType', response['payload']['roleType'], expiredDate);
-              // this.cookieService.set('teamLeaderId', response['payload']['teamLeaderId'], expiredDate);
-              // this.cookieService.set('superadminId', response['payload']['superadminId'], expiredDate);
-              // this.cookieService.set('token', response['payload']['token'], expiredDate);
+              this.cookieService.set('loginId', response['payload']['loginId'], expiredDate);
+              this.cookieService.set('firstName', response['payload']['firstName'], expiredDate);
+              this.cookieService.set('lastName', response['payload']['lastName'], expiredDate);
+              this.cookieService.set('roleType', response['payload']['roleType'], expiredDate);
+              this.cookieService.set('teamLeaderId', response['payload']['teamLeaderId'], expiredDate);
+              this.cookieService.set('superadminId', response['payload']['superadminId'], expiredDate);
+              this.cookieService.set('token', response['payload']['token'], expiredDate);
 
               this.messageService.add({
                 summary: response['payload']['respCode'],
                 detail: response['payload']['respMesg'],
                 styleClass: 'success-background-popover',
               });
-              if('DONOR_EXECUTIVE' == Constant.donorExecutive){
+              if(response['payload']['roleType'] == Constant.donorExecutive){
                 this.router.navigate([routes.adminDashboard]);
               }else{
                 this.router.navigate([routes.salesDashboard]);

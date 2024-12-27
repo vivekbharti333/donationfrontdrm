@@ -87,14 +87,14 @@ export class SidebarService {
           base1: 'dashboard',
           subMenus: [
             {
-              menuValue: 'Admin Dashboard',
-              route: routes.adminDashboard,
-              permission: 'admin-dashboard',
-            },
-            {
               menuValue: 'Dashboard',
               route: routes.salesDashboard,
               permission: 'dashboard',
+            },
+            {
+              menuValue: 'Call Dashboard',
+              route: routes.adminDashboard,
+              permission: 'admin-dashboard',
             },
           ],
         },
@@ -104,13 +104,13 @@ export class SidebarService {
           showSubRoute: false,
           icon: 'users',
           subMenus: [
+            // {
+            //   menuValue: 'Add user',
+            //   route: routes.addusers,
+            //   permission: 'create-user',
+            // },
             {
               menuValue: 'Add user',
-              route: routes.addusers,
-              permission: 'create-user',
-            },
-            {
-              menuValue: 'Create user',
               route: routes.createUser,
               permission: 'create-user',
             },

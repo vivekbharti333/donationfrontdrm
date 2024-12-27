@@ -82,11 +82,11 @@ export class CreateLeadComponent {
     this.getUserList();
     this.getDonationListForLead('JH');
     this.createForms();
-    this.getInvoiceTypeList();
+    // this.getInvoiceTypeList();
     this.getDonationTypeList();
-    this.getCurrencyDetailBySuperadmin();
-    this.getPaymentModeList();
-    this.getFundrisingOfficerByTeamLeaderId();
+    // this.getCurrencyDetailBySuperadmin();
+    // this.getPaymentModeList();
+    // this.getFundrisingOfficerByTeamLeaderId();
   }
 
   checkRoleType(){
@@ -136,7 +136,7 @@ export class CreateLeadComponent {
   }
 
   public getUserList() {
-    this.userManagementService.getUserDetailsList()
+    this.userManagementService.getUserListToGetDataForCall()
       .subscribe({
         next: (response: any) => {
           if (response['responseCode'] == '200') {

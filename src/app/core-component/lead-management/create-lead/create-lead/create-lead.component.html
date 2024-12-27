@@ -6,7 +6,7 @@
 
 <div class="row">
   <div class="col-lg-5 col-md-5 form-check"></div>
-  <div class="col-lg-1 col-md-1 form-check">
+  <!-- <div class="col-lg-1 col-md-1 form-check">
     <input type="radio" class="btn-check" name="formName" value="lead" id="lead" autocomplete="off" checked
       (change)="onSelectionChange($event)" />
     <label class="btn" for="lead">New Lead</label>
@@ -15,7 +15,7 @@
     <input type="radio" class="btn-check" name="formName" value="info" id="info" autocomplete="off"
       (change)="onSelectionChange($event)" />
     <label class="btn" for="info">Information</label>
-  </div>
+  </div> -->
   <div class="col-lg-5 col-md-5 form-check"></div>
 </div>
 
@@ -31,7 +31,7 @@
             </h6>
           </div>
 
-          <div class="row" *ngIf="showUserList">
+          <div class="row">
             <div class="col-lg-3 col-sm-6 col-12">
               <div class="input-blocks">
                 <i class="feather icon-user info-img"></i>
@@ -124,7 +124,7 @@
 </div>
 
 
-<div *ngIf="selectedOption === 'info'">
+<!-- <div *ngIf="selectedOption === 'info'">
 
   <form [formGroup]="addDonationForm" (ngSubmit)="saveDonationDetails()">
     <div class="card">
@@ -270,4 +270,4 @@
     </div>
   </form>
 
-</div>
+</div> -->
