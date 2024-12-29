@@ -8,7 +8,7 @@ const routes: Routes = [
     path: '',
     component: ThankYouComponent,
     children: [
-      { path: 'thank-you/letter/:receiptNo', component: LetterComponent },
+      { path: 'letter/:receiptNo', component: LetterComponent },
 
     ],
   },
