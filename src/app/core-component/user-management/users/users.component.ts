@@ -19,6 +19,8 @@ import { ToastModule } from 'primeng/toast';
 import { MatDialog } from '@angular/material/dialog';
 import { CookieService } from 'ngx-cookie-service';
 import { Constant } from 'src/app/core/constant/constants';
+import { FormGroup, FormArray, FormBuilder, Validators} from '@angular/forms';
+import { AuthenticationService } from 'src/app/auth/authentication.service'; 
 
 interface data {
   value: string;
@@ -37,9 +39,17 @@ export class UsersComponent {
   public isSuperadmin: boolean = false;
   public isAdmin: boolean = false;
   public isTeamLeader: boolean = false;
+  public editUserForm!: FormGroup;
+  public teamLeaderForm!: FormGroup;
 
+  public teamLeaderList: any;
+  // public addressList: any;
 
-  public addressList: any;
+  public userRoleList!: any;
+  public userPhoto: any;
+  public userAddressList: any;
+
+  
 
   public user = {
     userPicture: '',
@@ -62,32 +72,29 @@ export class UsersComponent {
     emergencyContactRelation2: '',
     emergencyContactName2: '',
     emergencyContactNo2: '',
+
     // addressList: [
-    //   this.createAddress(),
-    //   this.createAddress()
-    // ]
-    addressList: [
-      {
-        addressType: 'CURRENT',
-        addressLine: '',
-        landmark: '',
-        district: '',
-        city: '',
-        state: '',
-        country: 'INDIA',
-        pincode: '',
-      },
-      {
-        addressType: 'PARMANENT',
-        addressLine: '',
-        landmark: '',
-        district: '',
-        city: '',
-        state: '',
-        country: 'INDIA',
-        pincode: '',
-      },
-    ],
+    //   {
+    //     addressType: 'CURRENT',
+    //     addressLine: '',
+    //     landmark: '',
+    //     district: '',
+    //     city: '',
+    //     state: '',
+    //     country: 'INDIA',
+    //     pincode: '',
+    //   },
+    //   {
+    //     addressType: 'PARMANENT',
+    //     addressLine: '',
+    //     landmark: '',
+    //     district: '',
+    //     city: '',
+    //     state: '',
+    //     country: 'INDIA',
+    //     pincode: '',
+    //   },
+    // ],
   };
 
   onRoleTypeChange(event: any) {
@@ -112,30 +119,106 @@ export class UsersComponent {
     }
   }
 
+  createForms() {
+    this.editUserForm = this.fb.group({
+      loginId: [''],
+      firstName: ['', [Validators.required, Validators.pattern("[0-9A-Za-z ]{3,150}")]],
+      lastName: ['', [Validators.required, Validators.pattern("[1-9]{1}[0-9]{9}")]],
+      roleType: [''],
+      mobileNo: ['', [Validators.required, Validators.pattern('^[0-9]*$')]],
+      alternateMobile: ['', [Validators.required, Validators.pattern('^[0-9]*$')]],
+      emailId: ['', [Validators.required, Validators.email]],
+      dob: [''],
+      permissions: [''],
+      userPicture:[''],
+      addressList: this.fb.array([
+        this.addressForm(),
+        this.addressForm()]),
+    });
+    this.teamLeaderForm = this.fb.group({
+      teamLeaderId: [''],
+      searchKey: [''],
+    });
+    
+  }
 
-  openEditModal(templateRef: TemplateRef<any>, rowDate: any) {
-    this.user.userPicture = rowDate.userPicture;
-    this.user.firstName = rowDate.firstName; // Assign the value to user.firstName
-    this.user.lastName = rowDate.lastName;
-    this.user.gender = rowDate.gender;
-    this.user.permissions = rowDate.permissions;
-    this.user.emailId = rowDate.emailId;
-    this.user.roleType = rowDate.roleType;
-    this.user.mobileNo = rowDate.mobileNo;
-    this.user.alternateMobile = rowDate.alternateMobile;
-    this.user.userCode = rowDate.userCode;
-    this.user.idDocumentType = rowDate.idDocumentType;
-    this.user.idDocumentPicture = rowDate.idDocumentPicture;
-    this.user.panNumber = rowDate.panNumber;
-    this.user.emergencyContactRelation1 = rowDate.emergencyContactRelation1;
-    this.user.emergencyContactName1 = rowDate.emergencyContactName1;
-    this.user.emergencyContactNo1 = rowDate.emergencyContactNo1;
-    this.user.emergencyContactRelation2 = rowDate.emergencyContactRelation2;
-    this.user.emergencyContactName2 = rowDate.emergencyContactName2;
-    this.user.emergencyContactNo2 = rowDate.emergencyContactNo2;
-    this.getAddressListByUserId(rowDate.loginId);
+  get addressList(): FormArray {
+    return this.editUserForm.get("addressList") as FormArray
+  }
+
+  addressForm() {
+    return this.fb.group({
+      addressType: [''],
+      addressLine: [''],
+      landmark: [''],
+      district: [''],
+      city: [''],
+      state: [''],
+      country: ['INDIA'],
+      pincode: ['']
+    });
+  }
+
+
+
+  openEditModal(templateRef: TemplateRef<any>, user: any): void {
+    this.getAddressDetailsByUserId(user);
+  
+    // Create a copy of the addressList from userAddressList
+    const addressListCopy = [...this.userAddressList];
+  
+    // Ensure the addressForm array matches the userAddressList
+    while (this.addressList.length < addressListCopy.length) {
+      this.addressList.push(this.addressForm());
+    }
+  
+    for (let i = 0; i < addressListCopy.length; i++) {
+      const addressGroup = this.addressList.at(i) as FormGroup;
+      const address = addressListCopy[i];
+  
+      // Update the values in the addressForm
+      addressGroup.patchValue({
+        addressType: address.addressType,
+        addressLine: address.addressLine,
+        landmark: address.landmark,
+        district: address.district,
+        city: address.city,
+        state: address.state,
+        country: address.country,
+        pincode: address.pincode,
+      });
+    }
+
+    // Format the dob (if required)
+    const formattedDob = user['dob']
+      ? new Date(user['dob']).toISOString().split('T')[0]
+      : 'DD-MM-YYYY'; // Convert to YYYY-MM-DD or leave blank
+  
+    // Patch values into the editUserForm
+    this.editUserForm.patchValue({
+      userPicture: user['userPicture'],
+      loginId: user['loginId'],
+      firstName: user['firstName'],
+      lastName: user['lastName'],
+      roleType: user['roleType'],
+      mobileNo: user['mobileNo'],
+      alternateMobile: user['alternateMobile'],
+      emailId: user['emailId'],
+      dob: formattedDob, // Use the formatted dob
+      permissions: user['permissions'],
+      userPhoto: user['userPhoto'],
+      createdBy: user['createdBy'],
+    });
+  
+    // Update the userPhoto for display
+    this.userPhoto = user['userPicture']
+      ? 'data:image/png;base64,' + user['userPicture']
+      : '';
+  
+    // Open the dialog
     this.dialog.open(templateRef);
   }
+  
 
   public roleTypes = [
     { id: 1, name: 'SUPERADIN' },
@@ -170,26 +253,23 @@ export class UsersComponent {
     private pagination: PaginationService,
     private router: Router,
     private sidebar: SidebarService,
+    private fb: FormBuilder,
+    private authenticationService: AuthenticationService,
     private messageService: MessageService,
     private userManagementService: UserManagementService,
     private dialog: MatDialog,
     private cookieService: CookieService
   ) {
-    //   this.userManagementService.getUserDetailsList().subscribe((apiRes: any) => {
-    //   this.totalData = apiRes.totalNumber;
-    //   const stringRepresentation = JSON.stringify(apiRes);
-    //   const dataSize = stringRepresentation.length;
-    //   this.pagination.tablePageSize.subscribe((res: tablePageSize) => {
-    //     if (this.router.url == this.routes.users) {
-    //       this.getTableData({ skip: res.skip, limit: this.totalData  });
-    //       this.pageSize = res.pageSize;
-    //     }
-    //   });
-    // });
+    // this.loginUser = this.authenticationService.getLoginUser();
   }
+
 
   ngOnInit() {
     this.getUserDetails();
+    this.createForms();
+    // this.checkRoleType();
+    this.getUserRoleType();
+    this.getTeamleaderList();
   }
 
   genderType: data[] = [
@@ -197,13 +277,31 @@ export class UsersComponent {
     { value: '2', name: 'FEMALE' },
     { value: '3', name: 'OTHER' },
   ];
-  userType: data[] = [
-    { value: '1', name: 'ADMIN' },
-    { value: '2', name: 'TEAM LEADER' },
-    { value: '3', name: 'SALE EXECUTIVE' },
+
+  getUserRoleType(){
+    if( this.cookieService.get('roleType') === Constant.mainAdmin){
+      this.userRoleList = [{value: Constant.superAdmin, name: 'Superadmin'}, {value: Constant.admin, name: 'Admin'}, {value:Constant.teamLeader, name: 'Team Leader'}, { value: Constant.fundraisingOfficer, name: 'Fundrising Officer'}];
+
+    }else if( this.cookieService.get('roleType') === Constant.superAdmin){
+      this.userRoleList = [{value: Constant.admin, name: 'Admin'}, {value:Constant.teamLeader, name: 'Team Leader'}, { value: Constant.fundraisingOfficer, name: 'Fundrising Officer'}, { value: Constant.donorExecutive, name: 'Donation Executive'}];
+
+    }else if( this.cookieService.get('roleType') === Constant.admin){
+      this.userRoleList = [{value: Constant.teamLeader, name: 'Team Leader'}, { value: Constant.fundraisingOfficer, name: 'Fundrising Officer'}];
+    }else if( this.cookieService.get('roleType') === Constant.teamLeader){
+      this.userRoleList = [{ value: Constant.fundraisingOfficer, name: 'Fundrising Officer'}];
+    }
+  }
+
+  permissionsList: data[] =[
+    { value: 'admin-dashboard', name: 'Lead Dashboard' },
+    { value: 'sale-dashboard', name: 'Donation Dashboard' },
+    { value: 'create-user', name: 'Create User' },
+    { value: 'user-list', name: 'User List' },
+    { value: 'create-lead', name: 'Create Lead' },
+    { value: 'lead-list', name: 'Lead List' },
+    { value: 'general-setting', name: 'General Setting' },
+    { value: 'company-setting', name: 'Company Setting' }
   ];
-  // permissionsList: data[] = [{ value: '1', name: 'admindb'}, {value: '2', name: 'admindbn'}, {value: '3', name: 'usermang'},{value: '3', name: 'usermang1'}];
-  permissionsList: string[] = ['admindb', 'admindbn', 'usermang', 'usermang1'];
 
   getUserDetails() {
     this.userManagementService.getUserDetailsList().subscribe((apiRes: any) => {
@@ -340,11 +438,34 @@ export class UsersComponent {
     }
   }
 
-  show() {
-    this.messageService.add({
-      summary: 'Toast',
-      detail: 'Hello, world! This is a toast message.',
-    });
+  public getTeamleaderList() {
+    this.userManagementService.getTeamleaderList()
+      .subscribe({
+        next: (response: any) => {
+          if (response['responseCode'] == '200') {
+            this.userList = JSON.parse(JSON.stringify(response['listPayload']));
+           
+          } else {
+            
+          }
+        },
+      });
+  }
+
+  public getAddressDetailsByUserId(user:any) {
+    this.userManagementService.getAddressDetailsByUserId(user)
+      .subscribe({
+        next: (response: any) => {
+          console.log("Data : "+response)
+          if (response['responseCode'] == '200') {
+            this.userAddressList = JSON.parse(JSON.stringify(response['listPayload']));
+            // this.toastr.success(response['status'], response['responseCode']);
+          } else {
+            // this.toastr.error(response['responseMessage'], response['responseCode']);
+          }
+        },
+        // error: (error: any) => this.toastr.error('Server Error', '500'),
+      });
   }
 
   changeUserStatus(rowData: any) {
@@ -389,11 +510,11 @@ export class UsersComponent {
     this.userManagementService.getAddressListByUserId(userId).subscribe({
       next: (response: any) => {
         if (response['responseCode'] == '200') {
-          this.addressList = JSON.parse(
-            JSON.stringify(response['listPayload'])
-          );
-          alert('hghgg : ' + this.addressList);
-          console.log(this.addressList);
+          // this.addressList = JSON.parse(
+          //   JSON.stringify(response['listPayload'])
+          // );
+          // alert('hghgg : ' + this.addressList);
+          // console.log(this.addressList);
         } else {
         }
       },

@@ -22,22 +22,15 @@ const routes: Routes = [
       import('./error-pages/error-pages.module').then((m) => m.ErrorPagesModule
       ),
   },
-
-  // {
-  //   path: '**',
-  //   redirectTo: 'signin',
-  //   pathMatch: 'full',
-  // },
-
   {
     path: '**',
-    redirectTo: 'errorpages/error404',
+    redirectTo: 'error-pages/error-404',
     pathMatch: 'full',
   },
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes)],
+  imports: [RouterModule.forRoot(routes, { useHash: true })],
   exports: [RouterModule],
 })
 export class AppRoutingModule {}

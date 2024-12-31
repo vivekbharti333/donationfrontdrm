@@ -36,7 +36,7 @@
         <div class="card-title-head">
           <h6><span><i class="feather icon-info feather-edit"></i></span>Personal Information</h6>
         </div>
-        <div class="profile-pic-upload">
+        <!-- <div class="profile-pic-upload">
           <div class="profile-pic">
             <ng-container *ngIf="!user.userPicture; else showImage">
               <span><i class="feather icon-plus-circle plus-down-add"></i> Profile Photo</span>
@@ -53,7 +53,29 @@
               </div>
             </div>
           </div>
+        </div> -->
+
+        <div class="profile-pic-upload">
+          <div class="profile-pic">
+            <!-- Check if the userPicture field in the form is empty -->
+            <ng-container *ngIf="!addUserForm.get('userPicture')?.value; else showImage">
+              <span><i class="feather icon-plus-circle plus-down-add"></i> Profile Photo</span>
+            </ng-container>
+            <ng-template #showImage>
+              <img [src]="'data:image/png;base64,' + addUserForm.get('userPicture')?.value" alt="Profile Picture"
+                class="uploaded-profile-pic" />
+            </ng-template>
+          </div>
+          <div class="input-blocks mb-0">
+            <div class="image-upload mb-0">
+              <input type="file" class="form-control" id="userPicture" accept="image/*" (change)="onFileSelected($event)" />
+              <div class="image-uploads">
+                <h4>Change Image</h4>
+              </div>
+            </div>
+          </div>
         </div>
+        
 
         <div class="row">
           <div class="col-lg-4 col-md-6">
@@ -83,8 +105,8 @@
               <label class="form-label requiredField">Permission</label>
               <mat-select class="space-select select" formControlName="permissions" placeholder="Select Permission"
                 multiple>
-                <mat-option *ngFor="let data of permissionsList" [value]="data">
-                  {{data}}
+                <mat-option *ngFor="let data of permissionsList" [value]="data.value">
+                  {{data.name}}
                 </mat-option>
               </mat-select>
             </div>

@@ -9,13 +9,14 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatSelectModule } from '@angular/material/select';
 import { FormsModule } from '@angular/forms';
 import { CookieService } from 'ngx-cookie-service';
+import { HashLocationStrategy, LocationStrategy, PathLocationStrategy } from '@angular/common';
 
 
 @NgModule({
   declarations: [AppComponent, LoaderComponent],
   imports: [BrowserModule, AppRoutingModule, sharedModule, BrowserAnimationsModule,MatSelectModule,FormsModule],
   exports: [],
-  providers: [CookieService],
+  providers: [CookieService, { provide: LocationStrategy, useClass: HashLocationStrategy}],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

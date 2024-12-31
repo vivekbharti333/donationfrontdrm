@@ -143,8 +143,4 @@ export class HeaderComponent  {
     // window.location.href = "";
     // window.location.reload();
   }
-
-
-
- 
 }

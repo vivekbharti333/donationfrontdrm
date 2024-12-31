@@ -9,7 +9,6 @@ const routes: Routes = [
     component: ThankYouComponent,
     children: [
       { path: 'letter/:receiptNo', component: LetterComponent },
-
     ],
   },
 ];

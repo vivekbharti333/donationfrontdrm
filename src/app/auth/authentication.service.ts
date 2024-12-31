@@ -4,6 +4,8 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { CookieService } from 'ngx-cookie-service';
 // import { UserDetailsRequest } from '../interface/user-management';
 import { Constant } from '../core/constant/constants';
+import { Router } from '@angular/router';
+import { routes } from '../core/core.index';
 
 
 @Injectable({
@@ -18,6 +20,7 @@ export class AuthenticationService {
   constructor(
     private http: HttpClient,
     private cookieService: CookieService,
+    private router: Router
   ) {
     this.loginUser = this.getLoginUser();
   }
@@ -36,6 +39,8 @@ export class AuthenticationService {
     this.cookieService.delete('loginDetails');
     this.cookieService.deleteAll();
     sessionStorage.clear();
+    localStorage.clear();
+    this.router.navigate([routes.signIn]);
   }
 
 }

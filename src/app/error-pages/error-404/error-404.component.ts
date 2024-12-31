@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
 import { routes } from 'src/app/core/helpers/routes';
 
 @Component({
@@ -8,4 +9,9 @@ import { routes } from 'src/app/core/helpers/routes';
 })
 export class Error404Component {
   public routes = routes;
+  constructor(private router: Router) { }
+
+  backToDashboard() {
+    this.router.navigate([routes.baseUrl]);
+  }
 }

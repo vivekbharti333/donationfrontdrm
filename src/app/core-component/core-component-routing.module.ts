@@ -82,7 +82,6 @@ const routes: Routes = [
         loadChildren: () =>
           import('./thank-you/thank-you.module').then((m) => m.ThankYouModule),
       },
-
       {
         path: 'dashboard',
         loadChildren: () =>

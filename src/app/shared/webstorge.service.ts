@@ -26,6 +26,6 @@ export class WebstorgeService {
     localStorage.removeItem('authorized');
     localStorage.removeItem('loginTime');
     this.cookieService.deleteAll();
-    this.router.navigate(['/auth/signin']);
+    this.router.navigate(['/signin']);
   }
 }

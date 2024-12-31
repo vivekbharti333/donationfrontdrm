@@ -193,8 +193,8 @@ export class UserManagementService {
         firstName: userDetails.firstName,
         lastName: userDetails.lastName,
         roleType: userDetails.roleType,
-        // permissions: JSON.stringify(userDetails.permissions),
-        permissions: userDetails.permissions,
+        permissions: JSON.stringify(userDetails.permissions),
+        // permissions: userDetails.permissions,
         mobileNo: userDetails.mobileNo,
         alternateMobile: userDetails.alternateMobile,
         emailId: userDetails.emailId,
@@ -207,7 +207,7 @@ export class UserManagementService {
         superadminId: this.cookieService.get('superadminId'),
       }
     };
-    return  this.http.post<any>(Constant.Site_Url+"userRegistration",request);
+    return  this.http.post<UserDetailsRequest>(Constant.Site_Url+"userRegistration",request);
   }
 
   updateUserDetails(user: any): Observable<any> {
@@ -241,6 +241,33 @@ export class UserManagementService {
       }
     };
     return  this.http.post<any>(Constant.Site_Url+"userRegistration",request);
+  }
+
+  getAddressDetailsByUserId(user:any): Observable<UserDetailsRequest> {
+    let request: UserDetailsRequest = {
+      payload: {
+        requestedFor: 'ALL',
+        id: user['id'],
+        token: this.loginUser['token'],
+        roleType: this.loginUser['roleType'],
+        createdBy: this.loginUser['loginId'],
+        superadminId: this.loginUser['superadminId'],
+      }
+    };
+    return this.http.post<UserDetailsRequest>(Constant.Site_Url + "getAddressDetails", request);
+  }
+
+  getUserDetailsListBySelectingTeamLeader(teamLeader:any): Observable<UserDetailsRequest> {
+    let request: UserDetailsRequest = {
+      payload: {
+        requestedFor: 'ALL',
+        roleType: "TEAM_LEADER",
+        token: this.loginUser['token'],
+        createdBy: teamLeader.teamLeaderId,
+        superadminId: this.loginUser['superadminId'],
+      }
+    };
+    return this.http.post<UserDetailsRequest>(Constant.Site_Url + "getUserDetails", request);
   }
 
 

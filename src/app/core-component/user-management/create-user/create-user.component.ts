@@ -78,56 +78,52 @@ export class CreateUserComponent {
     this.getTeamleaderList();
   }
 
-  public user = {
-    userPicture: '',
-    firstName: '',
-    lastName: '',
-    emailId: '',
-    gender: '',
-    adminId: '',
-    teamleaderId: '',
-    permissions: '',
-    roleType: '',
-    mobileNo: '',
-    alternateMobile: '',
-    userCode: '',
-    idDocumentType: '',
-    idDocumentPicture: '',
-    panNumber: '',
-    dob: '',
-    emergencyContactRelation1: '',
-    emergencyContactName1: '',
-    emergencyContactNo1: '',
-    emergencyContactRelation2: '',
-    emergencyContactName2: '',
-    emergencyContactNo2: '',
-    // addressList: [
-    //   this.createAddress(),
-    //   this.createAddress()
-    // ]
-    addressList: [
-      {
-        addressType: 'CURRENT',
-        addressLine: '',
-        landmark: '',
-        district: '',
-        city: '',
-        state: '',
-        country: 'INDIA',
-        pincode: '',
-      },
-      {
-        addressType: 'PARMANENT',
-        addressLine: '',
-        landmark: '',
-        district: '',
-        city: '',
-        state: '',
-        country: 'INDIA',
-        pincode: '',
-      },
-    ],
-  };
+  // public user = {
+  //   userPicture: '',
+  //   firstName: '',
+  //   lastName: '',
+  //   emailId: '',
+  //   gender: '',
+  //   adminId: '',
+  //   teamleaderId: '',
+  //   permissions: '',
+  //   roleType: '',
+  //   mobileNo: '',
+  //   alternateMobile: '',
+  //   userCode: '',
+  //   idDocumentType: '',
+  //   idDocumentPicture: '',
+  //   panNumber: '',
+  //   dob: '',
+  //   emergencyContactRelation1: '',
+  //   emergencyContactName1: '',
+  //   emergencyContactNo1: '',
+  //   emergencyContactRelation2: '',
+  //   emergencyContactName2: '',
+  //   emergencyContactNo2: '',
+  //   addressList: [
+  //     {
+  //       addressType: 'CURRENT',
+  //       addressLine: '',
+  //       landmark: '',
+  //       district: '',
+  //       city: '',
+  //       state: '',
+  //       country: 'INDIA',
+  //       pincode: '',
+  //     },
+  //     {
+  //       addressType: 'PARMANENT',
+  //       addressLine: '',
+  //       landmark: '',
+  //       district: '',
+  //       city: '',
+  //       state: '',
+  //       country: 'INDIA',
+  //       pincode: '',
+  //     },
+  //   ],
+  // };
 
 
   createForms() {
@@ -142,8 +138,6 @@ export class CreateUserComponent {
       userPicture: [''],
       service: ['DONATION'],
       dob: [''],
-
-
       gender: [''],
       adminId: [''],
       teamleaderId: [''],
@@ -236,15 +230,26 @@ export class CreateUserComponent {
     { value: 'SALE_EXECUTIVE', name: 'SALE EXECUTIVE' },
   ];
   // permissionsList: data[] = [{ value: '1', name: 'admindb'}, {value: '2', name: 'admindbn'}, {value: '3', name: 'usermang'},{value: '3', name: 'usermang1'}];
-  permissionsList: string[] = [
-    'admin-dashboard',
-    'sale-dashboard',
-    'create-user',
-    'user-list',
-    'create-lead',
-    'lead-list',
-    'general-setting',
-    'company-setting',
+  // permissionsList: string[] = [
+  //   'admin-dashboard',
+  //   'sale-dashboard',
+  //   'create-user',
+  //   'user-list',
+  //   'create-lead',
+  //   'lead-list',
+  //   'general-setting',
+  //   'company-setting',
+  // ];
+
+  permissionsList: data[] =[
+    { value: 'admin-dashboard', name: 'Lead Dashboard' },
+    { value: 'sale-dashboard', name: 'Donation Dashboard' },
+    { value: 'create-user', name: 'Create User' },
+    { value: 'user-list', name: 'User List' },
+    { value: 'create-lead', name: 'Create Lead' },
+    { value: 'lead-list', name: 'Lead List' },
+    { value: 'general-setting', name: 'General Setting' },
+    { value: 'company-setting', name: 'Company Setting' }
   ];
 
   public isTeamLeaderFielsShow() {
@@ -264,7 +269,6 @@ export class CreateUserComponent {
             
           }
         },
-        
       });
   }
 
@@ -295,7 +299,9 @@ export class CreateUserComponent {
         const base64String = event.target.result.split(',')[1]; // Get the base64 part
 
         // Set the base64 string to the userPicture field
-        this.user.userPicture = 'data:image/jpeg;base64,' + base64String;
+        this.addUserForm.patchValue({
+          userPicture: base64String
+        });
       };
       reader.readAsDataURL(selectedFile);
     }
@@ -307,65 +313,47 @@ export class CreateUserComponent {
         next: (response: any) => {
           if (response['responseCode'] == '200') {
             if (response['payload']['respCode'] == '200') {
-              // this.toastr.success(response['payload']['respMesg'], response['payload']['respCode']);
-              this.messageService.add({ severity: 'success', summary: 'Success', detail: response['payload']['respMesg'] });
+             
+              this.messageService.add({
+                summary: response['payload']['respCode'],
+                detail: response['payload']['respMesg'],
+                styleClass: 'success-background-popover',
+              });
               this.addUserForm.reset();
               this.createForms();
-              // this.isLoading = false;
+
             } else if (response['payload']['respCode'] == '401') {
 
               this.cookieService.delete('loginDetails');
               window.location.href = "/login";
               window.location.reload();
-              this.messageService.add({ severity: 'danger', summary: 'Failed', detail: response['payload']['respMesg'] });
-              // this.isLoading = false;
+              
+              this.messageService.add({
+                summary: response['payload']['respCode'],
+                detail: response['payload']['respMesg'],
+                styleClass: 'danger-background-popover',
+              });
             } else {
-              this.messageService.add({ severity: 'danger', summary: 'Failed', detail: response['payload']['respMesg'] });
-              // this.isLoading = false;
+
+              this.messageService.add({
+                summary: response['payload']['respCode'],
+                detail: response['payload']['respMesg'],
+                styleClass: 'danger-background-popover',
+              });
             }
           } else {
-            this.messageService.add({ severity: 'danger', summary: 'Failed', detail: response['payload']['respMesg'] });
-            // this.isLoading = false;
-          }
-        },
-        // error: (error: any) => this.toastr.error('Server Error', '500'),
-        // this.messageService.add({ severity: 'danger', summary: 'Server Error', detail: 500 });
-      });
-      // this.isLoading = false;
-  }
-  submitUserForm(form: NgForm) {
-    this.userManagementService.saveUserDetails(this.user).subscribe({
-      next: (response: any) => {
-        if (response['responseCode'] == '200') {
-          if (response['payload']['respCode'] == '200') {
-            form.reset();
-            this.messageService.add({
-              summary: response['payload']['respCode'],
-              detail: response['payload']['respMesg'],
-              styleClass: 'success-background-popover',
-            });
-          } else {
+            
             this.messageService.add({
               summary: response['payload']['respCode'],
               detail: response['payload']['respMesg'],
               styleClass: 'danger-background-popover',
             });
           }
-        } else {
-          this.messageService.add({
-            summary: response['payload']['respCode'],
-            detail: response['payload']['respMesg'],
-            styleClass: 'danger-background-popover',
-          });
-        }
-      },
-      error: () =>
-        this.messageService.add({
-          summary: '500',
-          detail: 'Server Error',
-        }),
-    });
-    // this.isLoading = false;
+        },
+        error: (error: any) => this.messageService.add({
+          summary: '500', detail: 'Server Error', styleClass: 'danger-background-popover',
+        })
+      });
   }
 
   isCollapsed: boolean = false;
