@@ -5,7 +5,7 @@
       <h6>Manage your roles</h6>
     </div>
   </div>
-  <ul class="table-top-head">
+  <!-- <ul class="table-top-head">
     <li>
       <a data-bs-toggle="tooltip" data-bs-placement="top" matTooltip="Pdf" matTooltipPosition="above"><img
       src="assets/img/icons/pdf.svg" alt="img"></a>
@@ -31,12 +31,166 @@
         <i class="feather icon-chevron-down feather-chevron-down"></i>
       }</a>
     </li>
-  </ul>
+  </ul> -->
   <div class="page-btn">
-    <a href="javascript:void(0);" class="btn btn-added" data-bs-toggle="modal" data-bs-target="#add-units"><i
-    class="feather icon-plus-circle me-2"></i> Add New Role</a>
+    <!-- <a href="javascript:void(0);" class="btn btn-added" data-bs-toggle="modal" data-bs-target="#add-units"><i
+    class="feather icon-plus-circle me-2"></i> Add New Role</a> -->
   </div>
 </div>
+
+
+
+
+
+<form [formGroup]="changeUserPasswordForm" (ngSubmit)="changePassword()">
+  <div class="card">
+    <div class="card-body">
+      <div class="new-employee-field">
+        <div class="card-title-head">
+          <h6><span><i class="feather icon-info feather-edit"></i></span>Change User Password</h6>
+        </div>
+        <div class="row">
+          <div class="col-lg-4 col-md-6">
+            <div class="mb-3">
+              <label class="form-label requiredField">Select User</label>
+              <mat-select class="space-select select" formControlName="loginId" placeholder="Select User">
+                <mat-option *ngFor="let data of userList" [value]="data.loginId">
+                  {{ data.firstName }} {{ data.lastName }}
+                </mat-option>
+              </mat-select>
+            </div>
+          </div>
+
+          <div class="col-lg-4 col-md-6">
+            <div class="mb-3">
+              <label class="form-label requiredField">Enter New Password</label>
+              <input type="text" class="form-control" formControlName="password" required>
+            </div>
+          </div>
+
+          <div class="col-lg-4 col-md-6">
+            <div class="mb-3">
+              <div class="submit-button">
+                <button type="submit" class="btn btn-submit">{{changePasswordBtnMessage}}</button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+</form>
+
+
+<form [formGroup]="changeTeamLeaderForm" (ngSubmit)="changeTeamLeader()">
+  <div class="card">
+    <div class="card-body">
+      <div class="new-employee-field">
+        <div class="card-title-head">
+          <h6><span><i class="feather icon-info feather-edit"></i></span>Change Team Leader</h6>
+        </div>
+        <div class="row">
+          <div class="col-lg-4 col-md-6">
+            <div class="mb-3">
+              <label class="form-label requiredField">Select User</label>
+              <mat-select class="space-select select" formControlName="loginId" placeholder="Select User">
+                <mat-option *ngFor="let data of userList" [value]="data.loginId">
+                  {{ data.firstName }} {{ data.lastName }}
+                </mat-option>
+              </mat-select>
+            </div>
+          </div>
+
+          <div class="col-lg-4 col-md-6">
+            <div class="mb-3">
+              <label class="form-label requiredField">Team Leader list</label>
+              <mat-select class="space-select select" formControlName="teamLeaderId" placeholder="Select Team Leader">
+                <mat-option *ngFor="let data of teamLeaderList" [value]="data.loginId">
+                  {{ data.firstName }} {{ data.lastName }}
+                </mat-option>
+              </mat-select>
+            </div>
+          </div>
+
+          <div class="col-lg-4 col-md-6">
+            <div class="mb-3">
+              <div class="submit-button">
+                <button type="submit" class="btn btn-submit">{{changePasswordBtnMessage}}</button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+</form>
+
+
+
+<form [formGroup]="changeUserRoleForm" (ngSubmit)="changeUserRole()">
+  <div class="card">
+    <div class="card-body">
+      <div class="new-employee-field">
+        <div class="card-title-head">
+          <h6><span><i class="feather icon-info feather-edit"></i></span>Change User Role</h6>
+        </div>
+        <div class="row">
+          <div class="col-lg-4 col-md-6">
+            <div class="mb-3">
+              <label class="form-label requiredField">Select User</label>
+              <mat-select class="space-select select" formControlName="loginId" placeholder="Select User">
+                <mat-option *ngFor="let data of userList" [value]="data.loginId">
+                  {{ data.firstName }} {{ data.lastName }}
+                </mat-option>
+              </mat-select>
+            </div>
+          </div>
+
+          <div class="col-lg-4 col-md-6">
+            <div class="mb-3">
+              <label class="form-label requiredField">Role Type</label>
+              <mat-select class="space-select select" formControlName="roleType" placeholder="Select Team Leader">
+                <mat-option *ngFor="let data of userRoleList" [value]="data.value">
+                  {{ data.ame }}
+                </mat-option>
+              </mat-select>
+            </div>
+          </div>
+
+          <div class="col-lg-4 col-md-6">
+            <div class="mb-3">
+              <div class="submit-button">
+                <button type="submit" class="btn btn-submit">{{changePasswordBtnMessage}}</button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+</form>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 <!-- /product list -->
 <div class="card table-list-card">
   <div class="card-body">

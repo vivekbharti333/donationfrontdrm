@@ -270,5 +270,45 @@ export class UserManagementService {
     return this.http.post<UserDetailsRequest>(Constant.Site_Url + "getUserDetails", request);
   }
 
+  changeUserPassword(userDetails: any): Observable<UserDetailsRequest> {
+    this.loginId = localStorage.getItem('loginId');
+    this.superadminId = localStorage.getItem('superadminId');
+
+    let request: any = {
+      payload: {
+        loginId: userDetails['loginId'],
+        password: userDetails['password'],
+        token: this.loginUser['token'],
+        createdBy: this.loginUser['loginId'],
+        superadminId: this.loginUser['superadminId'],
+      }
+    };
+    return  this.http.post<any>(Constant.Site_Url+"changeUserPassword",request);
+  }
+
+  changeTeamLeader(userDetails: any): Observable<UserDetailsRequest> {
+    let request: any = {
+      payload: {
+        loginId: userDetails['loginId'],
+        teamLeaderId: userDetails['teamLeaderId'],
+        token: this.loginUser['token'],
+        // createdBy: this.loginUser['loginId'],
+        superadminId: this.loginUser['superadminId'],
+      }
+    };
+    return  this.http.post<any>(Constant.Site_Url+"changeTeamLeader",request);
+  }
+
+  changeUserRole(userDetails: any): Observable<UserDetailsRequest> {
+    let request: any = {
+      payload: {
+        loginId: userDetails['loginId'],
+        roleType: userDetails['roleType'],
+        token: this.loginUser['token'],
+        superadminId: this.loginUser['superadminId'],
+      }
+    };
+    return  this.http.post<any>(Constant.Site_Url+"changeUserRole",request);
+  }
 
 }

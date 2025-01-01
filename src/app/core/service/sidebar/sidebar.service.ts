@@ -119,6 +119,11 @@ export class SidebarService {
               route: routes.users,
               permission: 'user-list',
             },
+            {
+              menuValue: 'Roles & Permissions',
+              route: routes.rolesPermission,
+              permission: 'user-list',
+            },
           ],
         },
         {
