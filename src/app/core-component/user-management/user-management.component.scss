@@ -1,0 +1,149 @@
+// file:///C:/Users/HP/Documents/inv.html?receiptNo=153456454
+
+// <!DOCTYPE html>
+// <html lang="en">
+// <head>
+//   <meta charset="UTF-8">
+//   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+//   <title>Thank You Letter Download</title>
+//   <style>
+//     .error-message {
+//       font-family: 'Arial', sans-serif;
+//       font-size: 24px;
+//       color: #FF5733; /* Red color */
+//       text-align: center;
+//     }
+
+//     .container {
+//       display: flex;
+//       justify-content: center;
+//       align-items: center;
+//       height: 100vh;
+//     }
+//   </style>
+// </head>
+// <body>
+//   <div class="container">
+//     <p class="error-message" id="message">Loading...</p>
+//   </div>
+
+//   <script>
+//     // Base URL for API
+//     const Site_Url = "https://datfuslab.in/mycrm/";
+
+//     // Utility function to get a query parameter from the URL
+//     function getQueryParam(param) {
+//         const urlParams = new URLSearchParams(window.location.search);
+//         return urlParams.get(param);
+//     }
+
+//     // Function to fetch donation details by receipt number
+//     async function getDonationListByReceiptNumber(receiptNum) {
+//         const token = 'YOUR_TOKEN'; // Replace with actual token
+//         const createdBy = 'YOUR_LOGIN_ID'; // Replace with actual login ID
+//         const superadminId = 'YOUR_SUPERADMIN_ID'; // Replace with actual superadmin ID
+
+//         const requestPayload = {
+//             payload: {
+//                 receiptNumber: receiptNum,
+//                 token: token,
+//                 createdBy: createdBy,
+//                 superadminId: superadminId,
+//             },
+//         };
+
+//         const response = await fetch(Site_Url + "getDonationListByReceiptNumber", {
+//             method: "POST",
+//             headers: {
+//                 "Content-Type": "application/json",
+//             },
+//             body: JSON.stringify(requestPayload),
+//         });
+
+//         return response.json();
+//     }
+
+//     // Function to download the PDF
+//     async function downloadPdf(receiptNo) {
+//         const url = Site_Url + `donationinvoice/${receiptNo}`;
+//         try {
+//             const response = await fetch(url, { method: "GET" });
+
+//             if (!response.ok) throw new Error(`Error downloading file: ${response.status}`);
+
+//             const blob = await response.blob();
+//             const fileName = getFileNameFromResponse(response) || "file.pdf"; // Default name if not provided
+
+//             saveFile(blob, fileName);
+//         } catch (error) {
+//             console.error(error);
+//         }
+//     }
+
+//     // Extract the file name from the response headers
+//     function getFileNameFromResponse(response) {
+//         const contentDisposition = response.headers.get("Content-Disposition");
+//         if (contentDisposition) {
+//             const matches = contentDisposition.match(/filename="?([^";]+)"?/);
+//             if (matches && matches[1]) {
+//                 return matches[1];
+//             }
+//         }
+//         return null;
+//     }
+
+//     // Save the file to the user's system
+//     function saveFile(blob, fileName) {
+//         const link = document.createElement("a");
+//         const objectUrl = URL.createObjectURL(blob);
+
+//         link.href = objectUrl;
+//         link.download = fileName;
+//         link.click();
+
+//         URL.revokeObjectURL(objectUrl);
+//     }
+
+//     // Countdown before downloading the file
+//     function startCountdown(receiptNo) {
+//         let countdownValue = 5;
+//         const messageElement = document.getElementById("message");
+
+//         const interval = setInterval(() => {
+//             if (countdownValue > 0) {
+//                 messageElement.textContent = `Please Wait... Your Download will start in ${countdownValue}`;
+//                 countdownValue--;
+//             } else {
+//                 clearInterval(interval);
+//                 downloadPdf(receiptNo); // Trigger download
+//                 messageElement.textContent = "Thank You for Your Kind Donation!";
+//             }
+//         }, 1000);
+//     }
+
+//     // Main execution
+//     (async function main() {
+//         const receiptNo = getQueryParam("receiptNo");
+//         const messageElement = document.getElementById("message");
+
+//         if (!receiptNo) {
+//             messageElement.textContent = "No receipt number provided";
+//             return;
+//         }
+
+//         try {
+//             const response = await getDonationListByReceiptNumber(receiptNo);
+
+//             if (response.responseCode === "200") {
+//                 startCountdown(receiptNo);
+//             } else {
+//                 messageElement.textContent = "Invalid Request. Contact the admin for details";
+//             }
+//         } catch (error) {
+//             console.error("Error fetching donation details:", error);
+//             messageElement.textContent = "Server Error. Please try again later.";
+//         }
+//     })();
+//   </script>
+// </body>
+// </html>
