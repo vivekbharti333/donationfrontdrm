@@ -105,7 +105,6 @@ export class AllLeadComponent {
     records: '',
     remarks: '',
     reminderDate: '',
-    // leadStatus:'',
   };
   isEditForm: boolean = false;
   filteredCategoryTypeList: any[] = [];
@@ -123,6 +122,7 @@ export class AllLeadComponent {
   leadOrigine: listData[] = Constant.LEAD_ORIGINE_LIST;
   leadType: listData[] = Constant.LEAD_TYPE_LIST;
   leadStatus: listData[] = Constant.LEAD_STATUS_LIST;
+
   constructor(
     private data: DataService,
     private pagination: PaginationService,
