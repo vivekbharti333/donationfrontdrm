@@ -32,8 +32,9 @@ interface PaymentMode {
 export class PaymentModeComponent {
 
   public masterPaymentModeList: any;
-  public selectedIds: number[] = [1,2,3];
-  public paymentModeList:  any;
+  public selectedIds: number[] = [];
+  // public paymentModeList:  any;
+  public paymentModeList: any[] = [];
 
 
   constructor(
@@ -66,7 +67,11 @@ export class PaymentModeComponent {
       } else {
         this.selectedIds.push(id);
       }
-      console.log(this.selectedIds);
+      console.log("1 : "+this.selectedIds);
+
+      this.selectedIds.join(',')
+
+      this.addUpdatePaymentMode(this.selectedIds.join(','));
     }
 
   updateSelectedIds(data: any): void {
@@ -77,7 +82,9 @@ export class PaymentModeComponent {
       // Remove the ID if unchecked
       this.selectedIds = this.selectedIds.filter(id => id !== data.id);
     }
-    console.log(this.selectedIds); // Log or process the selected IDs
+    
+     // Log or process the selected IDs
+    
   }
 
   public getMasterPaymentModeList() {
@@ -94,12 +101,13 @@ export class PaymentModeComponent {
   public getPaymentModeListBySuperadminId() {
     this.paymentModeManagementService.getPaymentModeListBySuperadminId().subscribe({
       next: (response: any) => {
-        if (response['responseCode'] === '200') {
+        if (response['responseCode'] == '200') {
           this.paymentModeList = JSON.parse(JSON.stringify(response.listPayload));
           
           // Explicitly define the item type as PaymentMode
           const ids = this.paymentModeList.map((item: PaymentMode) => item.id);
-          console.log(ids);  // Log the array of ids for testing
+          this.selectedIds = ids;  // Log the array of ids for testing
+         
         }
       },
       error: (error) => {
@@ -108,6 +116,41 @@ export class PaymentModeComponent {
     });
   }
   
+
+  addUpdatePaymentMode(paymentModeIds:any) {
+    console.log("Updated ")
+    this.paymentModeManagementService.addUpdatePaymentModeBySuperadmin(paymentModeIds).subscribe({
+      next: (response: any) => {
+        if (response['responseCode'] == '200') {
+          if (response['payload']['respCode'] == '200') {
+            // form.reset();
+            // this.messageService.add({
+            //   summary: response['payload']['respCode'],
+            //   detail: response['payload']['respMesg'],
+            //   styleClass: 'success-background-popover',
+            // });
+          } else {
+            // this.messageService.add({
+            //   summary: response['payload']['respCode'],
+            //   detail: response['payload']['respMesg'],
+            //   styleClass: 'danger-background-popover',
+            // });
+          }
+        } else {
+          // this.messageService.add({
+          //   summary: response['payload']['respCode'],
+          //   detail: response['payload']['respMesg'],
+          //   styleClass: 'danger-background-popover',
+          // });
+        }
+      },
+      // error: () =>
+      //   this.messageService.add({
+      //     summary: '500',
+      //     detail: 'Server Error',
+      //   }),
+    });
+  }
 
 
 }

@@ -30,5 +30,25 @@ export class PaymentModeManagementService {
       };
       return this.http.post<any>(Constant.Site_Url + "getPaymentModeListBySuperadminId", request);
     }
+
+    addUpdatePaymentModeBySuperadmin(paymentModeIds :any){
+      let request: any = {
+        payload: {
+          paymentModeIds: paymentModeIds,
+          superadminId: '1234567890',
+        }
+      };
+      return this.http.post<any>(Constant.Site_Url + "addPaymentModeBySuperadmin", request);
+    }
+
+    changeStatusOfPaymentModeMaster(paymentMode :any){
+      let request: any = {
+        payload: {
+          paymentModeIds: paymentMode,
+          superadminId: '1234567890',
+        }
+      };
+      return this.http.post<any>(Constant.Site_Url + "addPaymentModeBySuperadmin", request);
+    }
   
 }
