@@ -16,7 +16,7 @@ import { HashLocationStrategy, LocationStrategy, PathLocationStrategy } from '@a
   declarations: [AppComponent, LoaderComponent],
   imports: [BrowserModule, AppRoutingModule, sharedModule, BrowserAnimationsModule,MatSelectModule,FormsModule],
   exports: [],
-  providers: [CookieService, { provide: LocationStrategy, useClass: PathLocationStrategy}],
+  providers: [CookieService, { provide: LocationStrategy, useClass: HashLocationStrategy}],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

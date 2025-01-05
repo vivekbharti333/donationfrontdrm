@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Constant } from 'src/app/core/constant/constants'; 
+import { AuthenticationService } from 'src/app/auth/authentication.service';
 
 @Injectable({
   providedIn: 'root'
@@ -14,16 +15,16 @@ export class CurrencyService {
 
   constructor(
     private http: HttpClient,
-    // private authenticationService: AuthenticationService,
+    private authenticationService: AuthenticationService,
   ) {
-    // this.loginUser = this.authenticationService.getLoginUser();
+    this.loginUser = this.authenticationService.getLoginUser();
   }
 
   getCurrencyDetailBySuperadmin(): Observable<any> {
     let request: any = {
       payload: {
         // token: this.loginUser['token'],
-        superadminId: '1234567890',
+        superadminId: this.loginUser['superadminId'],
       }
     };
     return this.http.post<any>(Constant.Site_Url + "getCurrencyDetailsBySuperadmin", request);

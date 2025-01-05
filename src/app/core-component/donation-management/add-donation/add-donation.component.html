@@ -20,7 +20,7 @@
                                     {{ invoiceType.companyFirstName + ' ' + invoiceType.companyLastName }}
                                 </option>
                             </select> -->
-                            <mat-select class="space-select select" formControlName="invoiceHeaderDetailsId"  placeholder="Select Fundrising Officer" (change)="onProgramSelect($event)">
+                            <mat-select class="space-select select" formControlName="invoiceHeaderDetailsId"  placeholder="Select Receipt" (change)="onProgramSelect($event)">
                                 <mat-option *ngFor="let invoiceType of invoiceTypeList" [value]="invoiceType.id">
                                     {{ invoiceType.companyFirstName + ' ' + invoiceType.companyLastName }}
                                 </mat-option>
@@ -91,20 +91,17 @@
                                 formControlName="amount" maxlength="100">
                         </div>
                     </div>
-                    <div class="col-lg-3 col-md-3" *ngIf="showCurrencyBox">
-                        <div class="mb-3" *ngIf="showCurrencyBox">
+                    <div class="col-lg-2 col-md-2" *ngIf="showCurrencyBox">
+                        <div class="mb-2" *ngIf="showCurrencyBox">
                             <label class="form-label">Amount</label>
                             <input class="form-control" type="number" pInputText pKeyFilter="int"
                                 formControlName="amount" maxlength="100">
                         </div>
                     </div>
-                    <div class="col-lg-1 col-md-1" *ngIf="showCurrencyBox">
-                        <div class="mb-3" *ngIf="showCurrencyBox">
+                    <div class="col-lg-2 col-md-2" *ngIf="showCurrencyBox">
+                        <div class="mb-2" *ngIf="showCurrencyBox">
                             <label class="form-label">Currency</label>
-                            <!-- <select class="form-control" formControlName="currencyCode" (change)="setCurrency($event)">
-                                <option *ngFor="let currency of currencyList" [ngValue]="currency.currencyCode">
-                                    {{currency.currencyCode+" "+currency.unicode}}</option>
-                            </select> -->
+                            
                             <mat-select class="space-select select" formControlName="currencyCode"  placeholder="Currency" >
                                 <mat-option *ngFor="let currency of currencyList" [value]="currency.currencyCode">
                                     {{currency.currencyCode+" "+currency.unicode}}
@@ -125,10 +122,7 @@
                     <div class="col-lg-4 col-md-4">
                         <div class="mb-3">
                             <label class="form-label">Payment Mode</label>
-                            <!-- <select class="form-control" formControlName="paymentMode">
-                                <option aria-readonly="true">Select Payment Mode</option>
-                                <option *ngFor="let payModOpt of paymentModeList">{{payModOpt.paymentMode}}</option>
-                            </select> -->
+                            
                             <mat-select class="space-select select" formControlName="paymentMode"  placeholder="Payment Mode" >
                                 <mat-option *ngFor="let payModOpt of paymentModeList" [value]="payModOpt.paymentMode">
                                     {{payModOpt.paymentMode}}
@@ -136,16 +130,9 @@
                               </mat-select>
                         </div>
                     </div>
-                    <div class="col-lg-4 col-md-4">
+                    <div class="col-lg-4 col-md-4" *ngIf="showFundrisingOfficerList">
                         <div class="mb-3">
                             <label class="form-label">Fundrising Officer</label>
-                            <!-- <select class="form-control" formControlName="createdBy">
-                                <option aria-readonly="true" value="N/A">Select Fundrising Officer</option>
-                                <option [value]="fundRisingOffcer.loginId"
-                                    *ngFor="let fundRisingOffcer of fundRisingOffcerList">
-                                    {{fundRisingOffcer.firstName}} {{fundRisingOffcer.lastName}}
-                                </option>
-                            </select> -->
                             <mat-select class="space-select select" formControlName="createdBy"  placeholder="Select Fundrising Officer" >
                                 <mat-option *ngFor="let fundRisingOffcer of fundRisingOffcerList" [value]="fundRisingOffcer.loginId">
                                     {{fundRisingOffcer.firstName}} {{fundRisingOffcer.lastName}}
@@ -153,18 +140,12 @@
                               </mat-select>
                         </div>
                     </div>
-                    <!-- <div class="col-lg-4 col-md-4">
-                        <div class="mb-3">
-                            <label class="form-label">Pan</label>
-                            <input class="form-control" type="text" pInputText formControlName="panNumber"
-                                maxlength="100">
-                        </div>
-                    </div> -->
+                    
                 </div>
 
                 <div class="row">
-                    <div class="col-lg-4 col-md-4">
-                        <div class="mb-3">
+                    <div class="col-lg-8 col-md-8">
+                        <div class="mb-8">
                             <label class="form-label">Remarks</label>
                             <textarea class="form-control"
                                 style=" float: left; width: 100%; margin-top: 6px; height:150px" formControlName="notes"

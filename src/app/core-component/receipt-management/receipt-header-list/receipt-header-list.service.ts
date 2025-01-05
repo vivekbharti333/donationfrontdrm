@@ -3,6 +3,7 @@ import { Observable } from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Constant } from 'src/app/core/constant/constants'; 
 import { InvoiceRequest, InvoiceDetails } from '../../interface/receipt-management'; 
+import { AuthenticationService } from 'src/app/auth/authentication.service';
 
 @Injectable({
   providedIn: 'root'
@@ -15,9 +16,9 @@ export class ReceiptHeaderListService {
 
   constructor(
     private http: HttpClient,
-    // private authenticationService: AuthenticationService,
+    private authenticationService: AuthenticationService,
   ) {
-    // this.loginUser = this.authenticationService.getLoginUser();
+    this.loginUser = this.authenticationService.getLoginUser();
   }
 
   getInvoiceHeaderList(){
@@ -25,10 +26,10 @@ export class ReceiptHeaderListService {
       payload: {
         requestFor: 'BYSUPERADMINID',
         // token: this.loginUser['token'],
-        // createdBy: this.loginUser['loginId'],
-        // superadminId: this.loginUser['superadminId'],
-        createdBy: '1234567890',
-        superadminId: '1234567890',
+        createdBy: this.loginUser['loginId'],
+        superadminId: this.loginUser['superadminId'],
+        // createdBy: '1234567890',
+        // superadminId: '1234567890',
       }
     };
     return this.http.post<InvoiceRequest>(Constant.Site_Url + "getInvoiceHeaderList", request);

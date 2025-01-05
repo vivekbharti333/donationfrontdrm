@@ -101,11 +101,11 @@
               </mat-select>
             </div>
           </div>
-          <div class="col-lg-3 col-sm-6 col-12">
+          <!-- <div class="col-lg-3 col-sm-6 col-12">
             <div class="input-blocks">
               <i class="feather icon-zap info-img"></i>
             </div>
-          </div>
+          </div> -->
           <div class="col-lg-3 col-sm-6 col-12">
             <div class="input-blocks">
               <a class="btn btn-filters ms-auto">
@@ -165,8 +165,7 @@
                   <div class="edit-delete-action">
                     <a class="me-2 p-2 mb-0" href="javascript:void(0);"><i class="feather icon-eye action-eye"></i>
                     </a>
-                    <a class="me-2 p-2 mb-0" data-bs-toggle="modal" data-bs-target="#edit-units"
-                      (click)="openEditModal(dialogTemplate, data)">
+                    <a class="me-2 p-2 mb-0" data-bs-toggle="modal" data-bs-target="#edit-units" (click)="openEditModal(dialogTemplate, data)">
                       <i class="feather icon-edit feather-edit"></i></a>
                    
                   </div>
@@ -376,12 +375,6 @@
                 <div class="col-lg-4 col-md-4">
                   <div class="mb-3">
                     <label class="form-label">Program</label>
-                    <!-- <select class="form-control" formControlName="programName" (change)="onProgramSelect($event)">
-                      <option value="" disabled selected>Select Program</option>
-                      <option [value]="donationOpt.programName" *ngFor="let donationOpt of donationTypeList">
-                        {{donationOpt.programName}}
-                      </option>
-                    </select> -->
                     <mat-select class="space-select select" formControlName="programName" (change)="onProgramSelect($event)" placeholder="Select Program">
                       <mat-option *ngFor="let donationOpt of donationTypeList" [value]="donationOpt.programName">
                         {{donationOpt.programName}}
@@ -389,35 +382,54 @@
                     </mat-select>
                   </div>
                 </div>
-                <div class="col-lg-4 col-md-4" *ngIf="!showCurrencyBox">
+                <!-- <div class="col-lg-4 col-md-4" *ngIf="!showCurrencyBox">
                   <div class="mb-3" *ngIf="!showCurrencyBox">
                     <label class="form-label">Amount</label>
                     <input class="form-control" type="number" pInputText pKeyFilter="int" formControlName="amount"
                       maxlength="100">
                   </div>
-                </div>
-                <div class="col-lg-2 col-md-2" *ngIf="showCurrencyBox">
+                </div> -->
+                <!-- <div class="col-lg-2 col-md-2" *ngIf="showCurrencyBox">
                   <div class="mb-2" *ngIf="showCurrencyBox">
                     <label class="form-label">Amount</label>
                     <input class="form-control" type="number" pInputText pKeyFilter="int" formControlName="amount"
                       maxlength="100">
                   </div>
-                </div>
-                <div class="col-lg-2 col-md-2" *ngIf="showCurrencyBox">
-                  <div class="mb-2" *ngIf="showCurrencyBox">
-                    <label class="form-label">Currency</label>
-                    <!-- <select class="form-control" formControlName="currencyCode" (change)="setCurrency($event)">
-                      <option *ngFor="let currency of currencyList" [ngValue]="currency.currencyCode">
-                        {{currency.currencyCode+" "+currency.unicode}}</option>
-                    </select> -->
-                    <mat-select class="space-select select" formControlName="currencyCode" (change)="setCurrency($event)" placeholder="Select Fundrising Officer">
-                      <mat-option *ngFor="let currency of currencyList" [value]="currency.currencyCode">
-                        {{currency.currencyCode+" "+currency.unicode}}
-                      </mat-option>
-                    </mat-select>
-
+                </div> -->
+                <div class="col-lg-2 col-md-2" *ngIf="isSuperadmin">
+                  <div class="mb-2">
+                    <label class="form-label">Amount</label>
+                    <ng-container *ngIf="isSuperadmin; else readonlyInput">
+                      <input class="form-control" type="number" pInputText pKeyFilter="int" formControlName="amount" maxlength="100">
+                    </ng-container>
+                    <ng-template #readonlyInput>
+                      <input class="form-control" type="number" pInputText pKeyFilter="int" formControlName="amount" maxlength="100"
+                        readonly>
+                    </ng-template>
                   </div>
                 </div>
+                <div class="col-lg-2 col-md-2" *ngIf="isSuperadmin">
+                  <div class="mb-2">
+                    <label class="form-label">Currency</label>
+                    <ng-container *ngIf="isSuperadmin; else readonlyCurrency">
+                      <mat-select class="space-select select" formControlName="currencyCode" (change)="setCurrency($event)"
+                        placeholder="Select currency">
+                        <mat-option *ngFor="let currency of currencyList" [value]="currency.currencyCode">
+                          {{currency.currencyCode + " " + currency.unicode}}
+                        </mat-option>
+                      </mat-select>
+                    </ng-container>
+                    <ng-template #readonlyCurrency>
+                      <mat-select class="space-select select" formControlName="currencyCode" [disabled]="true"
+                        placeholder="Select currency">
+                        <mat-option *ngFor="let currency of currencyList" [value]="currency.currencyCode">
+                          {{currency.currencyCode + " " + currency.unicode}}
+                        </mat-option>
+                      </mat-select>
+                    </ng-template>
+                  </div>
+                </div>
+                
                 <div class="col-lg-4 col-md-4">
                   <div class="mb-3">
                     <label class="form-label">Transaction Id</label>

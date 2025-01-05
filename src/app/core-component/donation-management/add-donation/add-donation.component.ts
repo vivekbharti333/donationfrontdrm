@@ -10,6 +10,7 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
 import { Constant } from 'src/app/core/constant/constants';
+import { AuthenticationService } from 'src/app/auth/authentication.service';
 
 
 @Component({
@@ -41,6 +42,7 @@ export class AddDonationComponent {
     this.getCurrencyDetailBySuperadmin();
     this.getPaymentModeList();
     this.getFundrisingOfficerByTeamLeaderId();
+    this.checkRoleType();
   }
 
   constructor(
@@ -53,14 +55,16 @@ export class AddDonationComponent {
     private paymentModeService: PaymentModeService,
     private donationManagementService: DonationManagementService,
     private messageService: MessageService,
+    private authenticationService: AuthenticationService
   ) {
+    this.loginUser = this.authenticationService.getLoginUser();
     this.createForms();
   }
 
   checkRoleType(){
     if(this.loginUser['roleType'] == Constant.mainAdmin ||
-      this.loginUser['roleType'] == Constant.superAdmin ||
-      this.loginUser['roleType'] == Constant.admin 
+       this.loginUser['roleType'] == Constant.superAdmin ||
+       this.loginUser['roleType'] == Constant.admin 
       // ||
       // this.loginUser['roleType'] == Constant.teamLeader
     ){

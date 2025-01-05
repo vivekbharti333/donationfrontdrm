@@ -24,6 +24,7 @@ import { ToastModule } from 'primeng/toast';
 import { MatDialog } from '@angular/material/dialog';
 import { Constant } from 'src/app/core/constant/constants';
 import { DonationDetails, DonationListForExcel } from '../../interface/donation-management';
+import { AuthenticationService } from 'src/app/auth/authentication.service';
 
 import * as fileSaver from 'file-saver';
 import * as XLSX from 'xlsx-js-style'
@@ -106,9 +107,10 @@ export class AllDonationListComponent {
     private paymentModeService: PaymentModeService,
     private donationManagementService: DonationManagementService,
     private userManagementService: UserManagementService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private authenticationService: AuthenticationService,
   ) {
-
+    this.loginUser = this.authenticationService.getLoginUser();
   }
 
   ngOnInit() {
@@ -121,7 +123,7 @@ export class AllDonationListComponent {
     this.getCurrencyDetailBySuperadmin();
     this.getPaymentModeList();
     this.getFundrisingOfficerByTeamLeaderId();
-    // this.checkRoleType();
+    this.checkRoleType();
   }
 
 
@@ -188,7 +190,7 @@ export class AllDonationListComponent {
 
 
   getDonationListByUser(event: any): void {
-    alert('Selected User ID:' + event.value); // Logs the selected user ID
+    // alert('Selected User ID:' + event.value); // Logs the selected user ID
     // Add your logic here
   }
 
