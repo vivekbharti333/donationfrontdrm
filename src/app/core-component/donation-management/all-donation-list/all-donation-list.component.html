@@ -337,9 +337,16 @@
                 </div>
 
                 <div class="col-lg-4 col-md-4">
-                  <div class="mb-3"> <label for="donorName" class="form-label">Donor Name</label>
-                    <input id="donorName" class="form-control" type="text" pInputText formControlName="donorName"
-                      maxlength="100" placeholder="Enter donor name" />
+                  <div class="mb-3">
+                    <label for="donorName" class="form-label">Donor Name</label>
+                    <ng-container *ngIf="isSuperadmin; else readonlyDonorName">
+                      <input id="donorName" class="form-control" type="text" pInputText formControlName="donorName" maxlength="100" placeholder="Enter donor name" />
+                    </ng-container>
+                    <ng-template #readonlyDonorName>
+                      <input id="donorName" class="form-control" type="text" pInputText formControlName="donorName" maxlength="100" placeholder="Enter donor name" readonly>
+                    </ng-template>
+
+                    
                   </div>
                 </div>
                 <div class="col-lg-4 col-md-4">
@@ -375,11 +382,20 @@
                 <div class="col-lg-4 col-md-4">
                   <div class="mb-3">
                     <label class="form-label">Program</label>
+                    <ng-container *ngIf="isSuperadmin; else readonlyProgramName">
                     <mat-select class="space-select select" formControlName="programName" (change)="onProgramSelect($event)" placeholder="Select Program">
                       <mat-option *ngFor="let donationOpt of donationTypeList" [value]="donationOpt.programName">
                         {{donationOpt.programName}}
                       </mat-option>
                     </mat-select>
+                  </ng-container>
+                  <ng-template #readonlyProgramName>
+                    <mat-select class="space-select select" formControlName="programName" (change)="onProgramSelect($event)" placeholder="Select Program">
+                      <mat-option *ngFor="let donationOpt of donationTypeList" [value]="donationOpt.programName" [disabled]="true">
+                        {{donationOpt.programName}}
+                      </mat-option>
+                    </mat-select>
+                  </ng-template>
                   </div>
                 </div>
                 <!-- <div class="col-lg-4 col-md-4" *ngIf="!showCurrencyBox">
@@ -396,7 +412,7 @@
                       maxlength="100">
                   </div>
                 </div> -->
-                <div class="col-lg-2 col-md-2" *ngIf="isSuperadmin">
+                <div class="col-lg-2 col-md-2">
                   <div class="mb-2">
                     <label class="form-label">Amount</label>
                     <ng-container *ngIf="isSuperadmin; else readonlyInput">
@@ -408,7 +424,7 @@
                     </ng-template>
                   </div>
                 </div>
-                <div class="col-lg-2 col-md-2" *ngIf="isSuperadmin">
+                <div class="col-lg-2 col-md-2">
                   <div class="mb-2">
                     <label class="form-label">Currency</label>
                     <ng-container *ngIf="isSuperadmin; else readonlyCurrency">
@@ -420,9 +436,9 @@
                       </mat-select>
                     </ng-container>
                     <ng-template #readonlyCurrency>
-                      <mat-select class="space-select select" formControlName="currencyCode" [disabled]="true"
-                        placeholder="Select currency">
-                        <mat-option *ngFor="let currency of currencyList" [value]="currency.currencyCode">
+                      <mat-select class="space-select select" formControlName="currencyCode" 
+                        placeholder="Select currency" [disabled]="true">
+                        <mat-option *ngFor="let currency of currencyList" [value]="currency.currencyCode" [disabled]="true">
                           {{currency.currencyCode + " " + currency.unicode}}
                         </mat-option>
                       </mat-select>
@@ -442,14 +458,24 @@
                 <div class="col-lg-4 col-md-4">
                   <div class="mb-3">
                     <label class="form-label">Payment Mode</label>
+                    <ng-container *ngIf="isSuperadmin; else readonlyPaymentMode">
                     <mat-select class="space-select select" formControlName="paymentMode"  placeholder="Payment Mode">
                       <mat-option *ngFor="let payModOpt of paymentModeList" [value]="payModOpt.paymentMode">
                         {{payModOpt.paymentMode}}
                       </mat-option>
                     </mat-select>
+                  </ng-container>
+                    <ng-template #readonlyPaymentMode>
+                    <mat-select class="space-select select" formControlName="paymentMode"  placeholder="Payment Mode">
+                      <mat-option *ngFor="let payModOpt of paymentModeList" [value]="payModOpt.paymentMode" [disabled]="true">
+                        {{payModOpt.paymentMode}}
+                      </mat-option>
+                    </mat-select>
+                    </ng-template>
+                  
                   </div>
                 </div>
-                <div class="col-lg-4 col-md-4">
+                <div class="col-lg-4 col-md-4" *ngIf="isSuperadmin">
                   <div class="mb-3">
                     <label class="form-label">Fundrising Officer</label>
                     <!-- <select class="form-control" formControlName="createdBy">

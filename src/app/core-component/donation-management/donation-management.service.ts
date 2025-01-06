@@ -88,10 +88,10 @@ export class DonationManagementService {
         paymentMode: donationDetails.paymentMode,
         notes: donationDetails.notes,
         paymentType: 'OFFLINE',
-        roleType: this.cookieService.get('roleType'),
-        loginId: this.cookieService.get('loginId'),
-        token: this.cookieService.get('token'),
-        superadminId: this.cookieService.get('superadminId'),
+        roleType: this.loginUser['roleType'],
+        loginId: this.loginUser['loginId'],
+        token: this.loginUser['token'],
+        superadminId: this.loginUser['superadminId'],
 
       }
     };

@@ -47,7 +47,7 @@ export class AddDonationComponent {
 
   constructor(
     private fb: FormBuilder,
-    private http: HttpClient,
+    // private http: HttpClient,
     private router: Router,
     private receiptHeaderListService: ReceiptHeaderListService,
     private programManagementService: ProgramManagementService,
@@ -202,10 +202,17 @@ export class AddDonationComponent {
               console.log("ok hai")
               //this.toastr.success(response['payload']['respMesg'], response['payload']['respCode']);
               this.messageService.add({ severity: 'success', summary: 'Success', detail: response['payload']['respMesg'] });
+
+              // this.messageService.add({
+              //   summary: 'Toast',
+              //   detail: 'Your,toast message here.',
+              //   styleClass: 'success-light-popover',
+              // });
+
               this.addDonationForm.reset();
               this.addDonationForm.controls['currencyCode'].setValue(this.currencyList[0].currencyCode);
               // this.setValueInForm();
-              this.isLoading = false;
+              // this.isLoading = false;
 
               if (payload['paymentMode'] == 'PAYMENT_GATEWAY') {
                 let url = payload['paymentGatewayPageRedirectUrl'];
@@ -214,13 +221,25 @@ export class AddDonationComponent {
               }
 
             } else {
-              //this.toastr.error(response['payload']['respMesg'], response['payload']['respCode']);
-              this.isLoading = false;
+              this.messageService.add({
+                summary: response['payload']['respCode'],
+                detail: response['payload']['respMesg'],
+                styleClass: 'danger-light-popover',
+              });
             }
           } else {
-            //this.toastr.error(response['responseMessage'], response['responseCode']);
-            this.isLoading = false;
+            this.messageService.add({
+              summary: response['responseCode'],
+              detail: response['responseMessage'],
+              styleClass: 'danger-light-popover',
+            });
           }
+
+          // this.messageService.add({
+          //   summary: 'Toast',
+          //   detail: 'Your,toast message here.',
+          //   styleClass: 'danger-light-popover',
+          // });
         },
         //error: (error: any) => this.toastr.error('Server Error', '500'),
       });

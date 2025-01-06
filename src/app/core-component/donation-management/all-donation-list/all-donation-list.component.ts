@@ -400,6 +400,11 @@ export class AllDonationListComponent {
               });
             }
           } else {
+            this.messageService.add({
+              summary: response['responseCode'],
+              detail: response['responseMessage'],
+              styleClass: 'danger-light-popover',
+            });
           }
         },
       });

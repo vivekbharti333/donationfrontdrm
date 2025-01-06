@@ -13,13 +13,6 @@
                     <div class="col-lg-4 col-md-4">
                         <div class="mb-3">
                             <label for="receiptType" class="form-label">Receipt Type</label>
-                            <!-- <select id="receiptType" class="form-control" formControlName="invoiceHeaderDetailsId"
-                                (change)="onProgramSelect($event)">
-                                <option value="" disabled selected>Select an option</option>
-                                <option *ngFor="let invoiceType of invoiceTypeList" [value]="invoiceType.id">
-                                    {{ invoiceType.companyFirstName + ' ' + invoiceType.companyLastName }}
-                                </option>
-                            </select> -->
                             <mat-select class="space-select select" formControlName="invoiceHeaderDetailsId"  placeholder="Select Receipt" (change)="onProgramSelect($event)">
                                 <mat-option *ngFor="let invoiceType of invoiceTypeList" [value]="invoiceType.id">
                                     {{ invoiceType.companyFirstName + ' ' + invoiceType.companyLastName }}
@@ -71,12 +64,6 @@
                     <div class="col-lg-4 col-md-4">
                         <div class="mb-3">
                             <label class="form-label">Program</label>
-                            <!-- <select class="form-control" formControlName="programName"
-                                (change)="onProgramSelect($event)">
-                                <option aria-readonly="true">Select Program</option>
-                                <option *ngFor="let donationOpt of donationTypeList">{{donationOpt.programName}}
-                                </option>
-                            </select> -->
                             <mat-select class="space-select select" formControlName="programName"  placeholder="Select Program" >
                                 <mat-option *ngFor="let donationOpt of donationTypeList" [value]="donationOpt.programName">
                                     {{donationOpt.programName}}
@@ -159,5 +146,6 @@
     </div>
     <div class="text-mid mb-3">
         <button type="submit" class="btn btn-submit">Save Info</button>
+        <!-- <button type="submit" class="btn btn-submit" [disabled]="addDonationForm.invalid">Save Info</button> -->
     </div>
 </form>
