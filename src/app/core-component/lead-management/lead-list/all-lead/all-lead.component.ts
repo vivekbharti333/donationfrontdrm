@@ -24,6 +24,7 @@ import { CookieService } from 'ngx-cookie-service';
 import { Constant } from 'src/app/core/constant/constants';
 import { DatePipe } from '@angular/common';
 import { DonationDetails } from 'src/app/core-component/interface/donation-management'; 
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 
 
 interface listData {
@@ -39,6 +40,13 @@ interface listData {
 })
 
 export class AllLeadComponent {
+
+  public editLeadForm!: FormGroup;
+  public leadUpdateDialog: any;
+  public showFollowupDateBox: boolean =false;
+
+    
+
   public followupList: any;
   public userForDropDown : any[]=[];
   public pickLocationList: any[] = [];
@@ -135,10 +143,12 @@ export class AllLeadComponent {
     private categoriesManagementService: CategoriesManagementService,
     private userManagementService: UserManagementService,
     private cookieService: CookieService,
-    private datePipe: DatePipe
+    private datePipe: DatePipe,
+    private fb: FormBuilder,
   ) {}
 
   ngOnInit() {
+    this.createForms();
     this.getAllLeadList("MONTH");
     this.getUserListForDropDown();
     // this.getCategoryType();
@@ -221,63 +231,11 @@ export class AllLeadComponent {
     }
   }
 
-  // async openEditModal(
-  //   templateRef: TemplateRef<any>,
-  //   rawData: any,
-  //   isEditable: boolean
-  // ) {
-  //   this.isEditForm = isEditable;
-  //   await this.getDropdownOnEditModal(rawData);
-  //   // this.saveLeadData(rawData);
-  //   this.viewLeadDetailsDialog = this.dialog.open(templateRef, {
-  //     width: '80%',
-  //   });
-  // }
 
-  // async getDropdownOnEditModal(rawData: any) {
-  //   const filterCategoryType: any = this.categoryTypeList.filter((item) => {
-  //     if (item?.categoryTypeName === rawData?.categoryTypeName) {
-  //       return item;
-  //     }
-  //   });
-  //   await this.getSuperCategory({
-  //     value: filterCategoryType[0]?.id,
-  //   });
-  //   const filterSuperCategory: any = this.superCategoryList.filter((item) => {
-  //     if (item?.superCategory === rawData?.superCategory) {
-  //       return item;
-  //     }
-  //   });
-  //   await this.getCategory({ value: filterSuperCategory[0]?.id });
-  //   const filterCategory: any = this.categoryList.filter((item) => {
-  //     if (item?.category === rawData?.category) {
-  //       return item;
-  //     }
-  //   });
-  //   await this.getSubCategory({ value: filterSuperCategory[0]?.id });
-  //   const filterSubCategory: any = this.categoryList.filter((item) => {
-  //     if (item?.category === rawData?.subCategory) {
-  //       return item;
-  //     }
-  //     console.log(
-  //       filterCategoryType,
-  //       filterSuperCategory,
-  //       filterCategory,
-  //       filterSubCategory
-  //     );
-  //   });
-  // }
+
+
 
   setDateTime(date: any): string {
-    // const currentDate = new Date(date);
-  
-    // const year = currentDate.getFullYear();
-    // const month = String(currentDate.getMonth() + 1).padStart(2, '0');  // Months are zero-indexed
-    // const day = String(currentDate.getDate()).padStart(2, '0');
-    // const hours = String(currentDate.getHours()).padStart(2, '0');
-    // const minutes = String(currentDate.getMinutes()).padStart(2, '0');
-
-    // const formattedDateTime = `${year}-${month}-${day}T${hours}:${minutes}`;
 
     const currentDate = new Date(date);
 
@@ -324,125 +282,6 @@ export class AllLeadComponent {
   }
 
 
-  // public getPickLocation() {
-  //   this.categoriesManagementService.getLocationByType('PICK').subscribe({
-  //     next: (response: any) => {
-  //       if (response['responseCode'] == '200') {
-  //         this.pickLocationList = JSON.parse(
-  //           JSON.stringify(response.listPayload)
-  //         );
-  //         this.filteredPickLocationList = this.pickLocationList;
-  //       }
-  //     },
-  //     error: (error: any) =>
-  //       this.messageService.add({
-  //         summary: '500',
-  //         detail: 'Server Error',
-  //         styleClass: 'danger-background-popover',
-  //       }),
-  //   });
-  // }
-
-  // public getDropLocation() {
-  //   this.categoriesManagementService.getLocationByType('DROP').subscribe({
-  //     next: (response: any) => {
-  //       if (response['responseCode'] == '200') {
-  //         this.dropLocationList = JSON.parse(
-  //           JSON.stringify(response.listPayload)
-  //         );
-  //         this.filteredDropLocationList = this.dropLocationList;
-  //       }
-  //     },
-  //     error: (error: any) =>
-  //       this.messageService.add({
-  //         summary: '500',
-  //         detail: 'Server Error',
-  //         styleClass: 'danger-background-popover',
-  //       }),
-  //   });
-  // }
-
-  // public getCategoryType() {
-  //   this.categoriesManagementService.getCategoryTypeList().subscribe({
-  //     next: (response: any) => {
-  //       if (response['responseCode'] == '200') {
-  //         this.categoryTypeList = JSON.parse(JSON.stringify(response.listPayload));
-  //         this.filteredCategoryTypeList = this.categoryTypeList;
-  //       }
-  //     },
-  //     error: (error: any) =>
-  //       this.messageService.add({
-  //         summary: '500',
-  //         detail: 'Server Error',
-  //         styleClass: 'danger-background-popover',
-  //       }),
-  //   });
-  // }
-
-  // public getSuperCategory(superCateId: any) {
-  //   this.categoriesManagementService.getSuperCategoryListByCategoryTypeId(superCateId)
-  //     .subscribe({
-  //       next: (response: any) => {
-  //         if (response['responseCode'] == '200') {
-  //           this.superCategoryList = JSON.parse(JSON.stringify(response.listPayload));
-
-  //           this.filteredSuperCategoryList = this.superCategoryList;
-
-  //           const category = this.superCategoryList.find(item => item.superCategory === this.leadDetails.superCategory);
-  //           this.getCategory(category.id)
-  //         }
-  //       },
-  //       error: (error: any) =>
-  //         this.messageService.add({
-  //           summary: '500',
-  //           detail: 'Server Error',
-  //           styleClass: 'danger-background-popover',
-  //         }),
-  //     });
-  // }
-  
-
-  // public getCategory(categoryId: any) {
-  //   this.categoriesManagementService.getCategoryBySuperCatId(categoryId)
-  //     .subscribe({
-  //       next: (response: any) => {
-  //         if (response['responseCode'] == '200') {
-  //           this.categoryList = JSON.parse( JSON.stringify(response.listPayload));
-  //           this.filteredCategoryList = this.categoryList;
-
-  //           const subCategory = this.categoryList.find(item => item.category === this.leadDetails.category);
-  //           this.getSubCategory(subCategory.id);
-  //         }
-  //       },
-  //       error: (error: any) =>
-  //         this.messageService.add({
-  //           summary: '500',
-  //           detail: 'Server Error',
-  //           styleClass: 'danger-background-popover',
-  //         }),
-  //     });
-  // }
-
-  // public getSubCategory(subCategoryId: any) {
-  //   this.categoriesManagementService.getSubCategoryListByCatId(subCategoryId)
-  //     .subscribe({
-  //       next: (response: any) => {
-  //         if (response['responseCode'] == '200') {
-  //           this.subCategoryList = JSON.parse(JSON.stringify(response.listPayload));
-  //           this.subCategoryList.forEach(subCategory => {
-  //           });
-  //           this.filteredSubCategoryList = this.subCategoryList;
-  //         }
-  //       },
-  //       error: (error: any) =>
-  //         this.messageService.add({
-  //           summary: '500',
-  //           detail: 'Server Error',
-  //           styleClass: 'danger-background-popover',
-  //         }),
-  //     });
-  // }
-
   isCollapsed: boolean = false;
   toggleCollapse() {
     this.sidebar.toggleCollapse();
@@ -484,12 +323,62 @@ export class AllLeadComponent {
     if (date === 'last') {
       this.lastDate = eve.target.value;
     }
-
-    // this.firstDate = new Date().toISOString().slice(0, 16);
-    // this.lastDate = new Date().toISOString().slice(0, 16);
   }
+
+
+
+    
+
+   createForms() {
+      this.editLeadForm = this.fb.group({
+        id: [''],
+        donorName: ['', [Validators.required, Validators.pattern('[A-Za-z ]{3,150}')]],
+        mobileNumber: ['', [Validators.pattern('^[0-9]{10}$')]], // Assuming a 10-digit phone number   
+        emailId: ['', [Validators.required, Validators.email]],
+        programName: [''],
+        amount: ['', [Validators.required, Validators.pattern('^[0-9]+$')]],
+        currency: ['', [Validators.required]],
+        status: ['', [Validators.required]],
+        followupDate: [''],
+        notes: [''],
+      });
+    }
+
+  openEditModal(templateRef: TemplateRef<any>, rowData: any) {
+
+    this.checkStatus(rowData['status']);
+
+    this.editLeadForm.patchValue({
+      id: rowData['id'],
+      donorName: rowData['donorName'],
+      mobileNumber: rowData['mobileNumber'],
+      emailId: rowData['emailId'],
+      status: rowData['status'],
+      programName: rowData['programName'],
+      followupDate: rowData['followupDate'],
+      notes: rowData['notes'],
+
+    });
+
+    this.leadUpdateDialog = this.dialog.open(templateRef, {
+      width: '1400px', // Set your desired width
+      // height: '600px', // Set your desired height
+      disableClose: true, // Optional: prevent closing by clicking outside
+      panelClass: 'custom-modal', // Optional: add custom class for additional styling
+    });
+
+  }
+
+  checkStatus(status: any){
+    this.showFollowupDateBox = false;
+    if( status.value == "FOLLOWUP"){
+      this.showFollowupDateBox = true;
+    }
+  }
+
+
   updateLeadDetails() {
-    this.leadManagementService.updateLeadDetails(this.leadDetails).subscribe({
+    this.leadManagementService.updateLeadDetails(this.editLeadForm).subscribe({
       next: (response: any) => {
         if (response['responseCode'] == '200') {
           if (response['payload']['respCode'] == '200') {

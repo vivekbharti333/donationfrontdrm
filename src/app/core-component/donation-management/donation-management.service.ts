@@ -50,12 +50,12 @@ export class DonationManagementService {
         notes: donationDetails.notes,
         status: donationDetails.status,
         followupDate: donationDetails.followupDate,
-        createdBy: this.cookieService.get('loginId'),
-        loginId: this.cookieService.get('loginId'),
-        token: this.cookieService.get('token'),
-        teamLeaderId: this.cookieService.get('teamLeaderId'),
-        superadminId: this.cookieService.get('superadminId'),
-        createdbyName: (this.cookieService.get('firstName')+" "+this.cookieService.get('lastName'))
+        createdBy: this.loginUser['loginId'],
+        loginId: this.loginUser['loginId'],
+        token: this.loginUser['token'],
+        teamLeaderId: this.loginUser['teamLeaderId'],
+        superadminId: this.loginUser['superadminId'],
+        createdbyName: (this.loginUser['firstName']+" "+this.loginUser['lastName'])
 
       }
     };

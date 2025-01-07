@@ -102,9 +102,9 @@ export class CreateLeadComponent {
     this.leadForm = this.fb.group({
       id: [''],
       donorName: ['', [Validators.required, Validators.pattern('[A-Za-z ]{3,150}')]],
-      mobileNumber: ['', [Validators.pattern('^[0-9]{10}$')]], // Assuming a 10-digit phone number
-      programName: [''],
+      mobileNumber: ['', [Validators.pattern('^[0-9]{10}$')]], // Assuming a 10-digit phone number   
       emailId: ['', [Validators.required, Validators.email]],
+      programName: [''],
       amount: ['', [Validators.required, Validators.pattern('^[0-9]+$')]],
       currency: ['', [Validators.required]],
       status: ['', [Validators.required]],
@@ -162,6 +162,7 @@ export class CreateLeadComponent {
 
             this.donationList = this.donationList[0];
             this.setDonationDetailsToLeadForm();
+            
             this.setDonationDetailsToNewDonationForm();
 
             // this.toastr.success(response['responseMessage'], response['responseCode']);

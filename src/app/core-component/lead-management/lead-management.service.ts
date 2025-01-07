@@ -89,11 +89,27 @@ export class LeadManagementService {
     return this.http.post<any>(Constant.Site_Url + 'registerLead', request);
   }
 
-  updateLeadDetails(lead: any): Observable<any> {
+  updateLeadDetails(leadDetails: any): Observable<any> {
+    
     const request: any = {
-      payload: this.updateLeadPayload(lead),
+      payload: {
+        id: leadDetails.id,
+        donorName: leadDetails.donorName,
+        mobileNumber: leadDetails.mobileNumber,
+        emailId: leadDetails.emailId,
+        notes: leadDetails.notes,
+        status: leadDetails.status,
+        followupDate: leadDetails.followupDate,
+        createdBy: this.loginUser['loginId'],
+        loginId: this.loginUser['loginId'],
+        token: this.loginUser['token'],
+        teamLeaderId: this.loginUser['teamLeaderId'],
+        superadminId: this.loginUser['superadminId'],
+        createdbyName: (this.loginUser['firstName']+" "+this.loginUser['lastName'])
+
+      }
     };
-    return this.http.post<any>(Constant.Site_Url + 'registerLead', request);
+    return this.http.post<any>(Constant.Site_Url + 'updateLead', request);
   }
 
   saveLeadPayload(lead: any) {
@@ -152,54 +168,7 @@ export class LeadManagementService {
     return payload;
   }
 
-  updateLeadPayload(lead: any) {
-    const payload = {
-      id: lead.id,
-      companyName: lead.companyName,
-      enquirySource: lead.enquirySource,
-      categoryTypeId: lead?.categoryType?.id,
-      superCategoryId: lead?.superCategory?.id,
-      categoryId: lead?.category?.id,
-      subCategoryId: lead?.subCategory?.id,
-      categoryTypeName: lead?.categoryType?.categoryTypeName,
-      superCategory: lead?.superCategory?.superCategory, //
-      category: lead?.category?.category, //
-      subCategory: lead?.subCategory?.subCategory, //
-      // itemName: lead.itemName,
-      pickupDateTime: lead?.pickUpDateTime,
-      pickupLocation: lead?.pickUpLocation,
-      pickupPoint: lead.pickupPoint,
-      dropDateTime: lead?.dropDateTime,
-      dropLocation: lead?.dropLocation,
-      dropPoint: lead.dropPoint,
-      customeName: lead?.customerName,
-      countryDialCode: lead?.dialCode,
-      customerMobile: lead?.mobile,
-      customerEmailId: lead?.emailId,
-      totalDays: lead?.totalDays,
-      quantity: lead?.quantity,
-      vendorRate: lead?.vendorRate,
-      payToVendor: lead?.payToVendor,
-      companyRate: lead?.companyRate,
-      payToCompany: lead?.payToCompany,
-      bookingAmount: lead?.bookingAmount,
-      balanceAmount: lead?.balanceAmount,
-      totalAmount: lead?.totalAmount,
-      securityAmount: lead?.securityAmount,
-      // vendorName: lead.,
-      status: lead.status,
-      leadOrigine: lead.leadOrigine,
-      leadType: lead.leadType,
-      // createdBy: lead.createdBy,
-      createdBy: this.cookieService.get('loginId'),
-      notes: lead.notes,
-      roleType: this.cookieService.get('roleType'),
-      token: this.cookieService.get('token'),
-      // createdBy: this.cookieService.get('loginId'),
-      superadminId: this.cookieService.get('superadminId'),
-    };
-    return payload;
-  }
+
 
   changeLeadStatus(lead: any): Observable<any> {
     const request: any = {
