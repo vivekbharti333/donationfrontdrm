@@ -21,16 +21,19 @@ import Swal from 'sweetalert2';
 import { ToastModule } from 'primeng/toast';
 import { MatDialog } from '@angular/material/dialog';
 import { Constant } from 'src/app/core/constant/constants';
+import { MessageService } from 'primeng/api';
 
 
 @Component({
   selector: 'app-program',
   templateUrl: './program.component.html',
-  styleUrl: './program.component.scss'
+  styleUrl: './program.component.scss',
+  providers: [MessageService, ToastModule],
 })
 export class ProgramComponent {
 
   public editProgramModel: any;
+  public saveProgramDialog: any;
 
   public loginUser: any;
   public programList: any;
@@ -57,9 +60,8 @@ export class ProgramComponent {
     private pagination: PaginationService,
     private router: Router,
     private sidebar: SidebarService,
-    private dialog: MatDialog
-    // private toastr: ToastrService,
-    // private authenticationService: AuthenticationService,
+    private dialog: MatDialog,
+    private messageService: MessageService,
   ) {
     // this.loginUser = this.authenticationService.getLoginUser();
   }
@@ -149,12 +151,14 @@ export class ProgramComponent {
 
     openAddModel(templateRef: TemplateRef<any>){
 
-      this.dialog.open(templateRef, {
+      this.saveProgramDialog = this.dialog.open(templateRef, {
         width: '800px', // Set your desired width
         // height: '600px', // Set your desired height
         disableClose: true, // Optional: prevent closing by clicking outside
         panelClass: 'custom-modal', // Optional: add custom class for additional styling
       });
+
+   
     }
 
     addProgramDetails(){
@@ -162,19 +166,45 @@ export class ProgramComponent {
       .subscribe({
         next: (response: any) => {
           if (response['responseCode'] == '200') {
-            // let payload = response['payload'];
             if (response['payload']['respCode'] == '200') {
               this.addProgramForm.reset();
 
               this.getProgramDetailsList();
+
+              this.saveProgramDialog.close();
+
+              this.messageService.add({
+                summary: response['payload']['respCode'],
+                detail: response['payload']['respMesg'],
+                styleClass: 'success-background-popover',
+              });
+
             } else {
-             
+
+              this.saveProgramDialog.close();
+
+              this.messageService.add({
+                summary: response['payload']['respCode'],
+                detail: response['payload']['respMesg'],
+                styleClass: 'danger-background-popover',
+              });
             }
           } else {
-            
-          }
+
+            this.saveProgramDialog.close();
+
+            this.messageService.add({
+              summary: response['payload']['respCode'],
+              detail: response['payload']['respMesg'],
+              styleClass: 'danger-background-popover',
+            });
+          } 
         },
-        
+        error: () =>
+          this.messageService.add({
+            summary: '500',
+            detail: 'Server Error',
+          }),
       });
     }
 

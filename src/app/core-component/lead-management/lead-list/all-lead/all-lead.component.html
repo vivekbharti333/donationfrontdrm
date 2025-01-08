@@ -254,8 +254,6 @@
 
                 <td class="action-table-data">
                   <div class="edit-delete-action">
-                    <a class="me-2 p-2 mb-0" href="javascript:void(0);"><i class="feather icon-eye action-eye"></i>
-                    </a>
                     <a class="me-2 p-2 mb-0" data-bs-toggle="modal" data-bs-target="#edit-units"
                       (click)="openEditModal(dialogTemplate, data)">
                       <i class="feather icon-edit feather-edit"></i></a>
@@ -282,7 +280,7 @@
 
     <ng-template #dialogTemplate let-dialog>
       <div class="modalHeaderContainer">
-        <h2 mat-dialog-title class="p-0">Edit User</h2>
+        <h2 mat-dialog-title class="p-0">Edit Lead</h2>
         <div mat-dialog-close class="closeBtn">
           <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
@@ -314,7 +312,7 @@
                     <div class="col-lg-3 col-md-3">
                       <div class="mb-3">
                         <label class="form-label">Mobile Number</label>
-                        <input class="form-control" type="number" pInputText formControlName="mobileNumber" maxlength="100">
+                        <input class="form-control" type="number" pInputText formControlName="mobileNumber" maxlength="100" readonly>
                       </div>
                     </div>
 
@@ -342,11 +340,10 @@
                     <div class="col-lg-3 col-md-3" *ngIf="showFollowupDateBox">
                       <div class="mb-2">
                         <label class="form-label">Followup Date</label>
-                        <input class="form-control datetimepicker" placeholder="Choose Date" formControlName="followupDate"bsDatepicker container=".date-input2" >
+                        <input type="date" class="form-control" placeholder="Choose Date" formControlName="followupDate" [min]="minDate"/>
                         <!-- <input type="text" class="datetimepicker" placeholder="Choose Date" bsDatepicker container=".date-input2" /> -->
                       </div>
                     </div>
-                    
                   </div>
     
                   

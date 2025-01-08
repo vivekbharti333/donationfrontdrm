@@ -210,38 +210,61 @@ export class UserManagementService {
     return  this.http.post<UserDetailsRequest>(Constant.Site_Url+"userRegistration",request);
   }
 
-  updateUserDetails(user: any): Observable<any> {
-    user.firstname
+  updateUserDetails(userDetails: any): Observable<any> {
     let request: any = {
       payload: {
-        userPicture: user.userPicture,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        emailId: user.emailId,
-        roleType: user.roleType,
-        mobileNo: user.mobileNo,
-        dob: user.dob,
-        alternateMobile: user.alternateMobile,
-        idDocumentType: user.idDocumentType,
-        idDocumentPicture: user.idDocumentPicture,
-        panNumber: user.panNumber,
-        
-        emergencyContactRelation1: user.emergencyContactRelation1,
-        emergencyContactName1: user.emergencyContactName1,
-        emergencyContactNo1: user.emergencyContactNo1,
-        emergencyContactRelation2: user.emergencyContactRelation2,
-        emergencyContactName2: user.emergencyContactName2,
-        emergencyContactNo2: user.emergencyContactNo2,
-        addressList: user.addressList,
-
-        token: '',
-        createdBy: 'MAINADMIN',
-        superadminId: 'MAINADMIN',
-
+        loginId: userDetails.loginId,
+        userPicture: userDetails.userPicture,
+        firstName: userDetails.firstName,
+        lastName: userDetails.lastName,
+        roleType: userDetails.roleType,
+        mobileNo: userDetails.mobileNo,
+        alternateMobile: userDetails.alternateMobile,
+        emailId: userDetails.emailId,
+        dob: userDetails.dob,
+        addressList: userDetails.addressList,
+        requestedFor: 'WEB',
+        token: this.loginUser['token'],
+        createdBy: this.loginUser['loginId'],
+        superadminId: this.loginUser['superadminId'],
       }
     };
-    return  this.http.post<any>(Constant.Site_Url+"userRegistration",request);
+    return  this.http.post<any>(Constant.Site_Url+"updateUserDetails",request);
   }
+
+  // updateUserDetails(user: any): Observable<any> {
+  //   user.firstname
+  //   let request: any = {
+  //     payload: {
+  //       // userPicture: user.userPicture,
+  //       firstName: user.firstName,
+  //       lastName: user.lastName,
+  //       emailId: user.emailId,
+  //       roleType: user.roleType,
+  //       mobileNo: user.mobileNo,
+  //       dob: user.dob,
+  //       alternateMobile: user.alternateMobile,
+  //       idDocumentType: user.idDocumentType,
+  //       idDocumentPicture: user.idDocumentPicture,
+  //       panNumber: user.panNumber,
+  //       permissions: user.permissions,
+        
+  //       emergencyContactRelation1: user.emergencyContactRelation1,
+  //       emergencyContactName1: user.emergencyContactName1,
+  //       emergencyContactNo1: user.emergencyContactNo1,
+  //       emergencyContactRelation2: user.emergencyContactRelation2,
+  //       emergencyContactName2: user.emergencyContactName2,
+  //       emergencyContactNo2: user.emergencyContactNo2,
+  //       addressList: user.addressList,
+
+  //       token: this.loginUser['token'],
+  //       createdBy: this.loginUser['createdBy'],
+  //       superadminId: this.loginUser['superadminId'],
+
+  //     }
+  //   };
+  //   return  this.http.post<any>(Constant.Site_Url+"updateUserDetails",request);
+  // }
 
   getAddressDetailsByUserId(user:any): Observable<UserDetailsRequest> {
     let request: UserDetailsRequest = {

@@ -20,114 +20,98 @@
 </div>
 
   <div *ngIf="selectedOption === 'lead'">
-
-  <form [formGroup]="leadForm" (ngSubmit)="saveLeadDetails()">
-    <div class="card">
-      <div class="card-body">
-        <div class="new-employee-field">
-          <div class="card-title-head">
-            <h6>
-              <span><i class="feather icon-info feather-edit"></i></span>Add New Lead
-            </h6>
+  
+    <form [formGroup]="leadForm" (ngSubmit)="saveLeadDetails()">
+      <div class="card">
+        <div class="card-body">
+          <div class="new-employee-field">
+            <div class="card-title-head">
+              <h6>
+                <span><i class="feather icon-info feather-edit"></i></span>Add New Lead
+              </h6>
+            </div>
+  
+            <div class="row">
+              <div class="col-lg-3 col-sm-6 col-12">
+                <div class="input-blocks">
+                  <i class="feather icon-user info-img"></i>
+                  <mat-select class="space-select select" placeholder="Choose Data"
+                    (selectionChange)="getDonationListForLead($event.value)">
+                    <mat-option *ngFor="let user of userList" [value]="user.loginId">
+                      {{user.firstName}} {{user.lastName}}
+                    </mat-option>
+                  </mat-select>
+  
+                </div>
+              </div>
+            </div>
+  
+            <div class="row">
+              <div class="col-lg-4 col-md-4">
+                <div class="mb-4"> <label for="donorName" class="form-label">Donor Name</label>
+                  <input id="donorName" class="form-control" type="text" pInputText formControlName="donorName"
+                    maxlength="100" placeholder="Enter donor name">
+                    <input id="donorName" class="form-control" type="text" pInputText formControlName="id">
+                </div>
+              </div>
+              <div class="col-lg-4 col-md-4">
+                <div class="mb-4">
+                  <label class="form-label">Mobile Number</label>
+                  <input class="form-control" type="number" pInputText formControlName="mobileNumber" maxlength="100">
+                </div>
+              </div>
+              <div class="col-lg-4 col-md-4">
+                <div class="mb-4">
+                  <label class="form-label">Email Id</label>
+                  <input class="form-control" type="text" pInputText formControlName="emailId" maxlength="100">
+                </div>
+              </div>
+              <input class="form-control" type="text" pInputText formControlName="programName" maxlength="100" hidden>
+            </div>
+            <div class="row">
+              <div class="col-lg-4 col-md-4">
+                <div class="mb-4">
+                  <label class="form-label">Status</label>
+                  <mat-select class="space-select select" formControlName="status" placeholder="Mark Lead Status"
+                    (selectionChange)="checkStatus($event)">
+                    <mat-option *ngFor="let listData of leadStatus" [value]="listData.value">
+                      {{listData.name}}
+                    </mat-option>
+                  </mat-select>
+                </div>
+              </div>
+  
+              <div class="col-lg-4 col-md-4" *ngIf="showFollowupDateBox">
+                <div class="mb-4">
+                  <label class="form-label">Followup Date</label>
+                  <input class="form-control datetimepicker" placeholder="Choose Date" formControlName="followupDate"
+                    bsDatepicker container=".date-input2"
+                    [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', minDate: minDate }">
+  
+                </div>
+              </div>
+            </div>
+  
+            <div class="row">
+              <div class="col-lg-6 col-md-6">
+                <div class="mb-6">
+                  <label class="form-label">Remarks</label>
+                  <textarea class="form-control" style=" float: left; width: 100%; margin-top: 6px; height:150px"
+                    formControlName="notes" placeholder="Write Notes.."></textarea>
+                </div>
+              </div>
+            </div>
+  
           </div>
-
-          <div class="row">
-            <div class="col-lg-3 col-sm-6 col-12">
-              <div class="input-blocks">
-                <i class="feather icon-user info-img"></i>
-                <mat-select class="space-select select" placeholder="Choose Data" (selectionChange)="getDonationListForLead($event.value)">   
-                  <mat-option *ngFor="let user of userList" [value]="user.loginId">
-                    {{user.firstName}} {{user.lastName}}
-                  </mat-option>
-                </mat-select>
-                   
-              </div>
-            </div>
-          </div>
-
-          <div class="row">
-            <div class="col-lg-3 col-md-3">
-              <div class="mb-3"> <label for="donorName" class="form-label">Donor Name</label>
-                <input id="donorName" class="form-control" type="text" pInputText formControlName="donorName"
-                  maxlength="100" placeholder="Enter donor name">
-              </div>
-            </div>
-            <div class="col-lg-3 col-md-3">
-              <div class="mb-3">
-                <label class="form-label">Mobile Number</label>
-                <input class="form-control" type="number" pInputText formControlName="mobileNumber" maxlength="100">
-              </div>
-            </div>
-            <div class="col-lg-3 col-md-3">
-              <div class="mb-3">
-                <label class="form-label">Email Id</label>
-                <input class="form-control" type="text" pInputText formControlName="emailId" maxlength="100">
-              </div>
-            </div>
-
-            <!-- <div class="col-lg-4 col-md-4">
-              <div class="mb-3">
-                <label class="form-label">Program</label> -->
-                <input class="form-control" type="text" pInputText formControlName="programName" maxlength="100">
-              <!-- </div>
-            </div> -->
-            <!-- <div class="col-lg-2 col-md-2">
-              <div class="mb-3">
-                <label class="form-label">Amount</label>
-                <input class="form-control" type="number" pInputText pKeyFilter="int" formControlName="amount"
-                  maxlength="100" readonly>
-              </div>
-            </div>
-            <div class="col-lg-1 col-md-1">
-              <div class="mb-3">
-                <label class="form-label">Currency</label>
-                <input class="form-control" type="text" pInputText formControlName="currencyCode" maxlength="100">
-              </div>
-            </div> -->
-
-
-            <div class="col-lg-3 col-md-3">
-              <div class="mb-2">
-                <label class="form-label">Status</label>
-                <mat-select class="space-select select" formControlName="status" placeholder="Mark Lead Status"  (selectionChange)="checkStatus($event)">
-                  <mat-option *ngFor="let listData of leadStatus" [value]="listData.value">
-                    {{listData.name}}
-                  </mat-option>
-                </mat-select>
-              </div>
-            </div>
-
-            <div class="col-lg-3 col-md-3" *ngIf="showFollowupDateBox">
-              <div class="mb-2">
-                <label class="form-label">Followup Date</label>
-                <input class="form-control datetimepicker" placeholder="Choose Date" formControlName="followupDate"bsDatepicker container=".date-input2" >
-                <!-- <input type="text" class="datetimepicker" placeholder="Choose Date" bsDatepicker container=".date-input2" /> -->
-              </div>
-            </div>
-
-
-          </div>
-
-          <div class="row">
-            <div class="col-lg-6 col-md-6">
-              <div class="mb-6">
-                <label class="form-label">Remarks</label>
-                <textarea class="form-control" style=" float: left; width: 100%; margin-top: 6px; height:150px"
-                 formControlName="notes" placeholder="Write Notes.."></textarea>
-              </div>
-            </div>
-          </div>
-
         </div>
       </div>
-    </div>
-
-    <div class="text-mid mb-3">
-      <button type="submit" class="btn btn-submit">Save Lead</button>
-    </div>
-  </form>
-
-</div>
+  
+      <div class="text-mid mb-3">
+        <button type="submit" class="btn btn-submit">Save Lead</button>
+      </div>
+    </form>
+  
+  </div>
 
 
 <!-- <div *ngIf="selectedOption === 'info'">

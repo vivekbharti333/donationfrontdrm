@@ -19,6 +19,7 @@ import { UserManagementService } from 'src/app/core-component/user-management/us
 import { CookieService } from 'ngx-cookie-service';
 import { CalendarModule } from 'primeng/calendar';
 
+
 interface listData {
   value: string;
   name: string;
@@ -43,6 +44,7 @@ export class CreateLeadComponent {
   public showUserList:  boolean =false;
 
   public createdBy: any;
+  public  minDate!: Date;
 
   public donationList: any;
   public showCurrencyBox: boolean = false;
@@ -89,6 +91,9 @@ export class CreateLeadComponent {
     // this.getCurrencyDetailBySuperadmin();
     // this.getPaymentModeList();
     // this.getFundrisingOfficerByTeamLeaderId();
+    // this.getTodayDate();
+    this.minDate = new Date(); // Set to today's date
+    this.minDate.setHours(0, 0, 0, 0); // Ensure time is reset to midnight
   }
 
   checkRoleType(){
@@ -97,6 +102,14 @@ export class CreateLeadComponent {
       this.showUserList = true;
     }
   }
+
+  // getTodayDate() {
+  //   const today = new Date();
+  //   const year = today.getFullYear();
+  //   const month = String(today.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+  //   const day = String(today.getDate()).padStart(2, '0');
+  //   this.minDate = `${year}-${month}-${day}`; // Format as YYYY-MM-DD
+  // }
 
   createForms() {
     this.leadForm = this.fb.group({
@@ -305,7 +318,7 @@ export class CreateLeadComponent {
   }
 
   saveLeadDetails() {
-    this.donationManagementService.saveLeadDetails(this.leadForm.value)
+    this.leadManagementService.saveLeadDetails(this.leadForm.value)
       .subscribe({
         next: (response: any) => {
           if (response['responseCode'] == '200') {

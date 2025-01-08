@@ -51,51 +51,29 @@ export class UsersComponent {
 
   
 
-  public user = {
-    userPicture: '',
-    firstName: '',
-    lastName: '',
-    emailId: '',
-    gender: '',
-    permissions: '',
-    roleType: '',
-    mobileNo: '',
-    alternateMobile: '',
-    userCode: '',
-    idDocumentType: '',
-    idDocumentPicture: '',
-    panNumber: '',
-    dob: '',
-    emergencyContactRelation1: '',
-    emergencyContactName1: '',
-    emergencyContactNo1: '',
-    emergencyContactRelation2: '',
-    emergencyContactName2: '',
-    emergencyContactNo2: '',
+  // public user = {
+  //   userPicture: '',
+  //   firstName: '',
+  //   lastName: '',
+  //   emailId: '',
+  //   gender: '',
+  //   permissions: '',
+  //   roleType: '',
+  //   mobileNo: '',
+  //   alternateMobile: '',
+  //   userCode: '',
+  //   idDocumentType: '',
+  //   idDocumentPicture: '',
+  //   panNumber: '',
+  //   dob: '',
+  //   emergencyContactRelation1: '',
+  //   emergencyContactName1: '',
+  //   emergencyContactNo1: '',
+  //   emergencyContactRelation2: '',
+  //   emergencyContactName2: '',
+  //   emergencyContactNo2: '',
 
-    // addressList: [
-    //   {
-    //     addressType: 'CURRENT',
-    //     addressLine: '',
-    //     landmark: '',
-    //     district: '',
-    //     city: '',
-    //     state: '',
-    //     country: 'INDIA',
-    //     pincode: '',
-    //   },
-    //   {
-    //     addressType: 'PARMANENT',
-    //     addressLine: '',
-    //     landmark: '',
-    //     district: '',
-    //     city: '',
-    //     state: '',
-    //     country: 'INDIA',
-    //     pincode: '',
-    //   },
-    // ],
-  };
+  // };
 
   onRoleTypeChange(event: any) {
     console.log('Selected gender:', event.value);
@@ -531,34 +509,48 @@ export class UsersComponent {
         const base64String = event.target.result.split(',')[1]; // Get the base64 part
 
         // Set the base64 string to the userPicture field
-        this.user.userPicture = 'data:image/jpeg;base64,' + base64String;
-        alert('base64 : ' + this.user.userPicture);
+        this.editUserForm.patchValue({
+          userPicture: base64String
+        });
       };
       reader.readAsDataURL(selectedFile);
     }
   }
 
-  submitUserForm() {
-    // this.isLoading = true;
-    alert(this.user.userPicture);
-    this.userManagementService.updateUserDetails(this.user).subscribe({
+  updateUserDetails() {
+    this.userManagementService.updateUserDetails(this.editUserForm.value).subscribe({
       next: (response: any) => {
         if (response['responseCode'] == '200') {
           if (response['payload']['respCode'] == '200') {
-            //  this.toastr.success(response['payload']['respMesg'], response['payload']['respCode']);
-            // form.reset();
+
+            this.messageService.add({
+              summary: response['payload']['respCode'],
+              detail: response['payload']['respMesg'],
+              styleClass: 'success-background-popover',
+            });
+
             // this.createForms();
             // this.isLoading = false;
           } else {
-            // this.toastr.error(response['payload']['respMesg'], response['payload']['respCode']);
-            // this.isLoading = false;
+            this.messageService.add({
+                summary: response['payload']['respCode'],
+                detail: response['payload']['respMesg'],
+                styleClass: 'danger-background-popover',
+              });
           }
         } else {
-          // this.toastr.error(response['responseMessage'], response['responseCode']);
-          // this.isLoading = false;
+          this.messageService.add({
+            summary: response['payload']['respCode'],
+            detail: response['payload']['respMesg'],
+            styleClass: 'danger-background-popover',
+          });
         }
       },
-      // error: (error: any) => this.toastr.error('Server Error', '500'),
+      error: () =>
+        this.messageService.add({
+          summary: '500',
+          detail: 'Server Error',
+        }),
     });
     // this.isLoading = false;
   }

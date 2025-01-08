@@ -44,7 +44,7 @@ export class AllLeadComponent {
   public editLeadForm!: FormGroup;
   public leadUpdateDialog: any;
   public showFollowupDateBox: boolean =false;
-
+  public minDate: any;
     
 
   public followupList: any;
@@ -71,54 +71,15 @@ export class AllLeadComponent {
   public searchDataValue = '';
   roleType: string = '';
   //** / pagination variables
-  viewLeadDetailsDialog: any;
+  // viewLeadDetailsDialog: any;
   firstDate: any = '';
   lastDate: any = '';
-  leadDetails = {
-    categoryType: '',
-    superCategory: '',
-    category: '',
-    subCategory: '',
-    pickupDateTime: '',
-    pickupLocation: '',
-    dropDateTime: '',
-    dropLocation: '',
-    totalDays: '',
-    quantity: '',
-    vendorRate: '',
-    companyRate: '',
-    bookingAmount: '',
-    balanceAmount: '',
-    totalAmount: '',
-    securityAmount: '',
-    payToVendor: '',
-    payToCompany: '',
-    deliveryToCompany: '',
-    deliveryToVendor: '',
-    customerName: '',
-    dialCode: '',
-    mobile: '',
-    alternateMobile: '',
-    emailId: '',
-    id: '',
-    companyName: '',
-    enquirySource: '',
-    pickupPoint: '',
-    dropPoint: '',
-    status: '',
-    leadOrigine: '',
-    leadType: '',
-    createdBy: '',
-    notes: '',
-    records: '',
-    remarks: '',
-    reminderDate: '',
-  };
+  
   isEditForm: boolean = false;
-  filteredCategoryTypeList: any[] = [];
-  filteredSuperCategoryList: any[] = [];
-  filteredCategoryList: any[] = [];
-  filteredSubCategoryList: any[] = [];
+  // filteredCategoryTypeList: any[] = [];
+  // filteredSuperCategoryList: any[] = [];
+  // filteredCategoryList: any[] = [];
+  // filteredSubCategoryList: any[] = [];
 
   allIds = {
     superCategoryId: '',
@@ -132,7 +93,6 @@ export class AllLeadComponent {
   leadStatus: listData[] = Constant.LEAD_STATUS_LIST;
 
   constructor(
-    private data: DataService,
     private pagination: PaginationService,
     private router: Router,
     private sidebar: SidebarService,
@@ -140,7 +100,6 @@ export class AllLeadComponent {
     private leadManagementService: LeadManagementService,
     private dialog: MatDialog,
     private helper: HelperService,
-    private categoriesManagementService: CategoriesManagementService,
     private userManagementService: UserManagementService,
     private cookieService: CookieService,
     private datePipe: DatePipe,
@@ -150,17 +109,12 @@ export class AllLeadComponent {
   ngOnInit() {
     this.createForms();
     this.getAllLeadList("MONTH");
-    this.getUserListForDropDown();
-    // this.getCategoryType();
-    // this.getPickLocation();
-    // this.getDropLocation();
-    
+    this.getUserListForDropDown(); 
   }
 
   // downloadInvoice(receiptNo : string) {
   //   window.open(Constant.Site_Url+"paymentreceipt/"+receiptNo, '_blank');
   // }
-
 
   public getUserListForDropDown() {
     this.userManagementService.getUserListForDropDown().subscribe({
@@ -231,44 +185,6 @@ export class AllLeadComponent {
     }
   }
 
-
-
-
-
-  setDateTime(date: any): string {
-
-    const currentDate = new Date(date);
-
-    // Adjust to local time zone
-    const timeZoneOffset = currentDate.getTimezoneOffset() * 60000; // offset in milliseconds
-    const localDate = new Date(currentDate.getTime() - timeZoneOffset);
-
-    // Round minutes to the nearest 15-minute interval
-    const minutes = localDate.getMinutes();
-    const roundedMinutes = Math.ceil(minutes / 15) * 15;
-    localDate.setMinutes(roundedMinutes);
-    localDate.setSeconds(0);
-    localDate.setMilliseconds(0);
-
-    // Format the date to the required input format: YYYY-MM-DDTHH:MM
-    const year = localDate.getFullYear();
-    const month = String(localDate.getMonth() + 1).padStart(2, '0');
-    const day = String(localDate.getDate()).padStart(2, '0');
-    const hours = String(localDate.getHours()).padStart(2, '0');
-    const minutesFormatted = String(localDate.getMinutes()).padStart(2, '0');
-
-    const formattedDateTime = `${year}-${month}-${day}T${hours}:${minutesFormatted}`;
-
-    return formattedDateTime;
-  }
-
-  
-  async copyData(data: any, idx: number) {
-    // this.saveLeadData(data);
-    this.helper.copyData(this.leadDetails);
-    this.setIsDataCopied(true, idx);
-  }
-
   public searchData(value: string): void {
     this.dataSource.filter = value.trim().toLowerCase();
     this.tableData = this.dataSource.filteredData;
@@ -291,24 +207,7 @@ export class AllLeadComponent {
   openFilter() {
     this.filter = !this.filter;
   }
-  setFilterList(listVal: any, typeOfList: any) {
-    switch (typeOfList) {
-      case 'categoryType':
-        this.filteredCategoryTypeList = listVal;
-        break;
-      case 'superCategory':
-        this.filteredSuperCategoryList = listVal;
-        break;
-      case 'category':
-        this.filteredCategoryList = listVal;
-        break;
-      case 'subCategory':
-        this.filteredSubCategoryList = listVal;
-        break;
-      default:
-        break;
-    }
-  }
+ 
   filterByDate() {
     this.leadManagementService
       .getAllLeadListByDate(this.firstDate, this.lastDate)
@@ -344,9 +243,40 @@ export class AllLeadComponent {
       });
     }
 
+    getTodayDate() {
+      const today = new Date();
+      const year = today.getFullYear();
+      const month = String(today.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+      const day = String(today.getDate()).padStart(2, '0');
+      this.minDate = `${year}-${month}-${day}`; // Format as YYYY-MM-DD
+    }
+
+    setDateTime(date: any): string {
+      // Use today's date if the input date is null or undefined
+      const currentDate = date ? new Date(date) : new Date();
+    
+      // Adjust to local time zone
+      const timeZoneOffset = currentDate.getTimezoneOffset() * 60000; // offset in milliseconds
+      const localDate = new Date(currentDate.getTime() - timeZoneOffset);
+    
+      // Round minutes to the nearest 15-minute interval
+      const minutes = localDate.getMinutes();
+      const roundedMinutes = Math.ceil(minutes / 15) * 15;
+      localDate.setMinutes(roundedMinutes);
+      localDate.setSeconds(0);
+      localDate.setMilliseconds(0);
+    
+      // Format the date to the required input format: YYYY-MM-DD
+      const year = localDate.getFullYear();
+      const month = String(localDate.getMonth() + 1).padStart(2, '0');
+      const day = String(localDate.getDate()).padStart(2, '0');
+    
+      return `${year}-${month}-${day}`; // Returns in YYYY-MM-DD format
+    }
+
   openEditModal(templateRef: TemplateRef<any>, rowData: any) {
 
-    this.checkStatus(rowData['status']);
+    this.getTodayDate();
 
     this.editLeadForm.patchValue({
       id: rowData['id'],
@@ -354,11 +284,14 @@ export class AllLeadComponent {
       mobileNumber: rowData['mobileNumber'],
       emailId: rowData['emailId'],
       status: rowData['status'],
+      followupDate: this.setDateTime(rowData['followupDate']),
       programName: rowData['programName'],
-      followupDate: rowData['followupDate'],
       notes: rowData['notes'],
-
     });
+
+    if( this.editLeadForm.value['status'] == "FOLLOWUP"){
+      this.showFollowupDateBox = true;
+    }
 
     this.leadUpdateDialog = this.dialog.open(templateRef, {
       width: '1400px', // Set your desired width
@@ -378,11 +311,15 @@ export class AllLeadComponent {
 
 
   updateLeadDetails() {
-    this.leadManagementService.updateLeadDetails(this.editLeadForm).subscribe({
+    this.leadManagementService.updateLeadDetails(this.editLeadForm.value).subscribe({
       next: (response: any) => {
         if (response['responseCode'] == '200') {
           if (response['payload']['respCode'] == '200') {
-            // form.reset();
+            
+            this.getAllLeadList('MONTH');
+
+            this.leadUpdateDialog.close();
+
             this.messageService.add({
               summary: response['payload']['respCode'],
               detail: response['payload']['respMesg'],

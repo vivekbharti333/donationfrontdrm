@@ -38,29 +38,7 @@ export class DonationManagementService {
   }
 
   
-  saveLeadDetails(donationDetails: DonationDetails): Observable<DonationDetailsRequest> {
-    this.loginUser = this.authenticationService.getLoginUser();
 
-    let request: DonationDetailsRequest = {
-      payload: {
-        id: donationDetails.id,
-        donorName: donationDetails.donorName,
-        mobileNumber: donationDetails.mobileNumber,
-        emailId: donationDetails.emailId,
-        notes: donationDetails.notes,
-        status: donationDetails.status,
-        followupDate: donationDetails.followupDate,
-        createdBy: this.loginUser['loginId'],
-        loginId: this.loginUser['loginId'],
-        token: this.loginUser['token'],
-        teamLeaderId: this.loginUser['teamLeaderId'],
-        superadminId: this.loginUser['superadminId'],
-        createdbyName: (this.loginUser['firstName']+" "+this.loginUser['lastName'])
-
-      }
-    };
-    return this.http.post<DonationDetailsRequest>(Constant.Site_Url + "createLead", request);
-  }
 
   saveDonationDetails(donationDetails: DonationDetails): Observable<DonationDetailsRequest> {
     this.loginUser = this.authenticationService.getLoginUser();
