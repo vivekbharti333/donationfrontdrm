@@ -42,6 +42,8 @@ export class UsersComponent {
   public editUserForm!: FormGroup;
   public teamLeaderForm!: FormGroup;
 
+  public userUpdateDialog: any;
+
   public teamLeaderList: any;
   // public addressList: any;
 
@@ -109,6 +111,7 @@ export class UsersComponent {
       dob: [''],
       permissions: [''],
       userPicture:[''],
+      createdBy: [''],
       addressList: this.fb.array([
         this.addressForm(),
         this.addressForm()]),
@@ -194,7 +197,14 @@ export class UsersComponent {
       : '';
   
     // Open the dialog
-    this.dialog.open(templateRef);
+    // this.dialog.open(templateRef);
+
+    this.userUpdateDialog = this.dialog.open(templateRef, {
+      width: '1400px', // Set your desired width
+      // height: '600px', // Set your desired height
+      disableClose: true, // Optional: prevent closing by clicking outside
+      panelClass: 'custom-modal', // Optional: add custom class for additional styling
+    });
   }
   
 
@@ -529,14 +539,16 @@ export class UsersComponent {
               styleClass: 'success-background-popover',
             });
 
-            // this.createForms();
-            // this.isLoading = false;
+            this.userUpdateDialog.close();
+
           } else {
             this.messageService.add({
                 summary: response['payload']['respCode'],
                 detail: response['payload']['respMesg'],
                 styleClass: 'danger-background-popover',
               });
+
+              this.userUpdateDialog.close();
           }
         } else {
           this.messageService.add({
@@ -544,6 +556,7 @@ export class UsersComponent {
             detail: response['payload']['respMesg'],
             styleClass: 'danger-background-popover',
           });
+          this.userUpdateDialog.close();
         }
       },
       error: () =>

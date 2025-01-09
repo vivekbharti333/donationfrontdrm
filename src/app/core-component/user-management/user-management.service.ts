@@ -139,44 +139,6 @@ export class UserManagementService {
   }
 
 
-  // saveUserDetails(user: any): Observable<any> {
-    
-  //   let request: any = {
-  //     payload: {
-  //       userPicture: user.userPicture,
-  //       firstName: user.firstName,
-  //       lastName: user.lastName,
-  //       emailId: user.emailId,
-  //       gender: user.gender,
-  //       roleType: user.roleType,
-  //       // permissions: "'"+user.permissions+"'",
-  //       permissions: JSON.stringify(user.permissions),
-  //       mobileNo: user.mobileNo,
-  //       dob: user.dob,
-  //       alternateMobile: user.alternateMobile,
-  //       idDocumentType: user.idDocumentType,
-  //       idDocumentPicture: user.idDocumentPicture,
-  //       panNumber: user.panNumber,
-        
-  //       emergencyContactRelation1: user.emergencyContactRelation1,
-  //       emergencyContactName1: user.emergencyContactName1,
-  //       emergencyContactNo1: user.emergencyContactNo1,
-  //       emergencyContactRelation2: user.emergencyContactRelation2,
-  //       emergencyContactName2: user.emergencyContactName2,
-  //       emergencyContactNo2: user.emergencyContactNo2,
-  //       addressList: user.addressList,
-
-  //       token: this.loginUser['token'],
-  //       adminId: '',
-  //       teamleaderId: '',
-  //       createdBy: this.loginUser['loginId'],
-  //       superadminId: this.loginUser['superadminId'],
-
-  //     }
-  //   };
-  //   return  this.http.post<any>(Constant.Site_Url+"userRegistration",request);
-  // }
-
   saveUserDetails(userDetails: any): Observable<UserDetailsRequest> {
     this.loginId = this.cookieService.get('loginId');
     this.superadminId = this.cookieService.get('superadminId');
@@ -184,7 +146,7 @@ export class UserManagementService {
     if(userDetails.roleType === Constant.fundraisingOfficer){
       creatBy = userDetails.createdBy;
     }else {
-      creatBy = this.loginUser['roleType'];
+      creatBy = this.loginUser['loginId'];
     }
 
     let request: any = {
@@ -202,9 +164,9 @@ export class UserManagementService {
         dob: userDetails.dob,
         addressList: userDetails.addressList,
         requestedFor: 'WEB',
-        token: this.cookieService.get('token'),
+        token: this.loginUser['token'],
         createdBy: creatBy,
-        superadminId: this.cookieService.get('superadminId'),
+        superadminId: this.loginUser['superadminId'],
       }
     };
     return  this.http.post<UserDetailsRequest>(Constant.Site_Url+"userRegistration",request);
