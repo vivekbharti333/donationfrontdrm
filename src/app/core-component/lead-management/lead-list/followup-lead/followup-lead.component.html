@@ -39,16 +39,11 @@
       </div>
       <div class="form-sort">
         <i class="feather icon-sliders info-img"></i>
-        <!-- <mat-select [(ngModel)]="selectedValue2" [ngModelOptions]="{standalone: true}" class="space-select select"
-                placeholder="Sort by Date">
-                <mat-option value="Sort by Date">Sort by Date</mat-option>
-                <mat-option value="Newest">Newest</mat-option>
-                <mat-option value="Oldest">Oldest</mat-option>
-              </mat-select> -->
+
       </div>
     </div>
     <!-- /Filter -->
-    <div class="card" id="filter_inputs" [ngClass]="{ 'd-block': filter, 'd-none': !filter }">
+    <!-- <div class="card" id="filter_inputs" [ngClass]="{ 'd-block': filter, 'd-none': !filter }">
       <div class="card-body pb-0">
         <div class="row">
           <div class="col-lg-3 col-sm-6 col-12">
@@ -56,7 +51,6 @@
               <label class="form-label requiredField">Select Agent</label>
               <mat-select name="permissions" class="select" placeholder="Select Agent"
                 (selectionChange)="onAgentSelectionChange($event.value)">
-                <!-- <mat-option [value]="ALL">ALL</mat-option> -->
                 @for (dropDownUser of userForDropDown; track dropDownUser) {
                 <mat-option [value]="dropDownUser.loginId">
                   {{dropDownUser.firstName+" "+dropDownUser.lastName}}
@@ -89,71 +83,47 @@
           </div>
         </div>
       </div>
-    </div>
+    </div> -->
 
-    <mat-tab-group>
-      <mat-tab>
-        <!-- <ng-template mat-tab-label> Today's </ng-template> -->
-        <ng-template mat-tab-label>
-          <span (click)="getFollowupList1()" style="cursor: pointer;">Today's</span>
-        </ng-template>
+
+
         <div class="table-responsive">
           <table matSort (matSortChange)="sortData($event)" class="table datanew">
             <thead>
               <tr>
                 <th></th>
-                <th mat-sort-header="userName">Sub Category</th>
-                <th mat-sort-header="loginId">Customer Name</th>
+                <th mat-sort-header="userName">Name</th>
                 <th mat-sort-header="phone">Mobile</th>
-                <th mat-sort-header="role">Agent Name</th>
-                <th mat-sort-header="createdOn">Created On</th>
+                <th mat-sort-header="role">Remarks</th>
                 <th mat-sort-header="status">Status</th>
-                <th class="no-sort">Action</th>
+                <th mat-sort-header="status">Followup Date</th>
+                <th mat-sort-header="createdOn">Created On</th>
+                <!-- <th mat-sort-header="loginId">Customer Name</th> -->
+                <!-- <th class="no-sort">Action</th> -->
               </tr>
             </thead>
             <tbody>
               @for (data of tableData; track data; let idx=$index) {
               <tr>
                 <td></td>
-                <td>{{ data.subCategory }}</td>
-                <td>{{ data.customeName }}</td>
-                <td>{{ data.customerMobile }}</td>
-                <td>{{ data.createdBy }}</td>
+                <td>{{ data.donorName }}</td>
+                <td>{{ data.mobileNumber }}</td>
+                <td>{{ data.notes }}</td>
+                <td>
+                  <button class="badge-button" [ngClass]="getBadgeClass(data.status)">
+                    {{ data.status }}
+                  </button>
+                </td>
+                <td>{{ data.followupDate | date : "dd-MM-yyyy" }}</td>
                 <td>{{ data.createdAt | date : "dd-MM-yyyy | HH:mm" }}</td>
-                <td>{{ data.status }}</td>
+
 
                 <td class="action-table-data">
                   <div class="edit-delete-action">
-                    <a class="me-2 p-2 mb-0 position-relative" data-bs-toggle="modal" data-bs-target="#view-units">
-                      <i class="feather icon-info feather-info"></i>
-                      <span class="tooltipText">View</span>
-                    </a>
-                    <a class="me-2 p-2 mb-0 position-relative" data-bs-toggle="modal" data-bs-target="#edit-units">
-                      <i class="feather icon-edit feather-edit textBlack"></i>
-                      <span class="tooltipText">Edit</span>
-                    </a>
-
-                    <a class="me-2 p-2 mb-0 position-relative" data-bs-toggle="modal"
-                      data-bs-target="#change-status-units" (click)="
-                openChangeStatusModal(changeStatusDialogTemplate, data, false)">
-                      <i class="feather icon-info feather-info"></i>
-                      <span class="tooltipText">change</span></a>
-
-                    <a class="me-2 p-2 mb-0 position-relative" data-bs-toggle="modal" data-bs-target="#edit-units">
-                      <i class="fa fa-download"></i>
-                      <span class="tooltipText">invoice</span>
-                    </a>
-                    <!-- @if(data?.isDataCopied) {
-                      <a class="me-2 p-2 mb-0 position-relative" data-bs-toggle="modal" data-bs-target="#copy-units">
-                        <i class="feather icon-check feather-check"></i>
-                        <span class="tooltipText">Copied!</span>
-                      </a>
-                      } @else {
-                      <a class="me-2 p-2 mb-0 position-relative" data-bs-toggle="modal" data-bs-target="#copy-units" (click)="copyData(data, idx)">
-                        <i class="feather icon-copy feather-copy"></i>
-                        <span class="tooltipText">Copy</span>
-                      </a>
-                      } -->
+                    <a class="me-2 p-2 mb-0" data-bs-toggle="modal" data-bs-target="#edit-units"
+                      (click)="openEditModal(dialogTemplate, data)">
+                      <i class="feather icon-edit feather-edit"></i></a>
+                  
                   </div>
                 </td>
               </tr>
@@ -161,210 +131,94 @@
             </tbody>
           </table>
         </div>
-      </mat-tab>
-
-      <mat-tab>
-        <ng-template mat-tab-label>
-          <span (click)="getFollowupList2()">Yesterday's</span>
-        </ng-template>
-
-        <div class="table-responsive">
-          <table matSort (matSortChange)="sortData($event)" class="table datanew">
-            <thead>
-              <tr>
-                <th></th>
-                <th mat-sort-header="userName">Sub Category</th>
-                <th mat-sort-header="loginId">Customer Name</th>
-                <th mat-sort-header="phone">Mobile</th>
-                <th mat-sort-header="role">Agent Name</th>
-                <th mat-sort-header="createdOn">Created On</th>
-                <th mat-sort-header="status">Status</th>
-                <th class="no-sort">Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (data of tableData; track data; let idx=$index) {
-              <tr>
-                <td></td>
-                <td>{{ data.subCategory }}</td>
-                <td>{{ data.customeName }}</td>
-                <td>{{ data.customerMobile }}</td>
-                <td>{{ data.createdBy }}</td>
-                <td>{{ data.createdAt | date : "dd-MM-yyyy | HH:mm" }}</td>
-                <td>{{ data.status }}</td>
-
-                <td class="action-table-data">
-                  <div class="edit-delete-action">
-                    <a class="me-2 p-2 mb-0 position-relative" data-bs-toggle="modal" data-bs-target="#view-units">
-                      <i class="feather icon-info feather-info"></i>
-                      <span class="tooltipText">View</span>
-                    </a>
-                    <a class="me-2 p-2 mb-0 position-relative" data-bs-toggle="modal" data-bs-target="#edit-units">
-                      <i class="feather icon-edit feather-edit textBlack"></i>
-                      <span class="tooltipText">Edit</span>
-                    </a>
-                    <!-- @if(data?.isDataCopied) {
-                      <a class="me-2 p-2 mb-0 position-relative" data-bs-toggle="modal" data-bs-target="#copy-units">
-                        <i class="feather icon-check feather-check"></i>
-                        <span class="tooltipText">Copied!</span>
-                      </a>
-                      } @else {
-                      <a class="me-2 p-2 mb-0 position-relative" data-bs-toggle="modal" data-bs-target="#copy-units" (click)="copyData(data, idx)">
-                        <i class="feather icon-copy feather-copy"></i>
-                        <span class="tooltipText">Copy</span>
-                      </a>
-                      } -->
-                  </div>
-                </td>
-              </tr>
-              }
-            </tbody>
-          </table>
-        </div>
-      </mat-tab>
-
-      <mat-tab>
-        <!-- <ng-template mat-tab-label>
-            Day Before Yesterday's
-          </ng-template> -->\
-        <ng-template mat-tab-label>
-          <span (click)="getFollowupList3()" style="cursor: pointer;">Day Before Yesterday's</span>
-        </ng-template>
-        <div class="table-responsive">
-          <table matSort (matSortChange)="sortData($event)" class="table datanew">
-            <thead>
-              <tr>
-                <th></th>
-                <th mat-sort-header="userName">Sub Category</th>
-                <th mat-sort-header="loginId">Customer Name</th>
-                <th mat-sort-header="phone">Mobile</th>
-                <th mat-sort-header="role">Agent Name</th>
-                <th mat-sort-header="createdOn">Created On</th>
-                <th mat-sort-header="status">Status</th>
-                <th class="no-sort">Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (data of tableData; track data; let idx=$index) {
-              <tr>
-                <td>{{ data.subCategory }}</td>
-                <td>{{ data.customeName }}</td>
-                <td>{{ data.customerMobile }}</td>
-                <td>{{ data.createdBy }}</td>
-                <td>{{ data.createdAt | date : "dd-MM-yyyy | HH:mm" }}</td>
-                <td>{{ data.status }}</td>
-
-                <td class="action-table-data">
-                  <div class="edit-delete-action">
-                    <a class="me-2 p-2 mb-0 position-relative" data-bs-toggle="modal" data-bs-target="#view-units">
-                      <i class="feather icon-info feather-info"></i>
-                      <span class="tooltipText">View</span>
-                    </a>
-                    <a class="me-2 p-2 mb-0 position-relative" data-bs-toggle="modal" data-bs-target="#edit-units">
-                      <i class="feather icon-edit feather-edit textBlack"></i>
-                      <span class="tooltipText">Edi1t</span>
-                    </a>
-
-                    <a class="me-2 p-2 mb-0 position-relative">
-                      <i class="feather icon-edit feather-edit textBlack"></i>
-                      <span class="tooltipText">invoice donload</span>
-                    </a>
-                    <!-- @if(data?.isDataCopied) {
-                      <a class="me-2 p-2 mb-0 position-relative" data-bs-toggle="modal" data-bs-target="#copy-units">
-                        <i class="feather icon-check feather-check"></i>
-                        <span class="tooltipText">Copied!</span>
-                      </a>
-                      } @else {
-                      <a class="me-2 p-2 mb-0 position-relative" data-bs-toggle="modal" data-bs-target="#copy-units" (click)="copyData(data, idx)">
-                        <i class="feather icon-copy feather-copy"></i>
-                        <span class="tooltipText">Copy</span>
-                      </a>
-                      } -->
-                  </div>
-                </td>
-              </tr>
-              }
-            </tbody>
-          </table>
-        </div>
-      </mat-tab>
-    </mat-tab-group>
 
     <!-- /Filter -->
-
     <app-custom-pagination></app-custom-pagination>
   </div>
 </div>
 
 
 
-<ng-template #changeStatusDialogTemplate let-dialog>
+<ng-template #dialogTemplate let-dialog>
   <div class="modalHeaderContainer">
-    <h2 mat-dialog-title class="p-0"> Change Status</h2>
+    <h2 mat-dialog-title class="p-0">Edit Lead</h2>
     <div mat-dialog-close class="closeBtn">
       <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
         <span aria-hidden="true">&times;</span>
       </button>
     </div>
   </div>
-  <form #enquiryForm="ngForm">
+  <form [formGroup]="editLeadForm" (ngSubmit)="updateLeadDetails()">
+
     <mat-dialog-content class="modalContent">
       <div class="modal-body custom-modal-body">
         <div class="card">
           <div class="card-body">
             <div class="new-employee-field">
+              <div class="card-title-head">
+                <h6>
+                  <span><i class="feather icon-info feather-edit"></i></span>Update Lead
+                </h6>
+              </div>
+
+
               <div class="row">
-                <div class="col-lg-4 col-md-6">
+
+                <div class="col-lg-3 col-md-3">
                   <div class="mb-3">
-                    <label class="form-label requiredField">Customer Name</label>
-                    <!-- <p>{{ enquiryDetails.customerName || '-' }}</p> -->
-                    <input [readonly]="!isEditForm" class="form-control" type="text" id="customerName"
-                      [(ngModel)]="followupDetails.customerName" name="customerName" #customerName="ngModel" required />
-                    @if(customerName?.errors?.['required'] &&
-                    customerName?.touched) {
-                    <div class="errorMessage">Customer Name is required</div>
-                    }
+                    <label for="donorName" class="form-label">Donor Name</label>
+                      <input id="donorName" class="form-control" type="text" pInputText formControlName="donorName" maxlength="100" placeholder="Enter donor name">
                   </div>
                 </div>
-                <div class="col-lg-4 col-md-6">
+                <div class="col-lg-3 col-md-3">
                   <div class="mb-3">
-                    <label class="form-label requiredField">Dial Code</label>
-                    <!-- <p>{{ enquiryDetails.dialCode || '-' }}</p> -->
-                    <input [readonly]="!isEditForm" class="form-control" type="text" id="dialCode"
-                      [(ngModel)]="followupDetails.dialCode" name="dialCode" #dialCode="ngModel" required />
-                    @if(dialCode?.errors?.['required'] && dialCode?.touched) {
-                    <div class="errorMessage">Dial Code is required</div>
-                    }
+                    <label class="form-label">Mobile Number</label>
+                    <input class="form-control" type="number" pInputText formControlName="mobileNumber" maxlength="100" readonly>
                   </div>
                 </div>
-                <div class="col-lg-4 col-md-6">
+
+                <div class="col-lg-3 col-md-">
                   <div class="mb-3">
-                    <label class="form-label requiredField">Mobile</label>
-                    <!-- <p>{{ enquiryDetails.mobile || '-' }}</p> -->
-                    <input [readonly]="!isEditForm" class="form-control" type="text" id="mobile"
-                      [(ngModel)]="followupDetails.mobile" name="mobile" #mobile="ngModel" required />
-                    @if(mobile?.errors?.['required'] && mobile?.touched) {
-                    <div class="errorMessage">Mobile is required</div>
-                    }
+                    <label class="form-label">Email Id</label>
+                    <input class="form-control" type="text" pInputText formControlName="emailId" maxlength="100">
                   </div>
                 </div>
 
               </div>
+
               <div class="row">
-                <div class="col-lg-4 col-md-6">
-                  <div class="mb-3">
+               
+                <div class="col-lg-3 col-md-3">
+                  <div class="mb-2">
                     <label class="form-label">Status</label>
-                    <mat-select name="status" [(ngModel)]="followupDetails.status" class="select"
-                      placeholder="Select Status">
-                      @for (listData of leadStatus; track listData) {
-                      <mat-option [value]="listData.value">
-                        {{ listData.name }}
+                    <mat-select class="space-select select" formControlName="status" placeholder="Mark Lead Status"  (selectionChange)="checkStatus($event)">
+                      <mat-option *ngFor="let listData of leadStatus" [value]="listData.value">
+                        {{listData.name}}
                       </mat-option>
-                      }
                     </mat-select>
                   </div>
                 </div>
+                <div class="col-lg-3 col-md-3" *ngIf="showFollowupDateBox">
+                  <div class="mb-2">
+                    <label class="form-label">Followup Date</label>
+                    <input type="date" class="form-control" placeholder="Choose Date" formControlName="followupDate" [min]="minDate"/>
+                    <!-- <input type="text" class="datetimepicker" placeholder="Choose Date" bsDatepicker container=".date-input2" /> -->
+                  </div>
+                </div>
+              </div>
 
+              
+
+          
+
+              <div class="row">
+                <div class="col-lg-4 col-md-4">
+                  <div class="mb-3">
+                    <label class="form-label">Remarks</label>
+                    <textarea class="form-control" style=" float: left; width: 100%; margin-top: 6px; height:150px"
+                      formControlName="notes" placeholder="Write Notes.."></textarea>
+                  </div>
+                </div>
               </div>
 
 
@@ -373,11 +227,17 @@
         </div>
       </div>
     </mat-dialog-content>
-
+    <mat-dialog-actions class="dialogAction">
+      <div class="text-end mb-3">
+        <!-- <button type="submit" class="btn btn-submit" [disabled]="!editDonationForm.valid"> Update Receipt </button> -->
+        <button type="submit" class="btn btn-submit"> Update Lead </button>
+      </div>
+      <!-- <button mat-button (click)="dialog.close()">Close</button> -->
+    </mat-dialog-actions>
   </form>
-  <div class="modalFooterContainer">
-    <button type="submit" class="btn btn-submit" (click)="changeLeadStatus()">
-      Save Enquiry Details
-    </button>
-  </div>
 </ng-template>
+
+
+            
+
+

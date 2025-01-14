@@ -2,9 +2,8 @@
 <div class="header">
 
   <!-- Logo -->
-  <div class="header-left active" (mouseover)="miniSideBarMouseHover('over')" (mouseout)="miniSideBarMouseHover('out')" >
+  <!-- <div class="header-left active" (mouseover)="miniSideBarMouseHover('over')" (mouseout)="miniSideBarMouseHover('out')" >
     <a [routerLink] = "routes.adminDashboard" class="logo logo-normal">
-      <!-- <img src="{{displayLogo}}" alt=""> -->
       <img src="assets/img/avatar/rmb1.png" alt="">
     </a>
     <a [routerLink] = "routes.adminDashboard" class="logo logo-white">
@@ -16,7 +15,7 @@
     <a id="toggle_btn" href="javascript:void(0);" (click)="toggleSidebar()" [ngClass]="{'d-none': page === 'pos'}">
       <i class="feather icon-chevrons-left" class="feather icon-16"></i>
     </a>
-  </div>
+  </div> -->
   <!-- /Logo -->
 
   <a id="mobile_btn" class="mobile_btn" (click)="togglesMobileSideBar()" [ngClass]="{'d-none': page === 'pos'}">

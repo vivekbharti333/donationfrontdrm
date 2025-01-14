@@ -21,6 +21,15 @@ import { MatDialog } from '@angular/material/dialog';
 import { CategoriesManagementService } from 'src/app/core-component/categories-management/categories-management.service';
 import { Constant } from 'src/app/core/constant/constants';
 import { UserManagementService } from '../../../user-management/user-management.service';
+import { DonationDetails } from 'src/app/core-component/interface/donation-management';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+
+import Swal from 'sweetalert2';
+
+import {MatTabsModule} from '@angular/material/tabs';
+import { CookieService } from 'ngx-cookie-service';
+import { DatePipe } from '@angular/common';
+
 
 
 interface listData {
@@ -43,6 +52,10 @@ export class FollowupLeadComponent {
 
   firstDate: any = '';
   lastDate: any = '';
+  public leadList: any;
+  public leadUpdateDialog: any;
+  public minDate: any;
+  public showFollowupDateBox: boolean =false;
 
   // pagination variables
   public tableData: Array<any> = [];
@@ -54,72 +67,35 @@ export class FollowupLeadComponent {
   public serialNumberArray: Array<number> = [];
   public totalData = 0;
   showFilter = false;
-  dataSource!: MatTableDataSource<users>;
+  dataSource!: MatTableDataSource<DonationDetails>;
   public searchDataValue = '';
+  public editLeadForm!: FormGroup;
 
   isEditForm: boolean = false;
   viewChangeStatusDialog: any;
-  followupDetails = {
-    categoryType: '',
-    superCategory: '',
-    category: '',
-    subCategory: '',
-    pickUpDateTime: '',
-    pickUpLocation: '',
-    dropDateTime: '',
-    dropLocation: '',
-    totalDays: '',
-    quantity: '',
-    vendorRate: '',
-    companyRate: '',
-    bookingAmount: '',
-    balanceAmount: '',
-    totalAmount: '',
-    securityAmount: '',
-    payToVendor: '',
-    payToCompany: '',
-    deliveryToCompany: '',
-    deliveryToVendor: '',
-    customerName: '',
-    dialCode: '',
-    mobile: '',
-    alternateMobile: '',
-    emailId: '',
-    id: '',
-    companyName: '',
-    enquirySource: '',
-    pickupPoint: '',
-    dropPoint: '',
-    status: '',
-    leadOrigine: '',
-    leadType: '',
-    createdBy: '',
-    notes: '',
-  };
 
-
-
-  constructor(
-    // private data: DataService,
-    private pagination: PaginationService,
-    private router: Router,
-    private sidebar: SidebarService,
-    private messageService: MessageService,
-    private leadManagementService: LeadManagementService,
-    private helper: HelperService,
-    private dialog: MatDialog,
-    private categoriesManagementService: CategoriesManagementService,
-    private userManagementService: UserManagementService,
-  ) { }
 
   ngOnInit() {
     (async () => {
       await
         this.getFollowupList1();
-      // this.getUserListForDropDown();
+        this.getFollowupLeadList('TODAY');
+      this.createForms();
       // this.getCategoryType();
     })();
   }
+
+  constructor(
+    private pagination: PaginationService,
+    private router: Router,
+    private sidebar: SidebarService,
+    private messageService: MessageService,
+    private leadManagementService: LeadManagementService,
+    private dialog: MatDialog,
+    private fb: FormBuilder,
+  ) { }
+
+
 
   filterByDate() {
     this.leadManagementService
@@ -139,65 +115,6 @@ export class FollowupLeadComponent {
 
   onAgentSelectionChange(dd: any) {
     alert(dd)
-  }
-
-
-
-
-  setFollowupData(rawData: any) {
-    const pickup = new Date(rawData?.pickupDateTime);
-    const drop = new Date(rawData?.dropDateTime);
-    const pickupDateTime = `${this.helper.addZeroInDateTime(
-      pickup.getDate()
-    )}-${this.helper.addZeroInDateTime(
-      pickup.getMonth() + 1
-    )}-${pickup.getFullYear()} ${this.helper.addZeroInDateTime(
-      pickup.getHours()
-    )}:${pickup.getMinutes()}`;
-    const dropDateTime = `${this.helper.addZeroInDateTime(
-      drop.getDate()
-    )}-${this.helper.addZeroInDateTime(
-      drop.getMonth() + 1
-    )}-${drop.getFullYear()} ${this.helper.addZeroInDateTime(
-      drop.getHours()
-    )}:${drop.getMinutes()}`;
-    this.followupDetails = {
-      categoryType: rawData?.categoryTypeName,
-      superCategory: rawData?.superCategory,
-      category: rawData?.category,
-      subCategory: rawData?.subCategory,
-      pickUpDateTime: pickupDateTime,
-      pickUpLocation: rawData?.pickupLocation,
-      dropDateTime: dropDateTime,
-      dropLocation: rawData?.dropLocation,
-      totalDays: rawData?.totalDays,
-      quantity: rawData?.quantity,
-      vendorRate: rawData?.vendorRate,
-      companyRate: rawData?.companyRate,
-      bookingAmount: rawData?.bookingAmount,
-      balanceAmount: rawData?.balanceAmount,
-      totalAmount: rawData?.totalAmount,
-      securityAmount: rawData?.securityAmount,
-      payToVendor: rawData?.payToVendor,
-      payToCompany: rawData?.payToCompany,
-      deliveryToCompany: rawData?.deliveryAmountToCompany,
-      deliveryToVendor: rawData?.deliveryAmountToVendor,
-      customerName: rawData?.customeName,
-      dialCode: rawData?.countryDialCode,
-      mobile: rawData?.customerMobile,
-      alternateMobile: '',
-      emailId: rawData?.customerEmailId,
-      id: rawData?.id,
-      companyName: rawData?.companyName,
-      enquirySource: rawData?.enquirySource,
-      pickupPoint: rawData?.pickupPoint,
-      dropPoint: rawData?.dropPoint,
-      status: rawData?.status,
-      leadOrigine: rawData?.leadOrigine,
-      leadType: rawData?.leadType,
-      createdBy: rawData?.createdBy,
-      notes: rawData?.notes,
-    };
   }
 
 
@@ -222,56 +139,6 @@ export class FollowupLeadComponent {
     });
   }
 
-  getFollowupList2() {
-    // Function to format a Date object as YYYY-MM-DD
-    function formatDate(date: Date): string {
-      let year = date.getFullYear();
-      let month = String(date.getMonth() + 1).padStart(2, '0');
-      let day = String(date.getDate()).padStart(2, '0');
-      return `${year}-${month}-${day}`;
-    }
-    let todayDate = new Date();
-
-    let firstDate = new Date(todayDate);
-    firstDate.setDate(todayDate.getDate() - 1);
-    let firstDayString = formatDate(firstDate);
-
-    let lastDate = new Date(todayDate);
-    lastDate.setDate(todayDate.getDate());
-    let lastDayString = formatDate(lastDate);
-
-    // Call the service with the formatted dates
-    this.leadManagementService.getLeadListByDate(Constant.FOLLOWUP, firstDayString, lastDayString).subscribe((apiRes: any) => {
-      this.setTableData(apiRes); // Process the API response
-    });
-  }
-
-
-  getFollowupList3() {
-    // Function to format a Date object as YYYY-MM-DD
-    function formatDate(date: Date): string {
-      let year = date.getFullYear();
-      let month = String(date.getMonth() + 1).padStart(2, '0');
-      let day = String(date.getDate()).padStart(2, '0');
-      return `${year}-${month}-${day}`;
-    }
-    let todayDate = new Date();
-
-    let firstDate = new Date(todayDate);
-    firstDate.setDate(todayDate.getDate() - 2);
-    let firstDayString = formatDate(firstDate);
-
-    let lastDate = new Date(todayDate);
-    lastDate.setDate(todayDate.getDate() -1 );
-    let lastDayString = formatDate(lastDate);
-
-    // Call the service with the formatted dates
-    this.leadManagementService.getLeadListByDate(Constant.FOLLOWUP, firstDayString, lastDayString).subscribe((apiRes: any) => {
-      this.setTableData(apiRes); // Process the API response
-    });
-  }
-
-
 
   setTableData(apiRes: any) {
     this.tableData = [];
@@ -283,11 +150,10 @@ export class FollowupLeadComponent {
           const serialNumber = index + 1;
           if (index >= pageRes.skip && serialNumber <= this.totalData) {
             this.tableData.push(res);
-            // this.setIsDataCopied(false, index);
             this.serialNumberArray.push(serialNumber);
           }
         });
-        this.dataSource = new MatTableDataSource<users>(this.tableData);
+        this.dataSource = new MatTableDataSource<DonationDetails>(this.tableData);
         const dataSize = this.tableData.length;
         this.pagination.calculatePageSize.next({
           totalData: this.totalData,
@@ -295,10 +161,66 @@ export class FollowupLeadComponent {
           tableData: this.tableData,
           serialNumberArray: this.serialNumberArray,
         });
-        // this.pageSize = res.pageSize;
+        this.pageSize = apiRes.totalNumber;
       }
     });
   }
+
+  getFollowupLeadList(tabName:any) {
+
+     // Function to format a Date object as YYYY-MM-DD
+     function formatDate(date: Date): string {
+      let year = date.getFullYear();
+      let month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+      let day = String(date.getDate()).padStart(2, '0'); // Ensures 2-digit format
+      return `${year}-${month}-${day}`;
+    }
+    let currentDate = new Date();
+    let dateString = formatDate(currentDate); // Format the current date as YYYY-MM-DD
+
+    let nextDate = new Date(currentDate); // Clone the current date
+    nextDate.setDate(currentDate.getDate() + 1); // Add 1 day
+    let nextDayString = formatDate(nextDate); // Format the next date as YYYY-MM-DD
+
+    // Call the service with the formatted dates
+    this.leadManagementService.getLeadListByDate(Constant.FOLLOWUP, dateString, nextDayString).subscribe((apiRes: any) => {
+     
+
+
+      // this.leadManagementService.getAllLeadList(this.cookieService.get('roleType'), tabName).subscribe((apiRes: any) => {
+        this.totalData = apiRes.totalNumber;
+        this.pagination.tablePageSize.subscribe((res: tablePageSize) => {
+          if (this.router.url == this.routes.folloupLead) {
+            this.getTableData({ skip: res.skip, limit: (res.skip)+ this.pageSize },tabName, dateString, nextDayString);
+            
+            this.pageSize = res.pageSize;
+          }
+        });
+      });
+    }
+  
+     private getTableData(pageOption: pageSelection, tabName: any, dateString: any, nextDayString: any): void {
+      this.leadManagementService.getLeadListByDate(Constant.FOLLOWUP, dateString, nextDayString).subscribe((apiRes: any) => {
+          this.leadList = apiRes.listPayload;
+          this.tableData = [];
+          this.serialNumberArray = [];
+          this.totalData = apiRes.totalNumber;
+          apiRes.listPayload.map((res: DonationDetails, index: number) => {
+            const serialNumber = index + 1;
+            if (index >= pageOption.skip && serialNumber <= pageOption.limit) {
+              this.tableData.push(res);
+              this.serialNumberArray.push(serialNumber);
+            }
+          });
+          this.dataSource = new MatTableDataSource<DonationDetails>(this.tableData);
+          this.pagination.calculatePageSize.next({
+            totalData: this.totalData,
+            pageSize: this.pageSize,
+            tableData: this.tableData,
+            serialNumberArray: this.serialNumberArray,
+          });
+        });
+      }
 
   public sortData(sort: Sort) {
     const data = this.tableData.slice();
@@ -331,32 +253,107 @@ export class FollowupLeadComponent {
   async openChangeStatusModal(templateRef: TemplateRef<any>, rawData: any, isEditable: boolean) {
     this.isEditForm = isEditable;
     // await this.getDropdownOnEditModal(rawData);
-    this.setFollowupData(rawData);
+    // this.setFollowupData(rawData);
     this.viewChangeStatusDialog = this.dialog.open(templateRef, {
       width: '40%',
     });
   }
 
-  changeLeadStatus() {
-    this.viewChangeStatusDialog.close();
-    this.leadManagementService.changeLeadStatus(this.followupDetails)
-      .subscribe({
-        next: (response: any) => {
-          if (response['responseCode'] == '200') {
-            if (response['payload']['respCode'] == '200') {
-              // this.getEnquiryList();
-              this.messageService.add({
-                summary: response['payload']['respCode'],
-                detail: response['payload']['respMesg'],
-                styleClass: 'success-background-popover',
-              });
-            } else {
-              this.messageService.add({
-                summary: response['payload']['respCode'],
-                detail: response['payload']['respMesg'],
-                styleClass: 'danger-background-popover',
-              });
-            }
+  createForms() {
+    this.editLeadForm = this.fb.group({
+      id: [''],
+      donorName: ['', [Validators.required, Validators.pattern('[A-Za-z ]{3,150}')]],
+      mobileNumber: ['', [Validators.pattern('^[0-9]{10}$')]], // Assuming a 10-digit phone number   
+      emailId: ['', [Validators.required, Validators.email]],
+      programName: [''],
+      amount: ['', [Validators.required, Validators.pattern('^[0-9]+$')]],
+      currency: ['', [Validators.required]],
+      status: ['', [Validators.required]],
+      followupDate: [''],
+      notes: [''],
+    });
+  }
+
+    checkStatus(status: any){
+    this.showFollowupDateBox = false;
+    if( status.value == "FOLLOWUP"){
+      this.showFollowupDateBox = true;
+    }
+  }
+
+  getTodayDate() {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+    const day = String(today.getDate()).padStart(2, '0');
+    this.minDate = `${year}-${month}-${day}`; // Format as YYYY-MM-DD
+  }
+
+  setDateTime(date: any): string {
+    // Use today's date if the input date is null or undefined
+    const currentDate = date ? new Date(date) : new Date();
+  
+    // Adjust to local time zone
+    const timeZoneOffset = currentDate.getTimezoneOffset() * 60000; // offset in milliseconds
+    const localDate = new Date(currentDate.getTime() - timeZoneOffset);
+  
+    // Round minutes to the nearest 15-minute interval
+    const minutes = localDate.getMinutes();
+    const roundedMinutes = Math.ceil(minutes / 15) * 15;
+    localDate.setMinutes(roundedMinutes);
+    localDate.setSeconds(0);
+    localDate.setMilliseconds(0);
+  
+    // Format the date to the required input format: YYYY-MM-DD
+    const year = localDate.getFullYear();
+    const month = String(localDate.getMonth() + 1).padStart(2, '0');
+    const day = String(localDate.getDate()).padStart(2, '0');
+  
+    return `${year}-${month}-${day}`; // Returns in YYYY-MM-DD format
+  }
+
+  openEditModal(templateRef: TemplateRef<any>, rowData: any) {
+
+    this.getTodayDate();
+
+    this.editLeadForm.patchValue({
+      id: rowData['id'],
+      donorName: rowData['donorName'],
+      mobileNumber: rowData['mobileNumber'],
+      emailId: rowData['emailId'],
+      status: rowData['status'],
+      followupDate: this.setDateTime(rowData['followupDate']),
+      programName: rowData['programName'],
+      notes: rowData['notes'],
+    });
+
+    if( this.editLeadForm.value['status'] == "FOLLOWUP"){
+      this.showFollowupDateBox = true;
+    }
+
+    this.leadUpdateDialog = this.dialog.open(templateRef, {
+      width: '1400px', // Set your desired width
+      // height: '600px', // Set your desired height
+      disableClose: true, // Optional: prevent closing by clicking outside
+      panelClass: 'custom-modal', // Optional: add custom class for additional styling
+    });
+  }
+
+  updateLeadDetails() {
+    this.leadManagementService.updateLeadDetails(this.editLeadForm.value).subscribe({
+      next: (response: any) => {
+        if (response['responseCode'] == '200') {
+          if (response['payload']['respCode'] == '200') {
+            
+            this.getFollowupLeadList('TODAY');
+
+            this.leadUpdateDialog.close();
+
+            this.messageService.add({
+              summary: response['payload']['respCode'],
+              detail: response['payload']['respMesg'],
+              styleClass: 'success-background-popover',
+            });
           } else {
             this.messageService.add({
               summary: response['payload']['respCode'],
@@ -364,13 +361,41 @@ export class FollowupLeadComponent {
               styleClass: 'danger-background-popover',
             });
           }
-        },
-        error: () =>
+        } else {
           this.messageService.add({
-            summary: '500',
-            detail: 'Server Error',
-          }),
-      });
+            summary: response['payload']['respCode'],
+            detail: response['payload']['respMesg'],
+            styleClass: 'danger-background-popover',
+          });
+        }
+      },
+      error: () =>
+        this.messageService.add({
+          summary: '500',
+          detail: 'Server Error',
+        }),
+    });
+  }
+
+  getBadgeClass(status: string): string {
+    switch (status.toLowerCase()) {
+      case 'win':
+        return 'badge-linewin';
+      case 'lost':
+        return 'badge-linedanger';
+      case 'info':
+        return 'badge-lineinfo';
+      case 'followup':
+        return 'badge-linewarning';
+      // case 'win':
+      //   return 'badge-linewin';
+      // case 'assigned':
+      //   return 'badge-lineassigned';
+      case 'OTHER':
+        return 'badge-linereserved';
+      default:
+        return 'badge-default'; // Default class if no match
+    }
   }
 
 }

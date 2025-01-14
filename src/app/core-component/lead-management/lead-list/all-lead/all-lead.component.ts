@@ -59,10 +59,10 @@ export class AllLeadComponent {
 
   // pagination variables
   public tableData: Array<any> = [];
-  public categoryTypeList: Array<any> = [];
-  public superCategoryList: Array<any> = [];
-  public categoryList: Array<any> = [];
-  public subCategoryList: Array<any> = [];
+  // public categoryTypeList: Array<any> = [];
+  // public superCategoryList: Array<any> = [];
+  // public categoryList: Array<any> = [];
+  // public subCategoryList: Array<any> = [];
   public pageSize = 10;
   public serialNumberArray: Array<number> = [];
   public totalData = 0;
@@ -108,7 +108,7 @@ export class AllLeadComponent {
 
   ngOnInit() {
     this.createForms();
-    this.getAllLeadList("MONTH");
+    this.getAllLeadList("TODAY");
     this.getUserListForDropDown(); 
   }
 
@@ -143,6 +143,7 @@ export class AllLeadComponent {
       this.pagination.tablePageSize.subscribe((res: tablePageSize) => {
         if (this.router.url == this.routes.allLead) {
           this.getTableData({ skip: res.skip, limit: (res.skip)+ this.pageSize },tabName);
+          
           this.pageSize = res.pageSize;
         }
       });

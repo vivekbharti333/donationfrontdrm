@@ -4,38 +4,9 @@
       <h4>All Lead List</h4>
       <!-- <h6>Manage Your Users</h6> -->
       <p-toast></p-toast>
-      <!-- <button type="button" class="btn btn-primary btn-wave" id="liveToastBtn" pButton pRipple
-        (click)="show()" label="Show">Show live
-        toast</button>  -->
     </div>
   </div>
-  <!-- <ul class="table-top-head">
-      <li>
-        <a data-bs-toggle="tooltip" data-bs-placement="top" matTooltip="Pdf" matTooltipPosition="above"><img
-        src="assets/img/icons/pdf.svg" alt="img"></a>
-      </li>
-      <li>
-        <a data-bs-toggle="tooltip" data-bs-placement="top" matTooltip="Excel" matTooltipPosition="above"><img
-        src="assets/img/icons/excel.svg" alt="img"></a>
-      </li>
-      <li>
-        <a data-bs-toggle="tooltip" data-bs-placement="top" matTooltip="Print" matTooltipPosition="above"><i
-        class="feather icon-printer feather-rotate-ccw"></i></a>
-      </li>
-      <li>
-        <a data-bs-toggle="tooltip" data-bs-placement="top" matTooltip="Refresh" matTooltipPosition="above" (click)="getUserDetails()"><i
-        class="feather icon-rotate-ccw feather-rotate-ccw"></i></a>
-      </li>
-      <li>
-        <a (click)="toggleCollapse()" data-bs-toggle="tooltip" data-bs-placement="top" matTooltip="Collapse"
-          matTooltipPosition="above" id="collapse-header"> @if (!isCollapsed) {
-          <i class="feather icon-chevron-up feather-chevron-up"></i>
-        }
-        @if (isCollapsed) {
-          <i class="feather icon-chevron-down feather-chevron-down"></i>
-        }</a>
-      </li>
-    </ul> -->
+ 
   <div class="page-btn">
     <!-- <a [routerLink] = "routes.addusers" class="btn btn-added"><i class="feather icon-plus-circle me-2"></i>Add New User</a>  -->
   </div>
@@ -70,7 +41,7 @@
       </div>
     </div>
     <!-- /Filter -->
-    <div class="card" id="filter_inputs" [ngClass]="{ 'd-block': filter, 'd-none': !filter }">
+    <!-- <div class="card" id="filter_inputs" [ngClass]="{ 'd-block': filter, 'd-none': !filter }">
       <div class="card-body pb-0">
         <div class="row">
           <div class="col-lg-3 col-sm-6 col-12">
@@ -78,7 +49,6 @@
               <label class="form-label requiredField">Select Agent</label>
               <mat-select name="permissions" class="select" placeholder="Select Agent"
                 (selectionChange)="onAgentSelectionChange($event.value)">
-                <!-- <mat-option [value]="ALL">ALL</mat-option> -->
                 @for (dropDownUser of userForDropDown; track dropDownUser) {
                 <mat-option [value]="dropDownUser.loginId">
                   {{dropDownUser.firstName+" "+dropDownUser.lastName}}
@@ -89,7 +59,6 @@
           </div>
           <div class="col-lg-2 col-sm-3 col-12">
             <div class="input-blocks">
-
               <label class="form-label requiredField">First Date</label>
               <input type="date" class="form-control" [(ngModel)]="firstDate" name="firstDate" id="firstDate"
                 #firstDate="ngModel" (change)="setFilterDate($event, 'first')" required />
@@ -111,10 +80,156 @@
           </div>
         </div>
       </div>
-    </div>
+    </div> -->
 
-    <mat-tab-group>
-      <!-- <mat-tab>
+
+    <div class="card-body">
+      <ul class="nav nav-tabs nav-tabs-solid nav-justified mb-3">
+          <li class="nav-item"><a class="nav-link active" href="#solid-justified-tab1" data-bs-toggle="tab" (click)="getAllLeadList('TODAY')">Today's</a></li>
+          <li class="nav-item"><a class="nav-link" href="#solid-justified-tab2" data-bs-toggle="tab" (click)="getAllLeadList('YESTERDAY')">Yesterday's</a></li>
+          <li class="nav-item"><a class="nav-link" href="#solid-justified-tab3" data-bs-toggle="tab" (click)="getAllLeadList('MONTH')">Current Month</a></li>
+      </ul>
+      <div class="tab-content">
+          <div class="tab-pane show active" id="solid-justified-tab1">
+            <div class="table-responsive">
+              <table matSort (matSortChange)="sortData($event)" class="table datanew">
+                <thead>
+                  <tr>
+                    <th></th>
+                    <th mat-sort-header="userName">Name</th>
+                    <th mat-sort-header="phone">Mobile</th>
+                    <th mat-sort-header="role">Remarks</th>
+                    <th mat-sort-header="status">Status</th>
+                    <th mat-sort-header="createdOn">Created On</th>
+                   
+                    <th class="no-sort">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (data of tableData; track data; let idx=$index) {
+                  <tr>
+                    <td></td>
+                    <td>{{ data.donorName }}</td>
+                    <td>{{ data.mobileNumber }}</td>
+                    <td>{{ data.notes }}</td>
+                    
+                    <td>
+                      <button class="badge-button" [ngClass]="getBadgeClass(data.status)">
+                        {{ data.status }}
+                      </button>
+                    </td>
+                    <td>{{ data.createdAt | date : "dd-MM-yyyy | HH:mm" }}</td>
+    
+    
+                    <td class="action-table-data">
+                      <div class="edit-delete-action">
+                        <a class="me-2 p-2 mb-0" data-bs-toggle="modal" data-bs-target="#edit-units"
+                          (click)="openEditModal(dialogTemplate, data)">
+                          <i class="feather icon-edit feather-edit"></i></a>
+                      </div>
+                    </td>
+                  </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="tab-pane" id="solid-justified-tab2">
+            <div class="table-responsive">
+              <table matSort (matSortChange)="sortData($event)" class="table datanew">
+                <thead>
+                  <tr>
+                    <th></th>
+                    <th mat-sort-header="userName">Name</th>
+                    <th mat-sort-header="phone">Mobile</th>
+                    <th mat-sort-header="role">Remarks</th>
+                    <th mat-sort-header="status">Status</th>
+                    <th mat-sort-header="createdOn">Created On</th>
+                   
+                    <th class="no-sort">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (data of tableData; track data; let idx=$index) {
+                  <tr>
+                    <td></td>
+                    <td>{{ data.donorName }}</td>
+                    <td>{{ data.mobileNumber }}</td>
+                    <td>{{ data.notes }}</td>
+                    
+                    <td>
+                      <button class="badge-button" [ngClass]="getBadgeClass(data.status)">
+                        {{ data.status }}
+                      </button>
+                    </td>
+                    <td>{{ data.createdAt | date : "dd-MM-yyyy | HH:mm" }}</td>
+    
+    
+                    <td class="action-table-data">
+                      <div class="edit-delete-action">
+                        <a class="me-2 p-2 mb-0" data-bs-toggle="modal" data-bs-target="#edit-units"
+                          (click)="openEditModal(dialogTemplate, data)">
+                          <i class="feather icon-edit feather-edit"></i></a>
+                      </div>
+                    </td>
+                  </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="tab-pane" id="solid-justified-tab3">
+            <div class="table-responsive">
+              <table matSort (matSortChange)="sortData($event)" class="table datanew">
+                <thead>
+                  <tr>
+                    <th></th>
+                    <th mat-sort-header="userName">Name</th>
+                    <th mat-sort-header="phone">Mobile</th>
+                    <th mat-sort-header="role">Remarks</th>
+                    <th mat-sort-header="status">Status</th>
+                    <th mat-sort-header="createdOn">Created On</th>
+                   
+                    <th class="no-sort">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (data of tableData; track data; let idx=$index) {
+                  <tr>
+                    <td></td>
+                    <td>{{ data.donorName }}</td>
+                    <td>{{ data.mobileNumber }}</td>
+                    <td>{{ data.notes }}</td>
+                    
+                    <td>
+                      <button class="badge-button" [ngClass]="getBadgeClass(data.status)">
+                        {{ data.status }}
+                      </button>
+                    </td>
+                    <td>{{ data.createdAt | date : "dd-MM-yyyy | HH:mm" }}</td>
+    
+    
+                    <td class="action-table-data">
+                      <div class="edit-delete-action">
+                        <a class="me-2 p-2 mb-0" data-bs-toggle="modal" data-bs-target="#edit-units"
+                          (click)="openEditModal(dialogTemplate, data)">
+                          <i class="feather icon-edit feather-edit"></i></a>
+                      </div>
+                    </td>
+                  </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+      </div>
+  </div>
+
+
+
+
+    <!-- <mat-tab-group>
+      <mat-tab>
         <ng-template mat-tab-label>
           <span (click)="getAllLeadList('TODAY')" style="cursor: pointer;">Today's</span>
         </ng-template>
@@ -150,12 +265,9 @@
 
                 <td class="action-table-data">
                   <div class="edit-delete-action">
-                    <a class="me-2 p-2 mb-0 position-relative" data-bs-toggle="modal" data-bs-target="#view-units"
-                     >
-                      <i class="feather icon-info feather-info"></i>
-                      <span class="tooltipText">View</span>
-                    </a>
-                    
+                    <a class="me-2 p-2 mb-0" data-bs-toggle="modal" data-bs-target="#edit-units"
+                      (click)="openEditModal(dialogTemplate, data)">
+                      <i class="feather icon-edit feather-edit"></i></a>
                   </div>
                 </td>
               </tr>
@@ -201,12 +313,9 @@
 
                 <td class="action-table-data">
                   <div class="edit-delete-action">
-                    <a class="me-2 p-2 mb-0 position-relative" data-bs-toggle="modal" data-bs-target="#view-units"
-                     >
-                      <i class="feather icon-info feather-info"></i>
-                      <span class="tooltipText">View</span>
-                    </a>
-                    
+                    <a class="me-2 p-2 mb-0" data-bs-toggle="modal" data-bs-target="#edit-units"
+                      (click)="openEditModal(dialogTemplate, data)">
+                      <i class="feather icon-edit feather-edit"></i></a>
                   </div>
                 </td>
               </tr>
@@ -214,12 +323,12 @@
             </tbody>
           </table>
         </div>
-      </mat-tab> -->
+      </mat-tab> 
 
       <mat-tab>
-        <!-- <ng-template mat-tab-label>
+        <ng-template mat-tab-label>
           <span (click)="getAllLeadList('MONTH')" style="cursor: pointer;">Month</span> 
-        </ng-template> -->
+        </ng-template> 
         <div class="table-responsive">
           <table matSort (matSortChange)="sortData($event)" class="table datanew">
             <thead>
@@ -231,7 +340,6 @@
                 <th mat-sort-header="status">Status</th>
                 <th mat-sort-header="status">Followup Date</th>
                 <th mat-sort-header="createdOn">Created On</th>
-                <!-- <th mat-sort-header="loginId">Customer Name</th> -->
                 <th class="no-sort">Action</th>
               </tr>
             </thead>
@@ -242,7 +350,6 @@
                 <td>{{ data.donorName }}</td>
                 <td>{{ data.mobileNumber }}</td>
                 <td>{{ data.notes }}</td>
-                <!-- <td>{{ data.status }}</td> -->
                 <td>
                   <button class="badge-button" [ngClass]="getBadgeClass(data.status)">
                     {{ data.status }}
@@ -266,7 +373,7 @@
           </table>
         </div>
       </mat-tab>
-    </mat-tab-group>
+    </mat-tab-group> -->
 
     <!-- /Filter -->
 
