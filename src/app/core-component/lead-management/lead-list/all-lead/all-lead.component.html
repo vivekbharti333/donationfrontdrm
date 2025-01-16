@@ -41,13 +41,13 @@
       </div>
     </div>
     <!-- /Filter -->
-    <!-- <div class="card" id="filter_inputs" [ngClass]="{ 'd-block': filter, 'd-none': !filter }">
+     <div class="card" id="filter_inputs" [ngClass]="{ 'd-block': filter, 'd-none': !filter }">
       <div class="card-body pb-0">
         <div class="row">
           <div class="col-lg-3 col-sm-6 col-12">
             <div class="input-blocks">
               <label class="form-label requiredField">Select Agent</label>
-              <mat-select name="permissions" class="select" placeholder="Select Agent"
+              <mat-select name="user" class="select" placeholder="Select Agent"
                 (selectionChange)="onAgentSelectionChange($event.value)">
                 @for (dropDownUser of userForDropDown; track dropDownUser) {
                 <mat-option [value]="dropDownUser.loginId">
@@ -80,7 +80,7 @@
           </div>
         </div>
       </div>
-    </div> -->
+    </div>
 
 
     <div class="card-body">

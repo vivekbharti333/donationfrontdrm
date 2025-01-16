@@ -109,15 +109,15 @@ export class AllLeadComponent {
   ngOnInit() {
     this.createForms();
     this.getAllLeadList("TODAY");
-    this.getUserListForDropDown(); 
+    this.getUserListForByRoleType(); 
   }
 
   // downloadInvoice(receiptNo : string) {
   //   window.open(Constant.Site_Url+"paymentreceipt/"+receiptNo, '_blank');
   // }
 
-  public getUserListForDropDown() {
-    this.userManagementService.getUserListForDropDown().subscribe({
+  public getUserListForByRoleType() {
+    this.userManagementService.getUserListForByRoleType(Constant.donorExecutive).subscribe({
       next: (response: any) => {
         if (response['responseCode'] == '200') {
           this.userForDropDown = JSON.parse(JSON.stringify(response.listPayload));
