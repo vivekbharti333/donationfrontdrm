@@ -19,11 +19,11 @@ import { MatDialog } from '@angular/material/dialog';
 import { HelperService } from 'src/app/core/service/helper.service';
 import { CategoriesManagementService } from 'src/app/core-component/categories-management/categories-management.service';
 import { UserManagementService } from '../../../user-management/user-management.service';
-import {MatTabsModule} from '@angular/material/tabs';
+import { MatTabsModule } from '@angular/material/tabs';
 import { CookieService } from 'ngx-cookie-service';
 import { Constant } from 'src/app/core/constant/constants';
 import { DatePipe } from '@angular/common';
-import { DonationDetails } from 'src/app/core-component/interface/donation-management'; 
+import { DonationDetails } from 'src/app/core-component/interface/donation-management';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 
 
@@ -43,16 +43,16 @@ export class AllLeadComponent {
 
   public editLeadForm!: FormGroup;
   public leadUpdateDialog: any;
-  public showFollowupDateBox: boolean =false;
+  public showFollowupDateBox: boolean = false;
   public minDate: any;
-    
+
 
   public followupList: any;
-  public userForDropDown : any[]=[];
+  public userForDropDown: any[] = [];
   public pickLocationList: any[] = [];
   public dropLocationList: any[] = [];
-  filteredPickLocationList: any[] =[];
-  filteredDropLocationList: any[] =[];
+  filteredPickLocationList: any[] = [];
+  filteredDropLocationList: any[] = [];
 
   public routes = routes;
   public leadList: any;
@@ -64,7 +64,8 @@ export class AllLeadComponent {
   // public categoryList: Array<any> = [];
   // public subCategoryList: Array<any> = [];
   public pageSize = 10;
-  public serialNumberArray: Array<number> = [];
+  // public serialNumberArray: Array<number> = [];
+  public pageNumberArray: Array<number> = [];
   public totalData = 0;
   showFilter = false;
   dataSource!: MatTableDataSource<DonationDetails>;
@@ -74,7 +75,7 @@ export class AllLeadComponent {
   // viewLeadDetailsDialog: any;
   firstDate: any = '';
   lastDate: any = '';
-  
+
   isEditForm: boolean = false;
   // filteredCategoryTypeList: any[] = [];
   // filteredSuperCategoryList: any[] = [];
@@ -86,7 +87,7 @@ export class AllLeadComponent {
     categoryTypeId: '',
   }
 
-  
+
   public userList: any[] = [];
   leadOrigine: listData[] = Constant.LEAD_ORIGINE_LIST;
   leadType: listData[] = Constant.LEAD_TYPE_LIST;
@@ -104,17 +105,14 @@ export class AllLeadComponent {
     private cookieService: CookieService,
     private datePipe: DatePipe,
     private fb: FormBuilder,
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.createForms();
     this.getAllLeadList("TODAY");
-    this.getUserListForByRoleType(); 
+    this.getUserListForByRoleType();
   }
 
-  // downloadInvoice(receiptNo : string) {
-  //   window.open(Constant.Site_Url+"paymentreceipt/"+receiptNo, '_blank');
-  // }
 
   public getUserListForByRoleType() {
     this.userManagementService.getUserListForByRoleType(Constant.donorExecutive).subscribe({
@@ -131,47 +129,48 @@ export class AllLeadComponent {
     });
   }
 
-  onAgentSelectionChange(dd:any){
+  onAgentSelectionChange(dd: any) {
     // this.leadManagementService.getAllLeadList('AGENT').subscribe((apiRes: any) => {
-      // this.setTableData(apiRes);
+    // this.setTableData(apiRes);
     // });
   }
 
-  getAllLeadList(tabName:any) {
+  getAllLeadList(tabName: any) {
     this.leadManagementService.getAllLeadList(this.cookieService.get('roleType'), tabName).subscribe((apiRes: any) => {
       this.totalData = apiRes.totalNumber;
       this.pagination.tablePageSize.subscribe((res: tablePageSize) => {
         if (this.router.url == this.routes.allLead) {
-          this.getTableData({ skip: res.skip, limit: (res.skip)+ this.pageSize },tabName);
-          
+          this.getTableData({ skip: res.skip, limit: (res.skip) + this.pageSize }, tabName);
+          //  this.getTableData({ skip: res.skip, limit: this.totalData  }, tabName);
+
           this.pageSize = res.pageSize;
         }
       });
     });
   }
 
-   private getTableData(pageOption: pageSelection, tabName: any): void {
+  private getTableData(pageOption: pageSelection, tabName: any): void {
     this.leadManagementService.getAllLeadList(this.cookieService.get('roleType'), tabName).subscribe((apiRes: any) => {
-        this.leadList = apiRes.listPayload;
-        this.tableData = [];
-        this.serialNumberArray = [];
-        this.totalData = apiRes.totalNumber;
-        apiRes.listPayload.map((res: DonationDetails, index: number) => {
-          const serialNumber = index + 1;
-          if (index >= pageOption.skip && serialNumber <= pageOption.limit) {
-            this.tableData.push(res);
-            this.serialNumberArray.push(serialNumber);
-          }
-        });
-        this.dataSource = new MatTableDataSource<DonationDetails>(this.tableData);
-        this.pagination.calculatePageSize.next({
-          totalData: this.totalData,
-          pageSize: this.pageSize,
-          tableData: this.tableData,
-          serialNumberArray: this.serialNumberArray,
-        });
+      this.leadList = apiRes.listPayload;
+      this.tableData = [];
+      this.pageNumberArray = [];
+      this.totalData = apiRes.totalNumber;
+      apiRes.listPayload.map((res: DonationDetails, index: number) => {
+        const serialNumber = index + 1;
+        if (index >= pageOption.skip && serialNumber <= pageOption.limit) {
+          this.tableData.push(res);
+          this.pageNumberArray.push(serialNumber);
+        }
       });
-    }
+      this.dataSource = new MatTableDataSource<DonationDetails>(this.tableData);
+      this.pagination.calculatePageSize.next({
+        totalData: this.totalData,
+        pageSize: this.pageSize,
+        tableData: this.tableData,
+        serialNumberArray: this.pageNumberArray,
+      });
+    });
+  }
 
   public sortData(sort: Sort) {
     const data = this.tableData.slice();
@@ -208,7 +207,7 @@ export class AllLeadComponent {
   openFilter() {
     this.filter = !this.filter;
   }
- 
+
   filterByDate() {
     this.leadManagementService
       .getAllLeadListByDate(this.firstDate, this.lastDate)
@@ -227,53 +226,53 @@ export class AllLeadComponent {
 
 
 
-    
 
-   createForms() {
-      this.editLeadForm = this.fb.group({
-        id: [''],
-        donorName: ['', [Validators.required, Validators.pattern('[A-Za-z ]{3,150}')]],
-        mobileNumber: ['', [Validators.pattern('^[0-9]{10}$')]], // Assuming a 10-digit phone number   
-        emailId: ['', [Validators.required, Validators.email]],
-        programName: [''],
-        amount: ['', [Validators.required, Validators.pattern('^[0-9]+$')]],
-        currency: ['', [Validators.required]],
-        status: ['', [Validators.required]],
-        followupDate: [''],
-        notes: [''],
-      });
-    }
 
-    getTodayDate() {
-      const today = new Date();
-      const year = today.getFullYear();
-      const month = String(today.getMonth() + 1).padStart(2, '0'); // Months are 0-based
-      const day = String(today.getDate()).padStart(2, '0');
-      this.minDate = `${year}-${month}-${day}`; // Format as YYYY-MM-DD
-    }
+  createForms() {
+    this.editLeadForm = this.fb.group({
+      id: [''],
+      donorName: ['', [Validators.required, Validators.pattern('[A-Za-z ]{3,150}')]],
+      mobileNumber: ['', [Validators.pattern('^[0-9]{10}$')]], // Assuming a 10-digit phone number   
+      emailId: ['', [Validators.required, Validators.email]],
+      programName: [''],
+      amount: ['', [Validators.required, Validators.pattern('^[0-9]+$')]],
+      currency: ['', [Validators.required]],
+      status: ['', [Validators.required]],
+      followupDate: [''],
+      notes: [''],
+    });
+  }
 
-    setDateTime(date: any): string {
-      // Use today's date if the input date is null or undefined
-      const currentDate = date ? new Date(date) : new Date();
-    
-      // Adjust to local time zone
-      const timeZoneOffset = currentDate.getTimezoneOffset() * 60000; // offset in milliseconds
-      const localDate = new Date(currentDate.getTime() - timeZoneOffset);
-    
-      // Round minutes to the nearest 15-minute interval
-      const minutes = localDate.getMinutes();
-      const roundedMinutes = Math.ceil(minutes / 15) * 15;
-      localDate.setMinutes(roundedMinutes);
-      localDate.setSeconds(0);
-      localDate.setMilliseconds(0);
-    
-      // Format the date to the required input format: YYYY-MM-DD
-      const year = localDate.getFullYear();
-      const month = String(localDate.getMonth() + 1).padStart(2, '0');
-      const day = String(localDate.getDate()).padStart(2, '0');
-    
-      return `${year}-${month}-${day}`; // Returns in YYYY-MM-DD format
-    }
+  getTodayDate() {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+    const day = String(today.getDate()).padStart(2, '0');
+    this.minDate = `${year}-${month}-${day}`; // Format as YYYY-MM-DD
+  }
+
+  setDateTime(date: any): string {
+    // Use today's date if the input date is null or undefined
+    const currentDate = date ? new Date(date) : new Date();
+
+    // Adjust to local time zone
+    const timeZoneOffset = currentDate.getTimezoneOffset() * 60000; // offset in milliseconds
+    const localDate = new Date(currentDate.getTime() - timeZoneOffset);
+
+    // Round minutes to the nearest 15-minute interval
+    const minutes = localDate.getMinutes();
+    const roundedMinutes = Math.ceil(minutes / 15) * 15;
+    localDate.setMinutes(roundedMinutes);
+    localDate.setSeconds(0);
+    localDate.setMilliseconds(0);
+
+    // Format the date to the required input format: YYYY-MM-DD
+    const year = localDate.getFullYear();
+    const month = String(localDate.getMonth() + 1).padStart(2, '0');
+    const day = String(localDate.getDate()).padStart(2, '0');
+
+    return `${year}-${month}-${day}`; // Returns in YYYY-MM-DD format
+  }
 
   openEditModal(templateRef: TemplateRef<any>, rowData: any) {
 
@@ -290,7 +289,7 @@ export class AllLeadComponent {
       notes: rowData['notes'],
     });
 
-    if( this.editLeadForm.value['status'] == "FOLLOWUP"){
+    if (this.editLeadForm.value['status'] == "FOLLOWUP") {
       this.showFollowupDateBox = true;
     }
 
@@ -303,9 +302,9 @@ export class AllLeadComponent {
 
   }
 
-  checkStatus(status: any){
+  checkStatus(status: any) {
     this.showFollowupDateBox = false;
-    if( status.value == "FOLLOWUP"){
+    if (status.value == "FOLLOWUP") {
       this.showFollowupDateBox = true;
     }
   }
@@ -316,7 +315,7 @@ export class AllLeadComponent {
       next: (response: any) => {
         if (response['responseCode'] == '200') {
           if (response['payload']['respCode'] == '200') {
-            
+
             this.getAllLeadList('MONTH');
 
             this.leadUpdateDialog.close();

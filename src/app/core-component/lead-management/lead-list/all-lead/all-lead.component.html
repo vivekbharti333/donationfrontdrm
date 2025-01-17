@@ -41,7 +41,7 @@
       </div>
     </div>
     <!-- /Filter -->
-     <div class="card" id="filter_inputs" [ngClass]="{ 'd-block': filter, 'd-none': !filter }">
+     <!-- <div class="card" id="filter_inputs" [ngClass]="{ 'd-block': filter, 'd-none': !filter }">
       <div class="card-body pb-0">
         <div class="row">
           <div class="col-lg-3 col-sm-6 col-12">
@@ -80,7 +80,7 @@
           </div>
         </div>
       </div>
-    </div>
+    </div> -->
 
 
     <div class="card-body">
@@ -224,156 +224,6 @@
           </div>
       </div>
   </div>
-
-
-
-
-    <!-- <mat-tab-group>
-      <mat-tab>
-        <ng-template mat-tab-label>
-          <span (click)="getAllLeadList('TODAY')" style="cursor: pointer;">Today's</span>
-        </ng-template>
-        <div class="table-responsive">
-          <table matSort (matSortChange)="sortData($event)" class="table datanew">
-            <thead>
-              <tr>
-                <th></th>
-                <th mat-sort-header="userName">Name</th>
-                <th mat-sort-header="phone">Mobile</th>
-                <th mat-sort-header="role">Remarks</th>
-                <th mat-sort-header="status">Status</th>
-                <th mat-sort-header="createdOn">Created On</th>
-               
-                <th class="no-sort">Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (data of tableData; track data; let idx=$index) {
-              <tr>
-                <td></td>
-                <td>{{ data.donorName }}</td>
-                <td>{{ data.mobileNumber }}</td>
-                <td>{{ data.notes }}</td>
-                
-                <td>
-                  <button class="badge-button" [ngClass]="getBadgeClass(data.status)">
-                    {{ data.status }}
-                  </button>
-                </td>
-                <td>{{ data.createdAt | date : "dd-MM-yyyy | HH:mm" }}</td>
-
-
-                <td class="action-table-data">
-                  <div class="edit-delete-action">
-                    <a class="me-2 p-2 mb-0" data-bs-toggle="modal" data-bs-target="#edit-units"
-                      (click)="openEditModal(dialogTemplate, data)">
-                      <i class="feather icon-edit feather-edit"></i></a>
-                  </div>
-                </td>
-              </tr>
-              }
-            </tbody>
-          </table>
-        </div>
-      </mat-tab>
-
-      <mat-tab>
-        <ng-template mat-tab-label>
-          <span (click)="getAllLeadList('YESTERDAY')" style="cursor: pointer;">Yesterday's</span> 
-        </ng-template>
-        <div class="table-responsive">
-          <table matSort (matSortChange)="sortData($event)" class="table datanew">
-            <thead>
-              <tr>
-                <th></th>
-                <th mat-sort-header="userName">Name</th>
-                <th mat-sort-header="phone">Mobile</th>
-                <th mat-sort-header="role">Remarks</th>
-                <th mat-sort-header="status">Status</th>
-                <th mat-sort-header="createdOn">Created On</th>
-                
-                <th class="no-sort">Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (data of tableData; track data; let idx=$index) {
-              <tr>
-                <td></td>
-                <td>{{ data.donorName }}</td>
-                <td>{{ data.mobileNumber }}</td>
-                <td>{{ data.notes }}</td>
-              
-                <td>
-                  <button class="badge-button" [ngClass]="getBadgeClass(data.status)">
-                    {{ data.status }}
-                  </button>
-                </td>
-                <td>{{ data.createdAt | date : "dd-MM-yyyy | HH:mm" }}</td>
-
-
-                <td class="action-table-data">
-                  <div class="edit-delete-action">
-                    <a class="me-2 p-2 mb-0" data-bs-toggle="modal" data-bs-target="#edit-units"
-                      (click)="openEditModal(dialogTemplate, data)">
-                      <i class="feather icon-edit feather-edit"></i></a>
-                  </div>
-                </td>
-              </tr>
-              }
-            </tbody>
-          </table>
-        </div>
-      </mat-tab> 
-
-      <mat-tab>
-        <ng-template mat-tab-label>
-          <span (click)="getAllLeadList('MONTH')" style="cursor: pointer;">Month</span> 
-        </ng-template> 
-        <div class="table-responsive">
-          <table matSort (matSortChange)="sortData($event)" class="table datanew">
-            <thead>
-              <tr>
-                <th></th>
-                <th mat-sort-header="userName">Name</th>
-                <th mat-sort-header="phone">Mobile</th>
-                <th mat-sort-header="role">Remarks</th>
-                <th mat-sort-header="status">Status</th>
-                <th mat-sort-header="status">Followup Date</th>
-                <th mat-sort-header="createdOn">Created On</th>
-                <th class="no-sort">Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (data of tableData; track data; let idx=$index) {
-              <tr>
-                <td></td>
-                <td>{{ data.donorName }}</td>
-                <td>{{ data.mobileNumber }}</td>
-                <td>{{ data.notes }}</td>
-                <td>
-                  <button class="badge-button" [ngClass]="getBadgeClass(data.status)">
-                    {{ data.status }}
-                  </button>
-                </td>
-                <td>{{ data.followupDate | date : "dd-MM-yyyy" }}</td>
-                <td>{{ data.createdAt | date : "dd-MM-yyyy | HH:mm" }}</td>
-
-
-                <td class="action-table-data">
-                  <div class="edit-delete-action">
-                    <a class="me-2 p-2 mb-0" data-bs-toggle="modal" data-bs-target="#edit-units"
-                      (click)="openEditModal(dialogTemplate, data)">
-                      <i class="feather icon-edit feather-edit"></i></a>
-                  
-                  </div>
-                </td>
-              </tr>
-              }
-            </tbody>
-          </table>
-        </div>
-      </mat-tab>
-    </mat-tab-group> -->
 
     <!-- /Filter -->
 
