@@ -28,7 +28,7 @@
   <div class="col-xl-6 col-sm-12 col-12">
     <div class="card d-flex align-items-center justify-content-between default-cover mb-4">
       <div>
-        <h6>Today Earning</h6>
+        <h6>Today Donation</h6>
         <h3><span class="counters" data-count="todaysCount" [countUp]="todaysCount"
             [options]="{ duration: 10 }">{{todaysCount}}</span></h3>
         <p class="sales-range"><span class="text-success">
@@ -108,70 +108,70 @@
       </div>
     </div>
   </div>
-  </div>
+</div>
 
 
-  <div class="row">
-    <div class="col-sm-12 col-md-12 col-xl-4 d-flex">
-      <div class="card flex-fill default-cover w-100 mb-4">
-        <div class="card-header d-flex justify-content-between align-items-center">
-          <h4 class="card-title mb-0">Payment Mode</h4>
-        </div>
-  
-        <ul class="nav nav-tabs mb-3 tab-style-6">
-          <li class="nav-item">
-            <button class="nav-link active" data-bs-toggle="tab" type="button" aria-selected="true"
-              (click)="getDonationPaymentModeCountAndAmountGroupByName('TODAY')">
-              <i class="feather icon-gift me-1 align-middle d-inline-block"></i>Today</button>
-          </li>
-          <li class="nav-item">
-            <button class="nav-link" data-bs-toggle="tab" type="button" aria-selected="false"
-              (click)="getDonationPaymentModeCountAndAmountGroupByName('YESTERDAY')">
-              <i class="feather icon-file me-1 align-middle d-inline-block"></i>Yesterday</button>
-          </li>
-          <li class="nav-item">
-            <button class="nav-link" data-bs-toggle="tab" type="button" aria-selected="false"
-              (click)="getDonationPaymentModeCountAndAmountGroupByName('MONTH')">
-              <i class="feather icon-file-minus me-1 align-middle d-inline-block"></i>{{currentMonthName}}</button>
-          </li>
-        </ul>
-  
-        <div class="card-body">
-          <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
-            <table class="table table-borderless best-seller" style="table-layout: fixed;">
-              <thead>
-                <tr>
-                  <th style="width: 40%;">Mode</th>
-                  <!-- <th style="width: 30%;">Currency</th> -->
-                  <th style="width: 20%;">Count</th>
-                  <th style="width: 30%;">Amount</th>
-  
-                </tr>
-              </thead>
-              <tbody class="table-body">
-                <!-- Iterate through the PaymentModeCountAmount object -->
-                <ng-container *ngFor="let paymentMode of objectKeys(PaymentModeCountAmount)">
-                  <ng-container *ngFor="let row of PaymentModeCountAmount[paymentMode]">
-                    <tr>
-                      <!-- Display the Payment Mode (only once for each payment mode) -->
-                      <td *ngIf="row === PaymentModeCountAmount[paymentMode][0]"
-                        [attr.rowspan]="PaymentModeCountAmount[paymentMode].length">
-                        {{ paymentMode }}
-                      </td>
-                      <!-- Display Count, Amount, Currency, and Symbol -->
-                      <td>{{ row[0] }}</td>
-                      <!-- <td></td> -->
-                      <td> {{ row[3] }} {{ row[1] }} ({{ row[2] }})</td>
-                    </tr>
-                  </ng-container>
+<div class="row">
+  <div class="col-sm-12 col-md-12 col-xl-4 d-flex">
+    <div class="card flex-fill default-cover w-100 mb-4">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h4 class="card-title mb-0">Payment Mode</h4>
+      </div>
+
+      <ul class="nav nav-tabs mb-3 tab-style-6">
+        <li class="nav-item">
+          <button class="nav-link active" data-bs-toggle="tab" type="button" aria-selected="true"
+            (click)="getDonationPaymentModeCountAndAmountGroupByName('TODAY')">
+            <i class="feather icon-gift me-1 align-middle d-inline-block"></i>Today</button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-link" data-bs-toggle="tab" type="button" aria-selected="false"
+            (click)="getDonationPaymentModeCountAndAmountGroupByName('YESTERDAY')">
+            <i class="feather icon-file me-1 align-middle d-inline-block"></i>Yesterday</button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-link" data-bs-toggle="tab" type="button" aria-selected="false"
+            (click)="getDonationPaymentModeCountAndAmountGroupByName('MONTH')">
+            <i class="feather icon-file-minus me-1 align-middle d-inline-block"></i>{{currentMonthName}}</button>
+        </li>
+      </ul>
+
+      <div class="card-body">
+        <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+          <table class="table table-borderless best-seller" style="table-layout: fixed;">
+            <thead>
+              <tr>
+                <th style="width: 40%;">Mode</th>
+                <!-- <th style="width: 30%;">Currency</th> -->
+                <th style="width: 20%;">Count</th>
+                <th style="width: 30%;">Amount</th>
+
+              </tr>
+            </thead>
+            <tbody class="table-body">
+              <!-- Iterate through the PaymentModeCountAmount object -->
+              <ng-container *ngFor="let paymentMode of objectKeys(PaymentModeCountAmount)">
+                <ng-container *ngFor="let row of PaymentModeCountAmount[paymentMode]">
+                  <tr>
+                    <!-- Display the Payment Mode (only once for each payment mode) -->
+                    <td *ngIf="row === PaymentModeCountAmount[paymentMode][0]"
+                      [attr.rowspan]="PaymentModeCountAmount[paymentMode].length">
+                      {{ paymentMode }}
+                    </td>
+                    <!-- Display Count, Amount, Currency, and Symbol -->
+                    <td>{{ row[0] }}</td>
+                    <!-- <td></td> -->
+                    <td> {{ row[3] }} {{ row[1] }} ({{ row[2] }})</td>
+                  </tr>
                 </ng-container>
-              </tbody>
-            </table>
-          </div>
-  
+              </ng-container>
+            </tbody>
+          </table>
         </div>
+
       </div>
     </div>
+  </div>
 
 
   <div class="col-sm-12 col-md-12 col-xl-8 d-flex">
@@ -210,7 +210,8 @@
             <tbody class="table-body">
               <ng-container *ngFor="let key of objectKeys(FRToday)">
                 <tr *ngFor="let row of FRToday[key]; let i = index">
-                  <td *ngIf="i === 0" [attr.rowspan]="FRToday[key].length" style="text-align: left; padding-left: 0px;">
+                  <td *ngIf="i === 0" [attr.rowspan]="FRToday[key].length"
+                    style="text-align: left; padding-left: 0px; word-wrap: break-word; white-space: normal;">
                     <img *ngIf="FRToday[3]" src="data:image/png;base64,{{FRToday[3]}}" size="lg" width="30px"
                       height="30px">
                     <img *ngIf="!FRToday[3]"
@@ -218,7 +219,7 @@
                       width="30px" height="30px"> &nbsp;&nbsp;
                     {{ key }}
                   </td>
-                  <td>{{ row[1] }} | {{ row[2] }} {{ row[4] }}</td>
+                  <td style="width: 40%;">{{ row[1] }} | {{ row[2] }} {{ row[4] }}</td>
                 </tr>
               </ng-container>
             </tbody>
@@ -229,7 +230,7 @@
     </div>
   </div>
 
-  
+
 
 
 
@@ -371,73 +372,75 @@
     </div>
   </div>
 </div> -->
-<!-- Button trigger modal -->
 
-<div class="row sales-board">
-  <div class="col-md-12 col-lg-7 col-sm-12 col-12">
-    <div class="card flex-fill default-cover">
-      <div class="card-header d-flex justify-content-between align-items-center">
-        <h5 class="card-title mb-0">Sales Analytics</h5>
-        <div class="graph-sets">
-          <div class="dropdown dropdown-wraper">
-            <button class="btn btn-white btn-sm dropdown-toggle d-flex align-items-center" type="button"
-              id="dropdown-sales" data-bs-toggle="dropdown" aria-expanded="false"><i
-                class="feather icon-calendar feather-14"></i>2023</button>
-            <ul class="dropdown-menu" aria-labelledby="dropdown-sales">
-              <li>
-                <a href="javascript:void(0);" class="dropdown-item">2023</a>
-              </li>
-              <li>
-                <a href="javascript:void(0);" class="dropdown-item">2022</a>
-              </li>
-              <li>
-                <a href="javascript:void(0);" class="dropdown-item">2021</a>
-              </li>
-            </ul>
+
+  <!-- Button trigger modal -->
+
+  <!-- <div class="row sales-board"> -->
+    <!-- <div class="col-md-12 col-lg-7 col-sm-12 col-12">
+      <div class="card flex-fill default-cover">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h5 class="card-title mb-0">Sales Analytics</h5>
+          <div class="graph-sets">
+            <div class="dropdown dropdown-wraper">
+              <button class="btn btn-white btn-sm dropdown-toggle d-flex align-items-center" type="button"
+                id="dropdown-sales" data-bs-toggle="dropdown" aria-expanded="false"><i
+                  class="feather icon-calendar feather-14"></i>2023</button>
+              <ul class="dropdown-menu" aria-labelledby="dropdown-sales">
+                <li>
+                  <a href="javascript:void(0);" class="dropdown-item">2023</a>
+                </li>
+                <li>
+                  <a href="javascript:void(0);" class="dropdown-item">2022</a>
+                </li>
+                <li>
+                  <a href="javascript:void(0);" class="dropdown-item">2021</a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div id="sales-analysis" class="chart-set">
+            <apx-chart [series]="chartOptionsOne.series" [chart]="chartOptionsOne.chart" [xaxis]="chartOptionsOne.xaxis"
+              [stroke]="chartOptionsOne.stroke" [tooltip]="chartOptionsOne.tooltip"
+              [dataLabels]="chartOptionsOne.dataLabels" [fill]="chartOptionsOne.fill"
+              [colors]="chartOptionsOne.colors"></apx-chart>
           </div>
         </div>
       </div>
-      <div class="card-body">
-        <div id="sales-analysis" class="chart-set">
-          <apx-chart [series]="chartOptionsOne.series" [chart]="chartOptionsOne.chart" [xaxis]="chartOptionsOne.xaxis"
-            [stroke]="chartOptionsOne.stroke" [tooltip]="chartOptionsOne.tooltip"
-            [dataLabels]="chartOptionsOne.dataLabels" [fill]="chartOptionsOne.fill"
-            [colors]="chartOptionsOne.colors"></apx-chart>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="col-md-12 col-lg-5 col-sm-12 col-12">
-    <!-- World Map -->
-    <div class="card default-cover">
-      <div class="card-header d-flex justify-content-between align-items-center">
-        <h5 class="card-title mb-0">Sales by Countries</h5>
-        <div class="graph-sets">
-          <div class="dropdown dropdown-wraper">
-            <button class="btn btn-white btn-sm dropdown-toggle d-flex align-items-center" type="button"
-              id="dropdown-country-sales" data-bs-toggle="dropdown" aria-expanded="false">This
-              Week</button>
-            <ul class="dropdown-menu" aria-labelledby="dropdown-country-sales">
-              <li>
-                <a href="javascript:void(0);" class="dropdown-item">This Month</a>
-              </li>
-              <li>
-                <a href="javascript:void(0);" class="dropdown-item">This Year</a>
-              </li>
-            </ul>
+    </div> -->
+    <!-- <div class="col-md-12 col-lg-5 col-sm-12 col-12"> -->
+      <!-- World Map -->
+      <!-- <div class="card default-cover">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h5 class="card-title mb-0">Sales by Countries</h5>
+          <div class="graph-sets">
+            <div class="dropdown dropdown-wraper">
+              <button class="btn btn-white btn-sm dropdown-toggle d-flex align-items-center" type="button"
+                id="dropdown-country-sales" data-bs-toggle="dropdown" aria-expanded="false">This
+                Week</button>
+              <ul class="dropdown-menu" aria-labelledby="dropdown-country-sales">
+                <li>
+                  <a href="javascript:void(0);" class="dropdown-item">This Month</a>
+                </li>
+                <li>
+                  <a href="javascript:void(0);" class="dropdown-item">This Year</a>
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
-      </div>
-      <div class="card-body">
-        <div id="sales_db_world_map" style="height: 265px;">
-          <iframe src="https://www.google.com/maps/embed" style="border:0;" style="height:265px;" allowfullscreen=""
-            loading="lazy" referrerpolicy="no-referrer-when-downgrade" class="contact-map"></iframe>
+        <div class="card-body">
+          <div id="sales_db_world_map" style="height: 265px;">
+            <iframe src="https://www.google.com/maps/embed" style="border:0;" style="height:265px;" allowfullscreen=""
+              loading="lazy" referrerpolicy="no-referrer-when-downgrade" class="contact-map"></iframe>
+          </div>
+          <p class="sales-range"><span class="text-success"><i
+                class="feather icon-chevron-up feather-16"></i>48%&nbsp;</span>increase compare to last week
+          </p>
         </div>
-        <p class="sales-range"><span class="text-success"><i
-              class="feather icon-chevron-up feather-16"></i>48%&nbsp;</span>increase compare to last week
-        </p>
-      </div>
-    </div>
-    <!-- /World Map -->
-  </div>
-</div>
+      </div> -->
+      <!-- /World Map -->
+    <!-- </div>
+  </div> -->

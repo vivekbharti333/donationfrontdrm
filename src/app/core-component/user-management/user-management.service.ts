@@ -112,6 +112,19 @@ export class UserManagementService {
     return  this.http.post<any>(Constant.Site_Url+"getUserListForDropDown",request);
   }
 
+  getUserListForByRoleType(roleType: string): Observable<any> {
+    // this.loginUser = JSON.parse(this.cookieService.get('loginDetails'));
+    let request: any = {
+      payload: {
+        roleType: roleType,
+        token:  this.loginUser['token'],
+        superadminId: this.loginUser['superadminId'],
+      }
+    };
+    return  this.http.post<any>(Constant.Site_Url+"getUserDetailsByUserRole",request);
+  }
+
+
   changeUserStatus(rowData:any): Observable<any> {
     // this.loginUser = JSON.parse(this.cookieService.get('loginDetails'));
     let request: any = {

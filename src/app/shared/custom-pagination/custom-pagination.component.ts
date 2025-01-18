@@ -41,6 +41,9 @@ export class CustomPaginationComponent {
     this.pagination.changePagesize.subscribe((res: pageSize) => {
       this.changePageSize(res.pageSize);
     });
+
+    
+    // this.pageNumberArray = Array.from({ length: this.totalPages }, (_, i) => i + 1);
   }
 
    
