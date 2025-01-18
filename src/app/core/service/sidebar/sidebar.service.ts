@@ -94,8 +94,8 @@ export class SidebarService {
             {
               menuValue: 'Call Dashboard',
               route: routes.adminDashboard,
-              // permission: 'call-dashboard',
-              permission: 'dashboard',
+              permission: 'call-dashboard',
+              // permission: 'dashboard',
             },
           ],
         },
