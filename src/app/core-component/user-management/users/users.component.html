@@ -4,9 +4,6 @@
       <h4>User List</h4>
       <h6>Manage Your Users</h6>
       <p-toast></p-toast>
-      <!-- <button type="button" class="btn btn-primary btn-wave" id="liveToastBtn" pButton pRipple
-      (click)="show()" label="Show">Show live
-      toast</button>  -->
     </div>
   </div>
   <ul class="table-top-head">
@@ -144,13 +141,17 @@
             <td>
               <div class="userimgname">
                 <a href="javascript:void(0);" class="userslist-img bg-img">
-                  <img src="data:image/jpeg;base64,{{ data.userPicture }}" alt="user image"
-                    style="border-radius: 100%" /></a>
+                  <img 
+                    src="data:image/jpeg;base64,{{ data.userPicture }}" 
+                    alt="user image" 
+                    style="border-radius: 100%;" 
+                    onerror="this.onerror=null; this.src='https://www.shareicon.net/data/128x128/2016/05/24/770117_people_512x512.png';" />
+                </a>
               </div>
             </td>
             <td>{{ data.firstName }} {{ data.lastName }}</td>
             <td>{{ data.loginId }}</td>
-            <td>{{ data.lastName }}</td>
+            <td>{{ data.mobileNo }}</td>
             <td>{{ data.roleType }}</td>
             <td>{{ data.createdAt | date : "dd-MM-yyyy | HH:mm" }}</td>
             <td>
