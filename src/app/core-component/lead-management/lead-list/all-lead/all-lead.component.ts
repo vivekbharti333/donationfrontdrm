@@ -135,40 +135,84 @@ export class AllLeadComponent {
     // });
   }
 
-  getAllLeadList(tabName: any) {
-    this.leadManagementService.getAllLeadList(this.cookieService.get('roleType'), tabName).subscribe((apiRes: any) => {
-      this.totalData = apiRes.totalNumber;
-      this.pagination.tablePageSize.subscribe((res: tablePageSize) => {
-        if (this.router.url == this.routes.allLead) {
-          this.getTableData({ skip: res.skip, limit: (res.skip) + this.pageSize }, tabName);
-          //  this.getTableData({ skip: res.skip, limit: this.totalData  }, tabName);
+  // getAllLeadList(tabName: any) {
+  //   this.leadManagementService.getAllLeadList(this.cookieService.get('roleType'), tabName).subscribe((apiRes: any) => {
+  //     this.totalData = apiRes.totalNumber;
+  //     this.pagination.tablePageSize.subscribe((res: tablePageSize) => {
+  //       if (this.router.url == this.routes.allLead) {
+  //         this.getTableData({ skip: res.skip, limit: (res.skip) + this.pageSize }, tabName);
+  //         this.pageSize = res.pageSize;
+  //       }
+  //     });
+  //   });
+  // }
 
+  // private getTableData(pageOption: pageSelection, tabName: any): void {
+  //   this.leadManagementService.getAllLeadList(this.cookieService.get('roleType'), tabName).subscribe((apiRes: any) => {
+  //     this.leadList = apiRes.listPayload;
+  //     this.tableData = [];
+  //     this.pageNumberArray = [];
+  //     this.totalData = apiRes.totalNumber;
+  //     apiRes.listPayload.map((res: DonationDetails, index: number) => {
+  //       const serialNumber = index + 1;
+  //       if (index >= pageOption.skip && serialNumber <= pageOption.limit) {
+  //         this.tableData.push(res);
+  //         this.pageNumberArray.push(serialNumber);
+  //       }
+  //     });
+  //     this.dataSource = new MatTableDataSource<DonationDetails>(this.tableData);
+  //     this.pagination.calculatePageSize.next({
+  //       totalData: this.totalData,
+  //       pageSize: this.pageSize,
+  //       tableData: this.tableData,
+  //       serialNumberArray: this.pageNumberArray,
+  //     });
+  //   });
+  // }
+
+  getAllLeadList(tabName: any) {
+    // Fetch roleType once to avoid multiple cookie accesses
+    const roleType = this.cookieService.get('roleType');
+  
+    // Single API call to fetch all lead list
+    this.leadManagementService.getAllLeadList(roleType, tabName).subscribe((apiRes: any) => {
+      this.totalData = apiRes.totalNumber;
+  
+      // Calculate pagination only after receiving the API response
+      this.pagination.tablePageSize.subscribe((res: tablePageSize) => {
+        // Ensure this logic runs only when the route matches
+        if (this.router.url === this.routes.allLead) {
           this.pageSize = res.pageSize;
+  
+          // Use the received data for table and pagination calculations
+          this.updateTableData(apiRes, { skip: res.skip, limit: res.skip + this.pageSize });
         }
       });
     });
   }
-
-  private getTableData(pageOption: pageSelection, tabName: any): void {
-    this.leadManagementService.getAllLeadList(this.cookieService.get('roleType'), tabName).subscribe((apiRes: any) => {
-      this.leadList = apiRes.listPayload;
-      this.tableData = [];
-      this.pageNumberArray = [];
-      this.totalData = apiRes.totalNumber;
-      apiRes.listPayload.map((res: DonationDetails, index: number) => {
-        const serialNumber = index + 1;
-        if (index >= pageOption.skip && serialNumber <= pageOption.limit) {
-          this.tableData.push(res);
-          this.pageNumberArray.push(serialNumber);
-        }
-      });
-      this.dataSource = new MatTableDataSource<DonationDetails>(this.tableData);
-      this.pagination.calculatePageSize.next({
-        totalData: this.totalData,
-        pageSize: this.pageSize,
-        tableData: this.tableData,
-        serialNumberArray: this.pageNumberArray,
-      });
+  
+  private updateTableData(apiRes: any, pageOption: pageSelection): void {
+    // Initialize table data and pagination arrays
+    this.leadList = apiRes.listPayload;
+    this.tableData = [];
+    this.pageNumberArray = [];
+  
+    // Paginate the data locally without making another API call
+    apiRes.listPayload.forEach((res: DonationDetails, index: number) => {
+      const serialNumber = index + 1;
+      if (index >= pageOption.skip && serialNumber <= pageOption.limit) {
+        this.tableData.push(res);
+        this.pageNumberArray.push(serialNumber);
+      }
+    });
+  
+    // Update the data source and pagination
+    this.dataSource = new MatTableDataSource<DonationDetails>(this.tableData);
+    this.pagination.calculatePageSize.next({
+      totalData: this.totalData,
+      pageSize: this.pageSize,
+      tableData: this.tableData,
+      serialNumberArray: this.pageNumberArray,
     });
   }
 

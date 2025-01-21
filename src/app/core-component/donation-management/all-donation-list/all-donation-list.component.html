@@ -82,19 +82,21 @@
           <div class="col-lg-3 col-sm-6 col-12">
             <div class="input-blocks">
               <i class="feather icon-user info-img"></i>
-              <mat-select class="space-select select" placeholder="Choose User" (selectionChange)="getDonationListByUser($event)">
+              <mat-select class="space-select select" placeholder="Choose User"
+                (selectionChange)="getDonationListByUser($event)">
                 <!-- <mat-option value="Choose Name">Choose Name</mat-option> -->
                 <mat-option *ngFor="let user of userList" [value]="user.loginId">
                   {{user.firstName}} {{user.lastName}}
                 </mat-option>
               </mat-select>
-                 
+
             </div>
           </div>
           <div class="col-lg-3 col-sm-6 col-12">
             <div class="input-blocks">
               <i class="feather icon-stop-circle info-img"></i>
-              <mat-select class="space-select select"  placeholder="Choose Teamleader" (selectionChange)="getDonationListByUser($event)">
+              <mat-select class="space-select select" placeholder="Choose Teamleader"
+                (selectionChange)="getDonationListByUser($event)">
                 <mat-option *ngFor="let teamLeader of teamLeaderList" [value]="teamLeader.loginId">
                   {{teamLeader.firstName}} {{teamLeader.lastName}}
                 </mat-option>
@@ -119,7 +121,7 @@
 
 
 
-    <mat-tab-group>
+    <!-- <mat-tab-group>
       <mat-tab>
         
         <ng-template mat-tab-label>
@@ -135,9 +137,7 @@
                 <th mat-sort-header="role">Payment Mode</th>
                 <th mat-sort-header="createdOn">Received By</th>
                 <th mat-sort-header="invoiceFor">Invoice For</th>
-                <!-- <th mat-sort-header="program">Program</th>
-                <th mat-sort-header="date&Time">Date & Time</th>
-                <th mat-sort-header="invoiceNumber">Invoice Number</th>-->
+
                 <th mat-sort-header="invoiceDownload">Invoice Download</th> 
                 <th class="no-sort">Action</th>
               </tr>
@@ -151,9 +151,7 @@
                 <td>{{ data.paymentMode }}</td>
                 <td>{{ data.createdbyName }}</td>
                 <td>{{ data.invoiceHeaderName }}</td>
-                <!-- <td>{{ data.programName }}</td>
-                <td>{{ data.createdAt | date : "dd-MM-yyyy | HH:mm" }}</td>
-                <td>{{ data.invoiceNumber}}</td> -->
+
                 <td>
                 
                   <button class="badge-button"
@@ -249,7 +247,7 @@
                 <th mat-sort-header="invoiceFor">Invoice For</th>
                 <th mat-sort-header="program">Program</th>
                 <th mat-sort-header="date&Time">Date & Time</th>
-                <!-- <th mat-sort-header="invoiceNumber">Invoice Number</th> -->
+ 
                 <th mat-sort-header="invoiceDownload">Invoice Download</th>
                 <th class="no-sort">Action</th>
               </tr>
@@ -265,7 +263,7 @@
                 <td>{{ data.invoiceHeaderName }}</td>
                 <td>{{ data.programName }}</td>
                 <td>{{ data.createdAt | date : "dd-MM-yyyy | HH:mm" }}</td>
-                <!-- <td>{{ data.invoiceNumber}}</td> -->
+
                 <td>
                  
                   <button class="badge-button"
@@ -289,12 +287,190 @@
           </table>
         </div>
       </mat-tab>
-    </mat-tab-group>
+    </mat-tab-group> -->
+
+
+
+
+    <div class="card-body">
+      <ul class="nav nav-tabs nav-tabs-solid nav-justified mb-3">
+        <li class="nav-item"><a class="nav-link active" href="#solid-justified-tab1" data-bs-toggle="tab"
+            (click)="getDonationList('TODAY')">Today's</a></li>
+        <li class="nav-item"><a class="nav-link" href="#solid-justified-tab2" data-bs-toggle="tab"
+            (click)="getDonationList('YESTERDAY')">Yesterday's</a></li>
+        <li class="nav-item"><a class="nav-link" href="#solid-justified-tab3" data-bs-toggle="tab"
+            (click)="getDonationList('MONTH')">Current Month</a></li>
+      </ul>
+      <div class="tab-content">
+        <div class="tab-pane show active" id="solid-justified-tab1">
+          <div class="table-responsive">
+            <table matSort (matSortChange)="sortData($event)" class="table datanew">
+              <thead>
+                <tr>
+                  <th mat-sort-header="userName">Name</th>
+                  <th mat-sort-header="loginId">Mobile</th>
+                  <th mat-sort-header="phone">Amount (currency)</th>
+                  <th mat-sort-header="role">Payment Mode</th>
+                  <th mat-sort-header="createdOn">Received By</th>
+                  <th mat-sort-header="invoiceFor">Invoice For</th>
+                  <th mat-sort-header="program">Program</th>
+                  <th mat-sort-header="date&Time">Date & Time</th>
+                  <!-- <th mat-sort-header="invoiceNumber">Invoice Number</th> -->
+                  <th mat-sort-header="invoiceDownload">Invoice Download</th>
+                  <th class="no-sort">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (data of tableData; track data) {
+                <tr>
+                  <td>{{ data.donorName }} </td>
+                  <td>{{ data.mobileNumber }}</td>
+                  <td>{{ data.amount }} {{ data.currencyCode }}</td>
+                  <td>{{ data.paymentMode }}</td>
+                  <td>{{ data.createdbyName }}</td>
+                  <td>{{ data.invoiceHeaderName }}</td>
+                  <td>{{ data.programName }}</td>
+                  <td>{{ data.createdAt | date : "dd-MM-yyyy | HH:mm" }}</td>
+                  <!-- <td>{{ data.invoiceNumber}}</td> -->
+                  <td>
+
+                    <button class="badge-button"
+                      [ngClass]="{'badge-linesuccess': data.invoiceDownloadStatus === 'NO','badge-linedanger': data.invoiceDownloadStatus === 'YES'}">
+                      {{ data.invoiceDownloadStatus }}
+                    </button>
+                  </td>
+                  <td class="action-table-data">
+                    <div class="edit-delete-action">
+                      <a class="me-2 p-2 mb-0" href="javascript:void(0);"><i class="feather icon-eye action-eye"></i>
+                      </a>
+                      <a class="me-2 p-2 mb-0" data-bs-toggle="modal" data-bs-target="#edit-units"
+                        (click)="openEditModal(dialogTemplate, data)">
+                        <i class="feather icon-edit feather-edit"></i></a>
+
+                    </div>
+                  </td>
+                </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="tab-pane" id="solid-justified-tab2">
+          <div class="table-responsive">
+            <table matSort (matSortChange)="sortData($event)" class="table datanew">
+              <thead>
+                <tr>
+                  <th mat-sort-header="userName">Name</th>
+                  <th mat-sort-header="loginId">Mobile</th>
+                  <th mat-sort-header="phone">Amount (currency)</th>
+                  <th mat-sort-header="role">Payment Mode</th>
+                  <th mat-sort-header="createdOn">Received By</th>
+                  <th mat-sort-header="invoiceFor">Invoice For</th>
+                  <th mat-sort-header="program">Program</th>
+                  <th mat-sort-header="date&Time">Date & Time</th>
+                  <!-- <th mat-sort-header="invoiceNumber">Invoice Number</th> -->
+                  <th mat-sort-header="invoiceDownload">Invoice Download</th>
+                  <th class="no-sort">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (data of tableData; track data) {
+                <tr>
+                  <td>{{ data.donorName }} </td>
+                  <td>{{ data.mobileNumber }}</td>
+                  <td>{{ data.amount }} {{ data.currencyCode }}</td>
+                  <td>{{ data.paymentMode }}</td>
+                  <td>{{ data.createdbyName }}</td>
+                  <td>{{ data.invoiceHeaderName }}</td>
+                  <td>{{ data.programName }}</td>
+                  <td>{{ data.createdAt | date : "dd-MM-yyyy | HH:mm" }}</td>
+                  <!-- <td>{{ data.invoiceNumber}}</td> -->
+                  <td>
+
+                    <button class="badge-button"
+                      [ngClass]="{'badge-linesuccess': data.invoiceDownloadStatus === 'NO','badge-linedanger': data.invoiceDownloadStatus === 'YES'}">
+                      {{ data.invoiceDownloadStatus }}
+                    </button>
+                  </td>
+                  <td class="action-table-data">
+                    <div class="edit-delete-action">
+                      <a class="me-2 p-2 mb-0" href="javascript:void(0);"><i class="feather icon-eye action-eye"></i>
+                      </a>
+                      <a class="me-2 p-2 mb-0" data-bs-toggle="modal" data-bs-target="#edit-units"
+                        (click)="openEditModal(dialogTemplate, data)">
+                        <i class="feather icon-edit feather-edit"></i></a>
+
+                    </div>
+                  </td>
+                </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="tab-pane" id="solid-justified-tab3">
+          <div class="table-responsive">
+            <table matSort (matSortChange)="sortData($event)" class="table datanew">
+              <thead>
+                <tr>
+                  <th mat-sort-header="userName">Name</th>
+                  <th mat-sort-header="loginId">Mobile</th>
+                  <th mat-sort-header="phone">Amount (currency)</th>
+                  <th mat-sort-header="role">Payment Mode</th>
+                  <th mat-sort-header="createdOn">Received By</th>
+                  <th mat-sort-header="invoiceFor">Invoice For</th>
+                  <th mat-sort-header="program">Program</th>
+                  <th mat-sort-header="date&Time">Date & Time</th>
+                  <!-- <th mat-sort-header="invoiceNumber">Invoice Number</th> -->
+                  <th mat-sort-header="invoiceDownload">Invoice Download</th>
+                  <th class="no-sort">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (data of tableData; track data) {
+                <tr>
+                  <td>{{ data.donorName }} </td>
+                  <td>{{ data.mobileNumber }}</td>
+                  <td>{{ data.amount }} {{ data.currencyCode }}</td>
+                  <td>{{ data.paymentMode }}</td>
+                  <td>{{ data.createdbyName }}</td>
+                  <td>{{ data.invoiceHeaderName }}</td>
+                  <td>{{ data.programName }}</td>
+                  <td>{{ data.createdAt | date : "dd-MM-yyyy | HH:mm" }}</td>
+                  <!-- <td>{{ data.invoiceNumber}}</td> -->
+                  <td>
+
+                    <button class="badge-button"
+                      [ngClass]="{'badge-linesuccess': data.invoiceDownloadStatus === 'NO','badge-linedanger': data.invoiceDownloadStatus === 'YES'}">
+                      {{ data.invoiceDownloadStatus }}
+                    </button>
+                  </td>
+                  <td class="action-table-data">
+                    <div class="edit-delete-action">
+                      <a class="me-2 p-2 mb-0" href="javascript:void(0);"><i class="feather icon-eye action-eye"></i>
+                      </a>
+                      <a class="me-2 p-2 mb-0" data-bs-toggle="modal" data-bs-target="#edit-units"
+                        (click)="openEditModal(dialogTemplate, data)">
+                        <i class="feather icon-edit feather-edit"></i></a>
+
+                    </div>
+                  </td>
+                </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
 
 
     <!-- /Filter -->
-
     <app-custom-pagination></app-custom-pagination>
+
+
   </div>
 </div>
 
@@ -327,7 +503,8 @@
                 <div class="col-lg-4 col-md-4">
                   <div class="mb-3">
                     <label for="receiptType" class="form-label">Receipt</label>
-                    <input id="donorName" class="form-control" type="text" pInputText formControlName="invoiceHeaderName" readonly>
+                    <input id="donorName" class="form-control" type="text" pInputText
+                      formControlName="invoiceHeaderName" readonly>
                     <!-- <mat-select class="space-select select" formControlName="invoiceHeaderName"  placeholder="Select Receipt Type">
                       <mat-option *ngFor="let invoiceType of invoiceTypeList" [value]="invoiceType.companyFirstName + ' ' + invoiceType.companyLastName">
                         {{ invoiceType.companyFirstName + ' ' + invoiceType.companyLastName }}
@@ -340,13 +517,15 @@
                   <div class="mb-3">
                     <label for="donorName" class="form-label">Donor Name</label>
                     <ng-container *ngIf="isSuperadmin; else readonlyDonorName">
-                      <input id="donorName" class="form-control" type="text" pInputText formControlName="donorName" maxlength="100" placeholder="Enter donor name" />
+                      <input id="donorName" class="form-control" type="text" pInputText formControlName="donorName"
+                        maxlength="100" placeholder="Enter donor name" />
                     </ng-container>
                     <ng-template #readonlyDonorName>
-                      <input id="donorName" class="form-control" type="text" pInputText formControlName="donorName" maxlength="100" placeholder="Enter donor name" readonly>
+                      <input id="donorName" class="form-control" type="text" pInputText formControlName="donorName"
+                        maxlength="100" placeholder="Enter donor name" readonly>
                     </ng-template>
 
-                    
+
                   </div>
                 </div>
                 <div class="col-lg-4 col-md-4">
@@ -383,19 +562,22 @@
                   <div class="mb-3">
                     <label class="form-label">Program</label>
                     <ng-container *ngIf="isSuperadmin; else readonlyProgramName">
-                    <mat-select class="space-select select" formControlName="programName" (change)="onProgramSelect($event)" placeholder="Select Program">
-                      <mat-option *ngFor="let donationOpt of donationTypeList" [value]="donationOpt.programName">
-                        {{donationOpt.programName}}
-                      </mat-option>
-                    </mat-select>
-                  </ng-container>
-                  <ng-template #readonlyProgramName>
-                    <mat-select class="space-select select" formControlName="programName" (change)="onProgramSelect($event)" placeholder="Select Program">
-                      <mat-option *ngFor="let donationOpt of donationTypeList" [value]="donationOpt.programName" [disabled]="true">
-                        {{donationOpt.programName}}
-                      </mat-option>
-                    </mat-select>
-                  </ng-template>
+                      <mat-select class="space-select select" formControlName="programName"
+                        (change)="onProgramSelect($event)" placeholder="Select Program">
+                        <mat-option *ngFor="let donationOpt of donationTypeList" [value]="donationOpt.programName">
+                          {{donationOpt.programName}}
+                        </mat-option>
+                      </mat-select>
+                    </ng-container>
+                    <ng-template #readonlyProgramName>
+                      <mat-select class="space-select select" formControlName="programName"
+                        (change)="onProgramSelect($event)" placeholder="Select Program">
+                        <mat-option *ngFor="let donationOpt of donationTypeList" [value]="donationOpt.programName"
+                          [disabled]="true">
+                          {{donationOpt.programName}}
+                        </mat-option>
+                      </mat-select>
+                    </ng-template>
                   </div>
                 </div>
                 <!-- <div class="col-lg-4 col-md-4" *ngIf="!showCurrencyBox">
@@ -416,11 +598,12 @@
                   <div class="mb-2">
                     <label class="form-label">Amount</label>
                     <ng-container *ngIf="isSuperadmin; else readonlyInput">
-                      <input class="form-control" type="number" pInputText pKeyFilter="int" formControlName="amount" maxlength="100">
+                      <input class="form-control" type="number" pInputText pKeyFilter="int" formControlName="amount"
+                        maxlength="100">
                     </ng-container>
                     <ng-template #readonlyInput>
-                      <input class="form-control" type="number" pInputText pKeyFilter="int" formControlName="amount" maxlength="100"
-                        readonly>
+                      <input class="form-control" type="number" pInputText pKeyFilter="int" formControlName="amount"
+                        maxlength="100" readonly>
                     </ng-template>
                   </div>
                 </div>
@@ -428,24 +611,25 @@
                   <div class="mb-2">
                     <label class="form-label">Currency</label>
                     <ng-container *ngIf="isSuperadmin; else readonlyCurrency">
-                      <mat-select class="space-select select" formControlName="currencyCode" (change)="setCurrency($event)"
-                        placeholder="Select currency">
+                      <mat-select class="space-select select" formControlName="currencyCode"
+                        (change)="setCurrency($event)" placeholder="Select currency">
                         <mat-option *ngFor="let currency of currencyList" [value]="currency.currencyCode">
                           {{currency.currencyCode + " " + currency.unicode}}
                         </mat-option>
                       </mat-select>
                     </ng-container>
                     <ng-template #readonlyCurrency>
-                      <mat-select class="space-select select" formControlName="currencyCode" 
+                      <mat-select class="space-select select" formControlName="currencyCode"
                         placeholder="Select currency" [disabled]="true">
-                        <mat-option *ngFor="let currency of currencyList" [value]="currency.currencyCode" [disabled]="true">
+                        <mat-option *ngFor="let currency of currencyList" [value]="currency.currencyCode"
+                          [disabled]="true">
                           {{currency.currencyCode + " " + currency.unicode}}
                         </mat-option>
                       </mat-select>
                     </ng-template>
                   </div>
                 </div>
-                
+
                 <div class="col-lg-4 col-md-4">
                   <div class="mb-3">
                     <label class="form-label">Transaction Id</label>
@@ -459,20 +643,21 @@
                   <div class="mb-3">
                     <label class="form-label">Payment Mode</label>
                     <ng-container *ngIf="isSuperadmin; else readonlyPaymentMode">
-                    <mat-select class="space-select select" formControlName="paymentMode"  placeholder="Payment Mode">
-                      <mat-option *ngFor="let payModOpt of paymentModeList" [value]="payModOpt.paymentMode">
-                        {{payModOpt.paymentMode}}
-                      </mat-option>
-                    </mat-select>
-                  </ng-container>
+                      <mat-select class="space-select select" formControlName="paymentMode" placeholder="Payment Mode">
+                        <mat-option *ngFor="let payModOpt of paymentModeList" [value]="payModOpt.paymentMode">
+                          {{payModOpt.paymentMode}}
+                        </mat-option>
+                      </mat-select>
+                    </ng-container>
                     <ng-template #readonlyPaymentMode>
-                    <mat-select class="space-select select" formControlName="paymentMode"  placeholder="Payment Mode">
-                      <mat-option *ngFor="let payModOpt of paymentModeList" [value]="payModOpt.paymentMode" [disabled]="true">
-                        {{payModOpt.paymentMode}}
-                      </mat-option>
-                    </mat-select>
+                      <mat-select class="space-select select" formControlName="paymentMode" placeholder="Payment Mode">
+                        <mat-option *ngFor="let payModOpt of paymentModeList" [value]="payModOpt.paymentMode"
+                          [disabled]="true">
+                          {{payModOpt.paymentMode}}
+                        </mat-option>
+                      </mat-select>
                     </ng-template>
-                  
+
                   </div>
                 </div>
                 <div class="col-lg-4 col-md-4" *ngIf="isSuperadmin">
@@ -484,8 +669,10 @@
                         {{fundRisingOffcer.firstName}} {{fundRisingOffcer.lastName}}
                       </option>
                     </select> -->
-                    <mat-select class="space-select select" formControlName="createdBy"  placeholder="Select Fundrising Officer">
-                      <mat-option *ngFor="let fundRisingOffcer of fundRisingOffcerList" [value]="fundRisingOffcer.loginId">
+                    <mat-select class="space-select select" formControlName="createdBy"
+                      placeholder="Select Fundrising Officer">
+                      <mat-option *ngFor="let fundRisingOffcer of fundRisingOffcerList"
+                        [value]="fundRisingOffcer.loginId">
                         {{fundRisingOffcer.firstName}} {{fundRisingOffcer.lastName}}
                       </mat-option>
                     </mat-select>

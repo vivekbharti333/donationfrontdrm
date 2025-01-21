@@ -44,7 +44,7 @@ interface data {
 })
 export class AllDonationListComponent {
 
-  donationList: DonationListForExcel[] =[]; // Use the defined interface
+  donationList: DonationListForExcel[] = []; // Use the defined interface
   datePipe = new DatePipe('en-US'); // Inject the DatePipe
 
 
@@ -80,6 +80,12 @@ export class AllDonationListComponent {
   activeTab: string = 'TODAY';
   firstDate: any;
   lastDate: any
+
+  POSTS: any;
+  page: number = 1;
+  count: number = 0;
+  tableSize: number = 10;
+  tableSizes: any = [3, 6, 9, 12];
 
 
   // pagination variables
@@ -131,7 +137,7 @@ export class AllDonationListComponent {
     this.editDonationForm = this.fb.group({
       id: [''],
       invoiceHeaderDetailsId: [''],
-      invoiceHeaderName:[''],
+      invoiceHeaderName: [''],
       createdBy: [''],
       donorName: ['', [Validators.required, Validators.pattern("[0-9A-Za-z ]{3,150}")]],
       mobileNumber: ['', Validators.pattern('^[0-9]*$')],
@@ -194,39 +200,81 @@ export class AllDonationListComponent {
     // Add your logic here
   }
 
-  public getDonationList(tabName: string) {
+  // public getDonationList(tabName: string) {
+  //   this.tabName = tabName;
+  //   this.donationManagementService.getDonationList(tabName).subscribe((apiRes: any) => {
+  //     this.totalData = apiRes.totalNumber;
+  //     this.pagination.tablePageSize.subscribe((res: tablePageSize) => {
+  //       if (this.router.url == this.routes.allDonationList) {
+  //         this.getTableData({ skip: res.skip, limit: (res.skip)+ this.pageSize }, tabName);
+  //         this.pageSize = res.pageSize;
+  //       }
+  //     });
+  //   });
+  // }
+
+  // private getTableData(pageOption: pageSelection, tabName: any): void {
+  //   this.donationManagementService.getDonationList(tabName).subscribe((apiRes: any) => {
+  //     this.donationList = apiRes.listPayload;
+  //     this.tableData = [];
+  //     this.serialNumberArray = [];
+  //     this.totalData = apiRes.totalNumber;
+  //     apiRes.listPayload.map((res: DonationDetails, index: number) => {
+  //       const serialNumber = index + 1;
+  //       if (index >= pageOption.skip && serialNumber <= pageOption.limit) {
+  //         this.tableData.push(res);
+  //         this.serialNumberArray.push(serialNumber);
+  //       }
+  //     });
+  //     this.dataSource = new MatTableDataSource<DonationDetails>(this.tableData);
+  //     this.pagination.calculatePageSize.next({
+  //       totalData: this.totalData,
+  //       pageSize: this.pageSize,
+  //       tableData: this.tableData,
+  //       serialNumberArray: this.serialNumberArray,
+  //     });
+  //   });
+  // }
+
+  public getDonationList(tabName: string): void {
     this.tabName = tabName;
+
+    // Fetch donation list only once
     this.donationManagementService.getDonationList(tabName).subscribe((apiRes: any) => {
       this.totalData = apiRes.totalNumber;
+
+      // Process table data once the API response is received
       this.pagination.tablePageSize.subscribe((res: tablePageSize) => {
-        if (this.router.url == this.routes.allDonationList) {
-          this.getTableData({ skip: res.skip, limit: (res.skip)+ this.pageSize }, tabName);
+        if (this.router.url === this.routes.allDonationList) {
           this.pageSize = res.pageSize;
+          this.prepareTableData(apiRes, { skip: res.skip, limit: res.skip + res.pageSize });
         }
       });
     });
   }
 
-  private getTableData(pageOption: pageSelection, tabName: any): void {
-    this.donationManagementService.getDonationList(tabName).subscribe((apiRes: any) => {
-      this.donationList = apiRes.listPayload;
-      this.tableData = [];
-      this.serialNumberArray = [];
-      this.totalData = apiRes.totalNumber;
-      apiRes.listPayload.map((res: DonationDetails, index: number) => {
-        const serialNumber = index + 1;
-        if (index >= pageOption.skip && serialNumber <= pageOption.limit) {
-          this.tableData.push(res);
-          this.serialNumberArray.push(serialNumber);
-        }
-      });
-      this.dataSource = new MatTableDataSource<DonationDetails>(this.tableData);
-      this.pagination.calculatePageSize.next({
-        totalData: this.totalData,
-        pageSize: this.pageSize,
-        tableData: this.tableData,
-        serialNumberArray: this.serialNumberArray,
-      });
+  private prepareTableData(apiRes: any, pageOption: pageSelection): void {
+    this.tableData = [];
+    this.serialNumberArray = [];
+
+    // Process the list payload for pagination
+    apiRes.listPayload.forEach((res: DonationDetails, index: number) => {
+      const serialNumber = index + 1;
+      if (index >= pageOption.skip && serialNumber <= pageOption.limit) {
+        this.tableData.push(res);
+        this.serialNumberArray.push(serialNumber);
+      }
+    });
+
+    // Update the MatTableDataSource
+    this.dataSource = new MatTableDataSource<DonationDetails>(this.tableData);
+
+    // Emit updated pagination data
+    this.pagination.calculatePageSize.next({
+      totalData: this.totalData,
+      pageSize: this.pageSize,
+      tableData: this.tableData,
+      serialNumberArray: this.serialNumberArray,
     });
   }
 
@@ -278,7 +326,7 @@ export class AllDonationListComponent {
       notes: rowData['notes'],
     });
 
-   
+
     this.donationUpdateDialog = this.dialog.open(templateRef, {
       width: '1400px', // Set your desired width
       // height: '600px', // Set your desired height
@@ -294,9 +342,8 @@ export class AllDonationListComponent {
         next: (response: any) => {
           if (response['responseCode'] == '200') {
             this.invoiceTypeList = JSON.parse(JSON.stringify(response['listPayload']));
-            // this.toastr.success(response['responseMessage'], response['responseCode']);
           } else {
-            //this.toastr.error(response['responseMessage'], response['responseCode']);
+            
           }
         },
         // error: (error: any) => this.toastr.error('Server Error', '500'),
@@ -311,7 +358,6 @@ export class AllDonationListComponent {
             this.donationTypeList = JSON.parse(JSON.stringify(response['listPayload']));
             this.programNames = this.donationTypeList.listPayload.map((item: any) => item.programName);
 
-            // this.toastr.success(response['responseMessage'], response['responseCode']);
           } else {
             //  this.toastr.error(response['responseMessage'], response['responseCode']);
           }
@@ -381,7 +427,7 @@ export class AllDonationListComponent {
         next: (response: any) => {
           if (response['responseCode'] == '200') {
             if (response['payload']['respCode'] == '200') {
-             
+
               this.editDonationForm.reset();
               this.getDonationList(this.tabName);
               this.donationUpdateDialog.close();
@@ -391,7 +437,7 @@ export class AllDonationListComponent {
                 detail: response['payload']['respMesg'],
                 styleClass: 'success-background-popover',
               });
-             
+
             } else {
               this.messageService.add({
                 summary: response['payload']['respCode'],
@@ -413,7 +459,7 @@ export class AllDonationListComponent {
   exportAsExcelFile(): void {
     let filteredArrayList: any[] = []; // Initialize as an empty array
 
-    console.log("this.donationList + "+this.donationList);
+    console.log("this.donationList + " + this.donationList);
 
     this.donationList.forEach((element: DonationListForExcel) => { // Explicitly type 'element'
       let fromDate = this.datePipe.transform(element.fromDate, 'dd-MM-yyyy');

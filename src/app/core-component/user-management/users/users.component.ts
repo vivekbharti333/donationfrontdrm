@@ -291,26 +291,12 @@ export class UsersComponent {
     { value: 'company-setting', name: 'Company Setting' }
   ];
 
-  getUserDetails() {
-    this.userManagementService.getUserDetailsList().subscribe((apiRes: any) => {
-      this.totalData = apiRes.totalNumber;
-      this.pagination.tablePageSize.subscribe((res: tablePageSize) => {
-        if (this.router.url == this.routes.users) {
-          this.getTableData({ skip: res.skip, limit: this.totalData }, 'ALL');
-          this.pageSize = res.pageSize;
-        }
-      });
-    });
-  }
-
   getUserDetailsByRoleType(roleType: any) {
     this.userManagementService.getUserDetailsByRoleType(roleType).subscribe((apiRes: any) => {
         this.totalData = apiRes.totalNumber;
         this.pagination.tablePageSize.subscribe((res: tablePageSize) => {
           if (this.router.url == this.routes.users) {
-            this.getTableData(
-              { skip: res.skip, limit: this.totalData },
-              roleType
+            this.getTableData( { skip: res.skip, limit: this.totalData }, roleType
             );
             this.pageSize = res.pageSize;
           }
@@ -318,27 +304,95 @@ export class UsersComponent {
       });
   }
 
-  private getTableData(pageOption: pageSelection, roleType: any): void {
-    var api;
+  // getUserDetails() {
+  //   this.userManagementService.getUserDetailsList().subscribe((apiRes: any) => {
+  //     this.totalData = apiRes.totalNumber;
+  //     this.pagination.tablePageSize.subscribe((res: tablePageSize) => {
+  //       if (this.router.url == this.routes.users) {
+  //         this.getTableData({ skip: res.skip, limit: this.totalData }, 'ALL');
+  //         this.pageSize = res.pageSize;
+  //       }
+  //     });
+  //   });
+  // } 
+
+  // private getTableData(pageOption: pageSelection, roleType: any): void {
+  //   var api;
+  //   if (roleType === 'ALL') {
+  //     api = this.userManagementService.getUserDetailsList();
+  //   } else {
+  //     api = this.userManagementService.getUserDetailsByRoleType(roleType);
+  //   }
+
+  //   api.subscribe((apiRes: any) => {
+  //     this.tableData = [];
+  //     this.serialNumberArray = [];
+  //     this.totalData = apiRes.totalNumber;
+  //     apiRes.listPayload.map((res: any, index: number) => {
+  //       const serialNumber = index + 1;
+  //       if (index >= pageOption.skip && serialNumber <= pageOption.limit) {
+  //         this.tableData.push(res);
+  //         this.serialNumberArray.push(serialNumber);
+  //       }
+  //     });
+  //     this.dataSource = new MatTableDataSource<UserDetails>(this.tableData);
+  //     const dataSize = this.tableData.length;
+  //     this.pagination.calculatePageSize.next({
+  //       totalData: this.totalData,
+  //       pageSize: this.pageSize,
+  //       tableData: this.tableData,
+  //       serialNumberArray: this.serialNumberArray,
+  //     });
+  //   });
+  // }
+
+  getUserDetails(): void {
+    // Fetch user details list
+    this.userManagementService.getUserDetailsList().subscribe((apiRes: any) => {
+      this.totalData = apiRes.totalNumber;
+  
+      // Subscribe to pagination updates
+      this.pagination.tablePageSize.subscribe((res: tablePageSize) => {
+        if (this.router.url === this.routes.users) {
+          this.pageSize = res.pageSize;
+  
+          // Calculate the page range and fetch data
+          const pageOption: pageSelection = { skip: res.skip, limit: res.skip + res.pageSize };
+          this.getTableData(pageOption, 'ALL');
+        }
+      });
+    });
+  }
+  
+  private getTableData(pageOption: pageSelection, roleType: string): void {
+    let api;
+  
+    // Determine API based on roleType
     if (roleType === 'ALL') {
       api = this.userManagementService.getUserDetailsList();
     } else {
       api = this.userManagementService.getUserDetailsByRoleType(roleType);
     }
-
+  
+    // Subscribe to the API and process data
     api.subscribe((apiRes: any) => {
+      this.totalData = apiRes.totalNumber;
       this.tableData = [];
       this.serialNumberArray = [];
-      this.totalData = apiRes.totalNumber;
-      apiRes.listPayload.map((res: any, index: number) => {
+  
+      // Prepare table data with pagination
+      apiRes.listPayload.forEach((res: any, index: number) => {
         const serialNumber = index + 1;
         if (index >= pageOption.skip && serialNumber <= pageOption.limit) {
           this.tableData.push(res);
           this.serialNumberArray.push(serialNumber);
         }
       });
+  
+      // Update MatTableDataSource
       this.dataSource = new MatTableDataSource<UserDetails>(this.tableData);
-      const dataSize = this.tableData.length;
+  
+      // Emit updated pagination details
       this.pagination.calculatePageSize.next({
         totalData: this.totalData,
         pageSize: this.pageSize,
@@ -347,6 +401,7 @@ export class UsersComponent {
       });
     });
   }
+  
 
   public sortData(sort: Sort) {
     const data = this.tableData.slice();

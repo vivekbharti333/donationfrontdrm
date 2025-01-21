@@ -3,30 +3,22 @@ import { Sort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { Router } from '@angular/router';
 import {
-  // DataService,
   pageSelection,
-  // apiResultFormat,
   SidebarService,
 } from 'src/app/core/core.index';
 import { routes } from 'src/app/core/helpers/routes';
-import { users } from 'src/app/shared/model/page.model';
 import { PaginationService, tablePageSize } from 'src/app/shared/shared.index';
-// import Swal from 'sweetalert2';
 import { LeadManagementService } from '../../lead-management.service';
-// import { UserManagementService } from '../user-management.service';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
-import { HelperService } from 'src/app/core/service/helper.service';
 import { MatDialog } from '@angular/material/dialog';
-import { CategoriesManagementService } from 'src/app/core-component/categories-management/categories-management.service';
 import { Constant } from 'src/app/core/constant/constants';
-import { UserManagementService } from '../../../user-management/user-management.service';
 import { DonationDetails } from 'src/app/core-component/interface/donation-management';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 
 import Swal from 'sweetalert2';
 
-import {MatTabsModule} from '@angular/material/tabs';
+import { MatTabsModule } from '@angular/material/tabs';
 import { CookieService } from 'ngx-cookie-service';
 import { DatePipe } from '@angular/common';
 
@@ -55,7 +47,7 @@ export class FollowupLeadComponent {
   public leadList: any;
   public leadUpdateDialog: any;
   public minDate: any;
-  public showFollowupDateBox: boolean =false;
+  public showFollowupDateBox: boolean = false;
 
   // pagination variables
   public tableData: Array<any> = [];
@@ -78,10 +70,8 @@ export class FollowupLeadComponent {
   ngOnInit() {
     (async () => {
       await
-        this.getFollowupList1();
         this.getFollowupLeadList('TODAY');
       this.createForms();
-      // this.getCategoryType();
     })();
   }
 
@@ -96,14 +86,6 @@ export class FollowupLeadComponent {
   ) { }
 
 
-
-  filterByDate() {
-    this.leadManagementService
-      .getLeadListByDate(Constant.LOST, this.firstDate, this.lastDate)
-      .subscribe((apiRes: any) => {
-        this.setTableData(apiRes);
-      });
-  }
   setFilterDate(eve: any, date: any) {
     if (date === 'first') {
       this.firstDate = eve.target.value;
@@ -117,143 +99,103 @@ export class FollowupLeadComponent {
     alert(dd)
   }
 
-
-  getFollowupList1() {
-    // Function to format a Date object as YYYY-MM-DD
-    function formatDate(date: Date): string {
-      let year = date.getFullYear();
-      let month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
-      let day = String(date.getDate()).padStart(2, '0'); // Ensures 2-digit format
+  getFollowupLeadList(tabName: any): void {
+    // Helper function to format a Date object as YYYY-MM-DD
+    const formatDate = (date: Date): string => {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+      const day = String(date.getDate()).padStart(2, '0'); // Ensures 2-digit format
       return `${year}-${month}-${day}`;
-    }
-    let currentDate = new Date();
-    let dateString = formatDate(currentDate); // Format the current date as YYYY-MM-DD
+    };
 
-    let nextDate = new Date(currentDate); // Clone the current date
+    const currentDate = new Date();
+    const dateString = formatDate(currentDate); // Format the current date as YYYY-MM-DD
+
+    const nextDate = new Date(currentDate); // Clone the current date
     nextDate.setDate(currentDate.getDate() + 1); // Add 1 day
-    let nextDayString = formatDate(nextDate); // Format the next date as YYYY-MM-DD
+    const nextDayString = formatDate(nextDate); // Format the next date as YYYY-MM-DD
 
-    // Call the service with the formatted dates
-    this.leadManagementService.getLeadListByDate(Constant.FOLLOWUP, dateString, nextDayString).subscribe((apiRes: any) => {
-      this.setTableData(apiRes); // Process the API response
-    });
-  }
+    // Fetch data once and handle pagination
+    this.leadManagementService.getLeadListByDate(Constant.FOLLOWUP, dateString, nextDayString)
+      .subscribe((apiRes: any) => {
+        this.totalData = apiRes.totalNumber;
 
-
-  setTableData(apiRes: any) {
-    this.tableData = [];
-    this.serialNumberArray = [];
-    this.totalData = apiRes.totalNumber;
-    this.pagination.tablePageSize.subscribe((pageRes: tablePageSize) => {
-      if (this.router.url == this.routes.folloupLead) {
-        apiRes.listPayload.map((res: any, index: number) => {
-          const serialNumber = index + 1;
-          if (index >= pageRes.skip && serialNumber <= this.totalData) {
-            this.tableData.push(res);
-            this.serialNumberArray.push(serialNumber);
-          }
-        });
-        this.dataSource = new MatTableDataSource<DonationDetails>(this.tableData);
-        const dataSize = this.tableData.length;
+        // Reset pagination state and subscribe to pagination changes
         this.pagination.calculatePageSize.next({
           totalData: this.totalData,
           pageSize: this.pageSize,
-          tableData: this.tableData,
-          serialNumberArray: this.serialNumberArray,
+          tableData: [],
+          serialNumberArray: [],
         });
-        this.pageSize = apiRes.totalNumber;
-      }
-    });
-  }
 
-  getFollowupLeadList(tabName:any) {
-
-     // Function to format a Date object as YYYY-MM-DD
-     function formatDate(date: Date): string {
-      let year = date.getFullYear();
-      let month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
-      let day = String(date.getDate()).padStart(2, '0'); // Ensures 2-digit format
-      return `${year}-${month}-${day}`;
-    }
-    let currentDate = new Date();
-    let dateString = formatDate(currentDate); // Format the current date as YYYY-MM-DD
-
-    let nextDate = new Date(currentDate); // Clone the current date
-    nextDate.setDate(currentDate.getDate() + 1); // Add 1 day
-    let nextDayString = formatDate(nextDate); // Format the next date as YYYY-MM-DD
-
-    // Call the service with the formatted dates
-    this.leadManagementService.getLeadListByDate(Constant.FOLLOWUP, dateString, nextDayString).subscribe((apiRes: any) => {
-     
-
-
-      // this.leadManagementService.getAllLeadList(this.cookieService.get('roleType'), tabName).subscribe((apiRes: any) => {
-        this.totalData = apiRes.totalNumber;
         this.pagination.tablePageSize.subscribe((res: tablePageSize) => {
-          if (this.router.url == this.routes.folloupLead) {
-            this.getTableData({ skip: res.skip, limit: (res.skip)+ this.pageSize },tabName, dateString, nextDayString);
-            
+          if (this.router.url === this.routes.folloupLead) {
             this.pageSize = res.pageSize;
+            this.prepareTableData(apiRes, { skip: res.skip, limit: res.skip + res.pageSize });
           }
         });
       });
-    }
-  
-     private getTableData(pageOption: pageSelection, tabName: any, dateString: any, nextDayString: any): void {
-      this.leadManagementService.getLeadListByDate(Constant.FOLLOWUP, dateString, nextDayString).subscribe((apiRes: any) => {
-          this.leadList = apiRes.listPayload;
-          this.tableData = [];
-          this.serialNumberArray = [];
-          this.totalData = apiRes.totalNumber;
-          apiRes.listPayload.map((res: DonationDetails, index: number) => {
-            const serialNumber = index + 1;
-            if (index >= pageOption.skip && serialNumber <= pageOption.limit) {
-              this.tableData.push(res);
-              this.serialNumberArray.push(serialNumber);
-            }
-          });
-          this.dataSource = new MatTableDataSource<DonationDetails>(this.tableData);
-          this.pagination.calculatePageSize.next({
-            totalData: this.totalData,
-            pageSize: this.pageSize,
-            tableData: this.tableData,
-            serialNumberArray: this.serialNumberArray,
-          });
-        });
-      }
+  }
 
-  public sortData(sort: Sort) {
-    const data = this.tableData.slice();
+  private prepareTableData(apiRes: any, pageOption: pageSelection): void {
+    this.tableData = [];
+    this.serialNumberArray = [];
+
+    // Process the list payload for pagination
+    apiRes.listPayload.forEach((res: DonationDetails, index: number) => {
+      const serialNumber = index + 1;
+      if (index >= pageOption.skip && serialNumber <= pageOption.limit) {
+        this.tableData.push(res);
+        this.serialNumberArray.push(serialNumber);
+      }
+    });
+
+    // Update MatTableDataSource with new data
+    this.dataSource = new MatTableDataSource<DonationDetails>(this.tableData);
+
+    // Emit updated pagination data
+    this.pagination.calculatePageSize.next({
+      totalData: this.totalData,
+      pageSize: this.pageSize,
+      tableData: this.tableData,
+      serialNumberArray: this.serialNumberArray,
+    });
+  }
+
+  public sortData(sort: Sort): void {
     if (!sort.active || sort.direction === '') {
-      this.tableData = data;
-    } else {
-      this.tableData = data.sort((a, b) => {
-        const aValue = (a as never)[sort.active];
-        const bValue = (b as never)[sort.active];
-        return (aValue < bValue ? -1 : 1) * (sort.direction === 'asc' ? 1 : -1);
-      });
+      this.tableData = this.dataSource.filteredData.slice(); // Reset to the current filtered data
+      return;
     }
+
+    this.tableData = this.dataSource.filteredData.slice().sort((a, b) => {
+      const aValue = (a as any)[sort.active];
+      const bValue = (b as any)[sort.active];
+      return (aValue < bValue ? -1 : 1) * (sort.direction === 'asc' ? 1 : -1);
+    });
+    this.dataSource = new MatTableDataSource<DonationDetails>(this.tableData);
   }
 
   public searchData(value: string): void {
     this.dataSource.filter = value.trim().toLowerCase();
     this.tableData = this.dataSource.filteredData;
   }
+
   isCollapsed: boolean = false;
-  toggleCollapse() {
+  toggleCollapse(): void {
     this.sidebar.toggleCollapse();
     this.isCollapsed = !this.isCollapsed;
   }
-  public filter = false;
-  openFilter() {
+
+  public filter: boolean = false;
+  openFilter(): void {
     this.filter = !this.filter;
   }
 
 
+
   async openChangeStatusModal(templateRef: TemplateRef<any>, rawData: any, isEditable: boolean) {
     this.isEditForm = isEditable;
-    // await this.getDropdownOnEditModal(rawData);
-    // this.setFollowupData(rawData);
     this.viewChangeStatusDialog = this.dialog.open(templateRef, {
       width: '40%',
     });
@@ -274,9 +216,9 @@ export class FollowupLeadComponent {
     });
   }
 
-    checkStatus(status: any){
+  checkStatus(status: any) {
     this.showFollowupDateBox = false;
-    if( status.value == "FOLLOWUP"){
+    if (status.value == "FOLLOWUP") {
       this.showFollowupDateBox = true;
     }
   }
@@ -292,23 +234,23 @@ export class FollowupLeadComponent {
   setDateTime(date: any): string {
     // Use today's date if the input date is null or undefined
     const currentDate = date ? new Date(date) : new Date();
-  
+
     // Adjust to local time zone
     const timeZoneOffset = currentDate.getTimezoneOffset() * 60000; // offset in milliseconds
     const localDate = new Date(currentDate.getTime() - timeZoneOffset);
-  
+
     // Round minutes to the nearest 15-minute interval
     const minutes = localDate.getMinutes();
     const roundedMinutes = Math.ceil(minutes / 15) * 15;
     localDate.setMinutes(roundedMinutes);
     localDate.setSeconds(0);
     localDate.setMilliseconds(0);
-  
+
     // Format the date to the required input format: YYYY-MM-DD
     const year = localDate.getFullYear();
     const month = String(localDate.getMonth() + 1).padStart(2, '0');
     const day = String(localDate.getDate()).padStart(2, '0');
-  
+
     return `${year}-${month}-${day}`; // Returns in YYYY-MM-DD format
   }
 
@@ -327,7 +269,7 @@ export class FollowupLeadComponent {
       notes: rowData['notes'],
     });
 
-    if( this.editLeadForm.value['status'] == "FOLLOWUP"){
+    if (this.editLeadForm.value['status'] == "FOLLOWUP") {
       this.showFollowupDateBox = true;
     }
 
@@ -344,7 +286,7 @@ export class FollowupLeadComponent {
       next: (response: any) => {
         if (response['responseCode'] == '200') {
           if (response['payload']['respCode'] == '200') {
-            
+
             this.getFollowupLeadList('TODAY');
 
             this.leadUpdateDialog.close();
@@ -387,10 +329,6 @@ export class FollowupLeadComponent {
         return 'badge-lineinfo';
       case 'followup':
         return 'badge-linewarning';
-      // case 'win':
-      //   return 'badge-linewin';
-      // case 'assigned':
-      //   return 'badge-lineassigned';
       case 'OTHER':
         return 'badge-linereserved';
       default:

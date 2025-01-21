@@ -14,6 +14,7 @@ import { MatTabsModule} from '@angular/material/tabs';
 import { MatIconModule } from '@angular/material/icon';
 import { CalendarModule } from 'primeng/calendar';
 import { MessageService } from 'primeng/api';
+import {NgxPaginationModule} from 'ngx-pagination';
 
 
 @NgModule({
@@ -33,7 +34,8 @@ import { MessageService } from 'primeng/api';
     MatDialogModule,
     MatTabsModule,
     MatIconModule,
-    CalendarModule
+    CalendarModule,
+    NgxPaginationModule
   ], providers: [MessageService],
 })
 export class DonationManagementModule { }
