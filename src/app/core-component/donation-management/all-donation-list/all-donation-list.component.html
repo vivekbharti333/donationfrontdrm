@@ -300,6 +300,8 @@
             (click)="getDonationList('YESTERDAY')">Yesterday's</a></li>
         <li class="nav-item"><a class="nav-link" href="#solid-justified-tab3" data-bs-toggle="tab"
             (click)="getDonationList('MONTH')">Current Month</a></li>
+            <li class="nav-item"><a class="nav-link" href="#solid-justified-tab4" data-bs-toggle="tab"
+              (click)="getDonationList('MONTH')">Export Excel</a></li>
       </ul>
       <div class="tab-content">
         <div class="tab-pane show active" id="solid-justified-tab1">
@@ -465,15 +467,94 @@
     </div>
 
 
-
-
     <!-- /Filter -->
     <app-custom-pagination></app-custom-pagination>
-
 
   </div>
 </div>
 
+<!-- /////////// -->
+<div class="tab-pane" id="solid-justified-tab4">
+  <div class="table-responsive">
+    <div class="row">
+
+      <div class="col-sm-2">
+        <label> From</label>
+        <input class="form-control" pInputText type="date" #firstDate>
+      </div>
+      <div class="col-sm-2">
+        <label> To </label>
+        <input class="form-control" pInputText type="date" #lastDate>
+
+      </div>
+      <div class="col-sm-2">
+        <br>
+        <button type="submit" mat-raised-button class="btn btn-warning"
+          (click)="getDonationListByDate(firstDate.value,lastDate.value)"
+          style="margin-top: 8px; margin-left: 0px;">Search</button>
+      </div>
+
+     
+        <div class="col-2">
+          <label> Download In Excel</label>
+          <br>
+          <button mat-raised-button class="btn btn-warning" (click)="exportAsExcelFile()">
+            <img src="/assets/img/brand/excel-logo.png" width="24"> Export Report
+          </button>
+        </div>
+    </div>
+
+    <div class="row">
+      <div class="col-4">
+        <input type="text" class="form-control" placeholder="Search here..." [(ngModel)]="searchTerm">
+      </div>
+    </div>
+
+
+    <table class="table table-striped" id="customers">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Mobile No.</th>
+          <th>Amount (Currency)</th>
+          <th>Payment Mode</th>
+          <th>Received By</th>
+          <th>Invoice For</th>
+          <th>Program</th>
+          <th>Date & Time</th>
+          <th>Invoice Number</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr
+          *ngFor=" let donation of donationList | paginate : { itemsPerPage: tableSize, currentPage: page, totalItems: count }; let i = index">
+          <td>{{ donation.donorName }}</td>
+          <td>{{ donation.mobileNumber }}</td>
+          <td>{{ donation.amount }} {{ donation.currencyCode }}</td>
+          <!-- <td>{{ donation.transactionId }}</td> -->
+          <td>{{ donation.paymentMode }}</td>
+          <td>{{ donation.createdbyName }}</td>
+          <td>{{ donation.invoiceHeaderName }}</td>
+          <td>{{ donation.programName }}</td>
+          <td>{{ donation.createdAt | date: 'dd-MM-yyyy | hh:mm:ss a' }}</td>
+          <td>{{ donation.invoiceNumber}}</td>
+          
+          <td>
+          
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="d-flex justify-content-center">
+      <pagination-controls previousLabel="Prev" nextLabel="Next" (pageChange)="onTableCustomDataChange($event)">
+      </pagination-controls>
+    </div>
+  </div>
+</div>
+
+<!-- ////////////////////////////// -->
 
 
 <ng-template #dialogTemplate let-dialog>

@@ -91,17 +91,23 @@ export class DonationManagementService {
     return this.http.post<DonationDetailsRequest>(Constant.Site_Url + "getDonationList", request);
   }
 
-  getDonationListForLead(event:any){
-    // const createdBy = this.cookieService.get('teamLeaderId');
-    // alert("createdBy : "+createdBy);
-    // const roleType = this.cookieService.get('roleType');
-    // if(roleType === 'SUPERADMIN'){
-    //     createdBy == event;
-    //     roleType == roleType
-    // } else {
-    //   roleType == 'elsepart';
-    // }
+  getDonationListByDate(firstDate:any,lastDate:any): Observable<DonationDetailsRequest> {
+    let request: DonationDetailsRequest = {
+      payload: {
+        firstDate: firstDate,
+        lastDate: lastDate,
+        requestedFor: 'CUSTOM',
+        
+        token: this.loginUser['token'],
+        createdBy: this.loginUser['loginId'],
+        superadminId: this.loginUser['superadminId'],
+        roleType: this.loginUser['roleType'],
+      }
+    };
+    return this.http.post<DonationDetailsRequest>(Constant.Site_Url + "getDonationList", request);
+  }
 
+  getDonationListForLead(event:any){
     let request: DonationDetailsRequest = {
       payload: {
         // requestedFor: tabName,

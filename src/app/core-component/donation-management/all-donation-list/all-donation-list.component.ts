@@ -25,6 +25,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { Constant } from 'src/app/core/constant/constants';
 import { DonationDetails, DonationListForExcel } from '../../interface/donation-management';
 import { AuthenticationService } from 'src/app/auth/authentication.service';
+import { CustomPaginationComponent } from 'src/app/shared/custom-pagination/custom-pagination.component';
 
 import * as fileSaver from 'file-saver';
 import * as XLSX from 'xlsx-js-style'
@@ -86,6 +87,8 @@ export class AllDonationListComponent {
   count: number = 0;
   tableSize: number = 10;
   tableSizes: any = [3, 6, 9, 12];
+  filteredDonations: any[] = []; // Filtered data
+  searchTerm: string = '';
 
 
   // pagination variables
@@ -100,9 +103,22 @@ export class AllDonationListComponent {
   //** / pagination variables
 
 
+    public lastIndex = 0;
+    // public totalData = 0;
+    public skip = 0;
+    public limit: number = this.pageSize;
+    public pageIndex = 0;
+    // public serialNumberArray: Array<number> = [];
+    public currentPage = 1;
+    public pageNumberArray: Array<number> = [];
+    public pageSelection: Array<pageSelection> = [];
+    public totalPages = 0;
+
+
   constructor(
     private data: DataService,
     private pagination: PaginationService,
+    // private customPaginationComponent: CustomPaginationComponent,
     private router: Router,
     private fb: FormBuilder,
     private sidebar: SidebarService,
@@ -200,44 +216,20 @@ export class AllDonationListComponent {
     // Add your logic here
   }
 
-  // public getDonationList(tabName: string) {
-  //   this.tabName = tabName;
-  //   this.donationManagementService.getDonationList(tabName).subscribe((apiRes: any) => {
-  //     this.totalData = apiRes.totalNumber;
-  //     this.pagination.tablePageSize.subscribe((res: tablePageSize) => {
-  //       if (this.router.url == this.routes.allDonationList) {
-  //         this.getTableData({ skip: res.skip, limit: (res.skip)+ this.pageSize }, tabName);
-  //         this.pageSize = res.pageSize;
-  //       }
-  //     });
-  //   });
+  // loadPagination(1: number): void {
+  //   // Call the changePageSize method with the passed page size
+  //   this.pagination.changePageSize(1);
+  
+  //   console.log(`Pagination initialized with page size: ${sk}`);
   // }
 
-  // private getTableData(pageOption: pageSelection, tabName: any): void {
-  //   this.donationManagementService.getDonationList(tabName).subscribe((apiRes: any) => {
-  //     this.donationList = apiRes.listPayload;
-  //     this.tableData = [];
-  //     this.serialNumberArray = [];
-  //     this.totalData = apiRes.totalNumber;
-  //     apiRes.listPayload.map((res: DonationDetails, index: number) => {
-  //       const serialNumber = index + 1;
-  //       if (index >= pageOption.skip && serialNumber <= pageOption.limit) {
-  //         this.tableData.push(res);
-  //         this.serialNumberArray.push(serialNumber);
-  //       }
-  //     });
-  //     this.dataSource = new MatTableDataSource<DonationDetails>(this.tableData);
-  //     this.pagination.calculatePageSize.next({
-  //       totalData: this.totalData,
-  //       pageSize: this.pageSize,
-  //       tableData: this.tableData,
-  //       serialNumberArray: this.serialNumberArray,
-  //     });
-  //   });
-  // }
 
+
+  
   public getDonationList(tabName: string): void {
     this.tabName = tabName;
+
+    this.serialNumberArray= [];
 
     // Fetch donation list only once
     this.donationManagementService.getDonationList(tabName).subscribe((apiRes: any) => {
@@ -245,17 +237,21 @@ export class AllDonationListComponent {
 
       // Process table data once the API response is received
       this.pagination.tablePageSize.subscribe((res: tablePageSize) => {
+       
         if (this.router.url === this.routes.allDonationList) {
+          // this.customPaginationComponent.changePageSize(res.pageSize);
           this.pageSize = res.pageSize;
           this.prepareTableData(apiRes, { skip: res.skip, limit: res.skip + res.pageSize });
         }
       });
+
+
     });
   }
 
   private prepareTableData(apiRes: any, pageOption: pageSelection): void {
     this.tableData = [];
-    this.serialNumberArray = [];
+    // this.serialNumberArray = [];
 
     // Process the list payload for pagination
     apiRes.listPayload.forEach((res: DonationDetails, index: number) => {
@@ -456,10 +452,45 @@ export class AllDonationListComponent {
       });
   }
 
-  exportAsExcelFile(): void {
-    let filteredArrayList: any[] = []; // Initialize as an empty array
 
-    console.log("this.donationList + " + this.donationList);
+  public getDonationListByDate(firstDate: any, lastDate: any) {
+    this.donationList = [];
+    this.firstDate = firstDate;
+    this.lastDate = lastDate;
+    
+    this.donationManagementService.getDonationListByDate(firstDate, lastDate)
+      .subscribe({
+        next: (response: any) => {
+          if (response['responseCode'] == '200') {
+            this.donationList = JSON.parse(JSON.stringify(response['listPayload']));
+            this.filteredDonations = [...this.donationList];
+          } else {
+          }
+        }, 
+      });
+  }
+
+
+   ngOnChanges(): void {
+    this.filterDonations();
+  }
+
+  filterDonations(): void {
+    this.filteredDonations = this.donationList.filter((donation) =>
+      JSON.stringify(donation).toLowerCase().includes(this.searchTerm.toLowerCase())
+    );
+  }
+
+
+
+
+  onTableCustomDataChange(event: any): void {
+    this.page = event;
+  }
+
+
+  exportAsExcelFile(): void {
+    let filteredArrayList: any[] = [];
 
     this.donationList.forEach((element: DonationListForExcel) => { // Explicitly type 'element'
       let fromDate = this.datePipe.transform(element.fromDate, 'dd-MM-yyyy');
