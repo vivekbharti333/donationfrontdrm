@@ -225,7 +225,11 @@ export class AllDonationListComponent {
 
 
 
-  
+  downloadInvoice(receiptNo : string) {
+    window.open(Constant.Site_Url+"donationinvoice/"+receiptNo, '_blank');
+  }
+
+
   public getDonationList(tabName: string): void {
     this.tabName = tabName;
 
