@@ -48,6 +48,7 @@ export class AllDonationListComponent {
   donationList: DonationListForExcel[] = []; // Use the defined interface
   datePipe = new DatePipe('en-US'); // Inject the DatePipe
 
+  public fullData: DonationDetails[] = [];
 
   public donationUpdateDialog: any;
   public editDonationForm!: FormGroup;
@@ -65,6 +66,7 @@ export class AllDonationListComponent {
   public isAdmin: boolean = false;
   public isTeamLeader: boolean = false;
   public isDonationExecutive: boolean = false;
+  public showExcelReport: boolean = false;
   public teamLeaderList: any;
 
   public showCurrencyBox: boolean = false;
@@ -77,7 +79,7 @@ export class AllDonationListComponent {
   public programNames: string = '';
   public selectedProgramAmount: number | null = null;
 
-
+  public currentMonthName!: string;
   activeTab: string = 'TODAY';
   firstDate: any;
   lastDate: any
@@ -103,16 +105,16 @@ export class AllDonationListComponent {
   //** / pagination variables
 
 
-    public lastIndex = 0;
-    // public totalData = 0;
-    public skip = 0;
-    public limit: number = this.pageSize;
-    public pageIndex = 0;
-    // public serialNumberArray: Array<number> = [];
-    public currentPage = 1;
-    public pageNumberArray: Array<number> = [];
-    public pageSelection: Array<pageSelection> = [];
-    public totalPages = 0;
+  public lastIndex = 0;
+  // public totalData = 0;
+  public skip = 0;
+  public limit: number = this.pageSize;
+  public pageIndex = 0;
+  // public serialNumberArray: Array<number> = [];
+  public currentPage = 1;
+  public pageNumberArray: Array<number> = [];
+  public pageSelection: Array<pageSelection> = [];
+  public totalPages = 0;
 
 
   constructor(
@@ -146,6 +148,10 @@ export class AllDonationListComponent {
     this.getPaymentModeList();
     this.getFundrisingOfficerByTeamLeaderId();
     this.checkRoleType();
+
+    const currentDate = new Date();
+    const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    this.currentMonthName = months[currentDate.getMonth()];
   }
 
 
@@ -175,8 +181,10 @@ export class AllDonationListComponent {
       this.isMainAdmin = true;
     } else if (this.loginUser['roleType'] == Constant.superAdmin) {
       this.isSuperadmin = true;
+      this.isAdmin = true;
     } else if (this.loginUser['roleType'] == Constant.admin) {
       this.isAdmin = true;
+      this.isSuperadmin = true;
     } else if (this.loginUser['roleType'] == Constant.teamLeader) {
       this.isTeamLeader = true;
     } else if (this.loginUser['roleType'] == Constant.donorExecutive) {
@@ -219,56 +227,90 @@ export class AllDonationListComponent {
   // loadPagination(1: number): void {
   //   // Call the changePageSize method with the passed page size
   //   this.pagination.changePageSize(1);
-  
+
   //   console.log(`Pagination initialized with page size: ${sk}`);
   // }
 
 
 
-  downloadInvoice(receiptNo : string) {
-    window.open(Constant.Site_Url+"donationinvoice/"+receiptNo, '_blank');
+  downloadInvoice(receiptNo: string) {
+    window.open(Constant.Site_Url + "donationinvoice/" + receiptNo, '_blank');
   }
 
 
   public getDonationList(tabName: string): void {
+    // this.dataTableClear();
     this.tabName = tabName;
+    this.serialNumberArray = [];
 
-    this.serialNumberArray= [];
-
-    // Fetch donation list only once
     this.donationManagementService.getDonationList(tabName).subscribe((apiRes: any) => {
       this.totalData = apiRes.totalNumber;
+      this.fullData = apiRes.listPayload; // Store the full dataset
 
-      // Process table data once the API response is received
       this.pagination.tablePageSize.subscribe((res: tablePageSize) => {
-       
         if (this.router.url === this.routes.allDonationList) {
-          // this.customPaginationComponent.changePageSize(res.pageSize);
           this.pageSize = res.pageSize;
-          this.prepareTableData(apiRes, { skip: res.skip, limit: res.skip + res.pageSize });
+
+          // Use the full dataset for pagination
+          this.prepareTableData(this.fullData, { skip: res.skip, limit: res.skip + res.pageSize });
+          this.pageSize = res.pageSize;
         }
       });
-
-
     });
   }
 
-  private prepareTableData(apiRes: any, pageOption: pageSelection): void {
+  dataTableClear(){
     this.tableData = [];
-    // this.serialNumberArray = [];
+    this.pageSize = 10;
+    this.serialNumberArray= [];
+    this.totalData = 0;
+    this.showFilter = false;
+    
+  }
+  
+  getDonationListByDate(firstDate: any, lastDate: any): void {
 
-    // Process the list payload for pagination
-    apiRes.listPayload.forEach((res: DonationDetails, index: number) => {
+    this.showExcelReport = false;
+    this.donationList = [];
+    this.firstDate = firstDate;
+    this.lastDate = lastDate;
+    this.serialNumberArray = [];
+
+
+    this.donationManagementService.getDonationListByDate(firstDate, lastDate).subscribe((apiRes: any) => {
+      this.totalData = apiRes.totalNumber;
+      this.fullData = apiRes.listPayload; // Store the full dataset
+
+      this.donationList = JSON.parse(JSON.stringify(apiRes['listPayload']));
+
+      if(this.totalData >=1){
+        this.showExcelReport = true;
+      }
+
+      this.pagination.tablePageSize.subscribe((res: tablePageSize) => {
+        if (this.router.url === this.routes.allDonationList) {
+          this.pageSize = res.pageSize;
+          // Use the full dataset for pagination
+          this.prepareTableData(this.fullData, { skip: res.skip, limit: res.skip + res.pageSize });
+          this.pageSize = res.pageSize;
+        }
+      });
+    });
+  }
+
+  private prepareTableData(apiRes: any[], pageOption: pageSelection): void {
+    this.tableData = [];
+    this.serialNumberArray = [];
+
+    apiRes.forEach((res: DonationDetails, index: number) => {
       const serialNumber = index + 1;
       if (index >= pageOption.skip && serialNumber <= pageOption.limit) {
         this.tableData.push(res);
         this.serialNumberArray.push(serialNumber);
       }
     });
-
     // Update the MatTableDataSource
     this.dataSource = new MatTableDataSource<DonationDetails>(this.tableData);
-
     // Emit updated pagination data
     this.pagination.calculatePageSize.next({
       totalData: this.totalData,
@@ -277,6 +319,7 @@ export class AllDonationListComponent {
       serialNumberArray: this.serialNumberArray,
     });
   }
+
 
   public sortData(sort: Sort) {
     const data = this.tableData.slice();
@@ -291,10 +334,36 @@ export class AllDonationListComponent {
     }
   }
 
+
   public searchData(value: string): void {
-    this.dataSource.filter = value.trim().toLowerCase();
-    this.tableData = this.dataSource.filteredData;
+    const searchTerm = value.trim().toLowerCase();
+
+    if (searchTerm) {
+      // Filter the full dataset based on the search term
+      const filteredData = this.fullData.filter((donation: DonationDetails) =>
+        Object.values(donation).some((field) =>
+          String(field).toLowerCase().includes(searchTerm)
+        )
+      );
+
+      this.prepareTableData(filteredData, { skip: 0, limit: this.pageSize });
+      this.totalData = filteredData.length; // Update total data count for pagination
+    } else {
+      // Reset to the full dataset when the search term is cleared
+      this.prepareTableData(this.fullData, { skip: 0, limit: this.pageSize });
+      this.totalData = this.fullData.length; // Reset the total data count
+    }
+
+    // Reset to the first page after a search or clearing search
+    this.pagination.calculatePageSize.next({
+      totalData: this.totalData,
+      pageSize: this.pageSize,
+      tableData: this.tableData,
+      serialNumberArray: this.serialNumberArray,
+    });
   }
+
+
   isCollapsed: boolean = false;
   toggleCollapse() {
     this.sidebar.toggleCollapse();
@@ -343,7 +412,7 @@ export class AllDonationListComponent {
           if (response['responseCode'] == '200') {
             this.invoiceTypeList = JSON.parse(JSON.stringify(response['listPayload']));
           } else {
-            
+
           }
         },
         // error: (error: any) => this.toastr.error('Server Error', '500'),
@@ -456,41 +525,6 @@ export class AllDonationListComponent {
       });
   }
 
-
-  public getDonationListByDate(firstDate: any, lastDate: any) {
-    this.donationList = [];
-    this.firstDate = firstDate;
-    this.lastDate = lastDate;
-    
-    this.donationManagementService.getDonationListByDate(firstDate, lastDate)
-      .subscribe({
-        next: (response: any) => {
-          if (response['responseCode'] == '200') {
-            this.donationList = JSON.parse(JSON.stringify(response['listPayload']));
-            this.filteredDonations = [...this.donationList];
-          } else {
-          }
-        }, 
-      });
-  }
-
-
-   ngOnChanges(): void {
-    this.filterDonations();
-  }
-
-  filterDonations(): void {
-    this.filteredDonations = this.donationList.filter((donation) =>
-      JSON.stringify(donation).toLowerCase().includes(this.searchTerm.toLowerCase())
-    );
-  }
-
-
-
-
-  onTableCustomDataChange(event: any): void {
-    this.page = event;
-  }
 
 
   exportAsExcelFile(): void {

@@ -44,6 +44,7 @@ export class UsersComponent {
 
   public userUpdateDialog: any;
 
+  public fullData: any[] = [];
   public teamLeaderList: any;
   // public addressList: any;
 
@@ -186,9 +187,11 @@ export class UsersComponent {
       alternateMobile: user['alternateMobile'],
       emailId: user['emailId'],
       dob: formattedDob, // Use the formatted dob
-      permissions: user['permissions'],
+      // permissions: user['permissions'],
       userPhoto: user['userPhoto'],
       createdBy: user['createdBy'],
+      addressList: []
+      
     });
   
     // Update the userPhoto for display
@@ -291,116 +294,67 @@ export class UsersComponent {
     { value: 'company-setting', name: 'Company Setting' }
   ];
 
-  getUserDetailsByRoleType(roleType: any) {
-    this.userManagementService.getUserDetailsByRoleType(roleType).subscribe((apiRes: any) => {
-        this.totalData = apiRes.totalNumber;
-        this.pagination.tablePageSize.subscribe((res: tablePageSize) => {
-          if (this.router.url == this.routes.users) {
-            this.getTableData( { skip: res.skip, limit: this.totalData }, roleType
-            );
-            this.pageSize = res.pageSize;
-          }
-        });
-      });
-  }
-
-  // getUserDetails() {
-  //   this.userManagementService.getUserDetailsList().subscribe((apiRes: any) => {
-  //     this.totalData = apiRes.totalNumber;
-  //     this.pagination.tablePageSize.subscribe((res: tablePageSize) => {
-  //       if (this.router.url == this.routes.users) {
-  //         this.getTableData({ skip: res.skip, limit: this.totalData }, 'ALL');
-  //         this.pageSize = res.pageSize;
-  //       }
-  //     });
-  //   });
-  // } 
-
-  // private getTableData(pageOption: pageSelection, roleType: any): void {
-  //   var api;
-  //   if (roleType === 'ALL') {
-  //     api = this.userManagementService.getUserDetailsList();
-  //   } else {
-  //     api = this.userManagementService.getUserDetailsByRoleType(roleType);
-  //   }
-
-  //   api.subscribe((apiRes: any) => {
-  //     this.tableData = [];
-  //     this.serialNumberArray = [];
-  //     this.totalData = apiRes.totalNumber;
-  //     apiRes.listPayload.map((res: any, index: number) => {
-  //       const serialNumber = index + 1;
-  //       if (index >= pageOption.skip && serialNumber <= pageOption.limit) {
-  //         this.tableData.push(res);
-  //         this.serialNumberArray.push(serialNumber);
-  //       }
-  //     });
-  //     this.dataSource = new MatTableDataSource<UserDetails>(this.tableData);
-  //     const dataSize = this.tableData.length;
-  //     this.pagination.calculatePageSize.next({
-  //       totalData: this.totalData,
-  //       pageSize: this.pageSize,
-  //       tableData: this.tableData,
-  //       serialNumberArray: this.serialNumberArray,
-  //     });
-  //   });
-  // }
-
-  getUserDetails(): void {
-    // Fetch user details list
-    this.userManagementService.getUserDetailsList().subscribe((apiRes: any) => {
-      this.totalData = apiRes.totalNumber;
+  public getUserDetailsByRoleType(roleType: any): void {
+    this.serialNumberArray = []; // Clear serial number array before fetching new data
   
-      // Subscribe to pagination updates
+    this.userManagementService.getUserDetailsByRoleType(roleType).subscribe((apiRes: any) => {
+      this.totalData = apiRes.totalNumber; // Set total data count
+      this.fullData = apiRes.listPayload;  // Store the full dataset
+  
       this.pagination.tablePageSize.subscribe((res: tablePageSize) => {
         if (this.router.url === this.routes.users) {
           this.pageSize = res.pageSize;
+          // Use the full dataset for pagination
+          this.prepareTableData(this.fullData, { skip: res.skip, limit: res.skip + res.pageSize });
+          this.pageSize = res.pageSize;
+        }
+      });
+    });
+  }
+
+  public getUserDetails(): void {
+    this.serialNumberArray = []; // Clear serial number array before fetching new data
   
-          // Calculate the page range and fetch data
-          const pageOption: pageSelection = { skip: res.skip, limit: res.skip + res.pageSize };
-          this.getTableData(pageOption, 'ALL');
+    this.userManagementService.getUserDetailsList().subscribe((apiRes: any) => {
+      this.totalData = apiRes.totalNumber; // Set total data count
+      this.fullData = apiRes.listPayload;  // Store the full dataset
+  
+      this.pagination.tablePageSize.subscribe((res: tablePageSize) => {
+        if (this.router.url === this.routes.users) {
+          this.pageSize = res.pageSize;
+          // Use the full dataset for pagination
+          this.prepareTableData(this.fullData, { skip: res.skip, limit: res.skip + res.pageSize });
+          this.pageSize = res.pageSize;
         }
       });
     });
   }
   
-  private getTableData(pageOption: pageSelection, roleType: string): void {
-    let api;
-  
-    // Determine API based on roleType
-    if (roleType === 'ALL') {
-      api = this.userManagementService.getUserDetailsList();
-    } else {
-      api = this.userManagementService.getUserDetailsByRoleType(roleType);
-    }
-  
-    // Subscribe to the API and process data
-    api.subscribe((apiRes: any) => {
-      this.totalData = apiRes.totalNumber;
-      this.tableData = [];
-      this.serialNumberArray = [];
-  
-      // Prepare table data with pagination
-      apiRes.listPayload.forEach((res: any, index: number) => {
+    prepareTableData(apiRes: any[], pageOption: pageSelection): void {
+      this.tableData = []; // Reset table data
+      this.serialNumberArray = []; // Reset serial numbers
+    
+      // Slice data based on pagination limits (skip, limit)
+      const dataToDisplay = apiRes.slice(pageOption.skip, pageOption.limit);
+    
+      // Add serial numbers and prepare table data
+      dataToDisplay.forEach((res: any, index: number) => {
         const serialNumber = index + 1;
-        if (index >= pageOption.skip && serialNumber <= pageOption.limit) {
-          this.tableData.push(res);
-          this.serialNumberArray.push(serialNumber);
-        }
+        this.tableData.push(res);
+        this.serialNumberArray.push(serialNumber);
       });
-  
+    
       // Update MatTableDataSource
-      this.dataSource = new MatTableDataSource<UserDetails>(this.tableData);
-  
-      // Emit updated pagination details
+      this.dataSource = new MatTableDataSource<any>(this.tableData);
+    
+      // Emit updated pagination data
       this.pagination.calculatePageSize.next({
         totalData: this.totalData,
         pageSize: this.pageSize,
         tableData: this.tableData,
         serialNumberArray: this.serialNumberArray,
       });
-    });
-  }
+    }
   
 
   public sortData(sort: Sort) {
@@ -417,9 +371,38 @@ export class UsersComponent {
   }
 
   public searchData(value: string): void {
-    this.dataSource.filter = value.trim().toLowerCase();
-    this.tableData = this.dataSource.filteredData;
-  }
+      const searchTerm = value.trim().toLowerCase();
+  
+      if (searchTerm) {
+        // Filter the full dataset based on the search term
+        const filteredData = this.fullData.filter((donation: UserDetails) =>
+          Object.values(donation).some((field) =>
+            String(field).toLowerCase().includes(searchTerm)
+          )
+        );
+  
+        this.prepareTableData(filteredData, { skip: 0, limit: this.pageSize });
+        this.totalData = filteredData.length; // Update total data count for pagination
+      } else {
+        // Reset to the full dataset when the search term is cleared
+        this.prepareTableData(this.fullData, { skip: 0, limit: this.pageSize });
+        this.totalData = this.fullData.length; // Reset the total data count
+      }
+  
+      // Reset to the first page after a search or clearing search
+      this.pagination.calculatePageSize.next({
+        totalData: this.totalData,
+        pageSize: this.pageSize,
+        tableData: this.tableData,
+        serialNumberArray: this.serialNumberArray,
+      });
+    }
+
+  // public searchData(value: string): void {
+  //   this.dataSource.filter = value.trim().toLowerCase();
+  //   this.tableData = this.dataSource.filteredData;
+  // }
+
   isCollapsed: boolean = false;
   toggleCollapse() {
     this.sidebar.toggleCollapse();
@@ -496,10 +479,10 @@ export class UsersComponent {
   }
 
   public getAddressDetailsByUserId(user:any) {
+    this.userAddressList ;
     this.userManagementService.getAddressDetailsByUserId(user)
       .subscribe({
         next: (response: any) => {
-          console.log("Data : "+response)
           if (response['responseCode'] == '200') {
             this.userAddressList = JSON.parse(JSON.stringify(response['listPayload']));
             // this.toastr.success(response['status'], response['responseCode']);

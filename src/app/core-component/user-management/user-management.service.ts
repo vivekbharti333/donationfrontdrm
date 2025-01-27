@@ -245,7 +245,7 @@ export class UserManagementService {
     let request: UserDetailsRequest = {
       payload: {
         requestedFor: 'ALL',
-        id: user['id'],
+        id: user.id,
         token: this.loginUser['token'],
         roleType: this.loginUser['roleType'],
         createdBy: this.loginUser['loginId'],

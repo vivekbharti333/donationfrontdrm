@@ -104,11 +104,6 @@ export class SidebarService {
           showSubRoute: false,
           icon: 'users',
           subMenus: [
-            // {
-            //   menuValue: 'Add user',
-            //   route: routes.addusers,
-            //   permission: 'create-user',
-            // },
             {
               menuValue: 'Add user',
               route: routes.createUser,
@@ -130,7 +125,7 @@ export class SidebarService {
           menuValue: 'Donation Management',
           hasSubRoute: true,
           showSubRoute: false,
-          icon: 'users',
+          icon: 'database',
           subMenus: [
             {
               menuValue: 'Add Receipt',
@@ -181,7 +176,7 @@ export class SidebarService {
           menuValue: 'Currency Management',
           hasSubRoute: true,
           showSubRoute: false,
-          icon: 'users',
+          icon: 'shield',
           // base1: 'usermang',
           subMenus: [
             {
@@ -218,13 +213,6 @@ export class SidebarService {
               route: routes.receipt,
               permission: 'receipt-header-list',
             }, 
-            // {
-            //   menuValue: 'Under Maintenance',
-            //   hasSubRoute: false,
-            //   showSubRoute: false,
-            //   route: routes.underMaintanance,
-            //   permission: 'receipt-header-list',
-            // },
           ],
         },
         {
@@ -363,15 +351,584 @@ export class SidebarService {
       ],
     },
 
-
-
-    
-
-
-    
   ];
 
+
   public sidebarData2 = [
+    {
+      tittle: 'Main',
+      hasSubRoute: true,
+      icon: 'assets/img/icons/menu-icon.svg',
+      showSubRoute: false,
+      menu: [
+        {
+          menuValue: 'Dashboard',
+          hasSubRoute: true,
+          showSubRoute: false,
+          icon: 'grid',
+          base1: 'dashboard',
+          subMenus: [
+            {
+              menuValue: 'Dashboard',
+              route: routes.salesDashboard,
+              permission: 'dashboard',
+            },
+            {
+              menuValue: 'Call Dashboard',
+              route: routes.adminDashboard,
+              permission: 'call-dashboard',
+            },
+          ],
+        },
+        {
+          menuValue: 'User Management',
+          hasSubRoute: true,
+          showSubRoute: false,
+          icon: 'users',
+          subMenus: [
+            // {
+            //   menuValue: 'Add user',
+            //   route: routes.addusers,
+            //   permission: 'create-user',
+            // },
+            {
+              menuValue: 'Add user',
+              route: routes.createUser,
+              permission: 'create-user',
+            },
+            {
+              menuValue: 'User List',
+              route: routes.users,
+              permission: 'user-list',
+            },
+            {
+              menuValue: 'Roles & Permissions',
+              route: routes.rolesPermission,
+              permission: 'user-list',
+            },
+          ],
+        },
+        {
+          menuValue: 'Donation Management',
+          hasSubRoute: true,
+          showSubRoute: false,
+          icon: 'users',
+          subMenus: [
+            {
+              menuValue: 'Add Receipt',
+              route: routes.addDonation,
+              permission: 'add-donation',
+            }, 
+            {
+              menuValue: 'Receipt List',
+              route: routes.allDonationList,
+              permission: 'all-donation-list',
+            },
+          ],
+        },
+        {
+          menuValue: 'Payment Mode Management',
+          hasSubRoute: true,
+          showSubRoute: false,
+          icon: 'users',
+          // base1: 'usermang',
+          subMenus: [
+            {
+              menuValue: 'Payment Mode Master',
+              route: routes.paymentModeMaster,
+              permission: 'payment-mode-master',
+            }, 
+            {
+              menuValue: 'Payment Mode',
+              route: routes.paymentMode,
+              permission: 'payment-mode',
+            },
+          ],
+        },
+        {
+          menuValue: 'Program Management',
+          hasSubRoute: true,
+          showSubRoute: false,
+          icon: 'users',
+          // base1: 'usermang',
+          subMenus: [
+            {
+              menuValue: 'Program',
+              route: routes.program,
+              permission: 'program',
+            }, 
+          ],
+        },
+        {
+          menuValue: 'Currency Management',
+          hasSubRoute: true,
+          showSubRoute: false,
+          icon: 'users',
+          // base1: 'usermang',
+          subMenus: [
+            {
+              menuValue: 'Currency Master',
+              route: routes.currencyMaster,
+              permission: 'currency-master',
+            }, 
+            {
+              menuValue: 'Currency',
+              route: routes.currency,
+              permission: 'currency',
+            }, 
+          ],
+        },
+        {
+          menuValue: 'Receipt Header Management',
+          hasSubRoute: true,
+          showSubRoute: false,
+          icon: 'users',
+          // base1: 'usermang',
+          subMenus: [
+            {
+              menuValue: 'Add Receipt Header',
+              route: routes.addReceiptHeader,
+              permission: 'add-receipt-header',
+            }, 
+            {
+              menuValue: 'Receipt Header List',
+              route: routes.receiptHeaderList,
+              permission: 'receipt-header-list',
+            }, 
+            {
+              menuValue: 'Receipt',
+              route: routes.receipt,
+              permission: 'receipt-header-list',
+            }, 
+          ],
+        },
+        {
+          menuValue: 'Lead Management',
+          hasSubRoute: true,
+          showSubRoute: false,
+          icon: 'bar-chart',
+          // base1: 'leadmang',
+          subMenus: [
+            {
+              menuValue: 'Create Lead',
+              route: routes.createLead,
+              permission: 'create-lead',
+            },
+            {
+              menuValue: 'Follow up',
+              route: routes.followupOne,
+              permission: 'follow-up',
+            },
+            {
+              menuValue: 'All Lead',
+              route: routes.allLead,
+              permission: 'lead-list',
+            },
+            {
+              menuValue: 'Info',
+              route: routes.infoLead,
+              permission: 'info',
+            },
+            {
+              menuValue: 'Enquiry',
+              route: routes.enquiry,
+              permission: 'enquiry',
+            },
+            {
+              menuValue: 'Hot Lead',
+              route: routes.hotLead,
+              permission: 'hot-lead',
+            },
+            {
+              menuValue: 'Follow Up',
+              route: routes.folloupLead,
+              permission: 'followup',
+            },
+            {
+              menuValue: 'importaint Lead',
+              route: routes.importaintLead,
+              permission: 'importaint-lead',
+            },
+            {
+              menuValue: 'Pending Paymnt',
+              route: routes.pendingPayment,
+              permission: 'pending-payment',
+            },
+            {
+              menuValue: 'Won Lead',
+              route: routes.wonLead,
+              permission: 'won-lead',
+            },
+            {
+              menuValue: 'Lost Lead',
+              route: routes.lost,
+              permission: 'lost-lead',
+            },
+            {
+              menuValue: 'Assigned Lead',
+              route: routes.assignedLead,
+              permission: 'assigned-lead',
+            },
+            {
+              menuValue: 'Reserved',
+              route: routes.reserved,
+              permission: 'reserved',
+            },
+            
+            
+          ],
+        },
+        {
+          menuValue: 'Category Management',
+          hasSubRoute: true,
+          showSubRoute: false,
+          icon: 'bar-chart',
+          // base1: 'leadmang',
+          subMenus: [
+            {
+              menuValue: 'Category Type',
+              route: routes.categoryType,
+              permission: 'category-type',
+            },
+            {
+              menuValue: 'Super Category',
+              route: routes.superCategory,
+              permission: 'super-category',
+            },
+            {
+              menuValue: 'Category',
+              route: routes.category,
+              permission: 'category',
+            },
+            {
+              menuValue: 'Sub category',
+              route: routes.subCategory,
+              permission: 'sub-category',
+            },
+            
+          ],
+        },
+      ],
+    },
+    {
+      tittle: 'Setting',
+      hasSubRoute: true,
+      icon: 'assets/img/icons/menu-icon.svg',
+      showSubRoute: false,
+      menu: [
+        {
+          menuValue: 'Setting',
+          hasSubRoute: true,
+          showSubRoute: false,
+          icon: 'grid',
+          base1: 'dashboard',
+          subMenus: [
+            {
+              menuValue: 'General Setting',
+              route: routes.generalSettings,
+              permission: 'general-setting',
+            },
+            {
+              menuValue: 'Company Setting',
+              route: routes.companySettings,
+              permission: 'company-setting',
+            },
+          ],
+        },
+      ],
+    },
+
+  ];
+
+
+  public sidebarData3 = [
+    {
+      tittle: 'Main',
+      hasSubRoute: true,
+      icon: 'assets/img/icons/menu-icon.svg',
+      showSubRoute: false,
+      menu: [
+        {
+          menuValue: 'Dashboard',
+          hasSubRoute: true,
+          showSubRoute: false,
+          icon: 'grid',
+          base1: 'dashboard',
+          subMenus: [
+            {
+              menuValue: 'Dashboard',
+              route: routes.salesDashboard,
+              permission: 'dashboard',
+            },
+            {
+              menuValue: 'Call Dashboard',
+              route: routes.adminDashboard,
+              permission: 'call-dashboard',
+            },
+          ],
+        },
+        {
+          menuValue: 'User Management',
+          hasSubRoute: true,
+          showSubRoute: false,
+          icon: 'users',
+          subMenus: [
+            // {
+            //   menuValue: 'Add user',
+            //   route: routes.addusers,
+            //   permission: 'create-user',
+            // },
+            {
+              menuValue: 'Add user',
+              route: routes.createUser,
+              permission: 'create-user',
+            },
+            {
+              menuValue: 'User List',
+              route: routes.users,
+              permission: 'user-list',
+            },
+            {
+              menuValue: 'Roles & Permissions',
+              route: routes.rolesPermission,
+              permission: 'user-list',
+            },
+          ],
+        },
+        {
+          menuValue: 'Donation Management',
+          hasSubRoute: true,
+          showSubRoute: false,
+          icon: 'users',
+          subMenus: [
+            {
+              menuValue: 'Add Receipt',
+              route: routes.addDonation,
+              permission: 'add-donation',
+            }, 
+            {
+              menuValue: 'Receipt List',
+              route: routes.allDonationList,
+              permission: 'all-donation-list',
+            },
+          ],
+        },
+        {
+          menuValue: 'Payment Mode Management',
+          hasSubRoute: true,
+          showSubRoute: false,
+          icon: 'users',
+          // base1: 'usermang',
+          subMenus: [
+            {
+              menuValue: 'Payment Mode Master',
+              route: routes.paymentModeMaster,
+              permission: 'payment-mode-master',
+            }, 
+            {
+              menuValue: 'Payment Mode',
+              route: routes.paymentMode,
+              permission: 'payment-mode',
+            },
+          ],
+        },
+        {
+          menuValue: 'Program Management',
+          hasSubRoute: true,
+          showSubRoute: false,
+          icon: 'users',
+          // base1: 'usermang',
+          subMenus: [
+            {
+              menuValue: 'Program',
+              route: routes.program,
+              permission: 'program',
+            }, 
+          ],
+        },
+        {
+          menuValue: 'Currency Management',
+          hasSubRoute: true,
+          showSubRoute: false,
+          icon: 'users',
+          // base1: 'usermang',
+          subMenus: [
+            {
+              menuValue: 'Currency Master',
+              route: routes.currencyMaster,
+              permission: 'currency-master',
+            }, 
+            {
+              menuValue: 'Currency',
+              route: routes.currency,
+              permission: 'currency',
+            }, 
+          ],
+        },
+        {
+          menuValue: 'Receipt Header Management',
+          hasSubRoute: true,
+          showSubRoute: false,
+          icon: 'users',
+          // base1: 'usermang',
+          subMenus: [
+            {
+              menuValue: 'Add Receipt Header',
+              route: routes.addReceiptHeader,
+              permission: 'add-receipt-header',
+            }, 
+            {
+              menuValue: 'Receipt Header List',
+              route: routes.receiptHeaderList,
+              permission: 'receipt-header-list',
+            }, 
+            {
+              menuValue: 'Receipt',
+              route: routes.receipt,
+              permission: 'receipt-header-list',
+            }, 
+          ],
+        },
+        {
+          menuValue: 'Lead Management',
+          hasSubRoute: true,
+          showSubRoute: false,
+          icon: 'bar-chart',
+          // base1: 'leadmang',
+          subMenus: [
+            {
+              menuValue: 'Create Lead',
+              route: routes.createLead,
+              permission: 'create-lead',
+            },
+            {
+              menuValue: 'Follow up',
+              route: routes.followupOne,
+              permission: 'follow-up',
+            },
+            {
+              menuValue: 'All Lead',
+              route: routes.allLead,
+              permission: 'lead-list',
+            },
+            {
+              menuValue: 'Info',
+              route: routes.infoLead,
+              permission: 'info',
+            },
+            {
+              menuValue: 'Enquiry',
+              route: routes.enquiry,
+              permission: 'enquiry',
+            },
+            {
+              menuValue: 'Hot Lead',
+              route: routes.hotLead,
+              permission: 'hot-lead',
+            },
+            {
+              menuValue: 'Follow Up',
+              route: routes.folloupLead,
+              permission: 'followup',
+            },
+            {
+              menuValue: 'importaint Lead',
+              route: routes.importaintLead,
+              permission: 'importaint-lead',
+            },
+            {
+              menuValue: 'Pending Paymnt',
+              route: routes.pendingPayment,
+              permission: 'pending-payment',
+            },
+            {
+              menuValue: 'Won Lead',
+              route: routes.wonLead,
+              permission: 'won-lead',
+            },
+            {
+              menuValue: 'Lost Lead',
+              route: routes.lost,
+              permission: 'lost-lead',
+            },
+            {
+              menuValue: 'Assigned Lead',
+              route: routes.assignedLead,
+              permission: 'assigned-lead',
+            },
+            {
+              menuValue: 'Reserved',
+              route: routes.reserved,
+              permission: 'reserved',
+            },
+            
+            
+          ],
+        },
+        {
+          menuValue: 'Category Management',
+          hasSubRoute: true,
+          showSubRoute: false,
+          icon: 'bar-chart',
+          // base1: 'leadmang',
+          subMenus: [
+            {
+              menuValue: 'Category Type',
+              route: routes.categoryType,
+              permission: 'category-type',
+            },
+            {
+              menuValue: 'Super Category',
+              route: routes.superCategory,
+              permission: 'super-category',
+            },
+            {
+              menuValue: 'Category',
+              route: routes.category,
+              permission: 'category',
+            },
+            {
+              menuValue: 'Sub category',
+              route: routes.subCategory,
+              permission: 'sub-category',
+            },
+            
+          ],
+        },
+      ],
+    },
+    {
+      tittle: 'Setting',
+      hasSubRoute: true,
+      icon: 'assets/img/icons/menu-icon.svg',
+      showSubRoute: false,
+      menu: [
+        {
+          menuValue: 'Setting',
+          hasSubRoute: true,
+          showSubRoute: false,
+          icon: 'grid',
+          base1: 'dashboard',
+          subMenus: [
+            {
+              menuValue: 'General Setting',
+              route: routes.generalSettings,
+              permission: 'general-setting',
+            },
+            {
+              menuValue: 'Company Setting',
+              route: routes.companySettings,
+              permission: 'company-setting',
+            },
+          ],
+        },
+      ],
+    },
+
+  ];
+
+
+  public sidebarData21 = [
     {
       tittle: 'Main Menu',
       hasSubRoute: true,
@@ -1635,7 +2192,7 @@ export class SidebarService {
     },
   ];
 
-  public sidebarData3 = [
+  public sidebarData31 = [
     {
       tittle: 'Main Menu',
       hasSubRoute: true,

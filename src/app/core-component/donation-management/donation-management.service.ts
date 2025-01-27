@@ -27,11 +27,12 @@ export class DonationManagementService {
     let request: DonationDetailsRequest = {
       payload: {
         requestedFor: "OPTION",
-        roleType: this.cookieService.get('roleType'),
-        createdBy: this.cookieService.get('loginId'),
-        loginId: this.cookieService.get('loginId'),
-        token: this.cookieService.get('token'),
-        superadminId: this.cookieService.get('superadminId'),
+        createdBy: this.loginUser['loginId'],
+        roleType: this.loginUser['roleType'],
+        loginId: this.loginUser['loginId'],
+        token: this.loginUser['token'],
+        superadminId: this.loginUser['superadminId'],
+
       }
     };
     return this.http.post<DonationDetailsRequest>(Constant.Site_Url + "getFundRisingOfficersBySuperadminId", request);

@@ -1,0 +1,8 @@
+.nav-link {
+    font-weight: bold;
+    color: black;
+  }
+  
+  .nav-link.active {
+    color: black; /* Ensure active links also remain black */
+  }
