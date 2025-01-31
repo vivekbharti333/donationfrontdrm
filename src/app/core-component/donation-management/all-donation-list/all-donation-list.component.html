@@ -142,7 +142,7 @@
                   <th mat-sort-header="invoiceFor">Invoice For</th>
                   <th mat-sort-header="program">Program</th>
                   <th mat-sort-header="date&Time">Date & Time</th>
-                  <!-- <th mat-sort-header="invoiceNumber">Invoice Number</th> -->
+                  <th mat-sort-header="invoiceNumber">Invoice Number</th>
                   <th mat-sort-header="invoiceDownload">Invoice Download</th>
                   <th class="no-sort">Action</th>
                 </tr>
@@ -158,7 +158,7 @@
                   <td>{{ data.invoiceHeaderName }}</td>
                   <td>{{ data.programName }}</td>
                   <td>{{ data.createdAt | date : "dd-MM-yyyy | HH:mm" }}</td>
-                  <!-- <td>{{ data.invoiceNumber}}</td> -->
+                  <td>{{ data.invoiceNumber}}</td>
                   <td>
 
                     <button class="badge-button"
@@ -198,7 +198,7 @@
                   <th mat-sort-header="invoiceFor">Invoice For</th>
                   <th mat-sort-header="program">Program</th>
                   <th mat-sort-header="date&Time">Date & Time</th>
-                  <!-- <th mat-sort-header="invoiceNumber">Invoice Number</th> -->
+                  <th mat-sort-header="invoiceNumber">Invoice Number</th>
                   <th mat-sort-header="invoiceDownload">Invoice Download</th>
                   <th class="no-sort">Action</th>
                 </tr>
@@ -214,7 +214,7 @@
                   <td>{{ data.invoiceHeaderName }}</td>
                   <td>{{ data.programName }}</td>
                   <td>{{ data.createdAt | date : "dd-MM-yyyy | HH:mm" }}</td>
-                  <!-- <td>{{ data.invoiceNumber}}</td> -->
+                  <td>{{ data.invoiceNumber}}</td>
                   <td>
 
                     <button class="badge-button"
@@ -254,7 +254,7 @@
                   <th mat-sort-header="invoiceFor">Invoice For</th>
                   <th mat-sort-header="program">Program</th>
                   <th mat-sort-header="date&Time">Date & Time</th>
-                  <!-- <th mat-sort-header="invoiceNumber">Invoice Number</th> -->
+                  <th mat-sort-header="invoiceNumber">Invoice Number</th>
                   <th mat-sort-header="invoiceDownload">Invoice Download</th>
                   <th class="no-sort">Action</th>
                 </tr>
@@ -270,7 +270,7 @@
                   <td>{{ data.invoiceHeaderName }}</td>
                   <td>{{ data.programName }}</td>
                   <td>{{ data.createdAt | date : "dd-MM-yyyy | HH:mm" }}</td>
-                  <!-- <td>{{ data.invoiceNumber}}</td> -->
+                  <td>{{ data.invoiceNumber}}</td>
                   <td>
 
                     <button class="badge-button"
@@ -314,11 +314,7 @@
               </div>
               <div class="col-sm-2">
                 <br>
-                <!-- <div class="input-blocks">
-              <a class="btn btn-filters ms-auto">
-                <i class="feather icon-search feather-search" ></i> Search
-              </a>
-            </div> -->
+               
                 <button type="submit" class="btn btn-warning " 
                   (click)="getDonationListByDate(firstDate.value,lastDate.value)"
                   style="margin-top: 8px; margin-left: 0px;"><i class="feather icon-search feather-search"></i> Search</button>
@@ -328,9 +324,7 @@
                 <div class="col-2" *ngIf = showExcelReport>
                   <label> Export Excel Report</label>
                   <br>
-                  <!-- <button mat-raised-button class="btn btn-warning" (click)="exportAsExcelFile()">
-                    <img src="assets/img/icons/xls.svg" width="24"> Export Report
-                  </button> -->
+                 
                   <a matTooltip="Export to Excel" matTooltipPosition="above" (click)="exportAsExcelFile()">
                     <img src="assets/img/icons/xls.svg" alt="Export Excel Report" width="30" />
                   </a>
