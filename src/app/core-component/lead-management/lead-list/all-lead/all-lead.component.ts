@@ -78,6 +78,7 @@ export class AllLeadComponent {
   firstDate: any = '';
   lastDate: any = '';
 
+  public currentMonthName!: string;
   isEditForm: boolean = false;
   // filteredCategoryTypeList: any[] = [];
   // filteredSuperCategoryList: any[] = [];
@@ -113,6 +114,10 @@ export class AllLeadComponent {
     this.createForms();
     this.getAllLeadList("TODAY");
     this.getUserListForByRoleType();
+
+    const currentDate = new Date();
+    const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    this.currentMonthName = months[currentDate.getMonth()];
   }
 
 
@@ -172,11 +177,106 @@ export class AllLeadComponent {
   //   });
   // }
 
-  getAllLeadList(tabName: any) {    
-    const roleType = this.cookieService.get('roleType');
-    this.leadManagementService.getAllLeadList(tabName).subscribe((apiRes: any) => {
-      this.totalData = apiRes.totalNumber;
 
+
+  // getAllLeadList(tabName: any) {    
+  //   // const roleType = this.cookieService.get('roleType');
+  //   this.leadManagementService.getAllLeadList(tabName).subscribe((apiRes: any) => {
+  //     this.totalData = apiRes.totalNumber;
+
+  //     this.pagination.tablePageSize.subscribe((res: tablePageSize) => {
+  //       if (this.router.url === this.routes.allLead) {
+  //         this.pageSize = res.pageSize;
+  
+  //         // Use the received data for table and pagination calculations
+  //         this.updateTableData(apiRes, { skip: res.skip, limit: res.skip + this.pageSize });
+  //       }
+  //     });
+  //   });
+  // }
+
+
+  // getLeadListByDate(firstDate: any, lastDate: any, tabName: string): void {
+  // const lastDateObj = new Date(lastDate);
+  // lastDateObj.setDate(lastDateObj.getDate() + 1);
+
+  // this.lastDate = lastDateObj.toISOString()
+
+  //   this.leadManagementService.getAllLeadList(tabName, firstDate, lastDateObj.toISOString()).subscribe((apiRes: any) => {
+  //     this.totalData = apiRes;
+
+  //     this.pagination.tablePageSize.subscribe((res: tablePageSize) => {
+  //       if (this.router.url === this.routes.allLead) {
+  //         this.pageSize = res.pageSize;
+  
+  //         // Use the received data for table and pagination calculations
+  //         this.updateTableData(apiRes, { skip: res.skip, limit: res.skip + this.pageSize });
+  //       }
+  //     });
+  //   });
+  // }
+
+  
+  // private updateTableData(apiRes: any, pageOption: pageSelection): void {
+  //   // Initialize table data and pagination arrays
+  //   this.leadList = apiRes.listPayload;
+  //   this.tableData = [];
+  //   this.pageNumberArray = [];
+
+  //   // Paginate the data locally without making another API call
+  //   apiRes.listPayload.forEach((res: DonationDetails, index: number) => {
+  //     const serialNumber = index + 1;
+  //     if (index >= pageOption.skip && serialNumber <= pageOption.limit) {
+  //       this.tableData.push(res);
+  //       this.pageNumberArray.push(serialNumber);
+  //     }
+  //   });
+  //   // Update the data source and pagination
+  //   this.dataSource = new MatTableDataSource<DonationDetails>(this.tableData);
+  //   this.pagination.calculatePageSize.next({
+  //     totalData: this.totalData,
+  //     pageSize: this.pageSize,
+  //     tableData: this.tableData,
+  //     serialNumberArray: this.pageNumberArray,
+  //   });
+  // }
+
+  
+
+  
+
+  // public searchData(value: string): void {
+  //   const searchTerm = value.trim().toLowerCase();
+  
+  //   // Filter the entire dataset (leadList) instead of just the paginated tableData
+  //   const filteredData = this.leadList.filter((lead: DonationDetails) => {
+  //     return Object.values(lead).some((field) =>
+  //       field && field.toString().toLowerCase().includes(searchTerm)
+  //     );
+  //   });
+  
+  //   // Update the tableData and reinitialize pagination
+  //   this.tableData = filteredData;
+  //   this.dataSource = new MatTableDataSource<DonationDetails>(this.tableData);
+  
+  //   // Update pagination based on the filtered results
+  //   this.pagination.calculatePageSize.next({
+  //     totalData: this.tableData.length,
+  //     pageSize: this.pageSize,
+  //     tableData: this.tableData,
+  //     serialNumberArray: this.tableData.map((_, index) => index + 1),
+  //   });
+  // }
+
+// public searchData(value: string): void {
+  //   this.dataSource.filter = value.trim().toLowerCase();
+  //   this.tableData = this.dataSource.filteredData;
+  // }
+
+  getAllLeadList(tabName: string): void {    
+    this.leadManagementService.getAllLeadList(tabName).subscribe((apiRes: any) => {
+      this.totalData = apiRes.totalNumber; // Ensure totalData reflects the total count
+  
       this.pagination.tablePageSize.subscribe((res: tablePageSize) => {
         if (this.router.url === this.routes.allLead) {
           this.pageSize = res.pageSize;
@@ -187,42 +287,36 @@ export class AllLeadComponent {
       });
     });
   }
-
-
+  
   getLeadListByDate(firstDate: any, lastDate: any, tabName: string): void {
-
-    this.firstDate = firstDate;
-    this.lastDate = lastDate;
-
-    this.leadManagementService.getAllLeadList(tabName,this.firstDate, this.lastDate).subscribe((apiRes: any) => {
-      this.totalData = apiRes.totalNumber;
-      // this.fullData = apiRes.listPayload; // Store the full dataset
-
-      this.customeLeadList = JSON.parse(JSON.stringify(apiRes['listPayload']));
-
-     
+    const lastDateObj = new Date(lastDate);
+    lastDateObj.setDate(lastDateObj.getDate() + 1); // Increment lastDate by 1 day
+    
+    // Format lastDate based on the expected format in API
+    const formattedLastDate = lastDateObj.toISOString(); // Change this if another format is required
+  
+    this.leadManagementService.getAllLeadList(tabName, firstDate, formattedLastDate).subscribe((apiRes: any) => {
+      this.totalData = apiRes.totalNumber; // Ensure total count is updated
+  
       this.pagination.tablePageSize.subscribe((res: tablePageSize) => {
-        if (this.router.url === this.routes.allDonationList) {
+        if (this.router.url === this.routes.allLead) {
           this.pageSize = res.pageSize;
-          // Use the full dataset for pagination
-          
+  
+          // Use the received data for table and pagination calculations
           this.updateTableData(apiRes, { skip: res.skip, limit: res.skip + this.pageSize });
-          this.pageSize = res.pageSize;
         }
       });
     });
   }
-
-
   
   private updateTableData(apiRes: any, pageOption: pageSelection): void {
-    // Initialize table data and pagination arrays
-    this.leadList = apiRes.listPayload;
+    // Ensure listPayload exists before proceeding
+    this.leadList = apiRes.listPayload ?? [];
     this.tableData = [];
     this.pageNumberArray = [];
   
     // Paginate the data locally without making another API call
-    apiRes.listPayload.forEach((res: DonationDetails, index: number) => {
+    this.leadList.forEach((res: DonationDetails, index: number) => {
       const serialNumber = index + 1;
       if (index >= pageOption.skip && serialNumber <= pageOption.limit) {
         this.tableData.push(res);
@@ -239,27 +333,27 @@ export class AllLeadComponent {
       serialNumberArray: this.pageNumberArray,
     });
   }
-
-  // public searchData(value: string): void {
-  //   this.dataSource.filter = value.trim().toLowerCase();
-  //   this.tableData = this.dataSource.filteredData;
-  // }
-
+  
   public searchData(value: string): void {
     const searchTerm = value.trim().toLowerCase();
   
-    // Filter the entire dataset (leadList) instead of just the paginated tableData
-    const filteredData = this.leadList.filter((lead: DonationDetails) => {
-      return Object.values(lead).some((field) =>
-        field && field.toString().toLowerCase().includes(searchTerm)
-      );
-    });
+    // Ensure search is performed only when data exists
+    if (!this.leadList || this.leadList.length === 0) {
+      return;
+    }
+  
+    // Filter the entire dataset (leadList) instead of just paginated data
+    const filteredData = this.leadList.filter((lead: DonationDetails) =>
+      Object.values(lead)
+        .filter((field) => field !== null && field !== undefined) // Remove null/undefined values
+        .some((field) => field.toString().toLowerCase().includes(searchTerm))
+    );
   
     // Update the tableData and reinitialize pagination
     this.tableData = filteredData;
     this.dataSource = new MatTableDataSource<DonationDetails>(this.tableData);
   
-    // Update pagination based on the filtered results
+    // Update pagination based on filtered results
     this.pagination.calculatePageSize.next({
       totalData: this.tableData.length,
       pageSize: this.pageSize,
@@ -267,9 +361,7 @@ export class AllLeadComponent {
       serialNumberArray: this.tableData.map((_, index) => index + 1),
     });
   }
-
-
-
+  
 
 
   public sortData(sort: Sort) {

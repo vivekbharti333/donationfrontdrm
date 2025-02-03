@@ -281,7 +281,7 @@ export class AllDonationListComponent {
       this.totalData = apiRes.totalNumber;
       this.fullData = apiRes.listPayload; // Store the full dataset
 
-      this.donationList = JSON.parse(JSON.stringify(apiRes['listPayload']));
+      // this.donationList = JSON.parse(JSON.stringify(apiRes['listPayload']));
 
       if(this.totalData >=1){
         this.showExcelReport = true;

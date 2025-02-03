@@ -87,7 +87,7 @@
       <ul class="nav nav-tabs nav-tabs-solid nav-justified mb-3">
           <li class="nav-item"><a class="nav-link active" href="#solid-justified-tab1" data-bs-toggle="tab" (click)="getAllLeadList('TODAY')">Today's</a></li>
           <li class="nav-item"><a class="nav-link" href="#solid-justified-tab2" data-bs-toggle="tab" (click)="getAllLeadList('YESTERDAY')">Yesterday's</a></li>
-          <li class="nav-item"><a class="nav-link" href="#solid-justified-tab3" data-bs-toggle="tab" (click)="getAllLeadList('MONTH')">Current Month</a></li>
+          <li class="nav-item"><a class="nav-link" href="#solid-justified-tab3" data-bs-toggle="tab" (click)="getAllLeadList('MONTH')">{{currentMonthName}}</a></li>
           <li class="nav-item"><a class="nav-link" href="#solid-justified-tab4" data-bs-toggle="tab" (click)="getAllLeadList('CUSTOM')">Custom Report</a></li>
       </ul>
       <div class="tab-content">
