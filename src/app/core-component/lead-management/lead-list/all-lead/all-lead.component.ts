@@ -46,6 +46,8 @@ export class AllLeadComponent {
   public showFollowupDateBox: boolean = false;
   public minDate: any;
 
+  public customeLeadList: any;
+
 
   public followupList: any;
   public userForDropDown: any[] = [];
@@ -170,17 +172,12 @@ export class AllLeadComponent {
   //   });
   // }
 
-  getAllLeadList(tabName: any) {
-    // Fetch roleType once to avoid multiple cookie accesses
+  getAllLeadList(tabName: any) {    
     const roleType = this.cookieService.get('roleType');
-  
-    // Single API call to fetch all lead list
-    this.leadManagementService.getAllLeadList(roleType, tabName).subscribe((apiRes: any) => {
+    this.leadManagementService.getAllLeadList(tabName).subscribe((apiRes: any) => {
       this.totalData = apiRes.totalNumber;
-  
-      // Calculate pagination only after receiving the API response
+
       this.pagination.tablePageSize.subscribe((res: tablePageSize) => {
-        // Ensure this logic runs only when the route matches
         if (this.router.url === this.routes.allLead) {
           this.pageSize = res.pageSize;
   
@@ -190,6 +187,33 @@ export class AllLeadComponent {
       });
     });
   }
+
+
+  getLeadListByDate(firstDate: any, lastDate: any, tabName: string): void {
+
+    this.firstDate = firstDate;
+    this.lastDate = lastDate;
+
+    this.leadManagementService.getAllLeadList(tabName,this.firstDate, this.lastDate).subscribe((apiRes: any) => {
+      this.totalData = apiRes.totalNumber;
+      // this.fullData = apiRes.listPayload; // Store the full dataset
+
+      this.customeLeadList = JSON.parse(JSON.stringify(apiRes['listPayload']));
+
+     
+      this.pagination.tablePageSize.subscribe((res: tablePageSize) => {
+        if (this.router.url === this.routes.allDonationList) {
+          this.pageSize = res.pageSize;
+          // Use the full dataset for pagination
+          
+          this.updateTableData(apiRes, { skip: res.skip, limit: res.skip + this.pageSize });
+          this.pageSize = res.pageSize;
+        }
+      });
+    });
+  }
+
+
   
   private updateTableData(apiRes: any, pageOption: pageSelection): void {
     // Initialize table data and pagination arrays
@@ -216,6 +240,38 @@ export class AllLeadComponent {
     });
   }
 
+  // public searchData(value: string): void {
+  //   this.dataSource.filter = value.trim().toLowerCase();
+  //   this.tableData = this.dataSource.filteredData;
+  // }
+
+  public searchData(value: string): void {
+    const searchTerm = value.trim().toLowerCase();
+  
+    // Filter the entire dataset (leadList) instead of just the paginated tableData
+    const filteredData = this.leadList.filter((lead: DonationDetails) => {
+      return Object.values(lead).some((field) =>
+        field && field.toString().toLowerCase().includes(searchTerm)
+      );
+    });
+  
+    // Update the tableData and reinitialize pagination
+    this.tableData = filteredData;
+    this.dataSource = new MatTableDataSource<DonationDetails>(this.tableData);
+  
+    // Update pagination based on the filtered results
+    this.pagination.calculatePageSize.next({
+      totalData: this.tableData.length,
+      pageSize: this.pageSize,
+      tableData: this.tableData,
+      serialNumberArray: this.tableData.map((_, index) => index + 1),
+    });
+  }
+
+
+
+
+
   public sortData(sort: Sort) {
     const data = this.tableData.slice();
     if (!sort.active || sort.direction === '') {
@@ -227,11 +283,6 @@ export class AllLeadComponent {
         return (aValue < bValue ? -1 : 1) * (sort.direction === 'asc' ? 1 : -1);
       });
     }
-  }
-
-  public searchData(value: string): void {
-    this.dataSource.filter = value.trim().toLowerCase();
-    this.tableData = this.dataSource.filteredData;
   }
 
   setIsDataCopied(val: boolean, idx: number) {

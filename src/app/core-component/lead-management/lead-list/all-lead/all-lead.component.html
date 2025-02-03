@@ -88,6 +88,7 @@
           <li class="nav-item"><a class="nav-link active" href="#solid-justified-tab1" data-bs-toggle="tab" (click)="getAllLeadList('TODAY')">Today's</a></li>
           <li class="nav-item"><a class="nav-link" href="#solid-justified-tab2" data-bs-toggle="tab" (click)="getAllLeadList('YESTERDAY')">Yesterday's</a></li>
           <li class="nav-item"><a class="nav-link" href="#solid-justified-tab3" data-bs-toggle="tab" (click)="getAllLeadList('MONTH')">Current Month</a></li>
+          <li class="nav-item"><a class="nav-link" href="#solid-justified-tab4" data-bs-toggle="tab" (click)="getAllLeadList('CUSTOM')">Custom Report</a></li>
       </ul>
       <div class="tab-content">
           <div class="tab-pane show active" id="solid-justified-tab1">
@@ -222,6 +223,77 @@
               </table>
             </div>
           </div>
+
+          <div class="tab-pane" id="solid-justified-tab4">
+            <div class="table-responsive">
+
+              <div class="row">
+
+                <div class="col-sm-2">
+                  <label> From</label>
+                  <input class="form-control" pInputText type="date" #firstDate>
+                </div>
+                <div class="col-sm-2">
+                  <label> To </label>
+                  <input class="form-control" pInputText type="date" #lastDate>
+          
+                </div>
+                <div class="col-sm-2">
+                  <br>
+                 
+                  <button type="submit" class="btn btn-warning " 
+                    (click)="getLeadListByDate(firstDate.value,lastDate.value,'CUSTOM')"
+                    style="margin-top: 8px; margin-left: 0px;"><i class="feather icon-search feather-search"></i> Search</button>
+                </div>
+          
+               
+                  
+              </div>
+              <br><br>
+
+              <table matSort (matSortChange)="sortData($event)" class="table datanew">
+                <thead>
+                  <tr>
+                    <th></th>
+                    <th mat-sort-header="userName">Name</th>
+                    <th mat-sort-header="phone">Mobile</th>
+                    <th mat-sort-header="role">Remarks</th>
+                    <th mat-sort-header="status">Status</th>
+                    <th mat-sort-header="createdOn">Created On</th>
+                   
+                    <th class="no-sort">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (data of tableData; track data; let idx=$index) {
+                  <tr>
+                    <td></td>
+                    <td>{{ data.donorName }}</td>
+                    <td>{{ data.mobileNumber }}</td>
+                    <td>{{ data.notes }}</td>
+                    
+                    <td>
+                      <button class="badge-button" [ngClass]="getBadgeClass(data.status)">
+                        {{ data.status }}
+                      </button>
+                    </td>
+                    <td>{{ data.createdAt | date : "dd-MM-yyyy | HH:mm" }}</td>
+    
+    
+                    <td class="action-table-data">
+                      <div class="edit-delete-action">
+                        <a class="me-2 p-2 mb-0" data-bs-toggle="modal" data-bs-target="#edit-units"
+                          (click)="openEditModal(dialogTemplate, data)">
+                          <i class="feather icon-edit feather-edit"></i></a>
+                      </div>
+                    </td>
+                  </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+
       </div>
   </div>
 

@@ -64,7 +64,38 @@ updateLeadDetails(leadDetails: any): Observable<any> {
 }
 
 
-getAllLeadList(roleType:string, tabName:string): Observable<any> {
+// getAllLeadList(roleType:string, tabName:string): Observable<any> {
+//   const request: any = {
+//     payload: {
+//       requestedFor: tabName,
+//       roleType: this.loginUser['roleType'],
+//       token: this.loginUser['token'],
+//       createdBy: this.loginUser['loginId'],
+//       adminId: this.loginUser['adminId'],
+//       superadminId: this.loginUser['superadminId'],
+//     },
+//   };
+//   return this.http.post<any>(Constant.Site_Url + 'getLeadList', request);
+// }
+
+// getAllLeadListByDate(firstDate:string, lastDate:string, tabName:string): Observable<any> {
+//   const request: any = {
+//     payload: {
+//       firstDate: firstDate,
+//       lastDate: lastDate,
+//       requestedFor: tabName,
+//       roleType: this.loginUser['roleType'],
+//       token: this.loginUser['token'],
+//       createdBy: this.loginUser['loginId'],
+//       adminId: this.loginUser['adminId'],
+//       superadminId: this.loginUser['superadminId'],
+//     },
+//   };
+//   return this.http.post<any>(Constant.Site_Url + 'getLeadList', request);
+// }
+
+
+getAllLeadList(tabName: string, firstDate?: string, lastDate?: string): Observable<any> {
   const request: any = {
     payload: {
       requestedFor: tabName,
@@ -73,11 +104,11 @@ getAllLeadList(roleType:string, tabName:string): Observable<any> {
       createdBy: this.loginUser['loginId'],
       adminId: this.loginUser['adminId'],
       superadminId: this.loginUser['superadminId'],
+      ...(firstDate && lastDate ? { firstDate, lastDate } : {}),
     },
   };
   return this.http.post<any>(Constant.Site_Url + 'getLeadList', request);
 }
-
 
 changeLeadStatus(lead: any): Observable<any> {
   const request: any = {
