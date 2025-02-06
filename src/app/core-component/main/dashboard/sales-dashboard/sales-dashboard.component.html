@@ -214,9 +214,10 @@
                     style="text-align: left; padding-left: 0px; word-wrap: break-word; white-space: normal;">
                     <img *ngIf="FRToday[3]" src="data:image/png;base64,{{FRToday[3]}}" size="lg" width="30px"
                       height="30px">
-                    <img *ngIf="!FRToday[3]"
-                      src="https://www.shareicon.net/data/128x128/2016/05/24/770117_people_512x512.png" size="lg"
-                      width="30px" height="30px"> &nbsp;&nbsp;
+                    <!-- <img *ngIf="!FRToday[3]" src="https://www.shareicon.net/data/128x128/2016/05/24/770117_people_512x512.png" size="lg"width="30px" height="30px">  -->
+                    <img *ngIf="!FRToday[3]" src="https://www.shareicon.net/data/128x128/2016/05/24/770117_people_512x512.png" size="lg"width="30px" height="30px"> 
+                    
+                    &nbsp;&nbsp;
                     {{ key }}
                   </td>
                   <td style="width: 40%;">{{ row[1] }} | {{ row[2] }} {{ row[4] }}</td>

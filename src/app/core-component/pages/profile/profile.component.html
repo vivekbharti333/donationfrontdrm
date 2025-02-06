@@ -14,12 +14,13 @@
             <div class="profile-top">
                 <div class="profile-content">
                     <div class="profile-contentimg">
-                        <img src="data:image/png;base64,{{userDetails.userPicture}}" height="300" width="350" alt="img" id="blah">
-                        <div class="profileupload">
-                            <input type="file" id="imgInp">
-                            <a href="javascript:void(0);"><img src="assets/img/icons/edit-set.svg" alt="img"></a>
-                        </div>
+                        <!-- <img *ngIf="userDetails.userPicture; else defaultImage" [src]="'data:image/png;base64,' + userDetails.userPicture"
+                            height="300" width="350" alt="User Profile Picture" id="blah"> -->
+                            
+                            <img src="data:image/jpeg;base64,{{ userDetails.userPicture }}" alt="user image" style="border-radius: 100%;"
+                                onerror="this.onerror=null; this.src='https://www.shareicon.net/data/128x128/2016/05/24/770117_people_512x512.png';" />
                     </div>
+                    
                     <div class="profile-contentname">
                         <h2>{{userDetails['firstName']}} {{userDetails['lastName']}}</h2>
                         <h4>This is Your Photo and Personal Details.</h4>

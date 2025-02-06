@@ -8,6 +8,8 @@ import { ReceiptHeaderListComponent } from './receipt-header-list/receipt-header
 import { DownloadReceiptComponent } from './download-receipt/download-receipt.component';
 import { sharedModule } from 'src/app/shared/shared.module';
 
+import { NgxEditorModule } from 'ngx-editor';
+
 @NgModule({
   declarations: [
     ReceiptManagementComponent ,
@@ -18,7 +20,8 @@ import { sharedModule } from 'src/app/shared/shared.module';
   imports: [
     CommonModule,
     ReceiptManagementRoutingModule,
-    sharedModule
+    sharedModule,
+    NgxEditorModule
   ]
 })
 export class ReceiptManagementModule { }
