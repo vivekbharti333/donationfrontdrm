@@ -49,7 +49,7 @@
                       </a>
                     </div>
                   </div>
-                  <p>Used to send emails safely and easily via SMPT code from a web server.</p>
+                  <p>Mailer is used to send receipt from a mail client.</p>
                 </li>
                 <li>
                   <div class="integration-btn" *ngIf="emailDetailsList?.serviceProvider === 'NIMBUZ' && emailDetailsList?.status === 'ACTIVE'">
@@ -79,7 +79,7 @@
                   <div class="d-flex align-items-center justify-content-between w-100 mb-2">
                     <div class="security-type d-flex align-items-center">
                       <div class="security-title">
-                        <h5>PHP Mailer</h5>
+                        <h5>Brevo Mailer</h5>
                       </div>
                     </div>
                     <div class="connect-btn">
@@ -88,17 +88,17 @@
                       </a>
                     </div>
                   </div>
-                  <p>PHP Mailer is used to send, relay or forward messages from a mail client.</p>
+                  <p>Brevo Mailer is used to send receipt from a mail client.</p>
                 </li>
                 <li>
                   <div class="integration-btn" *ngIf="emailDetailsList?.serviceProvider === 'PHP' && emailDetailsList?.status === 'ACTIVE'">
-                    <a href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#php-mail">
+                    <a href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#brevo-mail">
                       <i class="feather icon-tool me-2"></i>View Integration
                     </a>
                   </div>
                   
                   <div class="integration-btn" *ngIf="!(emailDetailsList?.serviceProvider === 'PHP' && emailDetailsList?.status === 'ACTIVE')">
-                    <a href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#php-mail">
+                    <a href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#brevo-mail">
                       <i class="feather icon-tool me-2"></i>Connect
                     </a>
                   </div>
@@ -127,7 +127,7 @@
                       </a>
                     </div>
                   </div>
-                  <p>Cloud-based email marketing tool that assists marketers and developers .
+                  <p>Mailer is used to send receipt from a mail client.
                   </p>
                 </li>
                 <li>
@@ -156,7 +156,7 @@
     </div>
   </div>
 </div>
-<!-- Php Mail -->
+<!-- Brevo Mail -->
 <div class="modal fade" id="smtp-mail">
   <div class="modal-dialog modal-dialog-centered custom-modal-two">
     <div class="modal-content">
@@ -192,37 +192,37 @@
                 </div>
                 <div class="col-lg-12">
                   <div class="mb-3">
-                    <label class="form-label">Port</label>
+                    <label class="form-label">Port <span> *</span></label>
                     <input class="form-control" type="text" pInputText formControlName="port" maxlength="100">
                   </div>
                 </div>
                 <div class="col-lg-12">
-                  <div class="mb-0">
-                    <label class="form-label">User Id</label>
+                  <div class="mb-3">
+                    <label class="form-label">User Id <span> *</span></label>
                     <input class="form-control" type="text" pInputText formControlName="emailUserid" maxlength="100">
                   </div>
                 </div>
                 <div class="col-lg-12">
-                  <div class="mb-0">
-                    <label class="form-label">Password</label>
+                  <div class="mb-3">
+                    <label class="form-label">Password <span> *</span></label>
                     <input class="form-control" type="text" pInputText formControlName="emailPassword"maxlength="100">
                   </div>
                 </div>
                 <div class="col-lg-12">
-                  <div class="mb-0">
-                    <label class="form-label">Email From</label>
+                  <div class="mb-3">
+                    <label class="form-label">Email From <span> *</span></label>
                     <input class="form-control" type="text" pInputText formControlName="emailFrom" maxlength="100">
                   </div>
                 </div>
                 <div class="col-lg-12">
-                  <div class="mb-0">
-                    <label class="form-label">Subject</label>
+                  <div class="mb-3">
+                    <label class="form-label">Subject <span> *</span></label>
                     <input class="form-control" type="text" pInputText formControlName="subject" maxlength="100">
                   </div>
                 </div>
                 <div class="col-lg-12">
-                  <div class="mb-0">
-                    <label class="form-label">Message / Templete id</label>
+                  <div class="mb-3">
+                    <label class="form-label">Message / Templete id <span> *</span></label>
                     <input class="form-control" type="text" pInputText formControlName="emailBody" maxlength="100">
                   </div>
                 </div>
@@ -239,17 +239,17 @@
     </div>
   </div>
 </div>
-<!-- /Php Mail -->
-
 <!-- Smtp Mail -->
-<div class="modal fade" id="php-mail">
+
+<!-- Brevo Mail -->
+<div class="modal fade" id="brevo-mail">
   <div class="modal-dialog modal-dialog-centered custom-modal-two">
     <div class="modal-content">
       <div class="page-wrapper-new p-0">
         <div class="content">
           <div class="modal-header border-0 custom-modal-header">
             <div class="page-title">
-              <h4>SMTP</h4>
+              <h4>Brevo</h4>
             </div>
             <div
               class="status-toggle modal-status d-flex justify-content-between align-items-center ms-auto me-2">
@@ -300,10 +300,10 @@
     </div>
   </div>
 </div>
-<!-- /Smtp Mail -->
+<!-- /Brevo Mail -->
 
 <!-- SendGrid Mail -->
-<div class="modal fade" id="send-grid">
+<div class="modal fade" id="send-grid-mail">
   <div class="modal-dialog modal-dialog-centered custom-modal-two">
     <div class="modal-content">
       <div class="page-wrapper-new p-0">
