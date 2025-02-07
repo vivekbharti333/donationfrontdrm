@@ -346,10 +346,61 @@ export class SidebarService {
               route: routes.companySettings,
               permission: 'company-setting',
             },
+            {
+              menuValue: 'Email',
+              route: routes.emailSettings,
+              permission: 'email-setting',
+            },
+            {
+              menuValue: 'SMS Gateways',
+              route: routes.smsGateway,
+              permission: 'sms-setting',
+            },
+            {
+              menuValue: 'OTP',
+              route: routes.otpSettings,
+              permission: 'otp-setting',
+            },
+
           ],
         },
       ],
     },
+
+
+
+    // {
+    //   tittle: 'System Settings',
+    //   hasSubRoute: true,
+    //   showSubRoute: false,
+    //   activeRoute: 'users',
+    //   subRoutes: [
+    //     {
+    //       tittle: 'Email',
+    //       route: routes.emailSettings,
+    //       hasSubRoute: false,
+    //       showSubRoute: false,
+    //     },
+    //     {
+    //       tittle: 'SMS Gateways',
+    //       route: routes.smsGateway,
+    //       hasSubRoute: false,
+    //       showSubRoute: false,
+    //     },
+    //     {
+    //       tittle: 'OTP',
+    //       route: routes.otpSettings,
+    //       hasSubRoute: false,
+    //       showSubRoute: false,
+    //     },
+    //     {
+    //       tittle: 'GDPR Cookies',
+    //       route: routes.gdprSettings,
+    //       hasSubRoute: false,
+    //       showSubRoute: false,
+    //     },
+    //   ],
+    // },
 
   ];
 

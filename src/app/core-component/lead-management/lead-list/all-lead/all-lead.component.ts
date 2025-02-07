@@ -61,34 +61,20 @@ export class AllLeadComponent {
 
   // pagination variables
   public tableData: Array<any> = [];
-  // public categoryTypeList: Array<any> = [];
-  // public superCategoryList: Array<any> = [];
-  // public categoryList: Array<any> = [];
-  // public subCategoryList: Array<any> = [];
   public pageSize = 10;
-  // public serialNumberArray: Array<number> = [];
   public pageNumberArray: Array<number> = [];
   public totalData = 0;
   showFilter = false;
   dataSource!: MatTableDataSource<DonationDetails>;
   public searchDataValue = '';
   roleType: string = '';
-  //** / pagination variables
-  // viewLeadDetailsDialog: any;
+  // pagination variables
+
   firstDate: any = '';
   lastDate: any = '';
 
   public currentMonthName!: string;
   isEditForm: boolean = false;
-  // filteredCategoryTypeList: any[] = [];
-  // filteredSuperCategoryList: any[] = [];
-  // filteredCategoryList: any[] = [];
-  // filteredSubCategoryList: any[] = [];
-
-  allIds = {
-    superCategoryId: '',
-    categoryTypeId: '',
-  }
 
 
   public userList: any[] = [];
@@ -103,10 +89,7 @@ export class AllLeadComponent {
     private messageService: MessageService,
     private leadManagementService: LeadManagementService,
     private dialog: MatDialog,
-    private helper: HelperService,
     private userManagementService: UserManagementService,
-    private cookieService: CookieService,
-    private datePipe: DatePipe,
     private fb: FormBuilder,
   ) { }
 
@@ -129,7 +112,7 @@ export class AllLeadComponent {
         }
       },
       error: (error: any) => this.messageService.add({
-        summary: '500',
+        summary: '500'+error,
         detail: 'Server Error',
         styleClass: 'danger-background-popover',
       })
@@ -142,136 +125,7 @@ export class AllLeadComponent {
     // });
   }
 
-  // getAllLeadList(tabName: any) {
-  //   this.leadManagementService.getAllLeadList(this.cookieService.get('roleType'), tabName).subscribe((apiRes: any) => {
-  //     this.totalData = apiRes.totalNumber;
-  //     this.pagination.tablePageSize.subscribe((res: tablePageSize) => {
-  //       if (this.router.url == this.routes.allLead) {
-  //         this.getTableData({ skip: res.skip, limit: (res.skip) + this.pageSize }, tabName);
-  //         this.pageSize = res.pageSize;
-  //       }
-  //     });
-  //   });
-  // }
 
-  // private getTableData(pageOption: pageSelection, tabName: any): void {
-  //   this.leadManagementService.getAllLeadList(this.cookieService.get('roleType'), tabName).subscribe((apiRes: any) => {
-  //     this.leadList = apiRes.listPayload;
-  //     this.tableData = [];
-  //     this.pageNumberArray = [];
-  //     this.totalData = apiRes.totalNumber;
-  //     apiRes.listPayload.map((res: DonationDetails, index: number) => {
-  //       const serialNumber = index + 1;
-  //       if (index >= pageOption.skip && serialNumber <= pageOption.limit) {
-  //         this.tableData.push(res);
-  //         this.pageNumberArray.push(serialNumber);
-  //       }
-  //     });
-  //     this.dataSource = new MatTableDataSource<DonationDetails>(this.tableData);
-  //     this.pagination.calculatePageSize.next({
-  //       totalData: this.totalData,
-  //       pageSize: this.pageSize,
-  //       tableData: this.tableData,
-  //       serialNumberArray: this.pageNumberArray,
-  //     });
-  //   });
-  // }
-
-
-
-  // getAllLeadList(tabName: any) {    
-  //   // const roleType = this.cookieService.get('roleType');
-  //   this.leadManagementService.getAllLeadList(tabName).subscribe((apiRes: any) => {
-  //     this.totalData = apiRes.totalNumber;
-
-  //     this.pagination.tablePageSize.subscribe((res: tablePageSize) => {
-  //       if (this.router.url === this.routes.allLead) {
-  //         this.pageSize = res.pageSize;
-  
-  //         // Use the received data for table and pagination calculations
-  //         this.updateTableData(apiRes, { skip: res.skip, limit: res.skip + this.pageSize });
-  //       }
-  //     });
-  //   });
-  // }
-
-
-  // getLeadListByDate(firstDate: any, lastDate: any, tabName: string): void {
-  // const lastDateObj = new Date(lastDate);
-  // lastDateObj.setDate(lastDateObj.getDate() + 1);
-
-  // this.lastDate = lastDateObj.toISOString()
-
-  //   this.leadManagementService.getAllLeadList(tabName, firstDate, lastDateObj.toISOString()).subscribe((apiRes: any) => {
-  //     this.totalData = apiRes;
-
-  //     this.pagination.tablePageSize.subscribe((res: tablePageSize) => {
-  //       if (this.router.url === this.routes.allLead) {
-  //         this.pageSize = res.pageSize;
-  
-  //         // Use the received data for table and pagination calculations
-  //         this.updateTableData(apiRes, { skip: res.skip, limit: res.skip + this.pageSize });
-  //       }
-  //     });
-  //   });
-  // }
-
-  
-  // private updateTableData(apiRes: any, pageOption: pageSelection): void {
-  //   // Initialize table data and pagination arrays
-  //   this.leadList = apiRes.listPayload;
-  //   this.tableData = [];
-  //   this.pageNumberArray = [];
-
-  //   // Paginate the data locally without making another API call
-  //   apiRes.listPayload.forEach((res: DonationDetails, index: number) => {
-  //     const serialNumber = index + 1;
-  //     if (index >= pageOption.skip && serialNumber <= pageOption.limit) {
-  //       this.tableData.push(res);
-  //       this.pageNumberArray.push(serialNumber);
-  //     }
-  //   });
-  //   // Update the data source and pagination
-  //   this.dataSource = new MatTableDataSource<DonationDetails>(this.tableData);
-  //   this.pagination.calculatePageSize.next({
-  //     totalData: this.totalData,
-  //     pageSize: this.pageSize,
-  //     tableData: this.tableData,
-  //     serialNumberArray: this.pageNumberArray,
-  //   });
-  // }
-
-  
-
-  
-
-  // public searchData(value: string): void {
-  //   const searchTerm = value.trim().toLowerCase();
-  
-  //   // Filter the entire dataset (leadList) instead of just the paginated tableData
-  //   const filteredData = this.leadList.filter((lead: DonationDetails) => {
-  //     return Object.values(lead).some((field) =>
-  //       field && field.toString().toLowerCase().includes(searchTerm)
-  //     );
-  //   });
-  
-  //   // Update the tableData and reinitialize pagination
-  //   this.tableData = filteredData;
-  //   this.dataSource = new MatTableDataSource<DonationDetails>(this.tableData);
-  
-  //   // Update pagination based on the filtered results
-  //   this.pagination.calculatePageSize.next({
-  //     totalData: this.tableData.length,
-  //     pageSize: this.pageSize,
-  //     tableData: this.tableData,
-  //     serialNumberArray: this.tableData.map((_, index) => index + 1),
-  //   });
-  // }
-
-// public searchData(value: string): void {
-  //   this.dataSource.filter = value.trim().toLowerCase();
-  //   this.tableData = this.dataSource.filteredData;
-  // }
 
   getAllLeadList(tabName: string): void {    
     this.leadManagementService.getAllLeadList(tabName).subscribe((apiRes: any) => {
@@ -410,9 +264,6 @@ export class AllLeadComponent {
       this.lastDate = eve.target.value;
     }
   }
-
-
-
 
 
   createForms() {
