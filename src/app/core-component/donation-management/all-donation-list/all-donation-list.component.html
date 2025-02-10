@@ -160,7 +160,6 @@
                   <td>{{ data.createdAt | date : "dd-MM-yyyy | HH:mm" }}</td>
                   <td>{{ data.invoiceNumber}}</td>
                   <td>
-
                     <button class="badge-button"
                       [ngClass]="{'badge-linesuccess': data.invoiceDownloadStatus === 'NO','badge-linedanger': data.invoiceDownloadStatus === 'YES'}">
                       {{ data.invoiceDownloadStatus }}

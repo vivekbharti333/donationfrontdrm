@@ -13,6 +13,7 @@ import { Constant } from 'src/app/core/constant/constants';
   styleUrls: ['./signin.component.scss'],  // Corrected property name
   providers: [MessageService],
 })
+
 export class SigninComponent {
   public routes = routes;
   constructor(
@@ -23,10 +24,6 @@ export class SigninComponent {
     private cookieService: CookieService
   ) { }
 
-  // navigation() {
-  //   localStorage.setItem('menuPermission', JSON.stringify(['admindb', 'admindbn', 'usermang', 'usermang1']));
-  //   this.router.navigate([routes.adminDashboard])
-  // }
 
   public password: boolean[] = [false];  // Ensure sufficient elements in the array
 
@@ -39,16 +36,14 @@ export class SigninComponent {
     password: '',
   };
 
-
-
-
   validateUser() {
     this.userManagementService.doLogin(this.login)
       .subscribe({
         next: (response: any) => {
           if (response['responseCode'] == '200') {
             if (response['payload']['respCode'] == '200') {
-              // this.getApplicaionHeaderDetails();
+
+              this.getApplicaionHeaderDetails(response['payload']['superadminId']);
 
               localStorage.setItem('authorized', 'true');
               let permission = response['payload']['permissions'];
@@ -59,7 +54,7 @@ export class SigninComponent {
               let expiredDate = new Date();
               expiredDate.setDate(expiredDate.getDate() + 1);
               this.cookieService.set('loginDetails', JSON.stringify(response['payload']), expiredDate);
-              
+
               this.cookieService.set('loginId', response['payload']['loginId'], expiredDate);
               this.cookieService.set('firstName', response['payload']['firstName'], expiredDate);
               this.cookieService.set('lastName', response['payload']['lastName'], expiredDate);
@@ -73,12 +68,11 @@ export class SigninComponent {
                 detail: response['payload']['respMesg'],
                 styleClass: 'success-background-popover',
               });
-              if(response['payload']['roleType'] == Constant.donorExecutive){
+              if (response['payload']['roleType'] == Constant.donorExecutive) {
                 this.router.navigate([routes.adminDashboard]);
-              }else{
+              } else {
                 this.router.navigate([routes.salesDashboard]);
               }
-              
             } else {
               this.messageService.add({
                 summary: response['payload']['respCode'],
@@ -102,8 +96,9 @@ export class SigninComponent {
       });
   }
 
-  public getApplicaionHeaderDetails() {
-    this.commonComponentService.getApplicaionHeaderDetails()
+  public getApplicaionHeaderDetails(superadminId: any) {
+    localStorage.clear();
+    this.commonComponentService.getApplicaionHeaderDetails(superadminId)
       .subscribe({
         next: (response: any) => {
           if (response['responseCode'] == '200') {

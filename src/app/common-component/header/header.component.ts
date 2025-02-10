@@ -8,6 +8,7 @@ import { AuthenticationService } from 'src/app/auth/authentication.service';
 import { CookieService } from 'ngx-cookie-service';
 
 
+
 @Component({
   selector: 'app-header',
   templateUrl: './header.component.html',
@@ -30,6 +31,7 @@ export class HeaderComponent  {
   public loginUser: any;
   public headerDetails: any;
   public displayLogo: any;
+  public displayLogoSmall: any;
 
   public userName: string = '';
   public userRole: string = '';
@@ -108,35 +110,23 @@ export class HeaderComponent  {
   }
 
   public getApplicaionHeaderDetails() {
+
     let firstName = this.cookieService.get('firstName');
     let lastName =  this.cookieService.get('lastName');
     this.userName = firstName+" "+lastName
     this.userRole =  this.cookieService.get('roleType');
 
+    // this.displayLogo = this.cookieService.get('displayLogo');
 
 
-    //  this.displayLogo =localStorage.getItem('displayLogo');
+     this.displayLogo =localStorage.getItem('displayLogo');
+     this.displayLogo = 'data:image/png;base64,'+this.displayLogo;
+
+
     //  this.userPicture = 'data:image/jpeg;base64,'+localStorage.getItem('userPicture');
     this.userPicture = localStorage.getItem('userPicture') || '';
   }
 
-  // logOut() {
-
-  //   this.cookieService.delete('loginDetails');
-  //   this.cookieService.delete('loginId');
-  //   this.cookieService.delete('firstName');
-  //   this.cookieService.delete('lastName');
-  //   this.cookieService.delete('roleType');
-  //   this.cookieService.delete('teamleaderId');
-  //   this.cookieService.delete('superadminId');
-  //   this.cookieService.delete('token');
-  //   this.cookieService.delete('userDetails');
-  //   localStorage.removeItem('displayLogo');
-  //   localStorage.removeItem('userPicture');
-    
-  //   this.router.navigate([routes.signIn]);
-
-  // }
 
   logOut(){
     this.authenticationService.logOut();
