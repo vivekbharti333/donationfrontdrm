@@ -13,7 +13,7 @@ const routes: Routes = [
       { path: 'add-receipt-header', component: AddReceiptHeaderComponent },
       { path: 'receipt-header-list', component: ReceiptHeaderListComponent },
       // { path: 'receipt', component: DownloadReceiptComponent },
-      { path: 'receipt/:receiptNo', component: DownloadReceiptComponent },
+      { path: 'receipt12/:receiptNo', component: DownloadReceiptComponent },
       
     ],
   },
