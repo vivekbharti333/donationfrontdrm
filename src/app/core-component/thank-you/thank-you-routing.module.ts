@@ -9,7 +9,7 @@ const routes: Routes = [
     path: '',
     component: ThankYouComponent,
     children: [
-      { path: 'letter/:receiptNo', component: LetterComponent },   // http://localhost:4200/#/thank-you/letter/1234w5tY752               https://mydonation.in/#/thank-you/letter/1234w5tY752
+      { path: 'letter/:receiptNo', component: LetterComponent },   // http://localhost:4200/#/thank-you/letter/1234w5tY752                https://mydonation.in/#/thank-you/letter/1234w5tY752
       { path: 'receipt', component: ReceiptComponent },            // http://localhost:4200/#/thank-you/receipt?receiptNo=1234w5tY752     https://mydonation.in/#/thank-you/receipt?receiptNo=1234w5tY752
       // { path: 'letter', component: LetterComponent },           
     ],

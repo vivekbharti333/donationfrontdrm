@@ -117,7 +117,7 @@ export class SidebarService {
             {
               menuValue: 'Roles & Permissions',
               route: routes.rolesPermission,
-              permission: 'user-list',
+              permission: 'roles-permission',
             },
           ],
         },
@@ -168,7 +168,8 @@ export class SidebarService {
             {
               menuValue: 'Program',
               route: routes.program,
-              permission: 'program',
+              // permission: 'program',
+              permission: 'add-donation',
             }, 
           ],
         },
