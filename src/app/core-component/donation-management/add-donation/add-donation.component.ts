@@ -11,7 +11,23 @@ import { Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
 import { Constant } from 'src/app/core/constant/constants';
 import { AuthenticationService } from 'src/app/auth/authentication.service';
+import { MatSelectChange } from '@angular/material/select';
 
+
+interface DonationProgram {
+  id: string;
+  programName: string;
+  programAmount: string;
+}
+
+interface CurrencyDetails {
+  id: string,
+  country: string;
+  currencyName: string;
+  currencyCode: string;
+  unicode: string;
+            
+}
 
 @Component({
   selector: 'app-add-donation',
@@ -31,8 +47,12 @@ export class AddDonationComponent {
   public invoiceType: any;
   public paymentModeList: any;
   public donationTypeList: any;
+  public donationTypeAmount: any;
   public programNames: string = '';
   public selectedProgramAmount: number | null = null;
+
+  public selectedProgramId: any;
+  public selectedCurrencyId: any;
 
 
   ngOnInit() {
@@ -43,6 +63,7 @@ export class AddDonationComponent {
     this.getPaymentModeList();
     this.getFundrisingOfficerByTeamLeaderId();
     this.checkRoleType();
+    this.getDonationTypeAmount("","");
   }
 
   constructor(
@@ -126,6 +147,50 @@ export class AddDonationComponent {
 
             console.log("This one :" + this.donationTypeList.value)
             this.programNames = this.donationTypeList.listPayload.map((item: any) => item.programName);
+
+            // this.toastr.success(response['responseMessage'], response['responseCode']);
+          } else {
+            //  this.toastr.error(response['responseMessage'], response['responseCode']);
+          }
+        },
+        //error: (error: any) => this.toastr.error('Server Error', '500'),
+      });
+  }
+
+  getAmountValueByIds(selectedProgramName: string, selectCurrencyName: string) {
+    // console.log(`Selected Program Name: ${selectedProgramName}`);
+    // console.log(`Selected Currency Name: ${selectCurrencyName}`);
+
+    // Find the selected program by name and get its ID
+    const selectedProgram = this.donationTypeList.find((p: DonationProgram) => p.programName === selectedProgramName);
+    if (selectedProgram) {
+      this.selectedProgramId = selectedProgram.id;
+      console.log("Selected Program ID: " + selectedProgram.id);
+    }
+
+    // Find the selected program by name and get its ID
+    const selectedCurrency = this.currencyList.find((c: CurrencyDetails) => c.currencyCode === selectCurrencyName);
+
+    if (selectedCurrency) {
+      this.selectedCurrencyId = selectedCurrency.id;
+      console.log("Selected Program ID: " + selectedCurrency.id);
+    }
+
+    if(this.selectedProgramId && this.selectedCurrencyId){
+
+      this.getDonationTypeAmount(this.selectedProgramId, this.selectedCurrencyId);
+    }
+
+  }
+
+  public getDonationTypeAmount(programId: any, currencyMasterId: any) {
+    this.programManagementService.getDonationTypeAmount(programId,currencyMasterId)
+      .subscribe({
+        next: (response: any) => {
+          if (response['responseCode'] == '200') {
+            this.donationTypeAmount = JSON.parse(JSON.stringify(response['listPayload']));
+
+            this.addDonationForm.patchValue({amount: this.donationTypeAmount[0]['programAmount']})
 
             // this.toastr.success(response['responseMessage'], response['responseCode']);
           } else {

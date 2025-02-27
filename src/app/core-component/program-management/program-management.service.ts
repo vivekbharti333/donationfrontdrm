@@ -34,6 +34,20 @@ export class ProgramManagementService {
     return this.http.post<any>(Constant.Site_Url + "getDonationTypeListBySuperadminId", request);
   }
 
+  getDonationTypeAmount(programId: any, currencyMasterId: any): Observable<any> {
+    let request: any = {
+      payload: {
+        requestedFor: "OPTION",
+        programId: 1,
+        currencyMasterId: 5,
+        token: this.loginUser['token'],
+        // superadminId: this.loginUser['superadminId'],
+        superadminId: "1234567890",
+      }
+    };
+    return this.http.post<any>(Constant.Site_Url + "getDonationTypeAmountListBySuperadminId", request);
+  }
+
   getProgramDetailsList(): Observable<any> {
     let request: any = {
       payload: {
