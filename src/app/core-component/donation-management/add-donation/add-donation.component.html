@@ -77,8 +77,7 @@
                     <div class="col-lg-2 col-md-2" *ngIf="showCurrencyBox">
                         <div class="mb-2" *ngIf="showCurrencyBox">
                             <label class="form-label">Currency</label>
-                            
-                            <mat-select class="space-select select" formControlName="currencyCode" placeholder="Currency"
+                            <mat-select class="space-select select" formControlName="currencyCode" placeholder="Select Currency"
                                 (selectionChange)="getAmountValueByIds('', $event.value)">
                                 <mat-option *ngFor="let currency of currencyList" [value]="currency.currencyCode">
                                     {{ currency.currencyCode + " " + currency.unicode }}

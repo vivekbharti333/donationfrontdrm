@@ -34,15 +34,14 @@ export class ProgramManagementService {
     return this.http.post<any>(Constant.Site_Url + "getDonationTypeListBySuperadminId", request);
   }
 
-  getDonationTypeAmount(programId: any, currencyMasterId: any): Observable<any> {
+  getDonationTypeAmount(programId: any, currencyCode: any): Observable<any> {
     let request: any = {
       payload: {
         requestedFor: "OPTION",
-        programId: 1,
-        currencyMasterId: 5,
+        programId: programId,
+        currencyCode: currencyCode,
         token: this.loginUser['token'],
-        // superadminId: this.loginUser['superadminId'],
-        superadminId: "1234567890",
+        superadminId: this.loginUser['superadminId'],
       }
     };
     return this.http.post<any>(Constant.Site_Url + "getDonationTypeAmountListBySuperadminId", request);
@@ -58,7 +57,8 @@ export class ProgramManagementService {
         superadminId: this.cookieService.get('superadminId'),
       }
     };
-    return this.http.post<any>(Constant.Site_Url + "getDonationTypeListBySuperadminId", request);
+    // return this.http.post<any>(Constant.Site_Url + "getDonationTypeListBySuperadminId", request);
+    return this.http.post<any>(Constant.Site_Url + "getDonationTypeAndAmtListBySuperadminId", request);
   }
 
   addProgramDetails(programDetails: any): Observable<any> {
@@ -74,6 +74,22 @@ export class ProgramManagementService {
       }
     };
     return this.http.post<any>(Constant.Site_Url + "addDonationType", request);
+  }
+
+  addProgramDetailsAmount(programDetailsAmt: any): Observable<any> {
+    this.loginUser = this.authenticationService.getLoginUser();
+    let request: any = {
+      payload: {
+       
+        programId: programDetailsAmt.programId,
+        programAmount: programDetailsAmt.programAmount,
+        currencyCode: programDetailsAmt.currencyCode,
+        createdBy: this.loginUser['userId'],
+        token: this.loginUser['token'],
+        superadminId: this.loginUser['superadminId'],
+      }
+    };
+    return this.http.post<any>(Constant.Site_Url + "addDonationTypeAmount", request);
   }
 
   changeProgramStatus(programDetails: any): Observable<any> {

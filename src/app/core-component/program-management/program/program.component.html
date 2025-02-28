@@ -148,36 +148,49 @@
             <table matSort (matSortChange)="sortData($event)" class="table datanew">
               <thead>
                 <tr>
-                  <th mat-sort-header="userName">Program Name</th>
-                  <th mat-sort-header="loginId">Amount</th>
-                  <th mat-sort-header="phone">Status </th>
+                  <th mat-sort-header="programName">Program Name</th>
+                  <th mat-sort-header="programAmount">Amount</th>
+                  <th mat-sort-header="status">Status</th>
+                  <th mat-sort-header="donationTypeAmount">Donation Type Amount</th>
                   <th class="no-sort">Action</th>
                 </tr>
               </thead>
               <tbody>
-                @for (data of tableData; track data) {
+                @for (data of tableData; track data.id) {
                 <tr>
-                  <td>{{ data.programName }} </td>
+                  <td>{{ data.programName }}</td>
                   <td>{{ data.programAmount }}</td>
                   <td>
                     <button class="badge-button" (click)="changeProgramStatus(data)"
-                      [ngClass]="{'badge-linesuccess': data.status === 'ACTIVE','badge-linedanger': data.status === 'INACTIVE'}">
+                      [ngClass]="{'badge-linesuccess': data.status === 'ACTIVE', 'badge-linedanger': data.status === 'INACTIVE'}">
                       {{ data.status }}
                     </button>
                   </td>
+                  <td>
+                    <span *ngIf="data.donationTypeAmount.length > 0">
+                      @for (donationTypeAmt of data.donationTypeAmount; track donationTypeAmt.id) {
+                        <span>{{ donationTypeAmt.currencyCode }} {{ donationTypeAmt.programAmount }}</span><br>
+                      }
+                    </span>
+                    <span *ngIf="data.donationTypeAmount.length === 0">-</span>
+                  </td>
                   <td class="action-table-data">
                     <div class="edit-delete-action">
-                      <!-- <a class="me-2 p-2 mb-0" href="javascript:void(0);"><i class="feather icon-eye action-eye"></i></a> -->
                       <a class="me-2 p-2 mb-0" data-bs-toggle="modal" data-bs-target="#edit-units"
                         (click)="openEditModal(dialogTemplate, data)">
-                        <i class="feather icon-edit feather-edit"></i></a>
-                    
+                        <i class="feather icon-edit feather-edit"></i>
+                      </a>
+                      <a class="me-2 p-2 mb-0" data-bs-toggle="modal" data-bs-target="#add-amount-units"
+                        (click)="openAddAountModal(dialogAmountTemplate, data)">
+                        <i class="feather icon-edit feather-edit"></i>
+                      </a>
                     </div>
                   </td>
                 </tr>
                 }
               </tbody>
             </table>
+            
           </div>
         
       <!-- /Filter -->
@@ -291,4 +304,67 @@
       </mat-dialog-actions>
     </form>
   </ng-template>
+
+  <ng-template #dialogAmountTemplate let-dialog>
+    <div class="modalHeaderContainer">
+      <h2 mat-dialog-title class="p-0">Add Program Amount</h2>
+      <div mat-dialog-close class="closeBtn">
+        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+    </div>
+
+    <form [formGroup]="addProgramAmountForm" (ngSubmit)="addProgramDetailsAmount()">
+  
+      <mat-dialog-content class="modalContent">
+        <div class="modal-body custom-modal-body">
+          <div class="card">
+            <div class="card-body">
+              <div class="new-employee-field">
+                <div class="card-title-head">
+                  <h6>
+                    <span><i class="feather icon-info feather-edit"></i></span>Update Program
+                  </h6>
+                </div>
+  
+                <div class="row">
+                  <div class="col-lg-4 col-md-4">
+                    <div class="mb-3">
+                      <label class="form-label">Program Id</label>
+                      <input class="form-control" pInputText formControlName="programId" readonly>
+                    </div>
+                  </div>
+
+                  <div class="col-lg-4 col-md-4">
+                    <div class="mb-3"> <label for="programName" class="form-label">Currency Name</label>
+                      <mat-select class="space-select select" formControlName="currencyCode" placeholder="Currency">
+                      <mat-option *ngFor="let currency of currencyList" [value]="currency.currencyCode">
+                          {{ currency.currencyCode + " " + currency.unicode }}
+                      </mat-option>
+                  </mat-select>
+                    </div>
+                  </div>
+                  <div class="col-lg-4 col-md-4">
+                    <div class="mb-3">
+                      <label class="form-label">Amount</label>
+                      <input class="form-control" type="programAmount" pInputText formControlName="programAmount" maxlength="100">
+                    </div>
+                  </div>
+                </div>
+  
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-dialog-content>
+      <mat-dialog-actions class="dialogAction">
+        <div class="text-end mb-3">
+          <!-- <button type="submit" class="btn btn-submit" [disabled]="!editDonationForm.valid"> Update Receipt </button> -->
+          <button type="submit" class="btn btn-submit"> Update Program </button>
+        </div>
+        <!-- <button mat-button (click)="dialog.close()">Close</button> -->
+      </mat-dialog-actions>
+    </form>
+    </ng-template>
   

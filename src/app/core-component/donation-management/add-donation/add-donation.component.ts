@@ -53,6 +53,7 @@ export class AddDonationComponent {
 
   public selectedProgramId: any;
   public selectedCurrencyId: any;
+  public selectedCurrencyCode: any;
 
 
   ngOnInit() {
@@ -176,9 +177,13 @@ export class AddDonationComponent {
       console.log("Selected Program ID: " + selectedCurrency.id);
     }
 
+    this.selectedCurrencyCode = selectCurrencyName;
+
     if(this.selectedProgramId && this.selectedCurrencyId){
 
-      this.getDonationTypeAmount(this.selectedProgramId, this.selectedCurrencyId);
+      // this.getDonationTypeAmount(this.selectedProgramId, this.selectedCurrencyId);
+
+      this.getDonationTypeAmount(this.selectedProgramId, this.selectedCurrencyCode);
     }
 
   }
@@ -216,7 +221,10 @@ export class AddDonationComponent {
               this.showCurrencyBox = true;
 
             }
-            this.addDonationForm.controls['currencyCode'].setValue(this.currencyList[0].currencyCode);
+            if(!this.showCurrencyBox){
+              this.addDonationForm.controls['currencyCode'].setValue(this.currencyList[0].currencyCode);
+            }
+            
           } else {
           }
         },

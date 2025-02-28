@@ -25,6 +25,7 @@ import { Constant } from 'src/app/core/constant/constants';
 import { MessageService } from 'primeng/api';
 
 
+
 @Component({
   selector: 'app-program',
   templateUrl: './program.component.html',
@@ -38,11 +39,13 @@ export class ProgramComponent {
 
   public loginUser: any;
   public programList: any;
+  public currencyList: any;
   public isLoading = true;
   public visible = false;
   public addPopupVisible = false;
   public editProgramForm!: FormGroup;
   public addProgramForm!: FormGroup;
+  public addProgramAmountForm!: FormGroup;
 
   // pagination variables
   public routes = routes;
@@ -66,13 +69,14 @@ export class ProgramComponent {
     private sidebar: SidebarService,
     private dialog: MatDialog,
     private messageService: MessageService,
+    private currencyService: CurrencyService,
   ) {
     // this.loginUser = this.authenticationService.getLoginUser();
   }
 
   ngOnInit() {
     this.getProgramDetailsList();
-    // this.getUserDetails();
+    this.getCurrencyDetails();
     this.createForms();
     // this.checkRoleType();
   }
@@ -87,6 +91,12 @@ export class ProgramComponent {
       programName: ['', [Validators.required]],
       programAmount: ['', [Validators.required, Validators.pattern("[0-9A-Za-z ]{3,150}")]],
     });
+    this.addProgramAmountForm = this.fb.group({
+      programId: ['', [Validators.required]],
+      programAmount: ['', [Validators.required]],
+      currencyMasterId: ['', [Validators.required]],
+      currencyCode: ['', [Validators.required]],
+    })
   }
 
 
@@ -278,12 +288,76 @@ export class ProgramComponent {
       });
   }
 
+  
+  addProgramDetailsAmount() {
+    this.programManagementService.addProgramDetailsAmount(this.addProgramAmountForm.value)
+      .subscribe({
+        next: (response: any) => {
+          if (response['responseCode'] == '200') {
+            if (response['payload']['respCode'] == '200') {
+              this.addProgramForm.reset();
+
+              this.getProgramDetailsList();
+
+              this.saveProgramDialog.close();
+
+              this.messageService.add({
+                summary: response['payload']['respCode'],
+                detail: response['payload']['respMesg'],
+                styleClass: 'success-background-popover',
+              });
+
+            } else {
+
+              this.saveProgramDialog.close();
+
+              this.messageService.add({
+                summary: response['payload']['respCode'],
+                detail: response['payload']['respMesg'],
+                styleClass: 'danger-background-popover',
+              });
+            }
+          } else {
+
+            this.saveProgramDialog.close();
+
+            this.messageService.add({
+              summary: response['payload']['respCode'],
+              detail: response['payload']['respMesg'],
+              styleClass: 'danger-background-popover',
+            });
+          }
+        },
+        error: () =>
+          this.messageService.add({
+            summary: '500',
+            detail: 'Server Error',
+          }),
+      });
+  }
 
   openEditModal(templateRef: TemplateRef<any>, rowData: any) {
     this.editProgramForm.patchValue({
       id: rowData['id'],
       programName: rowData['programName'],
       programAmount: rowData['programAmount'],
+    });
+
+    // this.dialog.open(templateRef);
+    this.editProgramModel = this.dialog.open(templateRef, {
+      width: '800px', // Set your desired width
+      // height: '600px', // Set your desired height
+      disableClose: true, // Optional: prevent closing by clicking outside
+      panelClass: 'custom-modal', // Optional: add custom class for additional styling
+    });
+
+  }
+
+  openAddAountModal(templateRef: TemplateRef<any>, rowData: any) {
+    this.addProgramAmountForm.patchValue({
+      programId: rowData['id'],
+      programName: rowData['programName'],
+      // programAmount: rowData['programAmount'],
     });
 
     // this.dialog.open(templateRef);
@@ -345,23 +419,23 @@ export class ProgramComponent {
       });
   }
 
-  // public getProgramDetailsList() {
-  //   this.programManagementService.getProgramDetailsList()
-  //     .subscribe({
-  //       next: (response: any) => {
+  public getCurrencyDetails() {
+    this.currencyService.getCurrencyDetailBySuperadmin()
+      .subscribe({
+        next: (response: any) => {
 
-  //         if (response['responseCode'] == '200') {
-  //           this.programList = JSON.parse(JSON.stringify(response['listPayload']));
-  //           this.isLoading = false;
-  //           // this.toastr.success(response['responseMessage']);
-  //         } else {
-  //           this.isLoading = false;
-  //           // this.toastr.error(response['responseMessage'], response['responseCode']);
-  //         }
-  //         this.isLoading = false;
-  //       },
-  //       // error: (error: any) => this.toastr.error('Server Error', '500'),
-  //     });
-  // }
+          if (response['responseCode'] == '200') {
+            this.currencyList = JSON.parse(JSON.stringify(response['listPayload']));
+            this.isLoading = false;
+            // this.toastr.success(response['responseMessage']);
+          } else {
+            this.isLoading = false;
+            // this.toastr.error(response['responseMessage'], response['responseCode']);
+          }
+          this.isLoading = false;
+        },
+        // error: (error: any) => this.toastr.error('Server Error', '500'),
+      });
+  }
 
 }
