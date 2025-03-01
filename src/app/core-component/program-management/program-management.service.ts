@@ -57,8 +57,8 @@ export class ProgramManagementService {
         superadminId: this.cookieService.get('superadminId'),
       }
     };
-    // return this.http.post<any>(Constant.Site_Url + "getDonationTypeListBySuperadminId", request);
-    return this.http.post<any>(Constant.Site_Url + "getDonationTypeAndAmtListBySuperadminId", request);
+    return this.http.post<any>(Constant.Site_Url + "getDonationTypeListBySuperadminId", request);
+    // return this.http.post<any>(Constant.Site_Url + "getDonationTypeAndAmtListBySuperadminId", request);
   }
 
   addProgramDetails(programDetails: any): Observable<any> {

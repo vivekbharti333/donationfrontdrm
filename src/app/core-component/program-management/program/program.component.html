@@ -149,7 +149,7 @@
               <thead>
                 <tr>
                   <th mat-sort-header="programName">Program Name</th>
-                  <th mat-sort-header="programAmount">Amount</th>
+                  <!-- <th mat-sort-header="programAmount">Amount</th> -->
                   <th mat-sort-header="status">Status</th>
                   <th mat-sort-header="donationTypeAmount">Donation Type Amount</th>
                   <th class="no-sort">Action</th>
@@ -159,7 +159,7 @@
                 @for (data of tableData; track data.id) {
                 <tr>
                   <td>{{ data.programName }}</td>
-                  <td>{{ data.programAmount }}</td>
+                  <!-- <td>{{ data.programAmount }}</td> -->
                   <td>
                     <button class="badge-button" (click)="changeProgramStatus(data)"
                       [ngClass]="{'badge-linesuccess': data.status === 'ACTIVE', 'badge-linedanger': data.status === 'INACTIVE'}">

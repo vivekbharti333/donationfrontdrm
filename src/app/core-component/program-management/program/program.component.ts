@@ -36,6 +36,7 @@ export class ProgramComponent {
 
   public editProgramModel: any;
   public saveProgramDialog: any;
+  public addProgramAmtDialog: any;
 
   public loginUser: any;
   public programList: any;
@@ -295,11 +296,11 @@ export class ProgramComponent {
         next: (response: any) => {
           if (response['responseCode'] == '200') {
             if (response['payload']['respCode'] == '200') {
-              this.addProgramForm.reset();
+              this.addProgramAmountForm.reset();
 
               this.getProgramDetailsList();
 
-              this.saveProgramDialog.close();
+              this.addProgramAmtDialog.close();
 
               this.messageService.add({
                 summary: response['payload']['respCode'],
@@ -309,7 +310,7 @@ export class ProgramComponent {
 
             } else {
 
-              this.saveProgramDialog.close();
+              this.addProgramAmtDialog.close();
 
               this.messageService.add({
                 summary: response['payload']['respCode'],
@@ -361,7 +362,7 @@ export class ProgramComponent {
     });
 
     // this.dialog.open(templateRef);
-    this.editProgramModel = this.dialog.open(templateRef, {
+    this.addProgramAmtDialog = this.dialog.open(templateRef, {
       width: '800px', // Set your desired width
       // height: '600px', // Set your desired height
       disableClose: true, // Optional: prevent closing by clicking outside
