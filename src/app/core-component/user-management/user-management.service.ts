@@ -309,4 +309,16 @@ export class UserManagementService {
     return  this.http.post<any>(Constant.Site_Url+"changeUserRole",request);
   }
 
+  removeUserParmanent(loginId: any): Observable<UserDetailsRequest> {
+    let request: any = {
+      payload: {
+        loginId:loginId,
+        token: this.loginUser['token'],
+        createdBy: this.loginUser['loginId'],
+        superadminId: this.loginUser['superadminId'],
+      }
+    };
+    return  this.http.post<any>(Constant.Site_Url+"removeUserParmanent",request);
+  }
+
 }

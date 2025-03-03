@@ -51,6 +51,7 @@ export class UsersComponent {
   public userRoleList!: any;
   public userPhoto: any;
   public userAddressList: any;
+  public loginId :any;
 
   
 
@@ -412,7 +413,7 @@ export class UsersComponent {
   openFilter() {
     this.filter = !this.filter;
   }
-  confirmColor() {
+  confirmColor(loginId : any) {
     const swalWithBootstrapButtons = Swal.mixin({
       customClass: {
         confirmButton: ' btn btn-success',
@@ -422,31 +423,66 @@ export class UsersComponent {
     });
 
     swalWithBootstrapButtons
-      .fire({
-        title: 'Are you sure?',
-        text: "You won't be able to revert this!",
-        confirmButtonText: 'Yes, delete it!',
-        showCancelButton: true,
-        cancelButtonText: 'Cancel',
-        reverseButtons: true,
-      })
-      .then((result) => {
-        if (result.isConfirmed) {
-          swalWithBootstrapButtons.fire(
-            'Deleted!',
-            'Your file has been deleted.',
-            'success'
-          );
-        } else if (result.dismiss === Swal.DismissReason.cancel) {
-          swalWithBootstrapButtons.fire(
-            'Cancelled',
-            'Your imaginary file is safe :)',
-            'error'
-          );
-        }
-      });
+    .fire({
+      title: 'Are you sure?',
+      text: "You won't be able to revert this!",
+      confirmButtonText: 'Yes, delete it!',
+      showCancelButton: true,
+      cancelButtonText: 'Cancel',
+      reverseButtons: true,
+    })
+    .then((result) => {
+      if (result.isConfirmed) {
+        // Call your function here
+        this.removeUserParmanent(loginId); // Replace this with your actual function
+  
+        // swalWithBootstrapButtons.fire(
+        //   'Deleted!',
+        //   'Your file has been deleted.',
+        //   'success'
+        // );
+      } else if (result.dismiss === Swal.DismissReason.cancel) {
+        swalWithBootstrapButtons.fire(
+          'Cancelled',
+          'Your imaginary file is safe :)',
+          'error'
+        );
+      }
+    });
   }
 
+  removeUserParmanent(loginId: any){
+    this.userManagementService.removeUserParmanent(loginId)
+    .subscribe({
+      next: (response: any) => {
+        if (response['responseCode'] == '200') {
+          if (response['payload']['respCode'] == '200') {
+
+            this.messageService.add({
+              summary: response['payload']['respCode'],
+              detail: response['payload']['respMesg'],
+              styleClass: 'success-background-popover',
+            });
+
+            this.getUserDetails();
+          } else {
+              this.messageService.add({
+              summary: response['payload']['respCode'],
+              detail: response['payload']['respMesg'],
+              styleClass: 'danger-background-popover',
+            });
+          }
+        } else {
+          this.messageService.add({
+            summary: response['responseCode'],
+            detail: response['responseMsg'],
+            styleClass: 'danger-background-popover',
+          });
+        }
+      },
+      // error: (error: any) => this.toastr.error('Server Error', '500'),
+    });
+}
   public password: boolean[] = [false];
 
   public togglePassword(index: number) {
