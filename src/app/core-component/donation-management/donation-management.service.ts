@@ -149,4 +149,25 @@ export class DonationManagementService {
   }
  
 
+  
+  updateDonationStatus(donationDetails: DonationDetails): Observable<DonationDetailsRequest> {
+    let donationStatus = "";
+    if (donationDetails['status'] == "INACTIVE") {
+      donationStatus = 'ACTIVE'
+    } else {
+      donationStatus = 'INACTIVE'
+    }
+
+    let request: DonationDetailsRequest = {
+      payload: {
+        id: donationDetails.id,
+        status: donationStatus,
+        createdBy: this.cookieService.get('userId'),
+        token: this.cookieService.get('token'),
+        superadminId: this.cookieService.get('superadminId'),
+      }
+    };
+    return this.http.post<DonationDetailsRequest>(Constant.Site_Url + "updateDonationStatus", request);
+  }
+
 }

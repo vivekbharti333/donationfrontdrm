@@ -490,6 +490,42 @@ export class AllDonationListComponent {
       });
   }
 
+  updateDonationStatus(rawData:any) {
+    this.donationManagementService.updateDonationStatus(rawData)
+      .subscribe({
+        next: (response: any) => {
+          if (response['responseCode'] == '200') {
+            if (response['payload']['respCode'] == '200') {
+
+              this.editDonationForm.reset();
+              this.getDonationList(this.tabName);
+              this.donationUpdateDialog.close();
+
+              this.messageService.add({
+                summary: response['payload']['respCode'],
+                detail: response['payload']['respMesg'],
+                styleClass: 'success-background-popover',
+              });
+
+            } else {
+              this.messageService.add({
+                summary: response['payload']['respCode'],
+                detail: response['payload']['respMesg'],
+                styleClass: 'danger-background-popover',
+              });
+            }
+          } else {
+            this.messageService.add({
+              summary: response['responseCode'],
+              detail: response['responseMessage'],
+              styleClass: 'danger-light-popover',
+            });
+          }
+        },
+      });
+  }
+
+
   updateDonationDetails() {
     this.donationManagementService.updateDonationDetails(this.editDonationForm.value)
       .subscribe({

@@ -139,11 +139,12 @@
                   <th mat-sort-header="phone">Amount </th>
                   <th mat-sort-header="role">Payment Mode</th>
                   <th mat-sort-header="createdOn">Received By</th>
-                  <th mat-sort-header="invoiceFor">Invoice For</th>
+                  <!-- <th mat-sort-header="invoiceFor">Invoice For</th> -->
                   <th mat-sort-header="program">Program</th>
                   <th mat-sort-header="date&Time">Date & Time</th>
                   <th mat-sort-header="invoiceNumber">Invoice Number</th>
                   <th mat-sort-header="invoiceDownload">Invoice Download</th>
+                  <th mat-sort-header="status">Status</th>
                   <th class="no-sort">Action</th>
                 </tr>
               </thead>
@@ -155,7 +156,7 @@
                   <td>{{ data.amount }} {{ data.currencyCode }}</td>
                   <td>{{ data.paymentMode }}</td>
                   <td>{{ data.createdbyName }}</td>
-                  <td>{{ data.invoiceHeaderName }}</td>
+                  <!-- <td>{{ data.invoiceHeaderName }}</td> -->
                   <td>{{ data.programName }}</td>
                   <td>{{ data.createdAt | date : "dd-MM-yyyy | HH:mm" }}</td>
                   <td>{{ data.invoiceNumber}}</td>
@@ -163,6 +164,12 @@
                     <button class="badge-button"
                       [ngClass]="{'badge-linesuccess': data.invoiceDownloadStatus === 'NO','badge-linedanger': data.invoiceDownloadStatus === 'YES'}">
                       {{ data.invoiceDownloadStatus }}
+                    </button>
+                  </td>
+                  <td>
+                    <button class="badge-button"
+                    [ngClass]="{'badge-linesuccess': data.status === 'ACTIVE','badge-linedanger': data.status === 'INACTIVE'}" (click)="updateDonationStatus(data)">
+                    {{ data.status}}
                     </button>
                   </td>
                   <td class="action-table-data">
@@ -194,11 +201,12 @@
                   <th mat-sort-header="phone">Amount</th>
                   <th mat-sort-header="role">Payment Mode</th>
                   <th mat-sort-header="createdOn">Received By</th>
-                  <th mat-sort-header="invoiceFor">Invoice For</th>
+                  <!-- <th mat-sort-header="invoiceFor">Invoice For</th> -->
                   <th mat-sort-header="program">Program</th>
                   <th mat-sort-header="date&Time">Date & Time</th>
                   <th mat-sort-header="invoiceNumber">Invoice Number</th>
                   <th mat-sort-header="invoiceDownload">Invoice Download</th>
+                  <th mat-sort-header="status">Status</th>
                   <th class="no-sort">Action</th>
                 </tr>
               </thead>
@@ -210,15 +218,20 @@
                   <td>{{ data.amount }} {{ data.currencyCode }}</td>
                   <td>{{ data.paymentMode }}</td>
                   <td>{{ data.createdbyName }}</td>
-                  <td>{{ data.invoiceHeaderName }}</td>
+                  <!-- <td>{{ data.invoiceHeaderName }}</td> -->
                   <td>{{ data.programName }}</td>
                   <td>{{ data.createdAt | date : "dd-MM-yyyy | HH:mm" }}</td>
                   <td>{{ data.invoiceNumber}}</td>
                   <td>
-
                     <button class="badge-button"
                       [ngClass]="{'badge-linesuccess': data.invoiceDownloadStatus === 'NO','badge-linedanger': data.invoiceDownloadStatus === 'YES'}">
                       {{ data.invoiceDownloadStatus }}
+                    </button>
+                  </td>
+                  <td>
+                    <button class="badge-button"
+                    [ngClass]="{'badge-linesuccess': data.status === 'ACTIVE','badge-linedanger': data.status === 'INACTIVE'}">
+                    {{ data.status}}
                     </button>
                   </td>
                   <td class="action-table-data">
@@ -250,11 +263,12 @@
                   <th mat-sort-header="phone">Amount </th>
                   <th mat-sort-header="role">Payment Mode</th>
                   <th mat-sort-header="createdOn">Received By</th>
-                  <th mat-sort-header="invoiceFor">Invoice For</th>
+                  <!-- <th mat-sort-header="invoiceFor">Invoice For</th> -->
                   <th mat-sort-header="program">Program</th>
                   <th mat-sort-header="date&Time">Date & Time</th>
                   <th mat-sort-header="invoiceNumber">Invoice Number</th>
                   <th mat-sort-header="invoiceDownload">Invoice Download</th>
+                  <th mat-sort-header="status">Status</th>
                   <th class="no-sort">Action</th>
                 </tr>
               </thead>
@@ -266,7 +280,7 @@
                   <td>{{ data.amount }} {{ data.currencyCode }}</td>
                   <td>{{ data.paymentMode }}</td>
                   <td>{{ data.createdbyName }}</td>
-                  <td>{{ data.invoiceHeaderName }}</td>
+                  <!-- <td>{{ data.invoiceHeaderName }}</td> -->
                   <td>{{ data.programName }}</td>
                   <td>{{ data.createdAt | date : "dd-MM-yyyy | HH:mm" }}</td>
                   <td>{{ data.invoiceNumber}}</td>
@@ -275,6 +289,12 @@
                     <button class="badge-button"
                       [ngClass]="{'badge-linesuccess': data.invoiceDownloadStatus === 'NO','badge-linedanger': data.invoiceDownloadStatus === 'YES'}">
                       {{ data.invoiceDownloadStatus }}
+                    </button>
+                  </td>
+                  <td>
+                    <button class="badge-button"
+                    [ngClass]="{'badge-linesuccess': data.status === 'ACTIVE','badge-linedanger': data.status === 'INACTIVE'}">
+                    {{ data.status}}
                     </button>
                   </td>
                   <td class="action-table-data">
@@ -339,11 +359,12 @@
                   <th mat-sort-header="phone">Amount</th>
                   <th mat-sort-header="role">Payment Mode</th>
                   <th mat-sort-header="createdOn">Received By</th>
-                  <th mat-sort-header="invoiceFor">Invoice For</th>
+                  <!-- <th mat-sort-header="invoiceFor">Invoice For</th> -->
                   <th mat-sort-header="program">Program</th>
                   <th mat-sort-header="date&Time">Date & Time</th>
-                  <!-- <th mat-sort-header="invoiceNumber">Invoice Number</th> -->
+                  <th mat-sort-header="invoiceNumber">Invoice Number</th>
                   <th mat-sort-header="invoiceDownload">Invoice Download</th>
+                  <th mat-sort-header="status">Status</th>
                   <th class="no-sort">Action</th>
                 </tr>
               </thead>
@@ -364,6 +385,12 @@
                     <button class="badge-button"
                       [ngClass]="{'badge-linesuccess': data.invoiceDownloadStatus === 'NO','badge-linedanger': data.invoiceDownloadStatus === 'YES'}">
                       {{ data.invoiceDownloadStatus }}
+                    </button>
+                  </td>
+                  <td>
+                    <button class="badge-button"
+                    [ngClass]="{'badge-linesuccess': data.status === 'ACTIVE','badge-linedanger': data.status === 'INACTIVE'}">
+                    {{ data.status}}
                     </button>
                   </td>
                   <td class="action-table-data">
