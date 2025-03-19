@@ -140,6 +140,20 @@ export class SidebarService {
           ],
         },
         {
+          menuValue: 'Reports Management',
+          hasSubRoute: true,
+          showSubRoute: false,
+          icon: 'database',
+          subMenus: [
+            {
+              menuValue: 'Payment Report',
+              route: routes.paymentReport,
+              permission: 'add-donation',
+            }, 
+            
+          ],
+        },
+        {
           menuValue: 'Payment Mode Management',
           hasSubRoute: true,
           showSubRoute: false,

@@ -887,36 +887,8 @@ export class routes {
   public static get fileShared(): string {
     return this.application + '/file-shared';
   }
-  public static get customerReport(): string {
-    return this.reports + '/customer-report';
-  }
-  public static get expenseReport(): string {
-    return this.reports + '/expense-report';
-  }
-  public static get incomeReport(): string {
-    return this.reports + '/income-report';
-  }
-  public static get inventoryReport(): string {
-    return this.reports + '/inventory-report';
-  }
-  public static get invoiceReport(): string {
-    return this.reports + '/invoice-report';
-  }
-  public static get profitAndLoss(): string {
-    return this.reports + '/profit-and-loss';
-  }
-  public static get purchaseReport(): string {
-    return this.reports + '/purchase-report';
-  }
-  public static get salesReport(): string {
-    return this.reports + '/sales-report';
-  }
-  public static get supplierReport(): string {
-    return this.reports + '/supplier-report';
-  }
-  public static get taxReport(): string {
-    return this.reports + '/tax-report';
-  }
+
+  
   public static get success(): string {
     return this.base + '/success';
   }
@@ -960,6 +932,41 @@ export class routes {
   }
   public static get allDonationList(): string {
     return this.donationManagement + '/all-donation-list';
+  }
+
+  //Reports Management
+  public static get paymentReport(): string {
+    return this.reports + '/payment-report';
+  }
+  public static get customerReport(): string {
+    return this.reports + '/customer-report';
+  }
+  public static get expenseReport(): string {
+    return this.reports + '/expense-report';
+  }
+  public static get incomeReport(): string {
+    return this.reports + '/income-report';
+  }
+  public static get inventoryReport(): string {
+    return this.reports + '/inventory-report';
+  }
+  public static get invoiceReport(): string {
+    return this.reports + '/invoice-report';
+  }
+  public static get profitAndLoss(): string {
+    return this.reports + '/profit-and-loss';
+  }
+  public static get purchaseReport(): string {
+    return this.reports + '/purchase-report';
+  }
+  public static get salesReport(): string {
+    return this.reports + '/sales-report';
+  }
+  public static get supplierReport(): string {
+    return this.reports + '/supplier-report';
+  }
+  public static get taxReport(): string {
+    return this.reports + '/tax-report';
   }
 
   //Payment Mode Management

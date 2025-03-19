@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 
 import { ReportsRoutingModule } from './reports-routing.module';
 import { ReportsComponent } from './reports.component';
+import { PaymentReportComponent } from './payment-report/payment-report.component';
 import { CustomerReportComponent } from './customer-report/customer-report.component';
 import { ExpenseReportComponent } from './expense-report/expense-report.component';
 import { IncomeReportComponent } from './income-report/income-report.component';
@@ -15,9 +16,11 @@ import { SupplierReportComponent } from './supplier-report/supplier-report.compo
 import { TaxReportComponent } from './tax-report/tax-report.component';
 import { sharedModule } from 'src/app/shared/shared.module';
 
+
 @NgModule({
   declarations: [
     ReportsComponent,
+    PaymentReportComponent,
     CustomerReportComponent,
     ExpenseReportComponent,
     IncomeReportComponent,

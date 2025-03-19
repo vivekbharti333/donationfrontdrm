@@ -12,8 +12,14 @@ import { SupplierReportComponent } from './supplier-report/supplier-report.compo
 import { TaxReportComponent } from './tax-report/tax-report.component';
 import { InventoryReportComponent } from './inventory-report/inventory-report.component';
 
+import { PaymentReportComponent } from './payment-report/payment-report.component';
+
 const routes: Routes = [{ path: '', component: ReportsComponent,
 children: [
+  {
+    path: 'payment-report',
+    component: PaymentReportComponent
+  },
   {
     path: 'customer-report',
     component: CustomerReportComponent
