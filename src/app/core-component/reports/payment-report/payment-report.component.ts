@@ -39,9 +39,6 @@ export class PaymentReportComponent {
 
   getPaymentReport(loginId: any ,firstDate: any,lastDate: any) {
     this.PaymentModeCountAmount = {}; // Initialize as an empty object
-    alert(loginId);
-    alert(firstDate);
-    alert(lastDate);
     this.paymentReportService.getDonationPaymentModeCountAndAmountGroupByPaymentMode(loginId,firstDate,lastDate)
         .subscribe({
             next: (response: any) => {

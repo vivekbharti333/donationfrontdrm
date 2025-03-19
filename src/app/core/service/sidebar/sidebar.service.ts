@@ -148,7 +148,7 @@ export class SidebarService {
             {
               menuValue: 'Payment Report',
               route: routes.paymentReport,
-              permission: 'add-donation',
+              permission: 'payment-report',
             }, 
             
           ],
