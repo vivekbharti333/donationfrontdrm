@@ -61,6 +61,13 @@ export interface DonationDetails {
   teamLeaderId?: string;
   invoiceHeaderDetailsId?: string;
   followupDate?: number;
+  fromDate: string | Date;
+  toDate: string | Date;
+  createdAt: string | Date;
+  receiptNumber: string;
+  invoiceNumber: string;
+  createdbyName: string;
+  invoiceHeaderName: string;
 }
 
 export interface DonationListForExcel {

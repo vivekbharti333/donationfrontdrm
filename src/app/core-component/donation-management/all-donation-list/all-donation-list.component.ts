@@ -566,9 +566,7 @@ export class AllDonationListComponent {
   exportAsExcelFile(): void {
     let filteredArrayList: any[] = [];
 
-    this.donationList.forEach((element: DonationListForExcel) => { // Explicitly type 'element'
-      let fromDate = this.datePipe.transform(element.fromDate, 'dd-MM-yyyy');
-      let toDate = this.datePipe.transform(element.toDate, 'dd-MM-yyyy');
+    this.fullData.forEach((element: DonationDetails) => { // Explicitly type 'element'
       let createdAt = this.datePipe.transform(element.createdAt, 'dd-MM-yyyy');
 
       let data: any = {
