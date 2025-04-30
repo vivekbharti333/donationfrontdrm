@@ -200,7 +200,8 @@ export class UserManagementService {
         addressList: userDetails.addressList,
         requestedFor: 'WEB',
         token: this.loginUser['token'],
-        createdBy: this.loginUser['loginId'],
+        // createdBy: this.loginUser['loginId'],
+        createdBy: userDetails.createdBy,
         superadminId: this.loginUser['superadminId'],
       }
     };
