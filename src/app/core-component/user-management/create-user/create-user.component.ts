@@ -1,15 +1,8 @@
 import { Component } from '@angular/core';
 import { FormGroup, FormArray, FormBuilder, Validators} from '@angular/forms';
-// import { Component, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { NgForm } from '@angular/forms'; // Import FormsModule and NgForm
 import { SidebarService } from 'src/app/core/core.index'; // Ensure correct import path
 import { UserManagementService } from '../user-management.service';
 import { MessageService } from 'primeng/api';
-import { routes } from 'src/app/core/helpers/routes';
-import { MatSelectModule } from '@angular/material/select';
-import { MatOptionModule } from '@angular/material/core';
-import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatFormFieldModule } from '@angular/material/form-field';
 import { AuthenticationService } from 'src/app/auth/authentication.service';
 import { CookieService } from 'ngx-cookie-service';
 import { Constant } from 'src/app/core/constant/constants';
@@ -44,7 +37,6 @@ export class CreateUserComponent {
   public parmanentAddressType: string = 'PERMANENT';
 
   public userList: any;
-  // public loginUser: any;
   public userRoleList: any;
   public isMainAdmin: boolean = false;
   public isSuperadmin: boolean = false;
@@ -64,8 +56,7 @@ export class CreateUserComponent {
     private authenticationService: AuthenticationService,
     private messageService: MessageService,
     private cookieService: CookieService,
-    
-  ) // private toastr: ToastrService
+  ) 
   {
     this.loginUser = this.authenticationService.getLoginUser();
   }
@@ -77,53 +68,6 @@ export class CreateUserComponent {
     this.getUserRoleType();
     this.getTeamleaderList();
   }
-
-  // public user = {
-  //   userPicture: '',
-  //   firstName: '',
-  //   lastName: '',
-  //   emailId: '',
-  //   gender: '',
-  //   adminId: '',
-  //   teamleaderId: '',
-  //   permissions: '',
-  //   roleType: '',
-  //   mobileNo: '',
-  //   alternateMobile: '',
-  //   userCode: '',
-  //   idDocumentType: '',
-  //   idDocumentPicture: '',
-  //   panNumber: '',
-  //   dob: '',
-  //   emergencyContactRelation1: '',
-  //   emergencyContactName1: '',
-  //   emergencyContactNo1: '',
-  //   emergencyContactRelation2: '',
-  //   emergencyContactName2: '',
-  //   emergencyContactNo2: '',
-  //   addressList: [
-  //     {
-  //       addressType: 'CURRENT',
-  //       addressLine: '',
-  //       landmark: '',
-  //       district: '',
-  //       city: '',
-  //       state: '',
-  //       country: 'INDIA',
-  //       pincode: '',
-  //     },
-  //     {
-  //       addressType: 'PARMANENT',
-  //       addressLine: '',
-  //       landmark: '',
-  //       district: '',
-  //       city: '',
-  //       state: '',
-  //       country: 'INDIA',
-  //       pincode: '',
-  //     },
-  //   ],
-  // };
 
 
   createForms() {
@@ -205,11 +149,6 @@ export class CreateUserComponent {
   }
 
   show() {
-    // this.messageService.add({
-    //   summary: 'Toast',
-    //   detail: 'Hello, world! This is a toast message.',
-    // });
-
     this.messageService.add({
       summary: 'test',
       detail: 'uiyiyuui',
@@ -229,17 +168,6 @@ export class CreateUserComponent {
     { value: 'TEAM_LEADER', name: 'TEAM LEADER' },
     { value: 'SALE_EXECUTIVE', name: 'SALE EXECUTIVE' },
   ];
-  // permissionsList: data[] = [{ value: '1', name: 'admindb'}, {value: '2', name: 'admindbn'}, {value: '3', name: 'usermang'},{value: '3', name: 'usermang1'}];
-  // permissionsList: string[] = [
-  //   'admin-dashboard',
-  //   'sale-dashboard',
-  //   'create-user',
-  //   'user-list',
-  //   'create-lead',
-  //   'lead-list',
-  //   'general-setting',
-  //   'company-setting',
-  // ];
 
   permissionsList: data[] =[
     { value: 'admin-dashboard', name: 'Lead Dashboard' },

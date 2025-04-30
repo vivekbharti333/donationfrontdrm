@@ -144,72 +144,125 @@ export class UsersComponent {
 
 
 
-  openEditModal(templateRef: TemplateRef<any>, user: any): void {
-    this.getAddressDetailsByUserId(user);
+  // openEditModal(templateRef: TemplateRef<any>, user: any): void {
+  //   this.getAddressDetailsByUserId(user);
   
-    // Create a copy of the addressList from userAddressList
-    const addressListCopy = [...this.userAddressList];
+  //   // Create a copy of the addressList from userAddressList
+  //   const addressListCopy = [...this.userAddressList];
   
-    // Ensure the addressForm array matches the userAddressList
-    while (this.addressList.length < addressListCopy.length) {
-      this.addressList.push(this.addressForm());
-    }
+  //   // Ensure the addressForm array matches the userAddressList
+  //   while (this.addressList.length < addressListCopy.length) {
+  //     this.addressList.push(this.addressForm());
+  //   }
   
-    for (let i = 0; i < addressListCopy.length; i++) {
-      const addressGroup = this.addressList.at(i) as FormGroup;
-      const address = addressListCopy[i];
+  //   for (let i = 0; i < addressListCopy.length; i++) {
+  //     const addressGroup = this.addressList.at(i) as FormGroup;
+  //     const address = addressListCopy[i];
   
-      // Update the values in the addressForm
-      addressGroup.patchValue({
-        addressType: address.addressType,
-        addressLine: address.addressLine,
-        landmark: address.landmark,
-        district: address.district,
-        city: address.city,
-        state: address.state,
-        country: address.country,
-        pincode: address.pincode,
-      });
-    }
+  //     addressGroup.patchValue({
+  //       addressType: address.addressType,
+  //       addressLine: address.addressLine,
+  //       landmark: address.landmark,
+  //       district: address.district,
+  //       city: address.city,
+  //       state: address.state,
+  //       country: address.country,
+  //       pincode: address.pincode,
+  //     });
+  //   }
 
-    // Format the dob (if required)
-    const formattedDob = user['dob']
-      ? new Date(user['dob']).toISOString().split('T')[0]
-      : 'DD-MM-YYYY'; // Convert to YYYY-MM-DD or leave blank
+  //   // Format the dob (if required)
+  //   const formattedDob = user['dob']
+  //     ? new Date(user['dob']).toISOString().split('T')[0]
+  //     : 'DD-MM-YYYY'; // Convert to YYYY-MM-DD or leave blank
   
-    // Patch values into the editUserForm
-    this.editUserForm.patchValue({
-      userPicture: user['userPicture'],
-      loginId: user['loginId'],
-      firstName: user['firstName'],
-      lastName: user['lastName'],
-      roleType: user['roleType'],
-      mobileNo: user['mobileNo'],
-      alternateMobile: user['alternateMobile'],
-      emailId: user['emailId'],
-      dob: formattedDob, // Use the formatted dob
-      // permissions: user['permissions'],
-      userPhoto: user['userPhoto'],
-      createdBy: user['createdBy'],
-      addressList: []
+  //   // Patch values into the editUserForm
+  //   this.editUserForm.patchValue({
+  //     userPicture: user['userPicture'],
+  //     loginId: user['loginId'],
+  //     firstName: user['firstName'],
+  //     lastName: user['lastName'],
+  //     roleType: user['roleType'],
+  //     mobileNo: user['mobileNo'],
+  //     alternateMobile: user['alternateMobile'],
+  //     emailId: user['emailId'],
+  //     dob: formattedDob, // Use the formatted dob
+  //     // permissions: user['permissions'],
+  //     userPhoto: user['userPhoto'],
+  //     createdBy: user['createdBy'],
+  //     addressList: []
       
-    });
+  //   });
   
-    // Update the userPhoto for display
-    this.userPhoto = user['userPicture']
-      ? 'data:image/png;base64,' + user['userPicture']
-      : '';
+  //   // Update the userPhoto for display
+  //   this.userPhoto = user['userPicture']
+  //     ? 'data:image/png;base64,' + user['userPicture']
+  //     : '';
   
-    // Open the dialog
-    // this.dialog.open(templateRef);
+  //   // Open the dialog
+  //   // this.dialog.open(templateRef);
 
-    this.userUpdateDialog = this.dialog.open(templateRef, {
-      width: '1400px', // Set your desired width
-      // height: '600px', // Set your desired height
-      disableClose: true, // Optional: prevent closing by clicking outside
-      panelClass: 'custom-modal', // Optional: add custom class for additional styling
+  //   this.userUpdateDialog = this.dialog.open(templateRef, {
+  //     width: '1400px', // Set your desired width
+  //     // height: '600px', // Set your desired height
+  //     disableClose: true, // Optional: prevent closing by clicking outside
+  //     panelClass: 'custom-modal', // Optional: add custom class for additional styling
+  //   });
+  // }
+  
+  openEditModal(templateRef: TemplateRef<any>, user: any): void {
+    this.getAddressDetailsByUserId(user, () => {
+      const addressListCopy = Array.isArray(this.userAddressList) ? [...this.userAddressList] : [];
+  
+      // Clear existing addressList FormArray
+      this.addressList.clear();
+  
+      // Re-populate FormArray based on addressListCopy
+      for (let i = 0; i < addressListCopy.length; i++) {
+        const addressGroup = this.addressForm();
+        addressGroup.patchValue({
+          addressType: addressListCopy[i].addressType,
+          addressLine: addressListCopy[i].addressLine,
+          landmark: addressListCopy[i].landmark,
+          district: addressListCopy[i].district,
+          city: addressListCopy[i].city,
+          state: addressListCopy[i].state,
+          country: addressListCopy[i].country || 'INDIA',
+          pincode: addressListCopy[i].pincode,
+        });
+        this.addressList.push(addressGroup);
+      }
+  
+      const formattedDob = user['dob']
+        ? new Date(user['dob']).toISOString().split('T')[0]
+        : '';
+  
+      this.editUserForm.patchValue({
+        loginId: user['loginId'],
+        firstName: user['firstName'],
+        lastName: user['lastName'],
+        roleType: user['roleType'],
+        mobileNo: user['mobileNo'],
+        alternateMobile: user['alternateMobile'],
+        emailId: user['emailId'],
+        dob: formattedDob,
+        userPicture: user['userPicture'],
+        createdBy: user['createdBy'],
+        permissions: user['permissions'] || ''
+      });
+  
+      this.userPhoto = user['userPicture']
+        ? 'data:image/png;base64,' + user['userPicture']
+        : '';
+  
+      this.userUpdateDialog = this.dialog.open(templateRef, {
+        width: '1400px',
+        disableClose: true,
+        panelClass: 'custom-modal',
+      });
     });
   }
+  
   
 
   public roleTypes = [
@@ -480,7 +533,6 @@ export class UsersComponent {
           });
         }
       },
-      // error: (error: any) => this.toastr.error('Server Error', '500'),
     });
 }
   public password: boolean[] = [false];
@@ -514,21 +566,40 @@ export class UsersComponent {
       });
   }
 
-  public getAddressDetailsByUserId(user:any) {
-    this.userAddressList ;
-    this.userManagementService.getAddressDetailsByUserId(user)
-      .subscribe({
-        next: (response: any) => {
-          if (response['responseCode'] == '200') {
-            this.userAddressList = JSON.parse(JSON.stringify(response['listPayload']));
-            // this.toastr.success(response['status'], response['responseCode']);
-          } else {
-            // this.toastr.error(response['responseMessage'], response['responseCode']);
-          }
-        },
-        // error: (error: any) => this.toastr.error('Server Error', '500'),
-      });
+  // public getAddressDetailsByUserId(user:any) {
+  //   this.userAddressList ;
+  //   this.userManagementService.getAddressDetailsByUserId(user)
+  //     .subscribe({
+  //       next: (response: any) => {
+  //         if (response['responseCode'] == '200') {
+  //           this.userAddressList = JSON.parse(JSON.stringify(response['listPayload']));
+           
+  //         } else {
+            
+  //         }
+  //       },
+        
+  //     });
+  // }
+
+  public getAddressDetailsByUserId(user: any, callback: () => void): void {
+    this.userManagementService.getAddressDetailsByUserId(user).subscribe({
+      next: (response: any) => {
+        if (response['responseCode'] === '200') {
+          this.userAddressList = response['listPayload'] || [];
+        } else {
+          this.userAddressList = [];
+        }
+        callback(); // Proceed after data is loaded
+      },
+      error: (error) => {
+        console.error('Error fetching address list:', error);
+        this.userAddressList = [];
+        callback(); // Still proceed with empty list
+      }
+    });
   }
+  
 
   changeUserStatus(rowData: any) {
     this.userManagementService.changeUserStatus(rowData).subscribe({
