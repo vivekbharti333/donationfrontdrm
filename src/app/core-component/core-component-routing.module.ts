@@ -83,6 +83,11 @@ const routes: Routes = [
           import('./thank-you/thank-you.module').then((m) => m.ThankYouModule),
       },
       {
+        path: 'pg',
+        loadChildren: () =>
+          import('./payment-gateway-management/payment-gateway-management.module').then((m) => m.PaymentGatewayManagementModule),
+      },
+      {
         path: 'dashboard',
         loadChildren: () =>
           import('./main/dashboard/dashboard.module').then((m) => m.DashboardModule),
