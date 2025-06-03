@@ -7,7 +7,7 @@ import { AuthenticationService } from 'src/app/auth/authentication.service';
 @Injectable({
   providedIn: 'root'
 })
-export class EmailSettingsService {
+export class PaymentGatewaySettingsService {
   public superadminId: any;
   public loginUser: any;
 
@@ -18,32 +18,30 @@ export class EmailSettingsService {
     this.loginUser = this.authenticationService.getLoginUser();
   }
 
-  addUpdateEmailServiceDetails(emailDetails: any): Observable<any> {
+  addPaymentGatewayDetails(pgDetails: any): Observable<any> {
     this.loginUser = this.authenticationService.getLoginUser();
     let request: any = {
       payload: {
-        emailType: emailDetails.emailType,
-        host: emailDetails.host,
-        port: emailDetails.port,
-        emailUserid: emailDetails.emailUserid,
-        emailPassword: emailDetails.emailPassword,
-        emailFrom: emailDetails.emailFrom,
-        subject: emailDetails.subject,
-        emailBody: emailDetails.emailBody,
+        pgProvider: pgDetails['pgProvider'],
+        redirectUrl: pgDetails['redirectUrl'],
+        url: pgDetails['url'],
+        merchantId: pgDetails['merchantId'],
+        saltIndex: pgDetails['saltIndex'],
+        saltKey: pgDetails['saltKey'],
         token: this.loginUser['token'],
         superadminId: this.loginUser['superadminId'],
       }
     };
-    return this.http.post<any>(Constant.Site_Url + "addUpdateEmailServiceDetails", request);
+    return this.http.post<any>(Constant.Site_Url + "addPaymentGatewayDetails", request);
   }
 
-  getEmailServiceDetailsList(): Observable<any> {
+  getPaymentGatewayDetailsList(): Observable<any> {
     let request: any = {
       payload: {
         token: this.loginUser['token'],
         superadminId: this.loginUser['superadminId'],
       }
     };
-    return this.http.post<any>(Constant.Site_Url + "getEmailServiceDetailsList", request);
+    return this.http.post<any>(Constant.Site_Url + "getPaymentGatewayDetailsList", request);
   }
 }

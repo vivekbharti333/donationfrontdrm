@@ -367,6 +367,11 @@ export class SidebarService {
               permission: 'email-setting',
             },
             {
+              menuValue: 'Payment Gateway',
+              route: routes.paymentGatewaySettings,
+              permission: 'email-setting',
+            },
+            {
               menuValue: 'SMS Gateways',
               route: routes.smsGateway,
               permission: 'sms-setting',
@@ -379,6 +384,49 @@ export class SidebarService {
 
           ],
         },
+      ],
+    },
+
+    {
+      tittle: 'Financial Settings',
+      hasSubRoute: true,
+      icon: 'assets/img/icons/menu-icon.svg',
+      showSubRoute: false,
+      menu: [
+        {
+         menuValue: 'Financial Settings',
+          hasSubRoute: true,
+          showSubRoute: false,
+          icon: 'grid',
+          base1: 'dashboard',
+          subMenus: [
+           {
+              menuValue: 'Payment Gateway',
+              route: routes.paymentGatewaySettings,
+              permission: 'email-setting',
+            },
+            {
+              menuValue: 'Bank Accounts',
+              route: routes.bankSettingsGrid,
+              permission: 'email-setting',
+            },
+            {
+              menuValue: 'Tax Rates',
+              route: routes.taxRates,
+              permission: 'email-setting',
+            },
+            {
+              menuValue: 'Currencies',
+              route: routes.currencySettings,
+              permission: 'email-setting',
+            },
+           
+            
+
+          ],
+        },
+
+    
       ],
     },
 
