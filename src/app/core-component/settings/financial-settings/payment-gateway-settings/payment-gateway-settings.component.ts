@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
+import { Modal } from 'bootstrap';
 import { FormGroup, FormArray, FormBuilder, Validators} from '@angular/forms';
 import { routes } from 'src/app/core/helpers/routes';
 import { SidebarService } from 'src/app/core/service/sidebar/sidebar.service';
@@ -10,6 +11,9 @@ import { PaymentGatewaySettingsService } from './payment-gateway-settings.servic
   styleUrl: './payment-gateway-settings.component.scss',
 })
 export class PaymentGatewaySettingsComponent {
+
+  @ViewChild('paymentModal') paymentModalRef!: ElementRef;
+  modalInstance!: Modal;
 
   public addPgForm!: FormGroup;
   public isLoading = false;
@@ -80,7 +84,7 @@ export class PaymentGatewaySettingsComponent {
         next: (response: any) => {
           if (response['responseCode'] == '200') {
             this.pgDetailsList = JSON.parse(JSON.stringify(response['listPayload']));
-            this.pgDetailsList = this.pgDetailsList[0];
+            this.pgDetailsList = this.pgDetailsList;
 
             const rawValue = this.pgDetailsList['pgProvider'];
             this.pgProvider = rawValue.charAt(0).toUpperCase() + rawValue.slice(1).toLowerCase();
@@ -92,6 +96,14 @@ export class PaymentGatewaySettingsComponent {
           }
         },
       });
+  }
+
+  ngAfterViewInit() {
+    this.modalInstance = new Modal(this.paymentModalRef.nativeElement);
+  }
+
+  openModal(rowData:any) {
+    this.modalInstance.show();
   }
 
   setPgDetails() {
