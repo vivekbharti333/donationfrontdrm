@@ -20,7 +20,12 @@
         }</a>
     </li>
   </ul>
+
+  <div class="page-btn">
+    <a class="btn btn-added" (click)="addPaymentDetailsModal()"><i class="feather icon-plus-circle me-2"></i>Add New </a>
+  </div>
 </div>
+
 <div class="row">
   <div class="col-xl-12">
     <div class="settings-wrapper d-flex">
@@ -30,9 +35,7 @@
           <h4>Payment Gateway</h4>
         </div>
         <div class="row social-authent-settings">
-          @for (data of pgDetailsList; track data; let idx=$index) {
-
-
+          @for (data of pgDetailsList; track data; let idx = $index) {
           <div class="col-xxl-4 col-xl-6 col-lg-12 col-md-6 d-flex">
             <div class="connected-app-card d-flex w-100">
               <ul class="w-100">
@@ -43,38 +46,30 @@
                         <img src="assets/img/icons/payment-icon-01.svg" alt="PAYPAL">
                       </span>
                     </div>
-                    <div class="connect-btn" *ngIf="data.pgProvider === 'ROZARPAY'; else notConnected">
-                      <a href="javascript:void(0);">Connected</a>
+                    <div class="connect-btn">
+                      <a href="javascript:void(0);">{{ data.pgProvider }}</a>
                     </div>
-
-                    <ng-template #notConnected>
-                      <div class="connect-btn not-connect">
-                        <a href="javascript:void(0);">Not Connected</a>
-                      </div>
-                    </ng-template>
-
                   </div>
                   <p>PayPal is the faster, safer way to send and receive money or make an online payment.</p>
                 </li>
                 <li>
-                  <div class="integration-btn" *ngIf="data.pgProvider === 'ROZARPAY'; else connectNow">
-                    <a href="javascript:void(0);" (click)="openModal(data)"><i-feather name="tool" class="me-2"></i-feather>View Integration</a>
+                  <div class="integration-btn">
+                    <a href="javascript:void(0);" (click)="editPaymentDetailsModal(data)">
+                      <i-feather name="tool" class="me-2"></i-feather>View Integration
+                    </a>
                   </div>
-                   <ng-template #connectNow>
-                      <div class="integration-btn">
-                    <a href="javascript:void(0);" (click)="openModal(data)"><i-feather name="tool" class="me-2"></i-feather>Connect Now</a>
-                  </div>
-                    </ng-template>
-                  <div class="status-toggle modal-status d-flex justify-content-between align-items-center ms-2"
-                    *ngIf="data.pgProvider === 'ROZARPAY'">
-                    <input type="checkbox" id="rozarpay" class="check" [checked]="data.status === 'ACTIVE'">
-                    <label for="rozarpay" class="checktoggle"></label>
+                  <div class="status-toggle modal-status d-flex justify-content-between align-items-center ms-2">
+                    <input type="checkbox" [id]="'pgStatus-' + idx" class="check" [checked]="data.status === 'ACTIVE'"
+                      (change)="changeStatus($event, data, idx)" />
+                    <label [for]="'pgStatus-' + idx" class="checktoggle"></label>
                   </div>
                 </li>
               </ul>
             </div>
           </div>
-          <div class="col-xxl-4 col-xl-6 col-lg-12 col-md-6 d-flex">
+
+
+          <!-- <div class="col-xxl-4 col-xl-6 col-lg-12 col-md-6 d-flex">
             <div class="connected-app-card d-flex w-100">
               <ul class="w-100">
                 <li class="flex-column align-items-start">
@@ -99,11 +94,11 @@
                 <li>
 
                   <div class="integration-btn" *ngIf="data.pgProvider === 'CASHFREE'; else connectNow">
-                    <a href="javascript:void(0);" (click)="openModal(data)"><i-feather name="tool" class="me-2"></i-feather>View Integration</a>
+                    <a href="javascript:void(0);" (click)="editPaymentDetailsModal(data)"><i-feather name="tool" class="me-2"></i-feather>View Integration</a>
                   </div>
                   <ng-template #connectNow>
                       <div class="integration-btn">
-                    <a href="javascript:void(0);"(click)="openModal(data)"><i-feather name="tool" class="me-2"></i-feather>Connect Now</a>
+                    <a href="javascript:void(0);"(click)="editPaymentDetailsModal(data)"><i-feather name="tool" class="me-2"></i-feather>Connect Now</a>
                   </div>
                     </ng-template>
 
@@ -116,8 +111,8 @@
                 </li>
               </ul>
             </div>
-          </div>
-          <div class="col-xxl-4 col-xl-6 col-lg-12 col-md-6 d-flex">
+          </div> -->
+          <!-- <div class="col-xxl-4 col-xl-6 col-lg-12 col-md-6 d-flex">
             <div class="connected-app-card d-flex w-100">
               <ul class="w-100">
                 <li class="flex-column align-items-start">
@@ -128,11 +123,11 @@
                       </span>
                     </div>
                     <div class="connect-btn" *ngIf="data.pgProvider === 'PAYTM'; else notConnected">
-                      <a href="javascript:void(0);" (click)="openModal(data)">Connected</a>
+                      <a href="javascript:void(0);" (click)="editPaymentDetailsModal(data)">Connected</a>
                     </div>
                     <ng-template #notConnected>
                       <div class="connect-btn not-connect">
-                        <a href="javascript:void(0);" (click)="openModal(data)">Not Connected</a>
+                        <a href="javascript:void(0);" (click)="editPaymentDetailsModal(data)">Not Connected</a>
                       </div>
                     </ng-template>
                   </div>
@@ -150,7 +145,7 @@
                 </li>
               </ul>
             </div>
-          </div>
+          </div> -->
           }
         </div>
 
@@ -160,20 +155,14 @@
 </div>
 
 <!-- Add PG Details -->
-<!-- <div class="modal fade" id="payment-connect">
-  <div class="modal-dialog modal-dialog-centered custom-modal-two"> -->
-    <div #paymentModal class="modal fade" id="payment-connect" tabindex="-1">
+<div #addPgModel class="modal fade" id="payment-connect" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered custom-modal-two">
     <div class="modal-content">
       <div class="page-wrapper-new p-0">
         <div class="content">
           <div class="modal-header border-0 custom-modal-header custom-class-modal">
-            <div class="page-title">
-              <h4>{{pgProvider}}</h4>
-            </div>
-            <div class="status-toggle modal-status d-flex justify-content-between align-items-center ms-auto me-2">
-              <input type="checkbox" id="user16" class="check" checked>
-              <label for="user16" class="checktoggle custom-class-checktoggle"> </label>
+            <div class="connect-btn">
+              <b><a href="javascript:void(0);">{{ pgProvider }}</a></b>
             </div>
             <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
@@ -182,6 +171,16 @@
           <div class="modal-body custom-modal-body">
             <form [formGroup]="addPgForm" (ngSubmit)="addPaymentGatewayDetails()">
               <div class="row">
+                <div class="col-lg-12">
+                  <div class="mb-3">
+                    <label class="form-label">PG Provider <span> *</span></label>
+                    <mat-select class="space-select select" formControlName="pgProvider" placeholder="Select PG Provider">
+                      <mat-option value="ROZARPAY">ROZARPAY</mat-option>
+                      <mat-option value="CASHFREE">CASHFREE</mat-option>
+                      <mat-option value="CASHFREE">PAYTM</mat-option>
+                    </mat-select>
+                  </div>
+                </div>
                 <div class="col-lg-12">
                   <div class="mb-3">
                     <label class="form-label">Link URL <span> *</span></label>
@@ -214,3 +213,57 @@
   </div>
 </div>
 <!-- / Add PG Details -->
+
+<!-- Edit PG Details -->
+<div #editPgModal class="modal fade" id="payment-connect" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered custom-modal-two">
+    <div class="modal-content">
+      <div class="page-wrapper-new p-0">
+        <div class="content">
+          <div class="modal-header border-0 custom-modal-header custom-class-modal">
+            <div class="connect-btn">
+              <b><a href="javascript:void(0);">{{ pgProvider }}</a></b>
+            </div>
+            <!-- <div class="status-toggle modal-status d-flex justify-content-between align-items-center ms-auto me-2">
+              <input type="checkbox" id="user16" class="check" checked>
+              <label for="user16" class="checktoggle custom-class-checktoggle"> </label>
+            </div> -->
+            <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body custom-modal-body">
+            <form [formGroup]="editPgForm" (ngSubmit)="editPaymentGatewayDetails()">
+              <div class="row">
+                <div class="col-lg-12">
+                  <div class="mb-3">
+                    <label class="form-label">Link URL <span> *</span></label>
+                    <input class="form-control" type="text" pInputText formControlName="url" maxlength="100">
+                  </div>
+                </div>
+                <div class="col-lg-12">
+                  <div class="mb-3">
+                    <label class="form-label">Client Id <span> *</span></label>
+                    <input class="form-control" type="text" pInputText formControlName="merchantId" maxlength="100">
+                  </div>
+                </div>
+                <div class="col-lg-12">
+                  <div class="mb-0">
+                    <label class="form-label">Client Secret <span> *</span></label>
+                    <input class="form-control" type="text" pInputText formControlName="saltKey" maxlength="100">
+
+                  </div>
+                </div>
+              </div>
+              <div class="modal-footer-btn">
+                <button type="button" class="btn btn-cancel me-2" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-submit">Submit</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- / Edit PG Details -->
