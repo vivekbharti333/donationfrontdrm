@@ -114,7 +114,7 @@ export class AddDonationComponent {
       address: ['', [Validators.required, Validators.pattern('[A-Za-z0-9 ,.-]{3,150}')]],
       panNumber: ['', [Validators.pattern('[A-Z]{5}[0-9]{4}[A-Z]{1}')]],
       programName: [''],
-      amount: ['', [Validators.required, Validators.pattern('^[0-9]+$')]],
+      amount: ['', [Validators.required, Validators.pattern('^[0-9]{1,5}$')]],
       currency: ['', [Validators.required]],
       currencyCode: ['', [Validators.required]],
       transactionId: ['', [Validators.pattern('[A-Za-z0-9]{3,150}')]],

@@ -1,6 +1,7 @@
 export class Constant {
 
     // public static Site_Url = "http://localhost/mycrm/";
+    // public static Site_Url = "http://192.168.29.119/mycrm/";
     public static Site_Url = "https://datfuslab.in/drmapinew/";
 
     // ['sale-dashboard','create-user','user-list','add-donation','all-donation-list','payment-mode-master','payment-mode','currency-master','currency','program','add-receipt-header','receipt-header-list','company-setting','create-lead','lead-list']

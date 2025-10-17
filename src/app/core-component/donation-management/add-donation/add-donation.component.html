@@ -90,14 +90,14 @@
                         <div class="mb-2" *ngIf="showCurrencyBox">
                             <label class="form-label">Amount</label>
                             <input class="form-control" type="number" pInputText pKeyFilter="int"
-                                formControlName="amount" maxlength="100">
+                                formControlName="amount" max="99999">
                         </div>
                     </div>
                     <div class="col-lg-4 col-md-4" *ngIf="!showCurrencyBox">
                         <div class="mb-3" *ngIf="!showCurrencyBox">
                             <label class="form-label">Amount</label>
                             <input class="form-control" type="number" pInputText pKeyFilter="int"
-                                formControlName="amount" maxlength="100">
+                                formControlName="amount" maxlength="5">
                         </div>
                     </div>
                     

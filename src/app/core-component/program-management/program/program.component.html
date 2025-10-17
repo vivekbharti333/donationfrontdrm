@@ -9,33 +9,7 @@
           toast</button>  -->
       </div>
     </div>
-    <ul class="table-top-head">
-      <!-- <li>
-        <a data-bs-toggle="tooltip" data-bs-placement="top" matTooltip="Pdf" matTooltipPosition="above"><img
-            src="assets/img/icons/pdf.svg" alt="img" /></a>
-      </li>
-      <li>
-        <a data-bs-toggle="tooltip" data-bs-placement="top" matTooltip="Excel" matTooltipPosition="above"><img
-            src="assets/img/icons/excel.svg" alt="img" /></a>
-      </li>
-      <li>
-        <a data-bs-toggle="tooltip" data-bs-placement="top" matTooltip="Print" matTooltipPosition="above"><i
-            class="feather icon-printer feather-rotate-ccw"></i></a>
-      </li> -->
-      <li>
-        <!-- <a data-bs-toggle="tooltip" data-bs-placement="top" matTooltip="Refresh" matTooltipPosition="above"
-            (click)="getUserDetails()"><i class="feather icon-rotate-ccw feather-rotate-ccw"></i></a> -->
-      </li>
-      <!-- <li>
-        <a (click)="toggleCollapse()" data-bs-toggle="tooltip" data-bs-placement="top" matTooltip="Collapse"
-          matTooltipPosition="above" id="collapse-header">
-          @if (!isCollapsed) {
-          <i class="feather icon-chevron-up feather-chevron-up"></i>
-          } @if (isCollapsed) {
-          <i class="feather icon-chevron-down feather-chevron-down"></i>
-          }</a>
-      </li> -->
-    </ul>
+    
     <div class="page-btn">
         <div class="page-btn">
             <button
@@ -66,66 +40,50 @@
             </div>
           </div>
         </div>
-        <div class="search-path">
-          <div class="d-flex align-items-center">
-            <a class="btn btn-filter" id="filter_search" (click)="openFilter()" [ngClass]="{ setclose: filter === true }">
-              <i class="feather icon-filter filter-icon"></i>
-              <span><img src="assets/img/icons/closes.svg" alt="img" /></span>
-            </a>
-          </div>
-        </div>
-        <div class="form-sort">
-          <i class="feather icon-sliders info-img"></i>
-          <!-- <mat-select [(ngModel)]="selectedValue2" [ngModelOptions]="{ standalone: true }" class="space-select select"
-              placeholder="Sort by Date">
-              <mat-option value="Sort by Date">Sort by Date</mat-option>
-              <mat-option value="Newest">Newest</mat-option>
-              <mat-option value="Oldest">Oldest</mat-option>
-            </mat-select> -->
-        </div>
+        
       </div>
       <!-- /Filter -->
-      <div class="card" id="filter_inputs" [ngClass]="{ 'd-block': filter, 'd-none': !filter }">
+      <!-- <div class="card" id="filter_inputs" [ngClass]="{ 'd-block': filter, 'd-none': !filter }">
         <div class="card-body pb-0">
           <div class="row">
             <div class="col-lg-3 col-sm-6 col-12">
               <div class="input-blocks">
                 <i class="feather icon-user info-img"></i>
-                <!-- <mat-select [(ngModel)]="selectedValue3" [ngModelOptions]="{ standalone: true }"
+                <mat-select [(ngModel)]="selectedValue3" [ngModelOptions]="{ standalone: true }"
                     class="space-select select" placeholder="Choose Name">
                     <mat-option value="Choose Name">Choose Name</mat-option>
                     <mat-option value="Lilly">Lilly</mat-option>
                     <mat-option value="Benjamin">Benjamin</mat-option>
-                  </mat-select> -->
+                  </mat-select>
               </div>
             </div>
             <div class="col-lg-3 col-sm-6 col-12">
               <div class="input-blocks">
                 <i class="feather icon-stop-circle info-img"></i>
-                <!-- <mat-select [(ngModel)]="selectedValue4" [ngModelOptions]="{ standalone: true }"
+                <mat-select [(ngModel)]="selectedValue4" [ngModelOptions]="{ standalone: true }"
                     class="space-select select" placeholder="Select User Role" (selectionChange)="onRoleTypeChange($event)">
                     <mat-option value="ALL">ALL</mat-option>
                     <mat-option *ngFor="let data of roleTypes" [value]="data.name">
                       {{ data.name }}
                     </mat-option>
-                  </mat-select> -->
+                  </mat-select>
   
-                <!-- <mat-select name="gender" [(ngModel)]="user.gender" [ngModelOptions]="{standalone: true}" class="select"  placeholder="Choose Status" (selectionChange)="onGenderChange($event)">
+                <mat-select name="gender" [(ngModel)]="user.gender" [ngModelOptions]="{standalone: true}" class="select"  placeholder="Choose Status" (selectionChange)="onGenderChange($event)">
                       <mat-option *ngFor="let data of genderType" [value]="data.name">
                         {{ data.name }}
                       </mat-option>
-                    </mat-select> -->
+                    </mat-select>
               </div>
             </div>
             <div class="col-lg-3 col-sm-6 col-12">
               <div class="input-blocks">
                 <i class="feather icon-zap info-img"></i>
-                <!-- <mat-select [(ngModel)]="selectedValue5" [ngModelOptions]="{ standalone: true }"
+                <mat-select [(ngModel)]="selectedValue5" [ngModelOptions]="{ standalone: true }"
                     class="space-select select" placeholder="Choose Role">
                     <mat-option value="Choose Role">Choose Role</mat-option>
                     <mat-option value="Store Keeper">Store Keeper</mat-option>
                     <mat-option value="Salesman">Salesman</mat-option>
-                  </mat-select> -->
+                  </mat-select>
               </div>
             </div>
             <div class="col-lg-3 col-sm-6 col-12">
@@ -137,7 +95,7 @@
             </div>
           </div>
         </div>
-      </div>
+      </div> -->
   
   
   
@@ -162,7 +120,7 @@
                   <!-- <td>{{ data.programAmount }}</td> -->
                   <td>
                     <button class="badge-button" (click)="changeProgramStatus(data)"
-                      [ngClass]="{'badge-linesuccess': data.status === 'ACTIVE', 'badge-linedanger': data.status === 'INACTIVE'}">
+                      [ngClass]="{'badge-linesuccess': data.status === 'ACTIVE', 'badge-linedanger': data.status === 'DEACTIVE'}">
                       {{ data.status }}
                     </button>
                   </td>
