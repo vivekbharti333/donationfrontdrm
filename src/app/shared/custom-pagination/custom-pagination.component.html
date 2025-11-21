@@ -21,39 +21,7 @@
 
           </li>
 
-          <!-- @for (item of pageNumberArray; track item; let i = $index) {
-          <li class="page-item" [class.active]="item === currentPage" [ngClass]="
-                (pageNumberArray[currentPage - 2] > item &&
-                  item !==  1 &&
-                  pageNumberArray.length > 6) ||
-                (pageNumberArray[currentPage] < item &&
-                  item !==  1 &&
-                  pageNumberArray.length > 6 &&
-                  pageNumberArray.length !==  item)
-                  ? 'hide-page-no'
-                  : 'show-page-no'
-              ">
-            <a (click)="moveToPage(item)" class="page-link" href="javascript:void(0);">
-              {{ item }}
-            </a>
-          </li>
-          @if (i === 0 && pageNumberArray.length > 6 && currentPage > 2) {
-          <li class="page-item" [hidden]="currentPage === 1" (click)="moveToPage(currentPage - 2)">
-            <a class="page-link" href="javascript:void(0);"> ... </a>
-          </li>
-          }
-          @if (
-          i === pageNumberArray.length - 2 && pageNumberArray.length > 6
-          ) {
-          <li [hidden]="
-                currentPage >= pageNumberArray[pageNumberArray.length - 2] ||
-                totalData < serialNumberArray[serialNumberArray.length - 1]
-              " class="page-item" (click)="moveToPage(currentPage + 2)">
-            <a class="page-link" href="javascript:void(0);"> ... </a>
-          </li>
-          }
-          } -->
-
+        
           @for (item of pageNumberArray; track item; let i = $index) {
             <!-- Display the first 4 pages or the last 2 pages -->
             @if (i < 4 || i >= pageNumberArray.length - 2 || (item === currentPage - 1 || item === currentPage || item === currentPage + 1)) {

@@ -4,28 +4,11 @@
       <h4>Donation Receipt List</h4>
       <h6>Manage Your Donation Receipt</h6>
       <p-toast></p-toast>
-      <!-- <button type="button" class="btn btn-primary btn-wave" id="liveToastBtn" pButton pRipple
-        (click)="show()" label="Show">Show live
-        toast</button>  -->
     </div>
   </div>
   <ul class="table-top-head">
-    <!-- <li>
-      <a data-bs-toggle="tooltip" data-bs-placement="top" matTooltip="Pdf" matTooltipPosition="above"><img
-          src="assets/img/icons/pdf.svg" alt="img" /></a>
-    </li> -->
-    <!-- <li>
-      <a matTooltip="Export to Excel" matTooltipPosition="above" (click)="exportAsExcelFile()">
-        <img src="assets/img/icons/xls.svg" alt="Export to Excel" />
-      </a>
-    </li> -->
-    <!-- <li>
-      <a data-bs-toggle="tooltip" data-bs-placement="top" matTooltip="Print" matTooltipPosition="above"><i
-          class="feather icon-printer feather-rotate-ccw"></i></a>
-    </li> -->
     <li>
-      <!-- <a data-bs-toggle="tooltip" data-bs-placement="top" matTooltip="Refresh" matTooltipPosition="above"
-          (click)="getUserDetails()"><i class="feather icon-rotate-ccw feather-rotate-ccw"></i></a> -->
+      
     </li>
     <li>
       <a (click)="toggleCollapse()" data-bs-toggle="tooltip" data-bs-placement="top" matTooltip="Collapse"
@@ -38,7 +21,6 @@
     </li>
   </ul>
   <div class="page-btn">
-    <!-- <a [routerLink] = "routes.addusers" class="btn btn-added"><i class="feather icon-plus-circle me-2"></i>Add New User</a>  -->
   </div>
 </div>
 
@@ -57,449 +39,249 @@
           </div>
         </div>
       </div>
-      <!-- <div class="search-path">
-        <div class="d-flex align-items-center">
-          <a class="btn btn-filter" id="filter_search" (click)="openFilter()" [ngClass]="{ setclose: filter === true }">
-            <i class="feather icon-filter filter-icon"></i>
-            <span><img src="assets/img/icons/closes.svg" alt="img" /></span>
-          </a>
-        </div>
-      </div> -->
-      <!-- <div class="form-sort">
-        <i class="feather icon-sliders info-img"></i>
-        <mat-select [(ngModel)]="selectedValue2" [ngModelOptions]="{ standalone: true }" class="space-select select"
-            placeholder="Sort by Date">
-            <mat-option value="Sort by Date">Sort by Date</mat-option>
-            <mat-option value="Newest">Newest</mat-option>
-            <mat-option value="Oldest">Oldest</mat-option>
-          </mat-select>
-      </div> -->
+      
     </div>
 
-
-    <!-- /Filter -->
-    <!-- <div class="card" id="filter_inputs" [ngClass]="{ 'd-block': filter, 'd-none': !filter }">
-      <div class="card-body pb-0">
-        <div class="row">
-          <div class="col-lg-3 col-sm-6 col-12">
-            <div class="input-blocks">
-              <i class="feather icon-user info-img"></i>
-              <mat-select class="space-select select" placeholder="Choose User"
-                (selectionChange)="getDonationListByUser($event)">
-                <mat-option *ngFor="let user of userList" [value]="user.loginId">
-                  {{user.firstName}} {{user.lastName}}
-                </mat-option>
-              </mat-select>
-
-            </div>
-          </div>
-          <div class="col-lg-3 col-sm-6 col-12">
-            <div class="input-blocks">
-              <i class="feather icon-stop-circle info-img"></i>
-              <mat-select class="space-select select" placeholder="Choose Teamleader"
-                (selectionChange)="getDonationListByUser($event)">
-                <mat-option *ngFor="let teamLeader of teamLeaderList" [value]="teamLeader.loginId">
-                  {{teamLeader.firstName}} {{teamLeader.lastName}}
-                </mat-option>
-              </mat-select>
-            </div>
-          </div>
-
-          <div class="col-lg-3 col-sm-6 col-12">
-            <div class="input-blocks">
-              <a class="btn btn-filters ms-auto">
-                <i class="feather icon-search feather-search"></i> Search
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div> -->
 
 
     <div class="card-body">
-      <ul class="nav nav-tabs nav-tabs-solid nav-justified mb-3">
-        <li class="nav-item"><a class="nav-link active" href="#solid-justified-tab1" data-bs-toggle="tab"
-            (click)="getDonationList('TODAY')">Today's Reports</a></li>
-        <li class="nav-item"><a class="nav-link" href="#solid-justified-tab2" data-bs-toggle="tab"
-            (click)="getDonationList('YESTERDAY')">Yesterday's Reports</a></li>
-        <li class="nav-item"><a class="nav-link" href="#solid-justified-tab3" data-bs-toggle="tab"
-            (click)="getDonationList('MONTH')">{{currentMonthName}}'s Reports</a></li>
-            <li class="nav-item" *ngIf =isSuperadmin><a class="nav-link" href="#solid-justified-tab4" data-bs-toggle="tab"
-              (click)="dataTableClear()" >Custom  Report</a></li>
-      </ul>
-      <div class="tab-content">
-        <div class="tab-pane show active" id="solid-justified-tab1">
-          <div class="table-responsive">
-            <table matSort (matSortChange)="sortData($event)" class="table datanew">
-              <thead>
-                <tr>
-                  <th mat-sort-header="userName">Name</th>
-                  <th mat-sort-header="loginId">Mobile</th>
-                  <th mat-sort-header="phone">Amount </th>
-                  <th mat-sort-header="role">Payment Mode</th>
-                  <th mat-sort-header="createdOn">Received By</th>
-                  <!-- <th mat-sort-header="invoiceFor">Invoice For</th> -->
-                  <th mat-sort-header="program">Program</th>
-                  <th mat-sort-header="date&Time">Date & Time</th>
-                  <th mat-sort-header="invoiceNumber">Invoice Number</th>
-                  <th mat-sort-header="invoiceDownload">Invoice Download</th>
-                  <th mat-sort-header="status">Status</th>
-                  <th class="no-sort">Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                @for (data of tableData; track data) {
-                <tr>
-                  <td>{{ data.donorName }} </td>
-                  <td>{{ data.mobileNumber }}</td>
-                  <td>{{ data.amount }} {{ data.currencyCode }}</td>
-                  <td>{{ data.paymentMode }}</td>
-                  <td>{{ data.createdbyName }}</td>
-                  <!-- <td>{{ data.invoiceHeaderName }}</td> -->
-                  <td>{{ data.programName }}</td>
-                  <td>{{ data.createdAt | date : "dd-MM-yyyy | HH:mm" }}</td>
-                  <td>{{ data.invoiceNumber}}</td>
-                  <td>
-                    <button class="badge-button"
-                      [ngClass]="{'badge-linesuccess': data.invoiceDownloadStatus === 'NO','badge-linedanger': data.invoiceDownloadStatus === 'YES'}">
-                      {{ data.invoiceDownloadStatus }}
-                    </button>
-                  </td>
-                  <td>
-                    <button class="badge-button"
-                    [ngClass]="{'badge-linesuccess': data.status === 'ACTIVE','badge-linedanger': data.status === 'INACTIVE'}" (click)="updateDonationStatus(data)">
-                    {{ data.status}}
-                    </button>
-                  </td>
-                  <td class="action-table-data">
-                    <div class="edit-delete-action">
-                    
-                      <a class="me-2 p-2 mb-0" data-bs-toggle="modal" data-bs-target="#edit-units"
-                        (click)="openEditModal(dialogTemplate, data)" *ngIf =isSuperadmin>
-                        <i class="feather icon-edit feather-edit"></i></a>
 
-                        <a class="me-2 p-2 mb-0" data-bs-toggle="modal" data-bs-target="#edit-units"
-                        (click)="downloadInvoice(data.receiptNumber)">
-                        <i class="feather icon-download feather-download"></i></a>
+  <!-- MOBILE TABS (scrollable) -->
+  <div class="tabs-wrapper d-block d-lg-none">
+  <ul class="responsive-tabs single-line-tabs">
 
-                    </div>
-                  </td>
-                </tr>
-                }
-              </tbody>
-            </table>
-          </div>
-        </div>
-        <div class="tab-pane" id="solid-justified-tab2">
-          <div class="table-responsive">
-            <table matSort (matSortChange)="sortData($event)" class="table datanew">
-              <thead>
-                <tr>
-                  <th mat-sort-header="userName">Name</th>
-                  <th mat-sort-header="loginId">Mobile</th>
-                  <th mat-sort-header="phone">Amount</th>
-                  <th mat-sort-header="role">Payment Mode</th>
-                  <th mat-sort-header="createdOn">Received By</th>
-                  <!-- <th mat-sort-header="invoiceFor">Invoice For</th> -->
-                  <th mat-sort-header="program">Program</th>
-                  <th mat-sort-header="date&Time">Date & Time</th>
-                  <th mat-sort-header="invoiceNumber">Invoice Number</th>
-                  <th mat-sort-header="invoiceDownload">Invoice Download</th>
-                  <th mat-sort-header="status">Status</th>
-                  <th class="no-sort">Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                @for (data of tableData; track data) {
-                <tr>
-                  <td>{{ data.donorName }} </td>
-                  <td>{{ data.mobileNumber }}</td>
-                  <td>{{ data.amount }} {{ data.currencyCode }}</td>
-                  <td>{{ data.paymentMode }}</td>
-                  <td>{{ data.createdbyName }}</td>
-                  <!-- <td>{{ data.invoiceHeaderName }}</td> -->
-                  <td>{{ data.programName }}</td>
-                  <td>{{ data.createdAt | date : "dd-MM-yyyy | HH:mm" }}</td>
-                  <td>{{ data.invoiceNumber}}</td>
-                  <td>
-                    <button class="badge-button"
-                      [ngClass]="{'badge-linesuccess': data.invoiceDownloadStatus === 'NO','badge-linedanger': data.invoiceDownloadStatus === 'YES'}">
-                      {{ data.invoiceDownloadStatus }}
-                    </button>
-                  </td>
-                  <td>
-                    <button class="badge-button"
-                    [ngClass]="{'badge-linesuccess': data.status === 'ACTIVE','badge-linedanger': data.status === 'INACTIVE'}">
-                    {{ data.status}}
-                    </button>
-                  </td>
-                  <td class="action-table-data">
-                    <div class="edit-delete-action">
-                    
-                      <a class="me-2 p-2 mb-0" data-bs-toggle="modal" data-bs-target="#edit-units"
-                        (click)="openEditModal(dialogTemplate, data)">
-                        <i class="feather icon-edit feather-edit" *ngIf =isSuperadmin></i></a>
+    <li class="nav-item">
+      <a class="nav-link active" (click)="getDonationList('TODAY')">Today's Reports</a>
+    </li>
 
-                        <a class="me-2 p-2 mb-0" data-bs-toggle="modal" data-bs-target="#edit-units"
-                        (click)="downloadInvoice(data.receiptNumber)">
-                        <i class="feather icon-download feather-download"></i></a>
+    <li class="nav-item">
+      <a class="nav-link" (click)="getDonationList('YESTERDAY')">Yesterday's Reports</a>
+    </li>
 
-                    </div>
-                  </td>
-                </tr>
-                }
-              </tbody>
-            </table>
-          </div>
-        </div>
-        <div class="tab-pane" id="solid-justified-tab3">
-          <div class="table-responsive">
-            <table matSort (matSortChange)="sortData($event)" class="table datanew">
-              <thead>
-                <tr>
-                  <th mat-sort-header="userName">Name</th>
-                  <th mat-sort-header="loginId">Mobile</th>
-                  <th mat-sort-header="phone">Amount </th>
-                  <th mat-sort-header="role">Payment Mode</th>
-                  <th mat-sort-header="createdOn">Received By</th>
-                  <!-- <th mat-sort-header="invoiceFor">Invoice For</th> -->
-                  <th mat-sort-header="program">Program</th>
-                  <th mat-sort-header="date&Time">Date & Time</th>
-                  <th mat-sort-header="invoiceNumber">Invoice Number</th>
-                  <th mat-sort-header="invoiceDownload">Invoice Download</th>
-                  <th mat-sort-header="status">Status</th>
-                  <th class="no-sort">Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                @for (data of tableData; track data) {
-                <tr>
-                  <td>{{ data.donorName }} </td>
-                  <td>{{ data.mobileNumber }}</td>
-                  <td>{{ data.amount }} {{ data.currencyCode }}</td>
-                  <td>{{ data.paymentMode }}</td>
-                  <td>{{ data.createdbyName }}</td>
-                  <!-- <td>{{ data.invoiceHeaderName }}</td> -->
-                  <td>{{ data.programName }}</td>
-                  <td>{{ data.createdAt | date : "dd-MM-yyyy | HH:mm" }}</td>
-                  <td>{{ data.invoiceNumber}}</td>
-                  <td>
+    <li class="nav-item">
+      <a class="nav-link" (click)="getDonationList('MONTH')">{{ currentMonthName }}'s Reports</a>
+    </li>
 
-                    <button class="badge-button"
-                      [ngClass]="{'badge-linesuccess': data.invoiceDownloadStatus === 'NO','badge-linedanger': data.invoiceDownloadStatus === 'YES'}">
-                      {{ data.invoiceDownloadStatus }}
-                    </button>
-                  </td>
-                  <td>
-                    <button class="badge-button"
-                    [ngClass]="{'badge-linesuccess': data.status === 'ACTIVE','badge-linedanger': data.status === 'INACTIVE'}">
-                    {{ data.status}}
-                    </button>
-                  </td>
-                  <td class="action-table-data">
-                    <div class="edit-delete-action">
-                    
-                      <a class="me-2 p-2 mb-0" data-bs-toggle="modal" data-bs-target="#edit-units"
-                        (click)="openEditModal(dialogTemplate, data)" *ngIf =isSuperadmin>
-                        <i class="feather icon-edit feather-edit"></i></a>
+    <li class="nav-item" *ngIf="isSuperadmin">
+      <a class="nav-link" (click)="dataTableClear()">Custom Report</a>
+    </li>
 
-                        <a class="me-2 p-2 mb-0" data-bs-toggle="modal" data-bs-target="#edit-units"
-                        (click)="downloadInvoice(data.receiptNumber)">
-                        <i class="feather icon-download feather-download"></i></a>
-
-                    </div>
-                  </td>
-                </tr>
-                }
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <div class="tab-pane" id="solid-justified-tab4">
-          <div class="table-responsive">
-
-            <div class="row">
-
-              <div class="col-sm-2">
-                <label> From</label>
-                <input class="form-control" pInputText type="date" #firstDate>
-              </div>
-              <div class="col-sm-2">
-                <label> To </label>
-                <input class="form-control" pInputText type="date" #lastDate>
-        
-              </div>
-              <div class="col-sm-2">
-                <br>
-               
-                <button type="submit" class="btn btn-warning " 
-                  (click)="getDonationListByDate(firstDate.value,lastDate.value)"
-                  style="margin-top: 8px; margin-left: 0px;"><i class="feather icon-search feather-search"></i> Search</button>
-              </div>
-        
-             
-                <div class="col-2" *ngIf = showExcelReport>
-                  <label> Export Excel Report</label>
-                  <br>
-                 
-                  <a matTooltip="Export to Excel" matTooltipPosition="above" (click)="exportAsExcelFile()">
-                    <img src="assets/img/icons/xls.svg" alt="Export Excel Report" width="30" />
-                  </a>
-                </div>
-            </div>
-            <br><br>
-
-            <table matSort (matSortChange)="sortData($event)" class="table datanew">
-              <thead>
-                <tr>
-                  <th mat-sort-header="userName">Name</th>
-                  <th mat-sort-header="loginId">Mobile</th>
-                  <th mat-sort-header="phone">Amount</th>
-                  <th mat-sort-header="role">Payment Mode</th>
-                  <th mat-sort-header="createdOn">Received By</th>
-                  <!-- <th mat-sort-header="invoiceFor">Invoice For</th> -->
-                  <th mat-sort-header="program">Program</th>
-                  <th mat-sort-header="date&Time">Date & Time</th>
-                  <th mat-sort-header="invoiceNumber">Invoice Number</th>
-                  <th mat-sort-header="invoiceDownload">Invoice Download</th>
-                  <th mat-sort-header="status">Status</th>
-                  <th class="no-sort">Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                @for (data of tableData; track data) {
-                <tr>
-                  <td>{{ data.donorName }} </td>
-                  <td>{{ data.mobileNumber }}</td>
-                  <td>{{ data.amount }} {{ data.currencyCode }}</td>
-                  <td>{{ data.paymentMode }}</td>
-                  <td>{{ data.createdbyName }}</td>
-                  <td>{{ data.invoiceHeaderName }}</td>
-                  <td>{{ data.programName }}</td>
-                  <td>{{ data.createdAt | date : "dd-MM-yyyy | HH:mm" }}</td>
-                  <!-- <td>{{ data.invoiceNumber}}</td> -->
-                  <td>
-
-                    <button class="badge-button"
-                      [ngClass]="{'badge-linesuccess': data.invoiceDownloadStatus === 'NO','badge-linedanger': data.invoiceDownloadStatus === 'YES'}">
-                      {{ data.invoiceDownloadStatus }}
-                    </button>
-                  </td>
-                  <td>
-                    <button class="badge-button"
-                    [ngClass]="{'badge-linesuccess': data.status === 'ACTIVE','badge-linedanger': data.status === 'INACTIVE'}">
-                    {{ data.status}}
-                    </button>
-                  </td>
-                  <td class="action-table-data">
-                    <div class="edit-delete-action">
-                    
-                      <a class="me-2 p-2 mb-0" data-bs-toggle="modal" data-bs-target="#edit-units"
-                        (click)="openEditModal(dialogTemplate, data)">
-                        <i class="feather icon-edit feather-edit"></i></a>
-
-                        <a class="me-2 p-2 mb-0" data-bs-toggle="modal" data-bs-target="#edit-units"
-                        (click)="downloadInvoice(data.receiptNumber)">
-                        <i class="feather icon-download feather-download"></i></a>
-
-                    </div>
-                  </td>
-                </tr>
-                }
-              </tbody>
-            </table>
-          </div>
-        </div>
+  </ul>
+</div>
 
 
+  <!-- DESKTOP TABS (normal bootstrap tabs) -->
+  <ul class="nav nav-tabs nav-tabs-solid nav-justified mb-3 d-none d-lg-flex">
+    <li class="nav-item">
+      <a class="nav-link active" data-bs-toggle="tab" href="#solid-justified-tab"
+         (click)="getDonationList('TODAY')">Today's Reports</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" data-bs-toggle="tab" href="#solid-justified-tab"
+         (click)="getDonationList('YESTERDAY')">Yesterday's Reports</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" data-bs-toggle="tab" href="#solid-justified-tab"
+         (click)="getDonationList('MONTH')">{{ currentMonthName }}'s Reports</a>
+    </li>
+    <li class="nav-item" *ngIf="isSuperadmin">
+      <a class="nav-link" data-bs-toggle="tab" href="#solid-justified-tab4"
+         (click)="dataTableClear()">Custom Report</a>
+    </li>
+  </ul>
+
+  <div class="tab-content">
+
+   <!-- SHOW ONLY FOR CUSTOM REPORT -->
+<div *ngIf="showCustomFilter" class="custom-filter-box">
+
+  <div class="row g-3 align-items-end">
+
+    <!-- From Date -->
+    <div class="col-6 col-md-2">
+      <label class="filter-label">From</label>
+      <input type="date" class="form-control filter-input" #firstDate>
+    </div>
+
+    <!-- To Date -->
+    <div class="col-6 col-md-2">
+      <label class="filter-label">To</label>
+      <input type="date" class="form-control filter-input" #lastDate>
+    </div>
+
+    <!-- Search Button -->
+    <div class="col-12 col-md-2">
+      <button class="btn btn-warning w-100 filter-btn"
+              (click)="getDonationListByDate(firstDate.value, lastDate.value)">
+        <i class="feather icon-search feather-search"></i> Search
+      </button>
+    </div>
+
+    <!-- Excel Download -->
+    <div class="col-12 col-md-2" *ngIf="showExcelReport">
+      <label class="filter-label d-none d-md-block">Export Excel</label>
+      <div>
+        <a class="excel-icon" (click)="exportAsExcelFile()">
+          <img src="assets/img/icons/xls.svg" width="35" alt="Export Excel">
+        </a>
       </div>
     </div>
 
+  </div>
+
+</div>
+
+
+    <!-- DESKTOP TABLE -->
+    <div class="desktop-table">
+      <div class="tab-pane show active" id="solid-justified-tab">
+        <div class="table-responsive">
+          <table matSort (matSortChange)="sortData($event)" class="table datanew">
+            <thead>
+              <tr>
+                <th mat-sort-header="userName">Name</th>
+                <th mat-sort-header="loginId">Mobile</th>
+                <th mat-sort-header="phone">Amount</th>
+                <th mat-sort-header="role">Payment Mode</th>
+                <th mat-sort-header="createdOn">Received By</th>
+                <th mat-sort-header="program">Program</th>
+                <th mat-sort-header="date&Time">Date & Time</th>
+                <th mat-sort-header="invoiceNumber">Invoice Number</th>
+                <th mat-sort-header="invoiceDownload">Invoice Download</th>
+                <th mat-sort-header="status">Status</th>
+                <th class="no-sort">Action</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              @for (data of tableData; track data) {
+              <tr>
+                <td>{{ data.donorName }}</td>
+                <td>{{ data.mobileNumber }}</td>
+                <td>{{ data.amount }} {{ data.currencyCode }}</td>
+                <td>{{ data.paymentMode }}</td>
+                <td>{{ data.createdbyName }}</td>
+                <td>{{ data.programName }}</td>
+                <td>{{ data.createdAt | date : "dd-MM-yyyy | HH:mm" }}</td>
+                <td>{{ data.invoiceNumber }}</td>
+
+                <td>
+                  <button class="badge-button"
+                          [ngClass]="{
+                            'badge-linesuccess': data.invoiceDownloadStatus === 'NO',
+                            'badge-linedanger': data.invoiceDownloadStatus === 'YES'
+                          }">
+                    {{ data.invoiceDownloadStatus }}
+                  </button>
+                </td>
+
+                <td>
+                  <button class="badge-button"
+                          [ngClass]="{
+                            'badge-linesuccess': data.status === 'ACTIVE',
+                            'badge-linedanger': data.status === 'INACTIVE'
+                          }"
+                          (click)="updateDonationStatus(data)">
+                    {{ data.status }}
+                  </button>
+                </td>
+
+                <td class="action-table-data">
+                  <div class="edit-delete-action">
+                    <a class="me-2 p-2 mb-0" *ngIf="isSuperadmin"
+                       (click)="openEditModal(dialogTemplate, data)">
+                      <i class="feather icon-edit feather-edit"></i>
+                    </a>
+
+                    <a class="me-2 p-2 mb-0"
+                       (click)="downloadInvoice(data.receiptNumber)">
+                      <i class="feather icon-download feather-download"></i>
+                    </a>
+                  </div>
+                </td>
+              </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- MOBILE CARDS -->
+    <div class="mobile-cards">
+      @for (d of tableData; track d) {
+      <div class="donation-card">
+
+        <div class="card-header">
+          <h3 class="name">{{ d.donorName }}</h3>
+          <span class="amount">{{ d.amount }} {{ d.currencyCode }}</span>
+        </div>
+
+        <div class="card-body">
+          <p><span class="label">Mobile:</span> {{ d.mobileNumber }}</p>
+          <p><span class="label">Program:</span> {{ d.programName }}</p>
+          <p><span class="label">FRO:</span> {{ d.createdbyName }}</p>
+          <p><span class="label">Date:</span> {{ d.createdAt | date:'dd/MM/yyyy | HH:mm' }}</p>
+
+          <p>
+            <span class="label">Receipt:</span>
+            {{ d.receiptNumber }}
+            <strong class="bold-separator"> | </strong>
+            <span class="status-text"
+                  [ngClass]="{
+                    'status-green': d.invoiceDownloadStatus === 'NO',
+                    'status-red': d.invoiceDownloadStatus === 'YES'
+                  }">
+              {{ d.invoiceDownloadStatus }}
+            </span>
+          </p>
+        </div>
+
+        <div class="card-actions">
+          <div class="left-actions">
+            <button class="status-btn"
+                    [ngClass]="{
+                      'btn-green': d.status === 'ACTIVE',
+                      'btn-red': d.status === 'INACTIVE'
+                    }"
+                    (click)="updateDonationStatus(d)">
+              {{ d.status }}
+            </button>
+          </div>
+
+          <div class="right-actions">
+            <button class="edit-btn" *ngIf="isSuperadmin"
+                    (click)="openEditModal(dialogTemplate, d)">
+              <i class="feather icon-edit feather-edit"></i>
+            </button>
+
+            <button class="download-btn"
+                    (click)="downloadInvoice(d.receiptNumber)">
+              <i class="feather icon-download feather-download"></i>
+            </button>
+          </div>
+        </div>
+
+      </div>
+      }
+    </div>
 
     <!-- /Filter -->
-    <app-custom-pagination></app-custom-pagination>
+    <!-- DESKTOP PAGINATION -->
+<!-- DESKTOP PAGINATION -->
+<div class="desktop-pagination d-none d-md-block">
+  <app-custom-pagination></app-custom-pagination>
+</div>
+
+<!-- MOBILE PAGINATION -->
+<div class="mobile-pagination d-block d-md-none">
+  <app-custom-pagination></app-custom-pagination>
+</div>
+
+
 
   </div>
 </div>
-
-<!-- /////////// -->
-<!-- <div class="tab-pane" id="solid-justified-tab5">
-  <div class="table-responsive">
-    <div class="row">
-
-      <div class="col-sm-2">
-        <label> From</label>
-        <input class="form-control" pInputText type="date" #firstDate>
-      </div>
-      <div class="col-sm-2">
-        <label> To </label>
-        <input class="form-control" pInputText type="date" #lastDate>
-
-      </div>
-      <div class="col-sm-2">
-        <br>
-        <button type="submit" mat-raised-button class="btn btn-warning"
-          (click)="getDonationListByDate(firstDate.value,lastDate.value)"
-          style="margin-top: 8px; margin-left: 0px;">Search</button>
-      </div>
-
-     
-        <div class="col-2">
-          <label> Download In Excel</label>
-          <br>
-          <button mat-raised-button class="btn btn-warning" (click)="exportAsExcelFile()">
-            <img src="/assets/img/brand/excel-logo.png" width="24"> Export Report
-          </button>
-        </div>
-    </div>
-
-    <div class="row">
-      <div class="col-4">
-        <input type="text" class="form-control" placeholder="Search here..." [(ngModel)]="searchTerm">
-      </div>
-    </div>
-
-
-    <table class="table table-striped" id="customers">
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Mobile No.</th>
-          <th>Amount (Currency)</th>
-          <th>Payment Mode</th>
-          <th>Received By</th>
-          <th>Invoice For</th>
-          <th>Program</th>
-          <th>Date & Time</th>
-          <th>Invoice Number</th>
-        </tr>
-      </thead>
-
-      <tbody>
-        <tr *ngFor="let donation of filteredDonations | paginate: { itemsPerPage: tableSize, currentPage: page }; let i = index">
-          <td>{{ donation.donorName }}</td>
-          <td>{{ donation.mobileNumber }}</td>
-          <td>{{ donation.amount }} {{ donation.currencyCode }}</td>
-          <td>{{ donation.paymentMode }}</td>
-          <td>{{ donation.createdbyName }}</td>
-          <td>{{ donation.invoiceHeaderName }}</td>
-          <td>{{ donation.programName }}</td>
-          <td>{{ donation.createdAt | date: 'dd-MM-yyyy | hh:mm:ss a' }}</td>
-          <td>{{ donation.invoiceNumber }}</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <div class="d-flex justify-content-center">
-      <pagination-controls previousLabel="Prev" nextLabel="Next" (pageChange)="onTableCustomDataChange($event)">
-      </pagination-controls>
-    </div>
-  </div>
-</div> -->
-
-<!-- ////////////////////////////// -->
 
 
 <ng-template #dialogTemplate let-dialog>
@@ -724,10 +506,8 @@
     </mat-dialog-content>
     <mat-dialog-actions class="dialogAction">
       <div class="text-end mb-3">
-        <!-- <button type="submit" class="btn btn-submit" [disabled]="!editDonationForm.valid"> Update Receipt </button> -->
         <button type="submit" class="btn btn-submit"> Update Receipt </button>
       </div>
-      <!-- <button mat-button (click)="dialog.close()">Close</button> -->
     </mat-dialog-actions>
   </form>
 </ng-template>

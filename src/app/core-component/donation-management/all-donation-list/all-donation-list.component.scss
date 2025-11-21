@@ -1,8 +1,222 @@
+/* ---------------- NAV LINKS ---------------- */
 .nav-link {
-    font-weight: bold;
-    color: black;
+  font-weight: bold;
+  color: black;
+}
+
+.nav-link.active {
+  color: black;
+}
+
+/* ---------------- RESPONSIVE TABS FOR MOBILE ---------------- */
+.tabs-wrapper {
+  margin-bottom: 12px;
+  padding-bottom: 5px;
+}
+
+/* Stacked tabs: one per row */
+.single-line-tabs {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.single-line-tabs .nav-item {
+  width: 100%;
+}
+
+.single-line-tabs .nav-link {
+  display: block;
+  width: 100%;
+  text-align: center;
+  padding: 12px;
+  font-size: 15px;
+  font-weight: 700;
+  border-radius: 8px;
+  background: #fff3cd;
+  border: 1px solid #ffcc80;
+  color: #333;
+}
+
+.single-line-tabs .nav-link.active {
+  background: #ff9800;
+  border-color: #ff9800;
+  color: white !important;
+}
+
+/* ---------------- DESKTOP VS MOBILE LOGIC ---------------- */
+.desktop-table {
+  display: block;
+}
+
+.mobile-cards {
+  display: none;
+}
+
+/* Desktop Pagination */
+.desktop-pagination app-custom-pagination {
+  display: block;
+  margin-top: 15px;
+}
+
+/* Mobile Pagination */
+.mobile-pagination app-custom-pagination {
+  display: block;
+  margin-top: 12px;
+  padding: 8px 0;
+}
+
+/* ---------------- MOBILE + TABLET VIEW ---------------- */
+@media (max-width: 992px) {
+
+  /* Hide Default Bootstrap Tabs */
+  .nav-tabs {
+    display: none !important;
   }
-  
-  .nav-link.active {
-    color: black; /* Ensure active links also remain black */
+
+  /* Hide Desktop Table */
+  .desktop-table {
+    display: none !important;
   }
+
+  /* Show Mobile Cards */
+  .mobile-cards {
+    display: block !important;
+  }
+
+  /* ---------------- CARD DESIGN ---------------- */
+  .donation-card {
+    background: #ffffff;
+    border: 1px solid #ffb84d;
+    padding: 12px;
+    border-radius: 10px;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  }
+
+  /* ---------------- HEADER ---------------- */
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 6px;
+  }
+
+  .name {
+    font-size: 16px;
+    font-weight: 700;
+    color: #111;
+    margin: 0;
+  }
+
+  .amount {
+    font-size: 16px;
+    font-weight: 700;
+    color: #ff7a00;
+  }
+
+  /* ---------------- BODY DATA TEXT ---------------- */
+  .card-body p {
+    margin: 2px 0;
+    font-size: 13px;
+    color: #444;
+  }
+
+  .label {
+    font-weight: 700;
+    color: #111;
+    font-size: 13.5px;
+  }
+
+  /* ---------------- STATUS TEXT ---------------- */
+  .status-green {
+    color: #1ca400 !important;
+    font-weight: 700;
+  }
+
+  .status-red {
+    color: #d30000 !important;
+    font-weight: 700;
+  }
+
+  /* ---------------- STATUS BUTTON ---------------- */
+  .status-btn {
+    padding: 4px 10px;
+    border-radius: 6px;
+    color: #fff;
+    font-weight: 600;
+    font-size: 12px;
+    border: none;
+  }
+
+  .btn-green {
+    background: #28a745 !important;
+  }
+
+  .btn-red {
+    background: #dc3545 !important;
+  }
+
+  /* ---------------- ACTION AREA ---------------- */
+  .card-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+    align-items: center;
+  }
+
+  .left-actions {
+    display: flex;
+    align-items: center;
+  }
+
+  .right-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .edit-btn,
+  .download-btn {
+    background: #ff7a00;
+    color: white;
+    border: none;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 13px;
+  }
+
+  /* ---------------- MOBILE PAGINATION STYLE ---------------- */
+  app-custom-pagination .pagination {
+    display: flex;
+    justify-content: center;
+    flex-wrap: nowrap;
+    gap: 4px !important;
+  }
+
+  app-custom-pagination .pagination li {
+    flex: 0 0 auto;
+  }
+
+  app-custom-pagination .pagination .page-link {
+    padding: 4px 8px !important;
+    font-size: 12px !important;
+    border-radius: 6px !important;
+  }
+
+  app-custom-pagination .pagination .active .page-link {
+    background-color: #ff9800 !important;
+    border-color: #ff9800 !important;
+    color: white !important;
+    font-weight: 700;
+  }
+
+  app-custom-pagination .pagination .page-item .page-link i {
+    font-size: 14px !important;
+  }
+}
+
+/* ------------------ SEPARATOR -------------------------- */
+.bold-separator {
+  font-weight: 700;
+  color: #000;
+}

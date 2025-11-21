@@ -45,10 +45,14 @@ interface data {
 })
 export class AllDonationListComponent {
 
+  lastPageState: pageSelection = { skip: 0, limit: 10 };
+
   donationList: DonationListForExcel[] = []; // Use the defined interface
   datePipe = new DatePipe('en-US'); // Inject the DatePipe
 
   public fullData: DonationDetails[] = [];
+  public showCustomFilter: boolean = false;
+
 
   public donationUpdateDialog: any;
   public editDonationForm!: FormGroup;
@@ -152,6 +156,21 @@ export class AllDonationListComponent {
     const currentDate = new Date();
     const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
     this.currentMonthName = months[currentDate.getMonth()];
+
+
+   // pagination
+  this.pagination.tablePageSize.subscribe((res: tablePageSize) => {
+    if (!this.fullData) return;
+
+    this.pageSize = res.pageSize;
+
+    this.prepareTableData(this.fullData, {
+      skip: res.skip,
+      limit: res.limit
+    });
+  });
+
+
   }
 
 
@@ -201,7 +220,6 @@ export class AllDonationListComponent {
           } else {
           }
         },
-        //   error: (error: any) => this.toastr.error('Server Error', '500'),
       });
   }
 
@@ -214,22 +232,13 @@ export class AllDonationListComponent {
           } else {
           }
         },
-        // error: (error: any) => this.toastr.error('Server Error', '500'),
       });
   }
 
 
   getDonationListByUser(event: any): void {
-    // alert('Selected User ID:' + event.value); // Logs the selected user ID
-    // Add your logic here
   }
 
-  // loadPagination(1: number): void {
-  //   // Call the changePageSize method with the passed page size
-  //   this.pagination.changePageSize(1);
-
-  //   console.log(`Pagination initialized with page size: ${sk}`);
-  // }
 
 
 
@@ -239,27 +248,44 @@ export class AllDonationListComponent {
 
 
   public getDonationList(tabName: string): void {
-    // this.dataTableClear();
-    this.tabName = tabName;
-    this.serialNumberArray = [];
+this.showCustomFilter = false;
+  this.tabName = tabName;
 
-    this.donationManagementService.getDonationList(tabName).subscribe((apiRes: any) => {
-      this.totalData = apiRes.totalNumber;
-      this.fullData = apiRes.listPayload; // Store the full dataset
+  // 🔥 CLEAR OLD DATA BEFORE API CALL
+  this.tableData = [];
+  this.fullData = [];
+  this.serialNumberArray = [];
+  this.totalData = 0;
+  this.showExcelReport = false;
+  this.dataSource = new MatTableDataSource<DonationDetails>([]);
 
-      this.pagination.tablePageSize.subscribe((res: tablePageSize) => {
-        if (this.router.url === this.routes.allDonationList) {
-          this.pageSize = res.pageSize;
+  // 🔥 Reset pagination to page 1
+  this.pagination.tablePageSize.next({
+    skip: 0,
+    limit: this.pageSize,
+    pageSize: this.pageSize
+  });
 
-          // Use the full dataset for pagination
-          this.prepareTableData(this.fullData, { skip: res.skip, limit: res.skip + res.pageSize });
-          this.pageSize = res.pageSize;
-        }
+  // 🔥 API CALL
+  this.donationManagementService.getDonationList(tabName)
+    .subscribe((apiRes: any) => {
+
+      // Assign new data
+      this.totalData = apiRes.totalNumber || 0;
+      this.fullData = apiRes.listPayload || [];
+      this.showExcelReport = this.totalData > 0;
+
+      // Load page 1 immediately
+      this.prepareTableData(this.fullData, {
+        skip: 0,
+        limit: this.pageSize
       });
     });
-  }
+}
+
 
   dataTableClear(){
+    this.showCustomFilter = true;
     this.tableData = [];
     this.pageSize = 10;
     this.serialNumberArray= [];
@@ -268,57 +294,70 @@ export class AllDonationListComponent {
     
   }
   
-  getDonationListByDate(firstDate: any, lastDate: any): void {
+ getDonationListByDate(firstDate: any, lastDate: any): void {
 
-    this.showExcelReport = false;
-    this.donationList = [];
-    this.firstDate = firstDate;
-    this.lastDate = lastDate;
-    this.serialNumberArray = [];
+  // 🔥 CLEAR DATA BEFORE API CALL
+  this.showExcelReport = false;
+  this.donationList = [];
+  this.firstDate = firstDate;
+  this.lastDate = lastDate;
 
+  this.tableData = [];
+  this.fullData = [];
+  this.serialNumberArray = [];
+  this.totalData = 0;
+  this.dataSource = new MatTableDataSource<DonationDetails>([]); // empty table
 
-    this.donationManagementService.getDonationListByDate(firstDate, lastDate).subscribe((apiRes: any) => {
-      this.totalData = apiRes.totalNumber;
-      this.fullData = apiRes.listPayload; // Store the full dataset
+  // 🔥 Reset pagination to page 1
+  this.pagination.tablePageSize.next({
+    skip: 0,
+    limit: this.pageSize,
+    pageSize: this.pageSize
+  });
 
-      // this.donationList = JSON.parse(JSON.stringify(apiRes['listPayload']));
+  // 🔥 API CALL
+  this.donationManagementService.getDonationListByDate(firstDate, lastDate)
+    .subscribe((apiRes: any) => {
 
-      if(this.totalData >=1){
-        this.showExcelReport = true;
-      }
+      this.totalData = apiRes.totalNumber || 0;
+      this.fullData = apiRes.listPayload || [];
 
-      this.pagination.tablePageSize.subscribe((res: tablePageSize) => {
-        if (this.router.url === this.routes.allDonationList) {
-          this.pageSize = res.pageSize;
-          // Use the full dataset for pagination
-          this.prepareTableData(this.fullData, { skip: res.skip, limit: res.skip + res.pageSize });
-          this.pageSize = res.pageSize;
-        }
+      this.showExcelReport = this.totalData > 0;
+
+      // 🚀 Load first page
+      this.prepareTableData(this.fullData, {
+        skip: 0,
+        limit: this.pageSize
       });
     });
-  }
+}
 
-  private prepareTableData(apiRes: any[], pageOption: pageSelection): void {
-    this.tableData = [];
-    this.serialNumberArray = [];
 
-    apiRes.forEach((res: DonationDetails, index: number) => {
-      const serialNumber = index + 1;
-      if (index >= pageOption.skip && serialNumber <= pageOption.limit) {
-        this.tableData.push(res);
-        this.serialNumberArray.push(serialNumber);
-      }
-    });
-    // Update the MatTableDataSource
-    this.dataSource = new MatTableDataSource<DonationDetails>(this.tableData);
-    // Emit updated pagination data
-    this.pagination.calculatePageSize.next({
-      totalData: this.totalData,
-      pageSize: this.pageSize,
-      tableData: this.tableData,
-      serialNumberArray: this.serialNumberArray,
-    });
-  }
+  private prepareTableData(apiRes: DonationDetails[], pageOption: pageSelection): void {
+  const start = pageOption.skip;
+  const end = pageOption.limit;
+
+  this.dataSource = new MatTableDataSource<DonationDetails>([]);
+
+  // Slice data for current page
+  this.tableData = apiRes.slice(start, end);
+
+  // Serial numbers (1-based)
+  this.serialNumberArray = this.tableData.map((_, i) => start + i + 1);
+
+  // Material table
+  this.dataSource = new MatTableDataSource<DonationDetails>(this.tableData);
+
+  // Notify pagination service
+  this.pagination.calculatePageSize.next({
+    totalData: this.totalData,
+    pageSize: this.pageSize,
+    tableData: this.tableData,
+    serialNumberArray: this.serialNumberArray,
+  });
+}
+
+
 
 
   public sortData(sort: Sort) {
@@ -336,32 +375,37 @@ export class AllDonationListComponent {
 
 
   public searchData(value: string): void {
-    const searchTerm = value.trim().toLowerCase();
+  const searchTerm = value.trim().toLowerCase();
 
-    if (searchTerm) {
-      // Filter the full dataset based on the search term
-      const filteredData = this.fullData.filter((donation: DonationDetails) =>
-        Object.values(donation).some((field) =>
-          String(field).toLowerCase().includes(searchTerm)
-        )
-      );
+  if (searchTerm) {
+    // Filter data
+    const filteredData = this.fullData.filter((donation: DonationDetails) =>
+      Object.values(donation).some((field: any) =>
+        String(field).toLowerCase().includes(searchTerm)
+      )
+    );
 
-      this.prepareTableData(filteredData, { skip: 0, limit: this.pageSize });
-      this.totalData = filteredData.length; // Update total data count for pagination
-    } else {
-      // Reset to the full dataset when the search term is cleared
-      this.prepareTableData(this.fullData, { skip: 0, limit: this.pageSize });
-      this.totalData = this.fullData.length; // Reset the total data count
-    }
+    this.totalData = filteredData.length;
 
-    // Reset to the first page after a search or clearing search
-    this.pagination.calculatePageSize.next({
-      totalData: this.totalData,
-      pageSize: this.pageSize,
-      tableData: this.tableData,
-      serialNumberArray: this.serialNumberArray,
+    // Always reset to page 1
+    this.prepareTableData(filteredData, { skip: 0, limit: this.pageSize });
+  } else {
+    // Search cleared → reset table & page to page 1
+    this.totalData = this.fullData.length;
+
+    this.prepareTableData(this.fullData, { skip: 0, limit: this.pageSize });
+
+    // Reset pagination to page 1
+    this.pagination.tablePageSize.next({
+      skip: 0,
+      limit: this.pageSize,
+      pageSize: this.pageSize
     });
   }
+}
+
+
+
 
 
   isCollapsed: boolean = false;
@@ -454,7 +498,6 @@ export class AllDonationListComponent {
           } else {
           }
         },
-        //error: (error: any) => this.toastr.error('Server Error', '500'),
       });
   }
 
