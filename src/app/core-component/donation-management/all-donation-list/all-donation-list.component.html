@@ -47,27 +47,19 @@
     <div class="card-body">
 
   <!-- MOBILE TABS (scrollable) -->
-  <div class="tabs-wrapper d-block d-lg-none">
-  <ul class="responsive-tabs single-line-tabs">
-
-    <li class="nav-item">
-      <a class="nav-link active" (click)="getDonationList('TODAY')">Today's Reports</a>
-    </li>
-
-    <li class="nav-item">
-      <a class="nav-link" (click)="getDonationList('YESTERDAY')">Yesterday's Reports</a>
-    </li>
-
-    <li class="nav-item">
-      <a class="nav-link" (click)="getDonationList('MONTH')">{{ currentMonthName }}'s Reports</a>
-    </li>
-
-    <li class="nav-item" *ngIf="isSuperadmin">
-      <a class="nav-link" (click)="dataTableClear()">Custom Report</a>
-    </li>
-
-  </ul>
+  <!-- Mobile Dropdown (visible only on mobile) -->
+<div class="d-block d-lg-none mb-3">
+  <select class="form-select orange-select" (change)="handleMobileReportChange($event)">
+    <option value="TODAY">Today's Reports</option>
+    <option value="YESTERDAY">Yesterday's Reports</option>
+    <option value="MONTH">{{ currentMonthName }}'s Reports</option>
+    <ng-container *ngIf="isSuperadmin">
+      <option value="CUSTOM">Custom Report</option>
+    </ng-container>
+  </select>
 </div>
+
+
 
 
   <!-- DESKTOP TABS (normal bootstrap tabs) -->
@@ -214,7 +206,7 @@
 
         <div class="card-header">
           <h3 class="name">{{ d.donorName }}</h3>
-          <span class="amount">{{ d.amount }} {{ d.currencyCode }}</span>
+          <span class="amount">{{d.currency}} {{ d.amount }}</span>
         </div>
 
         <div class="card-body">

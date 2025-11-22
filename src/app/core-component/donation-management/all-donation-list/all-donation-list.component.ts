@@ -418,6 +418,16 @@ this.showCustomFilter = false;
     this.filter = !this.filter;
   }
 
+  handleMobileReportChange(event: any) {
+  const value = event.target.value;
+
+  if (value === 'CUSTOM') {
+    this.dataTableClear();
+  } else {
+    this.getDonationList(value);
+  }
+}
+
 
   openEditModal(templateRef: TemplateRef<any>, rowData: any) {
     this.editDonationForm.patchValue({
