@@ -616,41 +616,146 @@ this.showCustomFilter = false;
 
 
 
+  // exportAsExcelFile(): void {
+  //   let filteredArrayList: any[] = [];
+
+  //   this.fullData.forEach((element: DonationDetails) => { // Explicitly type 'element'
+  //     let createdAt = this.datePipe.transform(element.createdAt, 'dd-MM-yyyy');
+
+  //     let data: any = {
+  //       'Donor Name': element.donorName,
+  //       'Mobile Number': element.mobileNumber,
+  //       'Email ID': element.emailId,
+  //       'Pan Number': element.panNumber,
+  //       'Address': element.address,
+  //       'Donation For': element.programName,
+  //       'Currency': element.currencyCode,
+  //       'Amount': element.amount,
+  //       'Transaction ID': element.transactionId,
+  //       'Payment Mode': element.paymentMode,
+  //       'Receipt': element.receiptNumber,
+  //       'Invoice Number': element.invoiceNumber,
+  //       'Received By': element.createdbyName,
+  //       'Team Leader ID': element.teamLeaderId,
+  //       'Invoice For': element.invoiceHeaderName,
+  //       'Super Admin ID': element.superadminId,
+  //       'Donation Date': createdAt,
+  //     };
+
+  //     filteredArrayList.push(data);
+  //   });
+
+  //   const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(filteredArrayList);
+  //   const workbook: XLSX.WorkBook = { Sheets: { data: worksheet }, SheetNames: ['data'] };
+  //   const excelBuffer: any = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+  //   const EXCEL_TYPE = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
+  //   const blob: Blob = new Blob([excelBuffer], { type: EXCEL_TYPE });
+  //   fileSaver.saveAs(blob, 'Donation Report.xlsx');
+  // }
+
+
+
   exportAsExcelFile(): void {
-    let filteredArrayList: any[] = [];
+  let filteredArrayList: any[] = [];
 
-    this.fullData.forEach((element: DonationDetails) => { // Explicitly type 'element'
-      let createdAt = this.datePipe.transform(element.createdAt, 'dd-MM-yyyy');
+  this.fullData.forEach((element: DonationDetails) => {
+  let createdAt = this.datePipe.transform(element.createdAt, 'dd-MM-yyyy | HH:mm:ss');
 
-      let data: any = {
-        'Donor Name': element.donorName,
-        'Mobile Number': element.mobileNumber,
-        'Email ID': element.emailId,
-        'Pan Number': element.panNumber,
-        'Address': element.address,
-        'Donation For': element.programName,
-        'Currency': element.currencyCode,
-        'Amount': element.amount,
-        'Transaction ID': element.transactionId,
-        'Payment Mode': element.paymentMode,
-        'Receipt': element.receiptNumber,
-        'Invoice Number': element.invoiceNumber,
-        'Received By': element.createdbyName,
-        'Team Leader ID': element.teamLeaderId,
-        'Invoice For': element.invoiceHeaderName,
-        'Super Admin ID': element.superadminId,
-        'Donation Date': createdAt,
-      };
-
-      filteredArrayList.push(data);
+    filteredArrayList.push({
+      'Donor Name': element.donorName,
+      'Mobile Number': element.mobileNumber,
+      'Email ID': element.emailId,
+      'Pan Number': element.panNumber,
+      'Address': element.address,
+      'Donation For': element.programName,
+      'Currency': element.currencyCode,
+      'Amount': element.amount,
+      'Transaction ID': element.transactionId,
+      'Payment Mode': element.paymentMode,
+      'Receipt': element.receiptNumber,
+      'Invoice Number': element.invoiceNumber,
+      'Received By': element.createdbyName,
+      'Team Leader ID': element.teamLeaderId,
+      'Invoice For': element.invoiceHeaderName,
+      'Super Admin ID': element.superadminId,
+      'Donation Date': createdAt,
     });
+  });
 
-    const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(filteredArrayList);
-    const workbook: XLSX.WorkBook = { Sheets: { data: worksheet }, SheetNames: ['data'] };
-    const excelBuffer: any = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-    const EXCEL_TYPE = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
-    const blob: Blob = new Blob([excelBuffer], { type: EXCEL_TYPE });
-    fileSaver.saveAs(blob, 'Donation Report.xlsx');
+  const worksheet: any = {};
+
+  // ----------- 🎨 HEADING ROWS (Clean + no green) ----------------
+
+  // Title row
+  worksheet["A1"] = {
+    v: "Donation Report",
+    t: "s",
+    s: {
+      font: { bold: true, sz: 25, color: { rgb: "000000" } },
+      alignment: { horizontal: "center", vertical: "center" }
+    }
+  };
+
+  // --- Current Date ---
+  const today = new Date();
+  const todayStr = this.datePipe.transform(today, "dd/MM/yyyy");
+
+  worksheet["A2"] = {
+    v: `Downloaded Date: ${todayStr}`,
+    t: "s",
+    s: {
+      font: { bold: true, sz: 12 },
+      alignment: { horizontal: "left" }
+    }
+  };
+
+  // Merge heading rows
+  worksheet["!merges"] = [
+    { s: { r: 0, c: 0 }, e: { r: 0, c: 16 } },
+    { s: { r: 1, c: 0 }, e: { r: 1, c: 16 } }
+  ];
+
+  // Add data starting at row 5
+  const dataSheet = XLSX.utils.json_to_sheet([]);
+  XLSX.utils.sheet_add_json(dataSheet, filteredArrayList, { origin: "A5", skipHeader: false });
+
+  Object.assign(worksheet, dataSheet);
+
+  // --------- 🎨 STYLE HEADER ROW (Row 5) - Light Orange -----------
+
+  const headerRange = XLSX.utils.decode_range(worksheet['!ref']);
+
+  for (let C = headerRange.s.c; C <= headerRange.e.c; C++) {
+    const cellAddr = XLSX.utils.encode_cell({ r: 4, c: C });
+
+    if (worksheet[cellAddr]) {
+      worksheet[cellAddr].s = {
+        fill: { fgColor: { rgb: "FFB74D" } }, // ⭐ Light Orange (#FFB74D)
+        font: { bold: true, color: { rgb: "000000" }, sz: 12 },
+        alignment: { horizontal: "center", vertical: "center" },
+        border: {
+          top: { style: "thin", color: { rgb: "000000" } },
+          bottom: { style: "thin", color: { rgb: "000000" } },
+          left: { style: "thin", color: { rgb: "000000" } },
+          right: { style: "thin", color: { rgb: "000000" } }
+        }
+      };
+    }
   }
 
+  // Auto column widths
+  worksheet["!cols"] = Object.keys(filteredArrayList[0]).map(k => ({ wch: k.length + 3 }));
+
+  const workbook: XLSX.WorkBook = {
+    Sheets: { "Donation Report": worksheet },
+    SheetNames: ["Donation Report"]
+  };
+
+  const buffer: any = XLSX.write(workbook, { bookType: "xlsx", type: "array", cellStyles: true });
+
+  fileSaver.saveAs(
+    new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }),
+    "Donation_Report.xlsx"
+  );
+}
 }
