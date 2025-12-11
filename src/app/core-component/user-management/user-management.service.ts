@@ -159,7 +159,7 @@ export class UserManagementService {
     if(userDetails.roleType === Constant.fundraisingOfficer){
       creatBy = userDetails.createdBy;
     }else {
-      creatBy = this.loginUser['loginId'];
+      creatBy = this.cookieService.get('loginId');
     }
 
     let request: any = {
