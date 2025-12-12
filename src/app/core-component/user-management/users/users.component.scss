@@ -1,20 +1,175 @@
+/* -----------------------------------------
+   BADGE BUTTONS (Desktop Status)
+----------------------------------------- */
 .badge-button {
+  border: none;
+  color: white;
+  padding: 5px 10px;
+  font-size: 14px;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.badge-linesuccess {
+  background-color: green;
+}
+
+.badge-linedanger {
+  background-color: red;
+}
+
+
+/* -----------------------------------------
+   DESKTOP VIEW (DEFAULT)
+----------------------------------------- */
+.desktop-view {
+  display: block !important;
+}
+
+.mobile-cards {
+  display: none !important;
+}
+
+.user-img {
+  width: 40px;
+  height: 40px;
+  border-radius: 100%;
+}
+
+
+/* =========================================================
+   MOBILE VIEW (≤ 992px)
+========================================================= */
+@media (max-width: 992px) {
+
+  /* Hide Table on Mobile */
+  .desktop-view {
+    display: none !important;
+  }
+
+  /* Show Cards */
+  .mobile-cards {
+    display: block !important;
+  }
+
+  /* -----------------------------------------
+     USER CARD DESIGN
+  ----------------------------------------- */
+  .user-card {
+    background: #ffffff;
+    border: 1px solid #ffb84d;
+    padding: 12px;
+    border-radius: 10px;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  }
+
+  /* Header Section */
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 6px;
+  }
+
+  .user-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .user-img-mobile {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  .username {
+    font-size: 16px;
+    font-weight: 700;
+    color: #111;
+    margin: 0;
+  }
+
+  .username::after,
+  .username::before {
+    content: "" !important;  /* FIX unwanted dropdown arrow */
+  }
+
+  /* Body Text */
+  .card-body p {
+    margin: 2px 0;
+    font-size: 13px;
+    color: #444;
+  }
+
+  .label {
+    font-weight: 700;
+    color: #111;
+    font-size: 13px;
+  }
+
+  /* -----------------------------------------
+     STATUS BUTTON (Active/Inactive)
+  ----------------------------------------- */
+  .status-btn {
+    padding: 4px 10px;
+    border-radius: 6px;
+    color: #fff;
+    font-weight: 600;
+    font-size: 12px;
     border: none;
-    color: white;
-    padding: 5px 10px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 14px;
-    margin: 4px 2px;
+  }
+
+  .btn-green {
+    background: #28a745 !important;
+  }
+
+  .btn-red {
+    background: #dc3545 !important;
+  }
+
+  /* -----------------------------------------
+     ACTION ICONS (EDIT & DELETE)
+  ----------------------------------------- */
+  .card-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+  }
+
+  .right-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .icon-btn {
+    background: none;
+    border: none;
+    padding: 4px;
+    display: flex;
     cursor: pointer;
-    border-radius: 12px;
   }
-  
-  .badge-linesuccess {
-    background-color: green;
+
+  .edit-icon {
+    color: #007bff !important;   /* Blue */
+    font-size: 20px;
   }
-  
-  .badge-linedanger {
-    background-color: red;
+
+  .delete-icon {
+    color: #ec0404 !important;   /* Red */
+    font-size: 20px;
   }
+
+}
+
+
+/* -----------------------------------------
+   SEPARATOR
+----------------------------------------- */
+.bold-separator {
+  font-weight: 700;
+  color: #000;
+}
