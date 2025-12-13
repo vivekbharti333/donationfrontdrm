@@ -255,3 +255,34 @@
     display: none !important;
   }
 }
+
+  // .icon-btn {
+  //   background: none;
+  //   border: none;
+  //   padding: 4px;
+  //   display: flex;
+  //   cursor: pointer;
+  // }
+
+  //   .edit-icon {
+  //   color: #007bff !important;   /* Blue */
+  //   font-size: 20px;
+  // }
+
+.whatsapp-btn {
+  // width: 26px;
+  // height: 26px;
+  background-color: #25D366;
+  border: none;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.whatsapp-icon {
+  width: 26px;
+  height: 26px;
+}
+

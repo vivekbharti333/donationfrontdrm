@@ -247,13 +247,13 @@
               <i class="feather icon-edit feather-edit"></i>
             </button>
 
-           <button class="download-btn whatsapp-btn"
+            <button class="whatsapp-btn" *ngIf="isSuperadmin"
                     (click)="shareOnWhatsApp(d.receiptNumber, d.mobileNumber)"
                     title="Share on WhatsApp">
-              <i class="feather icon-whatsapp"></i>
+              <img src="assets/icons/svg/whatsapp.svg"  
+                  alt="WhatsApp"
+                  class="whatsapp-icon">
             </button>
-
-
 
             <button class="download-btn"
                     (click)="downloadInvoice(d.receiptNumber)">

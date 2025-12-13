@@ -447,7 +447,7 @@ shareOnWhatsApp(receiptNumber: string, mobileNumber: string) {
     `https://mydonation.in/#/thank-you/receipt?receiptNo=${receiptNumber}`;
 
   const message =
-`Thank you for your kind donation to Aadyam Foundation 🙏
+`Thank you for your kind donation 🙏
 
 Please click the link below to download your donation receipt:
 ${receiptUrl}`;
