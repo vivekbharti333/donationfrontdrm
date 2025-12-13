@@ -429,6 +429,38 @@ this.showCustomFilter = false;
 }
 
 
+shareOnWhatsApp(receiptNumber: string, mobileNumber: string) {
+
+  if (!mobileNumber) {
+    alert('Donor mobile number not available');
+    return;
+  }
+
+  // WhatsApp requires country code (India = 91)
+  let formattedNumber = mobileNumber.replace(/\D/g, '');
+
+  if (!formattedNumber.startsWith('91')) {
+    formattedNumber = '91' + formattedNumber;
+  }
+
+  const receiptUrl =
+    `https://mydonation.in/#/thank-you/receipt?receiptNo=${receiptNumber}`;
+
+  const message =
+`Thank you for your kind donation to Aadyam Foundation 🙏
+
+Please click the link below to download your donation receipt:
+${receiptUrl}`;
+
+  const whatsappUrl =
+    `https://wa.me/${formattedNumber}?text=${encodeURIComponent(message)}`;
+
+  window.open(whatsappUrl, '_blank');
+}
+
+
+
+
   openEditModal(templateRef: TemplateRef<any>, rowData: any) {
     this.editDonationForm.patchValue({
       id: rowData['id'],

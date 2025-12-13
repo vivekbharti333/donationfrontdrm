@@ -247,6 +247,14 @@
               <i class="feather icon-edit feather-edit"></i>
             </button>
 
+           <button class="download-btn whatsapp-btn"
+                    (click)="shareOnWhatsApp(d.receiptNumber, d.mobileNumber)"
+                    title="Share on WhatsApp">
+              <i class="feather icon-whatsapp"></i>
+            </button>
+
+
+
             <button class="download-btn"
                     (click)="downloadInvoice(d.receiptNumber)">
               <i class="feather icon-download feather-download"></i>
