@@ -185,6 +185,12 @@
                       <i class="feather icon-edit feather-edit"></i>
                     </a>
 
+                    <a class="me-2 p-2 mb-0 whatsapp-share" *ngIf="isSuperadmin"
+                      (click)="shareOnWhatsApp(data.receiptNumber, data.mobileNumber)"
+                      title="Share on WhatsApp">
+                      <i class="feather icon-share-2"></i>
+                    </a>
+
                     <a class="me-2 p-2 mb-0"
                        (click)="downloadInvoice(data.receiptNumber)">
                       <i class="feather icon-download feather-download"></i>

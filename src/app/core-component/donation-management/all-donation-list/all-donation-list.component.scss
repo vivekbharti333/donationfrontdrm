@@ -185,6 +185,17 @@
     font-size: 13px;
   }
 
+  .whatsapp-share i {
+    color: #25D366;   /* WhatsApp green */
+    font-size: 18px;
+    cursor: pointer;
+}
+
+.whatsapp-share:hover i {
+    color: #1ebe5d;
+}
+
+
   /* ---------------- MOBILE PAGINATION STYLE ---------------- */
   app-custom-pagination .pagination {
     display: flex;
