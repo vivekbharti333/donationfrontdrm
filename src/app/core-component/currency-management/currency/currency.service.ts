@@ -29,4 +29,15 @@ export class CurrencyService {
     };
     return this.http.post<any>(Constant.Site_Url + "getCurrencyDetailsBySuperadmin", request);
   }
+  
+
+    addUpdateCurrencyBySuperadmin(ids: any): Observable<any> {
+    const request = {
+      payload: {
+        currencyMasterIds: ids,
+        superadminId: this.loginUser['superadminId'],
+      }
+    };
+    return this.http.post<any>(Constant.Site_Url + 'addUpdateCurrencyBySuperadmin', request);
+  }
 }

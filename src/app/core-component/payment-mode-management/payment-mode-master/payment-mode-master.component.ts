@@ -30,7 +30,8 @@ import { PaymentModeManagementService } from '../payment-mode-management.service
 @Component({
   selector: 'app-payment-mode-master',
   templateUrl: './payment-mode-master.component.html',
-  styleUrl: './payment-mode-master.component.scss'
+  styleUrl: './payment-mode-master.component.scss',
+  providers: [DatePipe, MessageService],
 })
 export class PaymentModeMasterComponent {
 
@@ -62,7 +63,7 @@ export class PaymentModeMasterComponent {
       private pagination: PaginationService,
       private router: Router,
       private sidebar: SidebarService,
-      // private messageService: MessageService,
+      private messageService: MessageService,
       private dialog: MatDialog,
       private helper: HelperService,
       private paymentModeManagementService: PaymentModeManagementService,
@@ -130,15 +131,10 @@ export class PaymentModeMasterComponent {
       this.tableData = this.dataSource.filteredData;
     }
 
-    changeUserStatus(nay:any){
-
-    }
-
      createForms() {
         this.paymentModeForm = this.fb.group({
           id: [''],
           paymentMode: ['', [Validators.required, Validators.pattern('[A-Za-z ]{3,150}')]],
-
         });
       }
 
@@ -152,6 +148,39 @@ export class PaymentModeMasterComponent {
         };
     }
 
+    changeStatusOfPaymentModeMaster(rawData:any){
+    this.paymentModeManagementService.changeStatusOfPaymentModeMaster(rawData.id)
+      .subscribe({
+        next: (response: any) => {
+          if (response['responseCode'] == '200') {
+            if (response['payload']['respCode'] == '200') {
+
+              this.getMasterPaymentModeList();
+             
+
+              this.messageService.add({
+                summary: response['payload']['respCode'],
+                detail: response['payload']['respMesg'],
+                styleClass: 'success-background-popover',
+              });
+
+            } else {
+              this.messageService.add({
+                summary: response['payload']['respCode'],
+                detail: response['payload']['respMesg'],
+                styleClass: 'danger-background-popover',
+              });
+            }
+          } else {
+            this.messageService.add({
+              summary: response['responseCode'],
+              detail: response['responseMessage'],
+              styleClass: 'danger-light-popover',
+            });
+          }
+        },
+      });
+  }
 
     submitPaymentModeMasterForm(){
 
