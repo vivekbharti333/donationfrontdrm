@@ -3,6 +3,8 @@ import { RouterModule, Routes } from '@angular/router';
 import { SchoolManagementComponent } from './school-management.component';
 import { AddStudentComponent } from './add-student/add-student.component'; 
 import { StudentListComponent } from './student-list/student-list.component';
+import { GenerateSchoolReceiptComponent } from './generate-school-receipt/generate-school-receipt.component';
+import { SchoolReceiptListComponent } from './school-receipt-list/school-receipt-list.component';
  
 
 const routes: Routes = [
@@ -17,6 +19,14 @@ const routes: Routes = [
       {
         path: 'student-list',
         component: StudentListComponent,
+      },
+       {
+        path: 'generate-school-receipt',
+        component: GenerateSchoolReceiptComponent,
+      },
+      {
+        path: 'school-receipt-list',
+        component: SchoolReceiptListComponent,
       },
     ],
   },

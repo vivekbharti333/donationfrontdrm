@@ -1,0 +1,169 @@
+<form [formGroup]="receiptForm" (ngSubmit)="submitReceipt()">
+
+  <!-- ================= STUDENT INFORMATION ================= -->
+  <div class="card mb-3">
+    <div class="card-header">
+      <h5>Student Information</h5>
+    </div>
+    <div class="card-body">
+      <div class="row">
+
+        <div class="col-md-4 mb-3">
+          <label>Admission No *</label>
+          <input class="form-control" formControlName="admissionNo">
+        </div>
+
+        <div class="col-md-4 mb-3">
+          <label>Roll Number</label>
+          <input class="form-control" formControlName="rollNumber">
+        </div>
+
+        <div class="col-md-4 mb-3">
+          <label>Student Name *</label>
+          <input class="form-control" formControlName="studentName">
+        </div>
+
+        <div class="col-md-4 mb-3">
+          <label>Grade</label>
+          <input class="form-control" formControlName="grade">
+        </div>
+
+        <div class="col-md-4 mb-3">
+          <label>Section</label>
+          <input class="form-control" formControlName="gradeSection">
+        </div>
+
+        <div class="col-md-4 mb-3">
+          <label>Academic Session</label>
+          <input class="form-control" formControlName="academicSession">
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= RECEIPT INFO ================= -->
+  <div class="card mb-3">
+    <div class="card-header">
+      <h5>Receipt Information</h5>
+    </div>
+    <div class="card-body">
+      <div class="row">
+
+        <div class="col-md-4 mb-3">
+          <label>Receipt Number *</label>
+          <input class="form-control" formControlName="receiptNumber">
+        </div>
+
+        <div class="col-md-4 mb-3">
+          <label>Installment</label>
+          <input class="form-control" formControlName="installmentName">
+        </div>
+
+        <div class="col-md-4 mb-3">
+          <label>Payment Mode</label>
+          <select class="form-control" formControlName="paymentMode">
+            <option value="">Select</option>
+            <option value="CASH">Cash</option>
+            <option value="ONLINE">Online</option>
+            <option value="CHEQUE">Cheque</option>
+          </select>
+        </div>
+
+        <div class="col-md-4 mb-3">
+          <label>Payment Date</label>
+          <input type="date" class="form-control" formControlName="paymentDate">
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= FEE DETAILS ================= -->
+  <div class="card mb-3">
+    <div class="card-header d-flex justify-content-between">
+      <h5>Fee Details</h5>
+      <button type="button" class="btn btn-sm btn-primary" (click)="addFeeRow()">
+        + Add Fee
+      </button>
+    </div>
+
+    <div class="card-body" formArrayName="receiptDetails">
+
+      <div class="row mb-2"
+           *ngFor="let fee of receiptDetails.controls; let i = index"
+           [formGroupName]="i">
+
+        <div class="col-md-6">
+          <label>Fee Type</label>
+          <input class="form-control" formControlName="feeType">
+        </div>
+
+        <div class="col-md-4">
+          <label>Amount</label>
+          <input type="number" class="form-control"
+                 formControlName="amount"
+                 (input)="calculateTotals()">
+        </div>
+
+        <div class="col-md-2 d-flex align-items-end">
+          <button type="button" class="btn btn-danger"
+                  (click)="removeFeeRow(i)">
+            Remove
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ================= AMOUNT SUMMARY ================= -->
+  <div class="card mb-3">
+    <div class="card-header">
+      <h5>Amount Summary</h5>
+    </div>
+    <div class="card-body">
+      <div class="row">
+
+        <div class="col-md-3">
+          <label>Total Amount</label>
+          <input class="form-control" formControlName="totalAmount" readonly>
+        </div>
+
+        <div class="col-md-3">
+          <label>Discount</label>
+          <input type="number" class="form-control"
+                 formControlName="discountAmount"
+                 (input)="calculateTotals()">
+        </div>
+
+        <div class="col-md-3">
+          <label>Fine</label>
+          <input type="number" class="form-control"
+                 formControlName="fineAmount"
+                 (input)="calculateTotals()">
+        </div>
+
+        <div class="col-md-3">
+          <label>Net Amount</label>
+          <input class="form-control" formControlName="netAmount" readonly>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= ACTIONS ================= -->
+  <div class="text-end">
+    <button type="submit" class="btn btn-success"
+            [disabled]="receiptForm.invalid">
+      Generate Receipt
+    </button>
+    <button type="button" class="btn btn-secondary ms-2"
+            (click)="resetForm()">
+      Cancel
+    </button>
+  </div>
+
+</form>

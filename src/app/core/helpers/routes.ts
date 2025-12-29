@@ -1087,5 +1087,11 @@ export class routes {
   public static get studentsList(): string {
     return this.schoolManagement + '/student-list';
   }
+   public static get generateSchoolReceipt(): string {
+    return this.schoolManagement + '/generate-school-receipt';
+  }
+  public static get schoolReceiptList(): string {
+    return this.schoolManagement + '/school-receipt-list';
+  }
   // core pages child routes *ends*
 }

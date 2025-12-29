@@ -9,6 +9,8 @@ import { SchoolManagementComponent } from './school-management.component';
 import { SchoolManagementRoutingModule } from './school-management-routing.module';
 import { AddStudentComponent } from './add-student/add-student.component';
 import { StudentListComponent } from './student-list/student-list.component';
+import { GenerateSchoolReceiptComponent } from './generate-school-receipt/generate-school-receipt.component';
+import { SchoolReceiptListComponent } from './school-receipt-list/school-receipt-list.component';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatTabsModule} from '@angular/material/tabs';
 import { MatIconModule } from '@angular/material/icon';
@@ -21,6 +23,8 @@ import { MessageService } from 'primeng/api';
     SchoolManagementComponent,
     AddStudentComponent,
     StudentListComponent,
+    GenerateSchoolReceiptComponent,
+    SchoolReceiptListComponent
   ],
   imports: [
     SchoolManagementRoutingModule,
