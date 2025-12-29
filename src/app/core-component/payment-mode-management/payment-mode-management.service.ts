@@ -20,7 +20,6 @@ export class PaymentModeManagementService {
    getMasterPaymentModeList(){
     let request: any = {
       payload: {
-        roleType: this.loginUser['roleType']
       }
     };
     return this.http.post<any>(Constant.Site_Url + "getMasterPaymentModeList", request);
@@ -46,15 +45,14 @@ export class PaymentModeManagementService {
       return this.http.post<any>(Constant.Site_Url + "addOrUpdatePaymentModeBySuperadmin", request);
     }
 
-    changeStatusOfPaymentModeMaster(id :any){
+    changeStatusOfPaymentModeMaster(paymentMode :any){
       let request: any = {
         payload: {
-          id: id,
-          // paymentModeIds: paymentMode,
+          paymentModeIds: paymentMode,
           superadminId: this.loginUser['superadminId'],
         }
       };
-      return this.http.post<any>(Constant.Site_Url + "changeStatusOfPaymentModeMaster", request);
+      return this.http.post<any>(Constant.Site_Url + "addPaymentModeBySuperadmin", request);
     }
   
 }

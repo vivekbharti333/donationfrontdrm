@@ -1,0 +1,46 @@
+.badge-linesuccess {
+    color: #007BFF; /* Blue text */
+    border: 1px solid #007BFF; /* Optional border */
+  }
+  
+  .badge-linedanger {
+    color: #DC3545; /* Red text */
+    border: 1px solid #DC3545; /* Optional border */
+  }
+  
+  .badge-lineinfo {
+    color: #5BC0DE; /* Light Blue text */
+    border: 1px solid #5BC0DE; /* Optional border */
+  }
+  
+  .badge-linewarning {
+    color: #FD7E14; /* Orange text */
+    border: 1px solid #FD7E14; /* Optional border */
+  }
+  
+  .badge-linewin {
+    color: #28A745; /* Green text */
+    border: 1px solid #28A745; /* Optional border */
+  }
+  
+  .badge-lineassigned {
+    color: #6F42C1; /* Purple text */
+    border: 1px solid #6F42C1; /* Optional border */
+  }
+  
+  .badge-linereserved {
+    color: #FFC107; /* Yellow text */
+    border: 1px solid #FFC107; /* Optional border */
+  }
+  
+  .badge-default {
+    color: #6C757D; /* Gray text */
+    border: 1px solid #6C757D; /* Optional border */
+  }
+  
+  .badge-button {
+    background: none; /* Removes background */
+    border-radius: 4px; /* Optional rounded corners */
+    padding: 5px 10px; /* Optional padding */
+    font-size: 14px; /* Adjust as needed */
+  }

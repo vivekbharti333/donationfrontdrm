@@ -1,0 +1,123 @@
+<div class="page-header">
+    <div class="add-item d-flex">
+        <div class="page-title">
+            <h4>Payment Mode Master</h4>
+            <!-- <p-toast></p-toast> -->
+        </div>
+    </div>
+
+    <div class="page-btn">
+        <button class="btn btn-added" data-bs-toggle="modal" data-bs-target="#add-units"
+            (click)="openAddModal(addPaymentModeTemplate)">
+            <i class="feather icon-plus-circle me-2"></i>Add Payment Mode Master</button>
+    </div>
+</div>
+    <!-- /product list -->
+    <div class="card table-list-card">
+        <div class="card-body">
+            <div class="table-top">
+                <div class="search-set">
+                    <div class="search-input">
+                        <a href="javascript:void(0);" class="btn btn-searchset"><i
+                                class="feather icon-search feather-search"></i></a>
+                        <div class="dataTables_filter">
+                            <label>
+                                <input [(ngModel)]="searchDataValue" [ngModelOptions]="{ standalone: true }"
+                                    (ngModelChange)="searchData(searchDataValue)" type="search" class="form-control"
+                                    placeholder="Search..." />
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="search-path">
+                    <div class="d-flex align-items-center">
+                        <a class="btn btn-filter" id="filter_search">
+                            <i class="feather icon-filter filter-icon"></i>
+                            <span><img src="assets/img/icons/closes.svg" alt="img" /></span>
+                        </a>
+                    </div>
+                </div>
+                <div class="form-sort">
+                    <i class="feather icon-sliders info-img"></i>
+                </div>
+            </div>
+            <!-- /Filter -->
+
+            <div class="table-responsive">
+                <table matSort (matSortChange)="sortData($event)" class="table datanew">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th mat-sort-header="userName">Name</th>
+                            <th mat-sort-header="status">Status</th>
+                            <th mat-sort-header="createdOn">Created On</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (data of tableData; track data; let idx=$index) {
+                        <tr>
+                            <td></td>
+                            <td>{{ data.paymentMode }}</td>
+                            <td>
+                                <button class="badge-button"
+                                    [ngClass]="{'badge-linesuccess': data.status === 'ACTIVE','badge-linedanger': data.status === 'INACTIVE'}"
+                                    (click)="changeStatusOfPaymentModeMaster(data)">
+                                    {{ data.status }}
+                                </button>
+                            </td>
+                            <td>{{ data.createdAt | date : "dd-MM-yyyy | HH:mm" }}</td>
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- /Filter -->
+
+            <app-custom-pagination></app-custom-pagination>
+        </div>
+</div>
+
+
+
+
+<ng-template #addPaymentModeTemplate let-dialog>
+    <div class="modalHeaderContainer">
+        <h2 mat-dialog-title class="p-0">Add Payment Mode Master</h2>
+        <div mat-dialog-close class="closeBtn">
+            <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    </div>
+    <form [formGroup]="paymentModeForm" (ngSubmit)="submitPaymentModeMasterForm()">
+        <mat-dialog-content class="modalContent">
+            <div class="modal-body custom-modal-body">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="new-employee-field">
+                            <div class="card-title-head">
+                                <h6>
+                                    <span><i class="feather icon-info feather-edit"></i></span>Payment Mode Master
+                                </h6>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-4 col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Payment Mode </label>
+                                        <input class="form-control" type="text" pInputText formControlName="paymentMode" maxlength="100">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </mat-dialog-content>
+        <mat-dialog-actions class="dialogAction">
+            <div class="text-end mb-3">
+                <button type="submit" class="btn btn-submit">Submit</button>
+            </div>
+        </mat-dialog-actions>
+    </form>
+</ng-template>

@@ -1,0 +1,263 @@
+
+
+<p-toast></p-toast>
+
+
+
+<div class="row">
+  <div class="col-lg-5 col-md-5 form-check"></div>
+  <!-- <div class="col-lg-1 col-md-1 form-check">
+    <input type="radio" class="btn-check" name="formName" value="lead" id="lead" autocomplete="off" checked
+      (change)="onSelectionChange($event)" />
+    <label class="btn" for="lead">New Lead</label>
+  </div>
+  <div class="col-lg-1 col-md-1 form-check">
+    <input type="radio" class="btn-check" name="formName" value="info" id="info" autocomplete="off"
+      (change)="onSelectionChange($event)" />
+    <label class="btn" for="info">Information</label>
+  </div> -->
+  <div class="col-lg-5 col-md-5 form-check"></div>
+</div>
+
+  <div *ngIf="selectedOption === 'lead'">
+  
+    <form [formGroup]="leadForm" (ngSubmit)="saveLeadDetails()">
+      <div class="card">
+        <div class="card-body">
+          <div class="new-employee-field">
+            <div class="card-title-head">
+              <h6>
+                <span><i class="feather icon-info feather-edit"></i></span>Add New Lead
+              </h6>
+            </div>
+  
+            <div class="row">
+              <div class="col-lg-3 col-sm-6 col-12">
+                <div class="input-blocks">
+                  <i class="feather icon-user info-img"></i>
+                  <mat-select class="space-select select" placeholder="Choose Data"
+                    (selectionChange)="getDonationListForLead($event.value)">
+                    <mat-option *ngFor="let user of userList" [value]="user.loginId">
+                      {{user.firstName}} {{user.lastName}}
+                    </mat-option>
+                  </mat-select>
+  
+                </div>
+              </div>
+            </div>
+  
+            <div class="row">
+              <div class="col-lg-4 col-md-4">
+                <div class="mb-4"> <label for="donorName" class="form-label">Donor Name</label>
+                  <input id="donorName" class="form-control" type="text" pInputText formControlName="donorName"
+                    maxlength="100" placeholder="Enter donor name">
+                    <!-- <input id="donorName" class="form-control" type="text" pInputText formControlName="id"> -->
+                </div>
+              </div>
+              <div class="col-lg-4 col-md-4">
+                <div class="mb-4">
+                  <label class="form-label">Mobile Number</label>
+                  <input class="form-control" type="number" pInputText formControlName="mobileNumber" maxlength="100">
+                </div>
+              </div>
+              <div class="col-lg-4 col-md-4">
+                <div class="mb-4">
+                  <label class="form-label">Email Id</label>
+                  <input class="form-control" type="text" pInputText formControlName="emailId" maxlength="100">
+                </div>
+              </div>
+              <input class="form-control" type="text" pInputText formControlName="programName" maxlength="100" hidden>
+            </div>
+            <div class="row">
+              <div class="col-lg-4 col-md-4">
+                <div class="mb-4">
+                  <label class="form-label">Status</label>
+                  <mat-select class="space-select select" formControlName="status" placeholder="Mark Lead Status"
+                    (selectionChange)="checkStatus($event)">
+                    <mat-option *ngFor="let listData of leadStatus" [value]="listData.value">
+                      {{listData.name}}
+                    </mat-option>
+                  </mat-select>
+                </div>
+              </div>
+  
+              <div class="col-lg-4 col-md-4" *ngIf="showFollowupDateBox">
+                <div class="mb-4">
+                  <label class="form-label">Followup Date</label>
+                  <input class="form-control datetimepicker" placeholder="Choose Date" formControlName="followupDate"
+                    bsDatepicker container=".date-input2"
+                    [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY', minDate: minDate }">
+  
+                </div>
+              </div>
+            </div>
+  
+            <div class="row">
+              <div class="col-lg-6 col-md-6">
+                <div class="mb-6">
+                  <label class="form-label">Remarks</label>
+                  <textarea class="form-control" style=" float: left; width: 100%; margin-top: 6px; height:150px"
+                    formControlName="notes" placeholder="Write Notes.."></textarea>
+                </div>
+              </div>
+            </div>
+  
+          </div>
+        </div>
+      </div>
+  
+      <div class="text-mid mb-3">
+        <button type="submit" class="btn btn-submit">Save Lead</button>
+      </div>
+    </form>
+  
+  </div>
+
+
+<!-- <div *ngIf="selectedOption === 'info'">
+
+  <form [formGroup]="addDonationForm" (ngSubmit)="saveDonationDetails()">
+    <div class="card">
+      <div class="card-body">
+        <div class="new-employee-field">
+          <div class="card-title-head">
+            <h6>
+              <span><i class="feather icon-info feather-edit"></i></span>Add Donation Receipt
+            </h6>
+          </div>
+          <div class="row">
+            <div class="col-lg-4 col-md-4">
+              <div class="mb-3">
+                <label for="receiptType" class="form-label">Receipt Type</label>
+                <mat-select class="space-select select" formControlName="invoiceHeaderDetailsId"
+                  placeholder="Select Fundrising Officer" (change)="onProgramSelect($event)">
+                  <mat-option *ngFor="let invoiceType of invoiceTypeList" [value]="invoiceType.id">
+                    {{ invoiceType.companyFirstName + ' ' + invoiceType.companyLastName }}
+                  </mat-option>
+                </mat-select>
+              </div>
+            </div>
+
+            <div class="col-lg-4 col-md-4">
+              <div class="mb-3"> <label for="donorName" class="form-label">Donor Name</label>
+                <input id="donorName" class="form-control" type="text" pInputText formControlName="donorName"
+                  maxlength="100" placeholder="Enter donor name" />
+              </div>
+            </div>
+            <div class="col-lg-4 col-md-4">
+              <div class="mb-3">
+                <label class="form-label">Mobile Number</label>
+                <input class="form-control" type="number" pInputText formControlName="mobileNumber" maxlength="100">
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-lg-4 col-md-4">
+              <div class="mb-3">
+                <label class="form-label">Email Id</label>
+                <input class="form-control" type="text" pInputText formControlName="emailId" maxlength="100">
+              </div>
+            </div>
+            <div class="col-lg-4 col-md-4">
+              <div class="mb-3">
+                <label class="form-label">Address</label>
+                <input class="form-control" type="text" pInputText formControlName="address" maxlength="100">
+              </div>
+            </div>
+            <div class="col-lg-4 col-md-4">
+              <div class="mb-3">
+                <label class="form-label">Pan</label>
+                <input class="form-control" type="text" pInputText formControlName="panNumber" maxlength="100">
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-lg-4 col-md-4">
+              <div class="mb-3">
+                <label class="form-label">Program</label>
+                <mat-select class="space-select select" formControlName="programName" placeholder="Select Program">
+                  <mat-option *ngFor="let donationOpt of donationTypeList" [value]="donationOpt.programName">
+                    {{donationOpt.programName}}
+                  </mat-option>
+                </mat-select>
+              </div>
+            </div>
+            <div class="col-lg-4 col-md-4" *ngIf="!showCurrencyBox">
+              <div class="mb-3" *ngIf="!showCurrencyBox">
+                <label class="form-label">Amount</label>
+                <input class="form-control" type="number" pInputText pKeyFilter="int" formControlName="amount"
+                  maxlength="100">
+              </div>
+            </div>
+            <div class="col-lg-3 col-md-3" *ngIf="showCurrencyBox">
+              <div class="mb-3" *ngIf="showCurrencyBox">
+                <label class="form-label">Amount</label>
+                <input class="form-control" type="number" pInputText pKeyFilter="int" formControlName="amount"
+                  maxlength="100">
+              </div>
+            </div>
+            <div class="col-lg-1 col-md-1" *ngIf="showCurrencyBox">
+              <div class="mb-3" *ngIf="showCurrencyBox">
+                <label class="form-label">Currency</label>
+                <mat-select class="space-select select" formControlName="currencyCode" placeholder="Currency">
+                  <mat-option *ngFor="let currency of currencyList" [value]="currency.currencyCode">
+                    {{currency.currencyCode+" "+currency.unicode}}
+                  </mat-option>
+                </mat-select>
+              </div>
+            </div>
+            <div class="col-lg-4 col-md-4">
+              <div class="mb-3">
+                <label class="form-label">Transaction Id</label>
+                <input class="form-control" type="text" pInputText formControlName="transactionId" maxlength="100">
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-lg-4 col-md-4">
+              <div class="mb-3">
+                <label class="form-label">Payment Mode</label>
+                <mat-select class="space-select select" formControlName="paymentMode" placeholder="Payment Mode">
+                  <mat-option *ngFor="let payModOpt of paymentModeList" [value]="payModOpt.paymentMode">
+                    {{payModOpt.paymentMode}}
+                  </mat-option>
+                </mat-select>
+              </div>
+            </div>
+            <div class="col-lg-4 col-md-4">
+              <div class="mb-3">
+                <label class="form-label">Fundrising Officer</label>
+
+                <mat-select class="space-select select" formControlName="createdBy"
+                  placeholder="Select Fundrising Officer">
+                  <mat-option *ngFor="let fundRisingOffcer of fundRisingOffcerList" [value]="fundRisingOffcer.loginId">
+                    {{fundRisingOffcer.firstName}} {{fundRisingOffcer.lastName}}
+                  </mat-option>
+                </mat-select>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="row">
+            <div class="col-lg-4 col-md-4">
+              <div class="mb-3">
+                <label class="form-label">Remarks</label>
+                <textarea class="form-control" style=" float: left; width: 100%; margin-top: 6px; height:150px"
+                  formControlName="notes" placeholder="Write Notes.."></textarea>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+    <div class="text-mid mb-3">
+      <button type="submit" class="btn btn-submit">Save Info</button>
+    </div>
+  </form>
+
+</div> -->

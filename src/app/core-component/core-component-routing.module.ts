@@ -155,6 +155,14 @@ const routes: Routes = [
           ),
       },
       {
+        path: 'school-management',
+        loadChildren: () =>
+          import('./school-management/school-management.module').then(
+            (m) => m.SchoolManagementModule
+          ),
+      },
+
+      {
         path: 'sales',
         loadChildren: () =>
           import('./sales/sales.module').then((m) => m.SalesModule),

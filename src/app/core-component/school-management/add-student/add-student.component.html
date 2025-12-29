@@ -1,0 +1,269 @@
+<div class="page-header">
+  <div class="add-item d-flex">
+    <div class="page-title">
+      <h4>New Admission Form</h4>
+      <!-- <h6>Create new User</h6> -->
+      <p-toast></p-toast>
+     
+    </div>
+  </div>
+
+  <ul class="table-top-head">
+    <li>
+      <div class="page-btn">
+       
+      </div>
+    </li>
+    <li>
+      <!-- <a (click)="toggleCollapse()" data-bs-toggle="tooltip" data-bs-placement="top" title="Collapse"
+        id="collapse-header" matTooltip="Collapse" matTooltipPosition="above">
+        @if (!isCollapsed) {
+        <i class="feather icon-chevron-up feather-chevron-up"></i>
+        } @if (isCollapsed) {
+        <i class="feather icon-chevron-down feather-chevron-down"></i>
+        }</a> -->
+    </li>
+  </ul>
+</div>
+
+<form [formGroup]="addStudentForm" (ngSubmit)="submitStudentForm()">
+
+  <!-- ================= STUDENT DETAILS ================= -->
+  <div class="card mb-3">
+    <div class="card-body">
+      <div class="new-employee-field">
+        <div class="card-title-head">
+          <h6><span><i class="feather icon-info feather-edit"></i></span>Student Information</h6>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-4 mb-3">
+          <label>Admission No *</label>
+          <input class="form-control" formControlName="admissionNo">
+        </div>
+
+        <div class="col-md-4 mb-3">
+          <label>Roll Number *</label>
+          <input class="form-control" formControlName="rollNumber">
+        </div>
+
+        <div class="col-md-4 mb-3">
+          <label>Grade *</label>
+          <input class="form-control" formControlName="grade">
+        </div>
+
+        <div class="col-md-4 mb-3">
+          <label>Grade Section</label>
+          <input class="form-control" formControlName="gradeSection">
+        </div>
+
+        <div class="col-md-4 mb-3">
+          <label>First Name *</label>
+          <input class="form-control" formControlName="firstName">
+        </div>
+
+        <div class="col-md-4 mb-3">
+          <label>Middle Name</label>
+          <input class="form-control" formControlName="middleName">
+        </div>
+
+        <div class="col-md-4 mb-3">
+          <label>Last Name *</label>
+          <input class="form-control" formControlName="lastName">
+        </div>
+
+        <div class="col-md-4 mb-3">
+          <label>Date of Birth</label>
+          <input type="date" class="form-control" formControlName="dob">
+        </div>
+
+        <div class="col-md-4 mb-3">
+          <label>Birth Place</label>
+          <input class="form-control" formControlName="dobPlace">
+        </div>
+
+        <div class="col-md-4 mb-3">
+          <label>Gender</label>
+          <select class="form-control" formControlName="gender">
+            <option value="">Select</option>
+            <option>Male</option>
+            <option>Female</option>
+          </select>
+        </div>
+
+        <div class="col-md-4 mb-3">
+          <label>Blood Group</label>
+          <input class="form-control" formControlName="bloodGroup">
+        </div>
+
+        <div class="col-md-4 mb-3">
+          <label>Nationality</label>
+          <input class="form-control" formControlName="nationality">
+        </div>
+
+        <div class="col-md-4 mb-3">
+          <label>Category</label>
+          <input class="form-control" formControlName="category">
+        </div>
+
+        <div class="col-md-4 mb-3">
+          <label>Religion</label>
+          <input class="form-control" formControlName="religion">
+        </div>
+
+        <div class="col-md-4 mb-3">
+          <label>Aadhaar No</label>
+          <input class="form-control" formControlName="aadharNumber">
+        </div>
+
+        <div class="col-md-4 mb-3">
+          <label>Birth Certificate No</label>
+          <input class="form-control" formControlName="birthCertificateNumber">
+        </div>
+
+        <div class="col-md-4 mb-3">
+          <label>PEN</label>
+          <input class="form-control" formControlName="permanentEducationNumber">
+        </div>
+
+        <div class="col-md-4 mb-3">
+          <label>Shiksha Unique ID</label>
+          <input class="form-control" formControlName="eShikshaUniqueId">
+        </div>
+
+        <div class="col-md-4 mb-3">
+          <label>Session</label>
+          <input class="form-control" formControlName="sessionName">
+        </div>
+
+        <div class="col-md-4 mb-3">
+          <label>Sibling Admission No</label>
+          <input class="form-control" formControlName="siblingAdmissionNumber">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= PARENTS DETAILS ================= -->
+  <div class="card mb-3">
+    <div class="card-body">
+      <div class="new-employee-field">
+        <div class="card-title-head">
+          <h6><span><i class="feather icon-info feather-edit"></i></span>Parents Information</h6>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label>Father Name *</label>
+          <input class="form-control" formControlName="fatherName">
+        </div>
+
+        <div class="col-md-6 mb-3">
+          <label>Father Mobile</label>
+          <input class="form-control" formControlName="fatherMobileNo">
+        </div>
+
+        <div class="col-md-6 mb-3">
+          <label>Mother Name</label>
+          <input class="form-control" formControlName="motherName">
+        </div>
+
+        <div class="col-md-6 mb-3">
+          <label>Mother Mobile</label>
+          <input class="form-control" formControlName="motherMobileNo">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= CURRENT ADDRESS ================= -->
+  <div class="card mb-3">
+    <div class="card-body">
+      <!-- <h6></h6> -->
+      <div class="new-employee-field">
+        <div class="card-title-head">
+          <h6><span><i class="feather icon-info feather-edit"></i></span>Current Address</h6>
+        </div>
+      </div>
+
+      <textarea class="form-control mb-2" formControlName="currentAddress"></textarea>
+
+      <div class="row">
+        <div class="col-md-4 mb-3">
+          <input class="form-control" placeholder="City" formControlName="currentCity">
+        </div>
+        <div class="col-md-4 mb-3">
+          <input class="form-control" placeholder="State" formControlName="currentState">
+        </div>
+        <div class="col-md-4 mb-3">
+          <input class="form-control" placeholder="PIN" formControlName="currentPin">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= PERMANENT ADDRESS ================= -->
+  <div class="card mb-3">
+    <div class="card-body">
+      <!-- <h6>Permanent Address</h6> -->
+      <div class="new-employee-field">
+        <div class="card-title-head">
+          <h6><span><i class="feather icon-info feather-edit"></i></span>Permanent Address</h6>
+        </div>
+      </div>
+
+      <textarea class="form-control mb-2" formControlName="permanentAddress"></textarea>
+
+      <div class="row">
+        <div class="col-md-4 mb-3">
+          <input class="form-control" placeholder="City" formControlName="permanentCity">
+        </div>
+        <div class="col-md-4 mb-3">
+          <input class="form-control" placeholder="State" formControlName="permanentState">
+        </div>
+        <div class="col-md-4 mb-3">
+          <input class="form-control" placeholder="PIN" formControlName="permanentPin">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= PREVIOUS SCHOOL ================= -->
+  <div class="card mb-3">
+    <div class="card-body">
+      <!-- <h6>Previous School</h6> -->
+      <div class="new-employee-field">
+        <div class="card-title-head">
+          <h6><span><i class="feather icon-info feather-edit"></i></span>Previous School Information</h6>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-4 mb-3">
+          <label>Previous School</label>
+          <input class="form-control" formControlName="previousSchool">
+        </div>
+        <div class="col-md-4 mb-3">
+          <label>Reason for Change</label>
+          <input class="form-control" formControlName="reasonForChange">
+        </div>
+        <div class="col-md-4 mb-3">
+          <label>Last Class Attended</label>
+          <input class="form-control" formControlName="lastClassAttended">
+        </div>
+      </div>  
+      <!-- <input class="form-control mb-2" placeholder="Previous School" formControlName="previousSchool"> -->
+      <!-- <input class="form-control mb-2" placeholder="Reason for Change" formControlName="reasonForChange"> -->
+      <!-- <input class="form-control" placeholder="Last Class Attended" formControlName="lastClassAttended"> -->
+    </div>
+  </div>
+
+  <!-- ================= SUBMIT ================= -->
+  <div class="text-end">
+    <button type="submit" class="btn btn-primary" [disabled]="addStudentForm.invalid">
+      Save Student
+    </button>
+  </div>
+
+</form>

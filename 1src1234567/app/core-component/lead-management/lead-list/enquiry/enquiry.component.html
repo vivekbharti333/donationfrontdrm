@@ -1,0 +1,671 @@
+<div class="page-header">
+  <div class="add-item d-flex">
+    <div class="page-title">
+      <h4>Enquiry List</h4>
+      <!-- <h6>Manage Your Users</h6> -->
+      <p-toast></p-toast>
+      <!-- <button type="button" class="btn btn-primary btn-wave" id="liveToastBtn" pButton pRipple
+        (click)="show()" label="Show">Show live
+        toast</button>  -->
+    </div>
+  </div>
+  <!-- <ul class="table-top-head">
+      <li>
+        <a data-bs-toggle="tooltip" data-bs-placement="top" matTooltip="Pdf" matTooltipPosition="above"><img
+        src="assets/img/icons/pdf.svg" alt="img"></a>
+      </li>
+      <li>
+        <a data-bs-toggle="tooltip" data-bs-placement="top" matTooltip="Excel" matTooltipPosition="above"><img
+        src="assets/img/icons/excel.svg" alt="img"></a>
+      </li>
+      <li>
+        <a data-bs-toggle="tooltip" data-bs-placement="top" matTooltip="Print" matTooltipPosition="above"><i
+        class="feather icon-printer feather-rotate-ccw"></i></a>
+      </li>
+      <li>
+        <a data-bs-toggle="tooltip" data-bs-placement="top" matTooltip="Refresh" matTooltipPosition="above" (click)="getUserDetails()"><i
+        class="feather icon-rotate-ccw feather-rotate-ccw"></i></a>
+      </li>
+      <li>
+        <a (click)="toggleCollapse()" data-bs-toggle="tooltip" data-bs-placement="top" matTooltip="Collapse"
+          matTooltipPosition="above" id="collapse-header"> @if (!isCollapsed) {
+          <i class="feather icon-chevron-up feather-chevron-up"></i>
+        }
+        @if (isCollapsed) {
+          <i class="feather icon-chevron-down feather-chevron-down"></i>
+        }</a>
+      </li>
+    </ul> -->
+  <div class="page-btn">
+    <!-- <a [routerLink] = "routes.addusers" class="btn btn-added"><i class="feather icon-plus-circle me-2"></i>Add New User</a>  -->
+  </div>
+</div>
+
+<!-- /product list -->
+<div class="card table-list-card">
+  <div class="card-body">
+    <div class="table-top">
+      <div class="search-set">
+        <div class="search-input">
+          <a href="javascript:void(0);" class="btn btn-searchset"><i class="feather icon-search feather-search"></i></a>
+          <div class="dataTables_filter">
+            <label>
+              <input [(ngModel)]="searchDataValue" [ngModelOptions]="{ standalone: true }"
+                (ngModelChange)="searchData(searchDataValue)" type="search" class="form-control"
+                placeholder="Search..." />
+            </label>
+          </div>
+        </div>
+      </div>
+      <div class="search-path">
+        <div class="d-flex align-items-center">
+          <a class="btn btn-filter" id="filter_search" (click)="openFilter()" [ngClass]="{ setclose: filter === true }">
+            <i class="feather icon-filter filter-icon"></i>
+            <span><img src="assets/img/icons/closes.svg" alt="img" /></span>
+          </a>
+        </div>
+      </div>
+      <div class="form-sort">
+        <i class="feather icon-sliders info-img"></i>
+        <!-- <mat-select [(ngModel)]="selectedValue2" [ngModelOptions]="{standalone: true}" class="space-select select"
+              placeholder="Sort by Date">
+              <mat-option value="Sort by Date">Sort by Date</mat-option>
+              <mat-option value="Newest">Newest</mat-option>
+              <mat-option value="Oldest">Oldest</mat-option>
+            </mat-select> -->
+      </div>
+    </div>
+    <!-- /Filter -->
+    <div class="card" id="filter_inputs" [ngClass]="{ 'd-block': filter, 'd-none': !filter }">
+      <div class="card-body pb-0">
+        <div class="row">
+          <div class="col-lg-3 col-sm-6 col-12">
+            <label class="form-label requiredField">Select Agent</label>
+            <mat-select name="permissions" class="select" placeholder="Select Agent"
+              (selectionChange)="onAgentSelectionChange($event.value)">
+              @for (dropDownUser of userForDropDown; track dropDownUser) {
+              <mat-option [value]="dropDownUser.loginId">
+                {{dropDownUser.firstName+" "+dropDownUser.lastName}}
+              </mat-option>
+              }
+            </mat-select>
+          </div>
+          <div class="col-lg-3 col-sm-6 col-12">
+            <div class="input-blocks">
+              <label class="form-label requiredField">First Date</label>
+              <!-- <p>{{ leadDetails.pickUpDateTime || '-' }}</p> -->
+              <input type="date" class="form-control" [(ngModel)]="firstDate" name="firstDate" id="firstDate"
+                #firstDate="ngModel" (change)="setFilterDate($event, 'first')" required />
+            </div>
+          </div>
+          <div class="col-lg-3 col-sm-6 col-12">
+            <div class="input-blocks">
+              <label class="form-label requiredField">Last Date</label>
+              <input type="date" class="form-control" [(ngModel)]="lastDate" name="lastDate" id="lastDate"
+                #lastDate="ngModel" (change)="setFilterDate($event, 'last')" required />
+            </div>
+          </div>
+          <div class="d-flex justify-content-center align-items-end col-lg-3 col-sm-6 col-12">
+            <div class="input-blocks">
+              <a (click)="filterByDate()" class="btn btn-filters ms-auto">
+                <i class="feather icon-search feather-search"></i> Search </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- /Filter -->
+    <div class="table-responsive">
+      <table matSort (matSortChange)="sortData($event)" class="table datanew">
+        <thead>
+          <tr>
+            <th></th>
+            <th mat-sort-header="userName">Sub Category</th>
+            <th mat-sort-header="loginId">Customer Name</th>
+            <th mat-sort-header="phone">Mobile</th>
+            <th mat-sort-header="role">Agent Name</th>
+            <th mat-sort-header="createdOn">Created On</th>
+            <th mat-sort-header="status">Status</th>
+            <th class="no-sort">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (data of tableData; track data; let idx=$index) {
+          <tr>
+            <td>
+              <!-- <div class="userimgname">
+                      <a href="javascript:void(0);" class="userslist-img bg-img">
+                        <img src= "{{data.userPicture}}" alt="user image" style="border-radius: 50%;"></a>
+                    </div> -->
+            </td>
+            <td>{{ data.subCategory }}</td>
+            <td>{{ data.customeName }}</td>
+            <td>{{ data.customerMobile }}</td>
+            <td>{{ data.createdBy }}</td>
+            <td>{{ data.createdAt | date : "dd-MM-yyyy | HH:mm" }}</td>
+            <td>{{ data.status }}</td>
+            <!-- <td><button class="badge-button" 
+                  [ngClass]="{'badge-linesuccess': data.status === 'ACTIVE', 'badge-linedanger': data.status === 'INACTIVE'}"
+                  (click)="changeUserStatus(data)">
+            {{data.status}}
+          </button></td>  -->
+            <td class="action-table-data">
+              <!-- <div class="edit-delete-action">
+                  <a class="me-2 p-2 mb-0" href="javascript:void(0);"><i class="feather icon-eye action-eye"></i> </a>
+                  <a class="me-2 p-2 mb-0" data-bs-toggle="modal" data-bs-target="#edit-units" (click)="openEditModal(data)"> <i class="feather icon-edit feather-edit"></i></a>
+                  <a class="me-2 confirm-text p-2 mb-0" href="javascript:void(0);" (click)=confirmColor()> <i class="feather icon-trash-2 feather-trash-2"></i></a>
+                </div> -->
+              <div class="edit-delete-action">
+                <!-- <a class="me-2 p-2 mb-0" href="javascript:void(0);"><i class="feather icon-eye action-eye"></i> </a> -->
+                <a class="me-2 p-2 mb-0 position-relative" data-bs-toggle="modal" data-bs-target="#view-units" (click)="
+                    openEditModal(viewEnquiryDialogTemplate, data, false)">
+                  <i class="feather icon-info feather-info"></i>
+                  <span class="tooltipText">View</span></a>
+                <a class="me-2 p-2 mb-0 position-relative" data-bs-toggle="modal" data-bs-target="#edit-units"
+                  (click)="openEditModal(viewEnquiryDialogTemplate, data, true)">
+                  <i class="feather icon-edit feather-edit textBlack"></i>
+                  <span class="tooltipText">Edit</span>
+                </a>
+
+                <a class="me-2 p-2 mb-0 position-relative" data-bs-toggle="modal" data-bs-target="#change-status-units" (click)="
+                openChangeStatusModal(changeStatusDialogTemplate, data, false)">
+                  <i class="feather icon-info feather-info"></i>
+                  <span class="tooltipText">change</span></a>
+
+                @if(data?.isDataCopied) {
+                <a class="me-2 p-2 mb-0 position-relative" data-bs-toggle="modal" data-bs-target="#copy-units">
+                  <i class="feather icon-check feather-check"></i>
+                  <span class="tooltipText">Copied!</span>
+                </a>
+                } @else {
+                <a class="me-2 p-2 mb-0 position-relative" data-bs-toggle="modal" data-bs-target="#copy-units"
+                  (click)="copyData(data, idx)">
+                  <i class="feather icon-copy feather-copy"></i>
+                  <span class="tooltipText">Copy</span>
+                </a>
+                }
+                <!-- <a class="me-2 confirm-text p-2 mb-0" href="javascript:void(0);" (click)=confirmColor()> <i class="feather icon-trash-2 feather-trash-2"></i></a> -->
+              </div>
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <app-custom-pagination></app-custom-pagination>
+  </div>
+</div>
+
+<ng-template #viewEnquiryDialogTemplate let-dialog>
+  <div class="modalHeaderContainer">
+    <h2 mat-dialog-title class="p-0">
+      {{ isEditForm ? "Edit Enquiry Details" : "View Enquiry Details" }}
+    </h2>
+    <div mat-dialog-close class="closeBtn">
+      <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  </div>
+  <form #enquiryForm="ngForm">
+    <mat-dialog-content class="modalContent">
+      <div class="modal-body custom-modal-body">
+        <div class="card">
+          <div class="card-body">
+            <div class="new-employee-field">
+              <!-- <div class="card-title-head">
+                <h6>
+                  <span><i class="feather icon-info feather-edit"></i></span
+                  >Category Type details
+                </h6>
+              </div> -->
+
+              <div class="row">
+                <div class="col-lg-4 col-md-6">
+                  <div class="mb-3">
+                    <label class="form-label requiredField">Category Type</label>
+                    <!-- <p>{{ enquiryDetails.categoryType || '-' }}</p> -->
+                    <mat-select class="select" placeholder="Select Category Type" type="text" id="categoryType"
+                      [(ngModel)]="enquiryDetails.categoryType" name="categoryType" #categoryType="ngModel" required
+                      (selectionChange)="getSuperCategory($event.value)">
+                      <app-mat-select-search (filteredList)="setFilterList($event, 'categoryType')"
+                        [originalList]="categoryTypeList" [categoryName]="'categoryTypeName'"></app-mat-select-search>
+                      <mat-option *ngFor="let cateType of filteredCategoryTypeList" [value]="cateType">
+                        {{ cateType.categoryTypeName }}
+                      </mat-option>
+                    </mat-select>
+                    @if(categoryType?.errors?.['required'] &&
+                    categoryType?.touched) {
+                    <div class="errorMessage">Category Type is required</div>
+                    }
+                  </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                  <div class="mb-3">
+                    <label class="form-label requiredField">Super Category</label>
+                    <!-- <p>{{ enquiryDetails.superCategory || '-' }}</p> -->
+                    <mat-select class="select" placeholder="Select a Super Category" type="text" id="superCategory"
+                      [(ngModel)]="enquiryDetails.superCategory" name="superCategory" #superCategory="ngModel" required
+                      (selectionChange)="getCategory($event.value)">
+                      <app-mat-select-search (filteredList)="setFilterList($event, 'superCategory')"
+                        [originalList]="superCategoryList" [categoryName]="'superCategory'"></app-mat-select-search>
+                      <mat-option *ngFor="let supCate of filteredSuperCategoryList" [value]="supCate">
+                        {{ supCate.superCategory }}
+                      </mat-option></mat-select>
+                    @if(superCategory?.errors?.['required'] &&
+                    superCategory?.touched) {
+                    <div class="errorMessage">Super Category is required</div>
+                    }
+                  </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                  <div class="mb-3">
+                    <label class="form-label requiredField">Category</label>
+                    <!-- <p>{{ enquiryDetails.category || '-' }}</p> -->
+                    <mat-select class="select" placeholder="Select Category" type="text" id="category"
+                      [(ngModel)]="enquiryDetails.category" name="category" #category="ngModel" required
+                      (selectionChange)="getSubCategory($event.value)">
+                      <app-mat-select-search (filteredList)="setFilterList($event, 'category')"
+                        [originalList]="categoryList" [categoryName]="'category'"></app-mat-select-search>
+                      <mat-option *ngFor="let cate of filteredCategoryList" [value]="cate">
+                        {{ cate.category }}
+                      </mat-option></mat-select>
+                    @if(category?.errors?.['required'] && category?.touched) {
+                    <div class="errorMessage">Category is required</div>
+                    }
+                  </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                  <div class="mb-3">
+                    <label class="form-label requiredField">Sub Category</label>
+                    <!-- <p>{{ enquiryDetails.subCategory || '-' }}</p> -->
+                    <mat-select class="select" placeholder="Select a Sub Category" type="text" id="subCategory"
+                      [(ngModel)]="enquiryDetails.subCategory" name="subCategory" #subCategory="ngModel" required>
+                      <app-mat-select-search (filteredList)="setFilterList($event, 'subCategory')"
+                        [originalList]="subCategoryList" [categoryName]="'subCategory'"></app-mat-select-search>
+                      <mat-option *ngFor="let subCate of filteredSubCategoryList" [value]="subCate">
+                        {{ subCate.subCategory }}
+                      </mat-option>
+                    </mat-select>
+                    @if(subCategory?.errors?.['required'] &&
+                    subCategory?.touched) {
+                    <div class="errorMessage">Sub Category is required</div>
+                    }
+                  </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                  <div class="mb-3">
+                    <label class="form-label requiredField">Pickup Date & Time</label>
+                    <!-- <p>{{ enquiryDetails.pickUpDateTime || '-' }}</p> -->
+                    <input [readonly]="!isEditForm" type="datetime-local" class="form-control"
+                      [(ngModel)]="enquiryDetails.pickUpDateTime" name="pickUpDateTime" #pickUpDateTime="ngModel"
+                      required />
+                    @if(pickUpDateTime?.errors?.['required'] &&
+                    pickUpDateTime?.touched) {
+                    <div class="errorMessage">
+                      Pickup Date & Time is required
+                    </div>
+                    }
+                  </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                  <div class="mb-3">
+                    <label class="form-label requiredField">Pickup Location</label>
+                    <!-- <p>{{ enquiryDetails.pickUpLocation || '-' }}</p> -->
+                    <input [readonly]="!isEditForm" class="form-control" type="text" id="pickUpLocation"
+                      [(ngModel)]="enquiryDetails.pickUpLocation" name="pickUpLocation" #pickUpLocation="ngModel"
+                      required />
+                    @if(pickUpLocation?.errors?.['required'] &&
+                    pickUpLocation?.touched) {
+                    <div class="errorMessage">Pickup Location is required</div>
+                    }
+                  </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                  <div class="mb-3">
+                    <label class="form-label requiredField">Drop Date & Time</label>
+                    <!-- <p>{{ enquiryDetails.dropDateTime || '-' }}</p> -->
+                    <input [readonly]="!isEditForm" class="form-control" type="datetime-local" id="dropDateTime"
+                      [(ngModel)]="enquiryDetails.dropDateTime" name="dropDateTime" #dropDateTime="ngModel" required />
+                    @if(dropDateTime?.errors?.['required'] &&
+                    dropDateTime?.touched) {
+                    <div class="errorMessage">Drop Date & Time is required</div>
+                    }
+                  </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                  <div class="mb-3">
+                    <label class="form-label requiredField">Drop Location</label>
+                    <!-- <p>{{ enquiryDetails.dropLocation || '-' }}</p> -->
+                    <input [readonly]="!isEditForm" class="form-control" type="text" id="dropLocation"
+                      [(ngModel)]="enquiryDetails.dropLocation" name="dropLocation" #dropLocation="ngModel" required />
+                    @if(dropLocation?.errors?.['required'] &&
+                    dropLocation?.touched) {
+                    <div class="errorMessage">Drop Location is required</div>
+                    }
+                  </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                  <div class="mb-3">
+                    <label class="form-label requiredField">Total Days</label>
+                    <!-- <p>{{ enquiryDetails.totalDays || '-' }}</p> -->
+                    <input [readonly]="!isEditForm" class="form-control" type="text" id="totalDays"
+                      [(ngModel)]="enquiryDetails.totalDays" name="totalDays" #totalDays="ngModel" required />
+                    @if(totalDays?.errors?.['required'] && totalDays?.touched) {
+                    <div class="errorMessage">Total Days is required</div>
+                    }
+                  </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                  <div class="mb-3">
+                    <label class="form-label requiredField">Quantity</label>
+                    <!-- <p>{{ enquiryDetails.quantity || '-' }}</p> -->
+                    <input [readonly]="!isEditForm" class="form-control" type="text" id="quantity"
+                      [(ngModel)]="enquiryDetails.quantity" name="quantity" #quantity="ngModel" required />
+                    @if(quantity?.errors?.['required'] && quantity?.touched) {
+                    <div class="errorMessage">Quantity is required</div>
+                    }
+                  </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                  <div class="mb-3">
+                    <label class="form-label requiredField">Vendor Rate</label>
+                    <!-- <p>{{ enquiryDetails.vendorRate || '-' }}</p> -->
+                    <input [readonly]="!isEditForm" class="form-control" type="text" id="vendorRate"
+                      [(ngModel)]="enquiryDetails.vendorRate" name="vendorRate" #vendorRate="ngModel" required />
+                    @if(vendorRate?.errors?.['required'] && vendorRate?.touched)
+                    {
+                    <div class="errorMessage">Vendor Rate is required</div>
+                    }
+                  </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                  <div class="mb-3">
+                    <label class="form-label requiredField">Company Rate</label>
+                    <!-- <p>{{ enquiryDetails.companyRate || '-' }}</p> -->
+                    <input [readonly]="!isEditForm" class="form-control" type="text" id="companyRate"
+                      [(ngModel)]="enquiryDetails.companyRate" name="companyRate" #companyRate="ngModel" required />
+                    @if(companyRate?.errors?.['required'] &&
+                    companyRate?.touched) {
+                    <div class="errorMessage">Company Rate is required</div>
+                    }
+                  </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                  <div class="mb-3">
+                    <label class="form-label requiredField">Booking Amount</label>
+                    <!-- <p>{{ enquiryDetails.bookingAmount || '-' }}</p> -->
+                    <input [readonly]="!isEditForm" class="form-control" type="text" id="bookingAmount"
+                      [(ngModel)]="enquiryDetails.bookingAmount" name="bookingAmount" #bookingAmount="ngModel"
+                      required />
+                    @if(bookingAmount?.errors?.['required'] &&
+                    bookingAmount?.touched) {
+                    <div class="errorMessage">Booking Amount is required</div>
+                    }
+                  </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                  <div class="mb-3">
+                    <label class="form-label requiredField">Balance Amount</label>
+                    <!-- <p>{{ enquiryDetails.balanceAmount || '-' }}</p> -->
+                    <input [readonly]="!isEditForm" class="form-control" type="text" id="balanceAmount"
+                      [(ngModel)]="enquiryDetails.balanceAmount" name="balanceAmount" #balanceAmount="ngModel"
+                      required />
+                    @if(balanceAmount?.errors?.['required'] &&
+                    balanceAmount?.touched) {
+                    <div class="errorMessage">Balance Amount is required</div>
+                    }
+                  </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                  <div class="mb-3">
+                    <label class="form-label requiredField">Total Amount</label>
+                    <!-- <p>{{ enquiryDetails.totalAmount || '-' }}</p> -->
+                    <input [readonly]="!isEditForm" class="form-control" type="text" id="totalAmount"
+                      [(ngModel)]="enquiryDetails.totalAmount" name="totalAmount" #totalAmount="ngModel" required />
+                    @if(totalAmount?.errors?.['required'] &&
+                    totalAmount?.touched) {
+                    <div class="errorMessage">Total Amount is required</div>
+                    }
+                  </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                  <div class="mb-3">
+                    <label class="form-label requiredField">Security Amount</label>
+                    <!-- <p>{{ enquiryDetails.securityAmount || '-' }}</p> -->
+                    <input [readonly]="!isEditForm" class="form-control" type="text" id="securityAmount"
+                      [(ngModel)]="enquiryDetails.securityAmount" name="securityAmount" #securityAmount="ngModel"
+                      required />
+                    @if(securityAmount?.errors?.['required'] &&
+                    securityAmount?.touched) {
+                    <div class="errorMessage">Security Amount is required</div>
+                    }
+                  </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                  <div class="mb-3">
+                    <label class="form-label requiredField">Pay to Vendor</label>
+                    <!-- <p>{{ enquiryDetails.payToVendor || '-' }}</p> -->
+                    <input [readonly]="!isEditForm" class="form-control" type="text" id="payToVendor"
+                      [(ngModel)]="enquiryDetails.payToVendor" name="payToVendor" #payToVendor="ngModel" required />
+                    @if(payToVendor?.errors?.['required'] &&
+                    payToVendor?.touched) {
+                    <div class="errorMessage">Pay To Vendor is required</div>
+                    }
+                  </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                  <div class="mb-3">
+                    <label class="form-label requiredField">Pay To Company</label>
+                    <!-- <p>{{ enquiryDetails.payToCompany || '-' }}</p> -->
+                    <input [readonly]="!isEditForm" class="form-control" type="text" id="payToCompany"
+                      [(ngModel)]="enquiryDetails.payToCompany" name="payToCompany" #payToCompany="ngModel" required />
+                    @if(payToCompany?.errors?.['required'] &&
+                    payToCompany?.touched) {
+                    <div class="errorMessage">Pay To Company is required</div>
+                    }
+                  </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                  <div class="mb-3">
+                    <label class="form-label requiredField">Delivery To Company</label>
+                    <!-- <p>{{ enquiryDetails.deliveryToCompany || '-' }}</p> -->
+                    <input [readonly]="!isEditForm" class="form-control" type="text" id="deliveryToCompany"
+                      [(ngModel)]="enquiryDetails.deliveryToCompany" name="deliveryToCompany"
+                      #deliveryToCompany="ngModel" required />
+                    @if(deliveryToCompany?.errors?.['required'] &&
+                    deliveryToCompany?.touched) {
+                    <div class="errorMessage">
+                      Delivery To Company is required
+                    </div>
+                    }
+                  </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                  <div class="mb-3">
+                    <label class="form-label requiredField">Delivery To Vendor</label>
+                    <!-- <p>{{ enquiryDetails.deliveryToVendor || '-' }}</p> -->
+                    <input [readonly]="!isEditForm" class="form-control" type="text" id="deliveryToVendor"
+                      [(ngModel)]="enquiryDetails.deliveryToVendor" name="deliveryToVendor" #deliveryToVendor="ngModel"
+                      required />
+                    @if(deliveryToVendor?.errors?.['required'] &&
+                    deliveryToVendor?.touched) {
+                    <div class="errorMessage">
+                      Delivery To Vendor is required
+                    </div>
+                    }
+                  </div>
+                </div>
+                <!-- <div class="col-lg-4 col-md-6">
+                  <div class="mb-3">
+                    <label class="form-label requiredField">Created By</label>
+                  </div>
+                </div> -->
+                <div class="col-lg-4 col-md-6">
+                  <div class="mb-3">
+                    <label class="form-label requiredField">Customer Name</label>
+                    <!-- <p>{{ enquiryDetails.customerName || '-' }}</p> -->
+                    <input [readonly]="!isEditForm" class="form-control" type="text" id="customerName"
+                      [(ngModel)]="enquiryDetails.customerName" name="customerName" #customerName="ngModel" required />
+                    @if(customerName?.errors?.['required'] &&
+                    customerName?.touched) {
+                    <div class="errorMessage">Customer Name is required</div>
+                    }
+                  </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                  <div class="mb-3">
+                    <label class="form-label requiredField">Dial Code</label>
+                    <!-- <p>{{ enquiryDetails.dialCode || '-' }}</p> -->
+                    <input [readonly]="!isEditForm" class="form-control" type="text" id="dialCode"
+                      [(ngModel)]="enquiryDetails.dialCode" name="dialCode" #dialCode="ngModel" required />
+                    @if(dialCode?.errors?.['required'] && dialCode?.touched) {
+                    <div class="errorMessage">Dial Code is required</div>
+                    }
+                  </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                  <div class="mb-3">
+                    <label class="form-label requiredField">Mobile</label>
+                    <!-- <p>{{ enquiryDetails.mobile || '-' }}</p> -->
+                    <input [readonly]="!isEditForm" class="form-control" type="text" id="mobile"
+                      [(ngModel)]="enquiryDetails.mobile" name="mobile" #mobile="ngModel" required />
+                    @if(mobile?.errors?.['required'] && mobile?.touched) {
+                    <div class="errorMessage">Mobile is required</div>
+                    }
+                  </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                  <div class="mb-3">
+                    <label class="form-label requiredField">Alternate Mobile</label>
+                    <!-- <p>{{ enquiryDetails.alternateMobile || '-' }}</p> -->
+                    <input [readonly]="!isEditForm" class="form-control" type="text" id="alternateMobile"
+                      [(ngModel)]="enquiryDetails.alternateMobile" name="alternateMobile" #alternateMobile="ngModel"
+                      required />
+                    @if(alternateMobile?.errors?.['required'] &&
+                    alternateMobile?.touched) {
+                    <div class="errorMessage">Alternate Mobile is required</div>
+                    }
+                  </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                  <div class="mb-3">
+                    <label class="form-label requiredField">Email Id</label>
+                    <!-- <p>{{ enquiryDetails.emailId || '-' }}</p> -->
+                    <input [readonly]="!isEditForm" class="form-control" type="text" id="emailId"
+                      [(ngModel)]="enquiryDetails.emailId" name="emailId" #emailId="ngModel" required />
+                    @if(emailId?.errors?.['required'] && emailId?.touched) {
+                    <div class="errorMessage">Email Id is required</div>
+                    }
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </mat-dialog-content>
+    <!-- <mat-dialog-actions class="dialogAction">
+      <div class="text-end mb-3">
+        <button
+          type="submit"
+          class="btn btn-submit"
+          [disabled]="!editForm.form.valid"
+        >
+          Update Category Type
+        </button>
+      </div>
+    </mat-dialog-actions> -->
+  </form>
+  <div class="modalFooterContainer">
+    <button type="submit" class="btn btn-submit" (click)="updateEnquiryDetails()">
+      Save Enquiry Details
+    </button>
+  </div>
+</ng-template>
+
+
+
+
+<ng-template #changeStatusDialogTemplate let-dialog>
+  <div class="modalHeaderContainer">
+    <h2 mat-dialog-title class="p-0"> Change Status</h2>
+    <div mat-dialog-close class="closeBtn">
+      <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  </div>
+  <form #enquiryForm="ngForm">
+    <mat-dialog-content class="modalContent">
+      <div class="modal-body custom-modal-body">
+        <div class="card">
+          <div class="card-body">
+            <div class="new-employee-field">
+              <div class="row">
+                <div class="col-lg-4 col-md-6">
+                  <div class="mb-3">
+                    <label class="form-label requiredField">Customer Name</label>
+                    <!-- <p>{{ enquiryDetails.customerName || '-' }}</p> -->
+                    <input [readonly]="!isEditForm" class="form-control" type="text" id="customerName"
+                      [(ngModel)]="enquiryDetails.customerName" name="customerName" #customerName="ngModel" required />
+                    @if(customerName?.errors?.['required'] &&
+                    customerName?.touched) {
+                    <div class="errorMessage">Customer Name is required</div>
+                    }
+                  </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                  <div class="mb-3">
+                    <label class="form-label requiredField">Dial Code</label>
+                    <!-- <p>{{ enquiryDetails.dialCode || '-' }}</p> -->
+                    <input [readonly]="!isEditForm" class="form-control" type="text" id="dialCode"
+                      [(ngModel)]="enquiryDetails.dialCode" name="dialCode" #dialCode="ngModel" required />
+                    @if(dialCode?.errors?.['required'] && dialCode?.touched) {
+                    <div class="errorMessage">Dial Code is required</div>
+                    }
+                  </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                  <div class="mb-3">
+                    <label class="form-label requiredField">Mobile</label>
+                    <!-- <p>{{ enquiryDetails.mobile || '-' }}</p> -->
+                    <input [readonly]="!isEditForm" class="form-control" type="text" id="mobile"
+                      [(ngModel)]="enquiryDetails.mobile" name="mobile" #mobile="ngModel" required />
+                    @if(mobile?.errors?.['required'] && mobile?.touched) {
+                    <div class="errorMessage">Mobile is required</div>
+                    }
+                  </div>
+                </div>
+
+                </div>
+                <div class="row">
+                <div class="col-lg-4 col-md-6">
+              <div class="mb-3">
+                <label class="form-label">Status</label>
+                <mat-select name="status" [(ngModel)]="enquiryDetails.status" class="select" placeholder="Select Status">
+                  @for (listData of leadStatus; track listData) {
+                  <mat-option [value]="listData.value">
+                    {{ listData.name }}
+                  </mat-option>
+                  }
+                </mat-select>
+              </div>
+            </div>
+
+              </div>
+
+              
+            </div>
+          </div>
+        </div>
+      </div>
+    </mat-dialog-content>
+
+  </form>
+  <div class="modalFooterContainer">
+    <button type="submit" class="btn btn-submit" (click)="changeLeadStatus()">
+      Save Enquiry Details
+    </button>
+  </div>
+</ng-template>

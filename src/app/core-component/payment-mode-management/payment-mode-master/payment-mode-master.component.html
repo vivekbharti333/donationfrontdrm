@@ -61,7 +61,7 @@
                             <td>
                                 <button class="badge-button"
                                     [ngClass]="{'badge-linesuccess': data.status === 'ACTIVE','badge-linedanger': data.status === 'INACTIVE'}"
-                                    (click)="changeStatusOfPaymentModeMaster(data)">
+                                    (click)="changeUserStatus(data)">
                                     {{ data.status }}
                                 </button>
                             </td>

@@ -1,0 +1,41 @@
+<div class="card">
+  <div class="card-body">
+    <div class="new-employee-field">
+      <div class="card-title-head">
+        <h6>
+          <span><i class="feather icon-info feather-edit"></i></span>Add Currency
+        </h6>
+      </div>
+
+      <div class="row">
+        <div class="col-lg-6 col-sm-6 col-12">
+          <div class="table-responsive">
+            <table matSort class="table datanew">
+              <thead>
+                <tr>
+                  <th></th>
+                  <th mat-sort-header="userName">Mode</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let data of currencyMasterList">
+                  <td></td>
+                  <td>
+                    <mat-checkbox [checked]="isChecked(data.id)" (change)="toggleSelection(data.id)">
+                      {{ data.currencyName }} ({{data.unicode}})
+                    </mat-checkbox>
+                  </td>
+                  
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+
+
+
+    </div>
+  </div>
+</div>

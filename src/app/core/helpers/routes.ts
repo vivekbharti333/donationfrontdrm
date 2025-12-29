@@ -1076,5 +1076,16 @@ export class routes {
     return this.categoryManagement + '/sub-category';
   }
   
+
+  // School Management
+  public static get schoolManagement(): string {
+    return this.core + '/school-management';
+  }
+  public static get addStudent(): string {
+    return this.schoolManagement + '/add-student';
+  }
+  public static get studentsList(): string {
+    return this.schoolManagement + '/student-list';
+  }
   // core pages child routes *ends*
 }
