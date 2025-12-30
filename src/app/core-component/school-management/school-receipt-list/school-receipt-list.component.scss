@@ -1,0 +1,140 @@
+.page {
+    width: 100%;
+    max-width: 100%;
+    margin: auto;
+}
+
+.receipt {
+    border: 2px solid #000;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+.school-details {
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #000;
+    padding-bottom: 8px;
+}
+
+.logo {
+    width: 65px;
+    margin-right: 8px;
+}
+
+.logo img {
+    width: 80px;
+}
+
+.school-info {
+    flex: 1;
+    text-align: center;
+}
+
+.school-name {
+    font-size: 20px;
+    font-weight: bold;
+    color: #c00000;
+}
+
+.school-address {
+    font-size: 13px;
+    color: #0000FF;
+}
+
+.school-contact {
+    font-size: 13px;
+    color: #00A36C;
+}
+
+.fee-title {
+    text-align: center;
+    border: 1px solid #000;
+    margin: 10px 0;
+    padding: 4px;
+    font-weight: bold;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.no-border td {
+    padding: 3px;
+}
+
+.fee-table th,
+.fee-table td {
+    padding: 6px;
+}
+
+.fee-table thead th {
+    background: #000;
+    color: #fff;
+}
+
+.signature {
+    margin-top: 20px;
+    text-align: right;
+    font-size: 13px;
+}
+
+.copy-label {
+    text-align: right;
+    font-size: 11px;
+    margin-bottom: 4px;
+}
+
+/* SEPARATOR */
+.receipt-separator {
+    text-align: center;
+    font-size: 14px;
+    margin-top: 10mm;
+    margin-bottom: 5mm;
+    margin-left: 0;
+    margin-right: 0;
+}
+
+/* SCREEN */
+.print-only {
+    display: none;
+}
+
+/* ================= PRINT ================= */
+@media print {
+
+    @page {
+        size: A4;
+        margin: 8mm;
+    }
+
+    body * {
+        visibility: hidden;
+    }
+
+    #printArea, #printArea * {
+        visibility: visible;
+    }
+
+    #printArea {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+    }
+
+    .print-copy {
+        height: 148.5mm;   /* HALF A4 */
+    }
+
+    .print-only {
+        display: block;
+    }
+
+    button,
+    .modalHeaderContainer {
+        display: none !important;
+    }
+}
