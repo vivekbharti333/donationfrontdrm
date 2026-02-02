@@ -1,4 +1,4 @@
-<form [formGroup]="receiptForm" (ngSubmit)="submitReceipt()">
+<form [formGroup]="studentSearchForm" (ngSubmit)="submitSearch()">
 
   <!-- ================= STUDENT INFORMATION ================= -->
   <div class="card mb-3">
@@ -8,7 +8,7 @@
     <div class="card-body">
       <div class="row">
 
-        <div class="col-md-4 mb-3">
+        <!-- <div class="col-md-4 mb-3">
           <label>Admission No *</label>
           <input class="form-control" formControlName="admissionNo">
         </div>
@@ -21,28 +21,61 @@
         <div class="col-md-4 mb-3">
           <label>Student Name *</label>
           <input class="form-control" formControlName="studentName">
-        </div>
+        </div> -->
 
-        <div class="col-md-4 mb-3">
-          <label>Grade</label>
-          <input class="form-control" formControlName="grade">
-        </div>
-
-        <div class="col-md-4 mb-3">
-          <label>Section</label>
-          <input class="form-control" formControlName="gradeSection">
-        </div>
-
-        <div class="col-md-4 mb-3">
+        <div class="col-md-3 mb-3">
           <label>Academic Session</label>
           <input class="form-control" formControlName="academicSession">
         </div>
+
+        <div class="col-md-3 mb-3">
+          <label>Grade</label>
+          <!-- <input class="form-control" formControlName="grade"> -->
+          <select class="form-control" formControlName="grade">
+            <option value="">Select One</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="7">7</option>
+            <option value="8">8</option>
+            <option value="9">9</option>
+            <option value="10">10</option>
+            <option value="11">11</option>
+            <option value="12">12</option>
+          </select>
+        </div>
+
+        <div class="col-md-3 mb-3">
+          <label>Section</label>
+          <!-- <input class="form-control" formControlName="gradeSection"> -->
+          <select class="form-control" formControlName="gradeSection">
+            <option value="">Select One</option>
+            <option value="A">A</option>
+            <option value="B">B</option>
+            <option value="C">c</option>
+            <option value="D">D</option>
+            <option value="E">E</option>
+          </select>
+        </div>
+
+        <!-- ================= SUBMIT BUTTON ================= -->
+        <div class="col-md-3 mb-3 search-btn-wrapper">
+          <button type="submit" class="btn btn-primary">Search Student</button>
+        </div>
+
 
       </div>
     </div>
   </div>
 
-  <!-- ================= RECEIPT INFO ================= -->
+
+</form>
+
+<!-- ================= RECEIPT INFO ================= -->
+<form [formGroup]="receiptForm" (ngSubmit)="submitReceipt()">
   <div class="card mb-3">
     <div class="card-header">
       <h5>Receipt Information</h5>
@@ -90,25 +123,40 @@
 
     <div class="card-body" formArrayName="receiptDetails">
 
-      <div class="row mb-2"
-           *ngFor="let fee of receiptDetails.controls; let i = index"
-           [formGroupName]="i">
+      <div class="row mb-2" *ngFor="let fee of receiptDetails.controls; let i = index" [formGroupName]="i">
 
         <div class="col-md-6">
           <label>Fee Type</label>
-          <input class="form-control" formControlName="feeType">
+          <!-- <input class="form-control" formControlName="feeType"> -->
+          <select class="form-control" formControlName="feeType">
+            <option value="">Select One</option>
+            <option value="Registration Fee">Registration Fee</option>
+            <option value="Tuition Fee">Tuition Fee</option>
+            <option value="Annual School Fee">Annual School Fee</option>
+            <option value="Development Fee">Development Fee</option>
+            <option value="Examination Fee">Examination Fee</option>
+            <option value="Practical Fee">Practical Fee</option>
+            <option value="Computer Fee">Computer Fee</option>
+            <option value="Transport Fee">Transport Fee</option>
+            <option value="Uniform Fee">Uniform Fee</option>
+            <option value="Study Material Fee">Study Material Fee</option>
+            <option value="Diary Fee">Diary Fee</option>
+            <option value="ID Card">ID Card</option>
+            <option value="Field Trip Fee">Field Trip Fee</option>
+            <option value="Late Fee">Late Fee</option>
+            <option value="Re-admission Fee">Re-admission Fee</option>
+            <option value="Document Fee">Document Fee</option>
+            <option value="Document Fee">Miscellaneous Fee</option>
+          </select>
         </div>
 
         <div class="col-md-4">
           <label>Amount</label>
-          <input type="number" class="form-control"
-                 formControlName="amount"
-                 (input)="calculateTotals()">
+          <input type="number" class="form-control" formControlName="amount" (input)="calculateTotals()">
         </div>
 
         <div class="col-md-2 d-flex align-items-end">
-          <button type="button" class="btn btn-danger"
-                  (click)="removeFeeRow(i)">
+          <button type="button" class="btn btn-danger" (click)="removeFeeRow(i)">
             Remove
           </button>
         </div>
@@ -133,16 +181,12 @@
 
         <div class="col-md-3">
           <label>Discount</label>
-          <input type="number" class="form-control"
-                 formControlName="discountAmount"
-                 (input)="calculateTotals()">
+          <input type="number" class="form-control" formControlName="discountAmount" (input)="calculateTotals()">
         </div>
 
         <div class="col-md-3">
           <label>Fine</label>
-          <input type="number" class="form-control"
-                 formControlName="fineAmount"
-                 (input)="calculateTotals()">
+          <input type="number" class="form-control" formControlName="fineAmount" (input)="calculateTotals()">
         </div>
 
         <div class="col-md-3">
@@ -156,12 +200,10 @@
 
   <!-- ================= ACTIONS ================= -->
   <div class="text-end">
-    <button type="submit" class="btn btn-success"
-            [disabled]="receiptForm.invalid">
+    <button type="submit" class="btn btn-success" [disabled]="receiptForm.invalid">
       Generate Receipt
     </button>
-    <button type="button" class="btn btn-secondary ms-2"
-            (click)="resetForm()">
+    <button type="button" class="btn btn-secondary ms-2" (click)="resetForm()">
       Cancel
     </button>
   </div>

@@ -72,8 +72,8 @@ export class CreateUserComponent {
 
   createForms() {
     this.addUserForm = this.fb.group({
-      firstName: ['', [Validators.required, Validators.pattern("[0-9A-Za-z ]{3,150}")]],
-      lastName: ['', [Validators.required, Validators.pattern("[1-9]{1}[0-9]{9}")]],
+      firstName: ['', [Validators.required, Validators.pattern('^[A-Za-z]+(?:[ .][A-Za-z]+)*$')]],
+      astName: ['', [Validators.required, Validators.pattern('^[A-Za-z]+(?:[ .][A-Za-z]+)*$')]],
       roleType: [''],
       createdBy: [''],
       mobileNo: ['', [Validators.required, Validators.pattern('^[0-9]*$')]],
@@ -85,7 +85,7 @@ export class CreateUserComponent {
       gender: [''],
       adminId: [''],
       teamleaderId: [''],
-      permissions: [''],
+      permissions: [[]],
 
       addressList: this.fb.array([
         this.addressForm(),
@@ -117,6 +117,13 @@ export class CreateUserComponent {
     this.addressList.removeAt(i);
   }
 
+onPermissionChange(event: any) {
+  this.addUserForm.get('permissions')?.setValue(event.value);
+
+  const permissions = this.addUserForm.get('permissions')?.value;
+  console.log('permissions : ', permissions);
+
+}
 
 
   getUserRoleType(){

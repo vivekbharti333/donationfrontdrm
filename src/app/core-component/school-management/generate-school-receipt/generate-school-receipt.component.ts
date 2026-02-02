@@ -1,28 +1,69 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
+import { AuthenticationService } from 'src/app/auth/authentication.service';
+import { Sort } from '@angular/material/sort';
+import { MatTableDataSource } from '@angular/material/table';
+import { Router } from '@angular/router';
+import { ReceiptHeaderListService } from '../../receipt-management/receipt-header-list/receipt-header-list.service';
+import { ProgramManagementService } from '../../program-management/program-management.service';
+import { CurrencyService } from '../../currency-management/currency/currency.service';
+import { PaymentModeService } from '../../payment-mode-management/payment-mode/payment-mode.service';
+import { ProgramDetails, ProgramDetailsRequest } from '../../interface/program-management';
+import {
+  DataService,
+  pageSelection,
+  apiResultFormat,
+  SidebarService,
+} from 'src/app/core/core.index';
+import { routes } from 'src/app/core/helpers/routes';
+import { users } from 'src/app/shared/model/page.model';
+import { PaginationService, tablePageSize } from 'src/app/shared/shared.index';
+import Swal from 'sweetalert2';
+import { ToastModule } from 'primeng/toast';
+import { MatDialog } from '@angular/material/dialog';
+import { Constant } from 'src/app/core/constant/constants';
+import { MessageService } from 'primeng/api';
+import { GenerateSchoolReceiptService } from './generate-school-receipt.service';
 
 @Component({
   selector: 'app-generate-school-receipt',
   templateUrl: './generate-school-receipt.component.html',
-  styleUrl: './generate-school-receipt.component.scss'
+  styleUrl: './generate-school-receipt.component.scss',
+  providers: [MessageService, ToastModule],
 })
 export class GenerateSchoolReceiptComponent {
 
 receiptForm!: FormGroup;
+studentSearchForm!: FormGroup;
 
   constructor(
     private fb: FormBuilder,
-    private http: HttpClient
+    private http: HttpClient,
+    private messageService: MessageService,
+    private generateSchoolReceiptService: GenerateSchoolReceiptService,
   ) {}
 
   ngOnInit(): void {
-    this.createForm();
+    this.createReceiptForm();
+    this.createSearchForm();
     this.addFeeRow(); // at least one fee row by default
   }
 
+   createSearchForm(): void {
+    this.studentSearchForm = this.fb.group({
+
+      // Search Info
+      grade: [''],
+      gradeSection: [''],
+      academicSession: ['2026-2027'],
+
+
+    });
+  }
+
   // ================= CREATE FORM =================
-  createForm(): void {
+  createReceiptForm(): void {
     this.receiptForm = this.fb.group({
 
       // Student Info
@@ -31,7 +72,7 @@ receiptForm!: FormGroup;
       studentName: ['', Validators.required],
       grade: [''],
       gradeSection: [''],
-      academicSession: [''],
+      academicSession: ['2026-2027'],
 
       // Receipt Info
       receiptNumber: ['', Validators.required],
@@ -98,39 +139,87 @@ receiptForm!: FormGroup;
   }
 
   // ================= SUBMIT RECEIPT =================
-  submitReceipt(): void {
 
-    if (this.receiptForm.invalid) {
-      this.receiptForm.markAllAsTouched();
-      return;
-    }
-
-    const payload = {
-      ...this.receiptForm.getRawValue()
-    };
-
-    const request = {
-      payload: payload
-    };
-
-    this.http.post('http://localhost:8080/addReceipt', request)
+  submitReceipt() {
+    this.generateSchoolReceiptService.submitReceipt(this.receiptForm.value)
       .subscribe({
-        next: (res: any) => {
-          alert('Receipt generated successfully');
-          this.resetForm();
+        next: (response: any) => {
+          if (response['responseCode'] == '200') {
+            if (response['payload']['respCode'] == '200') {
+             
+
+              this.messageService.add({
+                summary: response['payload']['respCode'],
+                detail: response['payload']['respMesg'],
+                styleClass: 'success-background-popover',
+              });
+
+            } else {
+
+             
+
+              this.messageService.add({
+                summary: response['payload']['respCode'],
+                detail: response['payload']['respMesg'],
+                styleClass: 'danger-background-popover',
+              });
+            }
+          } else {
+
+           
+
+            this.messageService.add({
+              summary: response['payload']['respCode'],
+              detail: response['payload']['respMesg'],
+              styleClass: 'danger-background-popover',
+            });
+          }
         },
-        error: (err) => {
-          console.error(err);
-          alert('Failed to generate receipt');
-        }
+        error: () =>
+          this.messageService.add({
+            summary: '500',
+            detail: 'Server Error',
+          }),
       });
   }
+
+  // submitReceipt(): void {
+
+  //   if (this.receiptForm.invalid) {
+  //     this.receiptForm.markAllAsTouched();
+  //     return;
+  //   }
+
+  //   const payload = {
+  //     ...this.receiptForm.getRawValue()
+  //   };
+
+  //   const request = {
+  //     payload: payload
+  //   };
+
+  //   this.http.post('http://localhost:8080/addReceipt', request)
+  //     .subscribe({
+  //       next: (res: any) => {
+  //         alert('Receipt generated successfully');
+  //         this.resetForm();
+  //       },
+  //       error: (err) => {
+  //         console.error(err);
+  //         alert('Failed to generate receipt');
+  //       }
+  //     });
+  // }
 
   // ================= RESET FORM =================
   resetForm(): void {
     this.receiptForm.reset();
     this.receiptDetails.clear();
     this.addFeeRow();
+  }
+
+  submitSearch(){
+    
   }
 
 }
