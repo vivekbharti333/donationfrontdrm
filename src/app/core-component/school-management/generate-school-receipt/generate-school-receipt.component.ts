@@ -5,11 +5,6 @@ import { AuthenticationService } from 'src/app/auth/authentication.service';
 import { Sort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { Router } from '@angular/router';
-import { ReceiptHeaderListService } from '../../receipt-management/receipt-header-list/receipt-header-list.service';
-import { ProgramManagementService } from '../../program-management/program-management.service';
-import { CurrencyService } from '../../currency-management/currency/currency.service';
-import { PaymentModeService } from '../../payment-mode-management/payment-mode/payment-mode.service';
-import { ProgramDetails, ProgramDetailsRequest } from '../../interface/program-management';
 import {
   DataService,
   pageSelection,
@@ -19,10 +14,8 @@ import {
 import { routes } from 'src/app/core/helpers/routes';
 import { users } from 'src/app/shared/model/page.model';
 import { PaginationService, tablePageSize } from 'src/app/shared/shared.index';
-import Swal from 'sweetalert2';
 import { ToastModule } from 'primeng/toast';
 import { MatDialog } from '@angular/material/dialog';
-import { Constant } from 'src/app/core/constant/constants';
 import { MessageService } from 'primeng/api';
 import { GenerateSchoolReceiptService } from './generate-school-receipt.service';
 
@@ -146,18 +139,14 @@ studentSearchForm!: FormGroup;
         next: (response: any) => {
           if (response['responseCode'] == '200') {
             if (response['payload']['respCode'] == '200') {
-             
+
 
               this.messageService.add({
                 summary: response['payload']['respCode'],
                 detail: response['payload']['respMesg'],
                 styleClass: 'success-background-popover',
               });
-
             } else {
-
-             
-
               this.messageService.add({
                 summary: response['payload']['respCode'],
                 detail: response['payload']['respMesg'],
@@ -165,9 +154,6 @@ studentSearchForm!: FormGroup;
               });
             }
           } else {
-
-           
-
             this.messageService.add({
               summary: response['payload']['respCode'],
               detail: response['payload']['respMesg'],

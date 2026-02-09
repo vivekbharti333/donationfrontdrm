@@ -1,0 +1,246 @@
+
+<p-toast></p-toast>
+<form
+  [formGroup]="invoiceForm"
+  (ngSubmit)="submitInvoice()"
+  class="invoice invoice--compact">
+
+  <!-- ================= INVOICE HEADER ================= -->
+  <section class="invoice__section invoice__header card mb-3">
+    <div class="card-body">
+      <div class="row align-items-center">
+
+        <div class="col-md-6">
+          <h2 class="invoice__title">INVOICE</h2>
+          <div class="invoice__number">
+            #{{ invoiceForm.get('invoiceNumber')?.value }}
+          </div>
+        </div>
+
+        <div class="col-md-6 text-end invoice__meta">
+          <div class="invoice__meta-row">
+            <label>Date</label>
+            <input type="date"
+                   class="form-control form-control-sm d-inline w-auto"
+                   formControlName="invoiceDate">
+          </div>
+
+          <div class="invoice__meta-row mt-1">
+            <label>Due Date</label>
+            <input type="date"
+                   class="form-control form-control-sm d-inline w-auto"
+                   formControlName="dueDate">
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= FROM (SELLER) ================= -->
+  <section class="invoice__section card mb-3">
+    <header class="card-header invoice__section-title">
+      From
+    </header>
+
+    <div class="card-body small">
+      <strong>CEF INTERNATIONAL</strong><br>
+      GSTIN: U80902KA2021NPL146742<br>
+      4WS8B, 4th floor West Block, Mani Casadona,<br>
+      New Town, Kolkata - 700156<br>
+      Email: infocefinternational.org<br>
+      Mobile: +91 9353356627
+    </div>
+  </section>
+
+  <!-- ================= BILL TO / DELIVERY TO ================= -->
+  <section class="invoice__section row mb-2">
+
+    <!-- BILL TO -->
+    <div class="col-md-6">
+      <div class="card invoice__party">
+        <header class="card-header invoice__section-title">
+          Bill To
+        </header>
+
+        <div class="card-body">
+          <label class="small">Customer Name</label>
+          <input class="form-control form-control-sm mb-1"
+                 formControlName="customerName">
+
+          <label class="small">GSTIN</label>
+          <input class="form-control form-control-sm mb-1"
+                 formControlName="gstNumber">
+
+          <label class="small">Billing Address</label>
+          <textarea rows="2"
+                    class="form-control form-control-sm"
+                    formControlName="billingAddress"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- DELIVERY TO -->
+    <div class="col-md-6">
+      <div class="card invoice__party">
+        <header class="card-header invoice__section-title">
+          Delivery To
+        </header>
+
+        <div class="card-body">
+          <label class="small">Customer Name</label>
+          <input class="form-control form-control-sm mb-1"
+                 formControlName="customerName">
+
+          <label class="small">GSTIN</label>
+          <input class="form-control form-control-sm mb-1"
+                 formControlName="gstNumber">
+
+          <label class="small">Delivery Address</label>
+          <textarea rows="2"
+                    class="form-control form-control-sm"
+                    formControlName="deliveryAddresses"></textarea>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ================= ITEMS ================= -->
+  <section class="invoice__section card mb-2">
+    <header class="card-header invoice__section-title d-flex justify-content-between">
+      <span>Invoice Items</span>
+      <button type="button"
+              class="btn btn-primary btn--xs"
+              (click)="addItem()">
+        + Add
+      </button>
+    </header>
+
+    <div class="card-body p-0" formArrayName="items">
+      <table class="invoice-table table table-sm mb-0">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Description</th>
+            <th class="text-end">Qty</th>
+            <th class="text-end">Rate</th>
+            <th class="text-end">Amount</th>
+            <th></th>
+          </tr>
+        </thead>
+
+        <tbody>
+  <tr *ngFor="let item of items.controls; let i = index"
+      [formGroupName]="i">
+
+    <td>{{ i + 1 }}</td>
+
+    <td>
+      <input class="form-control form-control-sm mb-1"
+             placeholder="Product Name"
+             formControlName="productName">
+
+      <textarea rows="1"
+                class="form-control form-control-sm"
+                placeholder="Duration / HSN"
+                formControlName="description"></textarea>
+    </td>
+
+    <td>
+      <input type="number"
+             class="form-control form-control-sm text-end"
+             formControlName="quantity"
+             (input)="calculateTotals()">
+    </td>
+
+    <td>
+      <input type="number"
+             class="form-control form-control-sm text-end"
+             formControlName="rate"
+             (input)="calculateTotals()">
+    </td>
+
+    <!-- ✅ PUT IT HERE -->
+    <td>
+      <input class="form-control form-control-sm text-end"
+             formControlName="amount"
+             readonly>
+    </td>
+
+    <td class="text-center">
+      <button type="button"
+              class="btn btn-outline-danger btn-sm"
+              (click)="removeItem(i)">
+        ✕
+      </button>
+    </td>
+
+  </tr>
+</tbody>
+
+      </table>
+    </div>
+  </section>
+
+  <!-- ================= TOTALS ================= -->
+  <!-- ================= TAX & DISCOUNT ================= -->
+<!-- ================= PAYMENT DETAILS ================= -->
+<section class="invoice__section card mb-2">
+  <header class="card-header invoice__section-title">
+    Payment Details
+  </header>
+
+  <div class="card-body row">
+
+    <div class="col-md-4">
+      <label class="small">Payment Mode</label>
+      <select class="form-control form-control-sm"
+              formControlName="paymentMode">
+        <option value="ONLINE">ONLINE</option>
+        <option value="CASH">CASH</option>
+        <option value="CHEQUE">CHEQUE</option>
+      </select>
+    </div>
+
+    <div class="col-md-4">
+      <label class="small">Transaction ID</label>
+      <input class="form-control form-control-sm"
+             formControlName="transactionId">
+    </div>
+
+    <div class="col-md-4">
+      <label class="small">Payment Status</label>
+      <select class="form-control form-control-sm"
+              formControlName="paymentStatus">
+        <option value="UNPAID">UNPAID</option>
+        <option value="PAID">PAID</option>
+      </select>
+    </div>
+
+  </div>
+</section>
+
+
+  <!-- ================= NOTES ================= -->
+  <section class="invoice__section card mb-3">
+    <div class="card-body small">
+      <strong>Notes</strong><br>
+      Thank you for your business. Please review all details carefully.<br><br>
+
+      <strong>Terms</strong><br>
+      Please visit our website:
+      <a href="https://datfuslab.com/terms.html" target="_blank">
+        https://datfuslab.com/terms.html
+      </a>
+    </div>
+  </section>
+
+  <!-- ================= ACTION ================= -->
+  <footer class="invoice__actions text-end">
+    <button class="btn btn-success btn-lg" type="submit">
+      Generate Invoice
+    </button>
+  </footer>
+
+</form>

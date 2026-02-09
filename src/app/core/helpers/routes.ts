@@ -1093,5 +1093,16 @@ export class routes {
   public static get schoolReceiptList(): string {
     return this.schoolManagement + '/school-receipt-list';
   }
+
+  //Invoice Management
+  public static get invoiceManagement(): string {
+    return this.core + '/invoice-management';
+  }
+   public static get generateInvoice(): string {
+    return this.invoiceManagement + '/generate-invoice';
+  }
+  public static get invoiceList(): string {
+    return this.invoiceManagement + '/invoice-list';
+  }
   // core pages child routes *ends*
 }

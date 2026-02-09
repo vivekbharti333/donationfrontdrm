@@ -1,0 +1,105 @@
+/* ===============================
+   INVOICE LAYOUT
+================================ */
+.invoice {
+  max-width: 1100px;
+  margin: auto;
+  font-size: 14px;
+  color: #212529;
+}
+
+.invoice--header {
+  border: 2px solid #000;
+}
+
+.invoice__title {
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.invoice__number {
+  font-size: 15px;
+  color: #555;
+}
+
+/* ===============================
+   SECTION HEADERS
+================================ */
+.invoice__section-title {
+  background-color: #f8f9fa;
+  font-weight: 600;
+  font-size: 13px;
+  text-transform: uppercase;
+  padding: 6px 10px;
+}
+
+/* ===============================
+   TABLES (ITEMS & TOTALS)
+================================ */
+.invoice-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.invoice-table th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+}
+
+.invoice-table th,
+.invoice-table td {
+  padding: 6px 8px;
+  vertical-align: top;
+}
+
+.invoice-totals th {
+  font-weight: 500;
+}
+
+.invoice-totals__grand {
+  border-top: 2px solid #000;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+/* ===============================
+   COMPACT MODE (PDF / PRINT)
+================================ */
+.invoice--compact .card-header {
+  padding: 4px 8px;
+  font-size: 12px;
+}
+
+.invoice--compact .card-body {
+  padding: 6px 8px;
+}
+
+.invoice--compact input,
+.invoice--compact textarea {
+  font-size: 12px;
+  padding: 4px 6px;
+}
+
+/* ===============================
+   BUTTONS
+================================ */
+.btn--xs {
+  padding: 4px 8px;
+  font-size: 14px;
+}
+
+/* ===============================
+   PRINT OPTIMIZATION
+================================ */
+@media print {
+  button {
+    display: none !important;
+  }
+
+  input,
+  textarea {
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+  }
+}

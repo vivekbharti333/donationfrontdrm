@@ -163,6 +163,14 @@ const routes: Routes = [
       },
 
       {
+        path: 'invoice-management',
+        loadChildren: () =>
+          import('./invoice-management/invoice-management.module').then(
+            (m) => m.InvoiceManagementModule
+          ),
+      },
+
+      {
         path: 'sales',
         loadChildren: () =>
           import('./sales/sales.module').then((m) => m.SalesModule),
