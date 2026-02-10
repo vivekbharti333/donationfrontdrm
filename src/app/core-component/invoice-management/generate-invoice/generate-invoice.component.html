@@ -20,16 +20,12 @@
         <div class="col-md-6 text-end invoice__meta">
           <div class="invoice__meta-row">
             <label>Date</label>
-            <input type="date"
-                   class="form-control form-control-sm d-inline w-auto"
-                   formControlName="invoiceDate">
+            <input type="date" class="form-control form-control-sm d-inline w-auto" formControlName="invoiceDate">
           </div>
 
           <div class="invoice__meta-row mt-1">
             <label>Due Date</label>
-            <input type="date"
-                   class="form-control form-control-sm d-inline w-auto"
-                   formControlName="dueDate">
+            <input type="date" class="form-control form-control-sm d-inline w-auto" formControlName="dueDate">
           </div>
         </div>
 
@@ -37,8 +33,16 @@
     </div>
   </section>
 
+  <select class="form-control" formControlName="companyId" (change)="onCompanyChange($event)">
+  <option value="">Select Company</option>
+
+  <option *ngFor="let invoiceHeader of invoiceHeaderList" [value]="invoiceHeader.id">
+    {{ invoiceHeader.companyFirstName }} {{ invoiceHeader.companyLastName }}
+  </option>
+</select> 
+
   <!-- ================= FROM (SELLER) ================= -->
-  <section class="invoice__section card mb-3">
+  <!-- <section class="invoice__section card mb-3">
     <header class="card-header invoice__section-title">
       From
     </header>
@@ -51,7 +55,51 @@
       Email: infocefinternational.org<br>
       Mobile: +91 9353356627
     </div>
-  </section>
+  </section> -->
+  <section class="card mb-2">
+  <div class="card-body small">
+
+    <!-- Company Name -->
+    <input type="text" formControlName="companyName" class="form-control border-0 fw-bold p-0 mb-1" placeholder="Company Name" />
+
+    <!-- GST -->
+    <div>
+      GSTIN:
+      <input type="text" formControlName="gstNumber" class="form-control d-inline border-0 p-0" style="width: auto;" placeholder="GST Number"/>
+    </div>
+    <!-- Address -->
+    <textarea formControlName="officeAddress" class="form-control border-0 p-0 mb-1" rows="2" placeholder="Office Address"></textarea>
+    <textarea formControlName="regAddress" class="form-control border-0 p-0 mb-2" rows="2" placeholder="Registered Address" ></textarea>
+    <!-- Website -->
+    <div>
+      Website:
+      <input type="text" formControlName="website" class="form-control d-inline border-0 p-0" style="width: auto;" placeholder="Email"/>
+    </div>
+    <!-- Email -->
+    <div>
+      Email:
+      <input type="email" formControlName="emailId" class="form-control d-inline border-0 p-0" style="width: auto;" placeholder="Email"/>
+    </div>
+    <!-- Mobile -->
+    <div>
+      Mobile:
+      <input type="text" formControlName="mobileNo" class="form-control d-inline border-0 p-0" style="width: auto;" placeholder="Mobile Number"/>
+    </div>
+
+  </div>
+</section>
+
+
+  <!-- ================= BILL TO / DELIVERY TO ================= -->
+
+<select class="form-control" formControlName="customerId" (change)="onCustomerChange($event)">
+  <option value="">Select Customer</option>
+
+  <option *ngFor="let customer of customerList" [value]="customer.id">
+    {{ customer.customerName }}
+  </option>
+</select> 
+
 
   <!-- ================= BILL TO / DELIVERY TO ================= -->
   <section class="invoice__section row mb-2">
@@ -65,17 +113,13 @@
 
         <div class="card-body">
           <label class="small">Customer Name</label>
-          <input class="form-control form-control-sm mb-1"
-                 formControlName="customerName">
+          <input class="form-control form-control-sm mb-1" formControlName="customerName">
 
           <label class="small">GSTIN</label>
-          <input class="form-control form-control-sm mb-1"
-                 formControlName="gstNumber">
+          <input class="form-control form-control-sm mb-1" formControlName="customerGstNumber">
 
           <label class="small">Billing Address</label>
-          <textarea rows="2"
-                    class="form-control form-control-sm"
-                    formControlName="billingAddress"></textarea>
+          <textarea rows="2" class="form-control form-control-sm" formControlName="billingAddress"></textarea>
         </div>
       </div>
     </div>
@@ -89,17 +133,10 @@
 
         <div class="card-body">
           <label class="small">Customer Name</label>
-          <input class="form-control form-control-sm mb-1"
-                 formControlName="customerName">
-
-          <label class="small">GSTIN</label>
-          <input class="form-control form-control-sm mb-1"
-                 formControlName="gstNumber">
+          <input class="form-control form-control-sm mb-1" formControlName="customerName">
 
           <label class="small">Delivery Address</label>
-          <textarea rows="2"
-                    class="form-control form-control-sm"
-                    formControlName="deliveryAddresses"></textarea>
+          <textarea rows="2" class="form-control form-control-sm" formControlName="deliveryAddresses"></textarea>
         </div>
       </div>
     </div>
@@ -110,11 +147,7 @@
   <section class="invoice__section card mb-2">
     <header class="card-header invoice__section-title d-flex justify-content-between">
       <span>Invoice Items</span>
-      <button type="button"
-              class="btn btn-primary btn--xs"
-              (click)="addItem()">
-        + Add
-      </button>
+      <button type="button" class="btn btn-primary btn--xs" (click)="addItem()"> + Add </button>
     </header>
 
     <div class="card-body p-0" formArrayName="items">
@@ -137,43 +170,20 @@
     <td>{{ i + 1 }}</td>
 
     <td>
-      <input class="form-control form-control-sm mb-1"
-             placeholder="Product Name"
-             formControlName="productName">
-
-      <textarea rows="1"
-                class="form-control form-control-sm"
-                placeholder="Duration / HSN"
-                formControlName="description"></textarea>
+      <input class="form-control form-control-sm mb-1" placeholder="Product Name" formControlName="productName">
+      <textarea rows="1"  class="form-control form-control-sm" placeholder="Duration / HSN" formControlName="description"></textarea>
     </td>
-
     <td>
-      <input type="number"
-             class="form-control form-control-sm text-end"
-             formControlName="quantity"
-             (input)="calculateTotals()">
+      <input type="number" class="form-control form-control-sm text-end" formControlName="quantity"(input)="calculateTotals()">
     </td>
-
     <td>
-      <input type="number"
-             class="form-control form-control-sm text-end"
-             formControlName="rate"
-             (input)="calculateTotals()">
+      <input type="number" class="form-control form-control-sm text-end" formControlName="rate" (input)="calculateTotals()">
     </td>
-
-    <!-- ✅ PUT IT HERE -->
     <td>
-      <input class="form-control form-control-sm text-end"
-             formControlName="amount"
-             readonly>
+      <input class="form-control form-control-sm text-end" formControlName="amount" readonly>
     </td>
-
     <td class="text-center">
-      <button type="button"
-              class="btn btn-outline-danger btn-sm"
-              (click)="removeItem(i)">
-        ✕
-      </button>
+      <button type="button" class="btn btn-outline-danger btn-sm" (click)="removeItem(i)"> ✕ </button>
     </td>
 
   </tr>
@@ -183,8 +193,135 @@
     </div>
   </section>
 
+  
+
+   <!-- ================= TAX & DISCOUNT ================= -->
+<section class="invoice__section row justify-content-end mb-2">
+  <div class="col-md-4">
+
+    <table class="invoice-table table table-sm">
+      <tbody>
+
+        <tr>
+          <th class="align-middle align-items-center ms-1">Discount</th>
+          <td class="text-end align-middle">
+            <input type="number" class="form-control form-control-sm text-end border-0 shadow-none bg-transparent" formControlName="discount"(input)="calculateTotals()">
+          </td>
+        </tr>
+
+        <tr>
+          <th class="align-middle">
+            Discount
+            <span class="d-inline-flex align-items-center ms-1">
+              <input type="number" class="form-control form-control-sm text-end" style="width:60px" Value="Flate" (input)="calculateTotals()">
+              <span class="ms-1">Flat</span>
+            </span>
+          </th>
+          <td class="text-end align-middle">
+            {{ invoiceForm.get('cgstAmount')?.value }}
+          </td>
+        </tr>
+
+        <tr>
+          <th class="align-middle">
+            CGST
+            <span class="d-inline-flex align-items-center ms-1">
+              <input type="number" class="form-control form-control-sm text-end" style="width:60px" formControlName="cgstRate" (input)="calculateTotals()">
+              <span class="ms-1">%</span>
+            </span>
+          </th>
+
+          <td class="text-end align-middle">
+            {{ invoiceForm.get('cgstAmount')?.value }}
+          </td>
+        </tr>
+
+         <tr>
+          <th class="align-middle">
+            CGST
+            <span class="d-inline-flex align-items-center ms-1">
+              <input type="number" class="form-control form-control-sm text-end" style="width:60px" formControlName="cgstRate" (input)="calculateTotals()">
+              <span class="ms-1">%</span>
+            </span>
+          </th>
+
+          <td class="text-end align-middle">
+            {{ invoiceForm.get('cgstAmount')?.value }}
+          </td>
+        </tr>
+
+        <tr>
+          <th class="align-middle">
+            SGST
+            <span class="d-inline-flex align-items-center ms-1">
+              <input type="number" class="form-control form-control-sm text-end" style="width:60px" formControlName="sgstRate" (input)="calculateTotals()">
+              <span class="ms-1">%</span>
+            </span>
+          </th>
+
+          <td class="text-end align-middle">
+            {{ invoiceForm.get('sgstRate')?.value }}
+          </td>
+        </tr>
+
+        <tr>
+          <th class="align-middle">
+            IGST
+            <span class="d-inline-flex align-items-center ms-1">
+              <input type="number" class="form-control form-control-sm text-end" style="width:60px" formControlName="igstRate" (input)="calculateTotals()">
+              <span class="ms-1">%</span>
+            </span>
+          </th>
+
+          <td class="text-end align-middle">
+            {{ invoiceForm.get('igstAmount')?.value }}
+          </td>
+        </tr>
+
+      </tbody>
+    </table>
+
+  </div>
+</section>
+
   <!-- ================= TOTALS ================= -->
-  <!-- ================= TAX & DISCOUNT ================= -->
+<section class="invoice__section row justify-content-end mb-3">
+  <div class="col-md-4">
+
+    <table class="invoice-table invoice-totals table table-sm">
+      <tbody>
+
+        <tr>
+          <th>Subtotal</th>
+          <td class="text-end">
+            {{ invoiceForm.get('subtotal')?.value }}
+          </td>
+        </tr>
+
+        <tr>
+          <th>Total Tax</th>
+          <td class="text-end">
+            {{
+              (invoiceForm.get('cgstAmount')?.value || 0) +
+              (invoiceForm.get('sgstAmount')?.value || 0) +
+              (invoiceForm.get('igstAmount')?.value || 0)
+            }}
+          </td>
+        </tr>
+
+        <tr class="invoice-totals__grand">
+          <th>Grand Total</th>
+          <th class="text-end">
+            {{ invoiceForm.get('totalAmount')?.value }}
+          </th>
+        </tr>
+
+      </tbody>
+    </table>
+
+  </div>
+</section>
+
 <!-- ================= PAYMENT DETAILS ================= -->
 <section class="invoice__section card mb-2">
   <header class="card-header invoice__section-title">

@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { HttpClient, HttpResponse } from '@angular/common/http';
-import { Constant } from 'src/app/core/constant/constants'; 
+import { InvoiceRequest, InvoiceDetails } from '../../interface/receipt-management'; 
+import { Constant } from 'src/app/core/constant/constants';
 import { AuthenticationService } from 'src/app/auth/authentication.service';
 import { CookieService } from 'ngx-cookie-service';
 
@@ -23,69 +24,97 @@ export class GenerateInvoiceService {
   }
 
 
- saveInvoiceDetails(invoiceDetails: any): Observable<any> {
+  saveInvoiceDetails(invoiceDetails: any): Observable<any> {
 
-  const request = {
-    payload: {
+    const request = {
+      payload: {
 
-      // ===== CORE CONTEXT =====
-      superadminId: invoiceDetails.superadminId,
-      companyId: invoiceDetails.companyId,
+        // ===== CORE CONTEXT =====
+        superadminId: invoiceDetails.superadminId,
+        companyId: invoiceDetails.companyId,
 
-      // ===== CUSTOMER DETAILS =====
-      customerName: invoiceDetails.customerName,
-      email: invoiceDetails.email,
-      phone: invoiceDetails.phone,
-      gstNumber: invoiceDetails.gstNumber,
-      billingAddress: invoiceDetails.billingAddress,
-      deliveryAddresses: invoiceDetails.deliveryAddresses,
+        companyLogo: invoiceDetails.companyLogo,
+        companyName: invoiceDetails.companyName,
+        officeAddress: invoiceDetails.officeAddress,
+        regAddress: invoiceDetails.regAddress,
+        mobileNo: invoiceDetails.mobileNo,
+        emailId: invoiceDetails.emailId,
+        website: invoiceDetails.website,
+        gstNumber: invoiceDetails.gstNumber,
+        panNumber: invoiceDetails.panNumber,
 
-      // ===== INVOICE DETAILS =====
-      invoiceNumber: invoiceDetails.invoiceNumber,
-      invoiceDate: invoiceDetails.invoiceDate,
-      dueDate: invoiceDetails.dueDate,
+        // ===== CUSTOMER DETAILS =====
+        customerName: invoiceDetails.customerName,
+        customerEmail: invoiceDetails.email,
+        customerPhone: invoiceDetails.phone,
+        customerGstNumber: invoiceDetails.gstNumber,
+        billingAddress: invoiceDetails.billingAddress,
+        deliveryAddresses: invoiceDetails.deliveryAddresses,
 
-      // ===== AMOUNTS =====
-      subtotal: invoiceDetails.subtotal ?? 0,
-      discount: invoiceDetails.discount ?? 0,
+        // ===== INVOICE DETAILS =====
+        invoiceNumber: invoiceDetails.invoiceNumber,
+        invoiceDate: invoiceDetails.invoiceDate,
+        dueDate: invoiceDetails.dueDate,
 
-      cgstRate: invoiceDetails.cgstRate ?? 0,
-      cgstAmount: invoiceDetails.cgstAmount ?? 0,
+        // ===== AMOUNTS =====
+        subtotal: invoiceDetails.subtotal ?? 0,
+        discount: invoiceDetails.discount ?? 0,
 
-      sgstRate: invoiceDetails.sgstRate ?? 0,
-      sgstAmount: invoiceDetails.sgstAmount ?? 0,
+        cgstRate: invoiceDetails.cgstRate ?? 0,
+        cgstAmount: invoiceDetails.cgstAmount ?? 0,
 
-      igstRate: invoiceDetails.igstRate ?? 0,
-      igstAmount: invoiceDetails.igstAmount ?? 0,
+        sgstRate: invoiceDetails.sgstRate ?? 0,
+        sgstAmount: invoiceDetails.sgstAmount ?? 0,
 
-      totalAmount: invoiceDetails.totalAmount ?? 0,
+        igstRate: invoiceDetails.igstRate ?? 0,
+        igstAmount: invoiceDetails.igstAmount ?? 0,
 
-      // ===== PAYMENT & STATUS =====
-      status: invoiceDetails.status,
-      paymentMode: invoiceDetails.paymentMode,
-      transactionId: invoiceDetails.transactionId,
-      paymentStatus: invoiceDetails.paymentStatus,
-      invoiceStatus: invoiceDetails.invoiceStatus,
+        totalAmount: invoiceDetails.totalAmount ?? 0,
 
-      // ===== AUDIT =====
-      createdAt: invoiceDetails.createdAt,
-      createdBy: invoiceDetails.createdBy,
+        // ===== PAYMENT & STATUS =====
+        status: invoiceDetails.status,
+        paymentMode: invoiceDetails.paymentMode,
+        transactionId: invoiceDetails.transactionId,
+        paymentStatus: invoiceDetails.paymentStatus,
+        invoiceStatus: invoiceDetails.invoiceStatus,
 
-      // ===== ITEMS =====
-      items: invoiceDetails.items.map((item: any) => ({
-        productName: item.productName,
-        description: item.description,
-        rate: item.rate,
-        quantity: item.quantity,
-        amount: item.amount ?? (item.rate * item.quantity)
-      }))
-    }
-  };
+        // ===== AUDIT =====
+        createdAt: invoiceDetails.createdAt,
+        createdBy: invoiceDetails.createdBy,
 
-  return this.http.post<any>(
-    Constant.Site_Url + 'generateInvoice',
-    request
-  );
-}
+        // ===== ITEMS =====
+        items: invoiceDetails.items.map((item: any) => ({
+          productName: item.productName,
+          description: item.description,
+          rate: item.rate,
+          quantity: item.quantity,
+          amount: item.amount ?? (item.rate * item.quantity)
+        }))
+      }
+    };
+    return this.http.post<any>(Constant.Site_Url + 'generateInvoice', request);
+  }
+
+
+  getCustomerDetails(): Observable<any> {
+    const request: any = {
+      payload: {
+        requestFor: 'BY_SUPERADMIN',
+        superadminId: '1234567890',
+        // superadminId: this.loginUser['superadminId'],
+      },
+    };
+    return this.http.post<any>(Constant.Site_Url + 'getCustomerDetails', request);
+  }
+
+ getInvoiceHeaderList(){
+    let request: InvoiceRequest = {
+      payload: {
+        requestFor: 'BYSUPERADMINID',
+        superadminId: '9220208888',
+      }
+    };
+    return this.http.post<InvoiceRequest>(Constant.Site_Url + "getInvoiceHeaderList", request);
+  }
 
 }

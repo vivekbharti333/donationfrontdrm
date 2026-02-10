@@ -3,26 +3,64 @@ import { FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
 import { MessageService } from 'primeng/api';
 import { GenerateInvoiceService } from './generate-invoice.service';
 import { ToastModule } from 'primeng/toast';
+import { ReceiptHeaderListService } from '../../receipt-management/receipt-header-list/receipt-header-list.service';
+
+export interface Customer {
+  id: number;
+  customerName: string;
+  email: string;
+  phone: string;
+  gstNumber: string;
+  billingAddress: string;
+}
+
+export interface Company {
+  id: number;
+  invoiceInitial: string;
+  serialNumber: string;
+}
+
+
+            
 
 @Component({
   selector: 'app-generate-invoice',
   templateUrl: './generate-invoice.component.html',
   styleUrl: './generate-invoice.component.scss',
-  providers: [MessageService, ToastModule], 
+  providers: [MessageService, ToastModule],
 })
 export class GenerateInvoiceComponent implements OnInit {
 
   invoiceForm!: FormGroup;
 
+  customerList: any;
+  invoiceHeaderList: any;
+
+  companyFirstName!: string;
+  companyLastName!: string;
+  companyLastNameColor!: string;
+  backgroundColor!: string;
+  officeAddress!: string;
+  regAddress!: string;
+  mobileNo!: string;
+  alternateMobile!: string;
+  emailId!: string;
+  website!: string;
+  gstNumber!: string;
+  panNumber!: string;
+
+
   constructor(
     private fb: FormBuilder,
     private messageService: MessageService,
     private invoiceService: GenerateInvoiceService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.createInvoiceForm();
     this.addItem(); // default one item
+    this.getCustomerDetails();
+    this.getInvoiceTypeList();
   }
 
   // ================= CREATE INVOICE FORM =================
@@ -35,16 +73,28 @@ export class GenerateInvoiceComponent implements OnInit {
       superadminId: ['6202203047', Validators.required],
       companyId: [1, Validators.required],
 
+      // ===== COMPANY =====
+      companyLogo: [''],
+      companyName: [''],
+      officeAddress: [''],
+      regAddress: [''],
+      mobileNo: [''],
+      emailId: [''],
+      website: [''],
+      gstNumber: [''],
+      panNumber: [''],
+
       // ===== CUSTOMER =====
       customerName: ['', Validators.required],
-      email: [''],
-      phone: [''],
-      gstNumber: [''],
+      customerEmail: [''],
+      customerPhone: [''],
+      customerGstNumber: [''],
       billingAddress: [''],
       deliveryAddresses: [''],
 
       // ===== INVOICE =====
-      invoiceNumber: ['DFL-02/0104', Validators.required],
+      // invoiceNumber: ['DFL-02/0104', Validators.required],
+      invoiceNumber: ['', Validators.required],
       invoiceDate: [today, Validators.required],
       dueDate: [''],
 
@@ -144,121 +194,146 @@ export class GenerateInvoiceComponent implements OnInit {
     });
   }
 
+  // ================= GET INVOICE HEADER ===========
+  public getInvoiceTypeList() {
+    this.invoiceService.getInvoiceHeaderList()
+      .subscribe({
+        next: (response: any) => {
+          if (response['responseCode'] == '200') {
+            this.invoiceHeaderList = JSON.parse(JSON.stringify(response['listPayload']));
+            console.log(this.invoiceHeaderList)
+            // this.toastr.success(response['responseMessage'], response['responseCode']);
+          } else {
+            //this.toastr.error(response['responseMessage'], response['responseCode']);
+          }
+        },
+        // error: (error: any) => this.toastr.error('Server Error', '500'),
+      });
+  }
+
+
+  onCompanyChange(event: Event) {
+    const companyId = Number((event.target as HTMLSelectElement).value);
+
+    const company = this.invoiceHeaderList.find(
+      (c: Company) => c.id === companyId
+    );
+
+    if (!company) return;
+
+    this.invoiceForm.patchValue({
+      invoiceNumber: (company.invoiceInitial + company.serialNumber),
+
+      companyLogo: company.companyLogo,
+      companyName: company.companyName,
+      officeAddress: company.officeAddress,
+      regAddress: company.regAddress,
+      mobileNo: company.mobileNo,
+      emailId: company.emailId,
+      website: company.website,
+      gstNumber: company.gstNumber,
+      panNumber: company.panNumber,
+    });
+  }
+
+  // ================= GET CUSTOMER ==================
+  public getCustomerDetails() {
+    this.invoiceService.getCustomerDetails()
+      .subscribe({
+        next: (response: any) => {
+          if (response['responseCode'] == '200') {
+            this.customerList = JSON.parse(JSON.stringify(response['listPayload']));
+            console.log(this.customerList)
+          } else {
+            //  this.toastr.error(response['responseMessage'], response['responseCode']);
+          }
+        },
+        //error: (error: any) => this.toastr.error('Server Error', '500'),
+      });
+  }
+
+  onCustomerChange(event: Event) {
+  const customerId = Number((event.target as HTMLSelectElement).value);
+
+  const customer = this.customerList.find(
+    (c: Customer) => c.id === customerId
+  );
+
+  if (!customer) return;
+
+  this.invoiceForm.patchValue({
+    customerName: customer.customerName,
+    email: customer.email,
+    phone: customer.phone,
+    gstNumber: customer.gstNumber,
+    billingAddress: customer.billingAddress
+  });
+}
+
   // ================= SUBMIT INVOICE =================
   submitInvoice(): void {
 
-  this.calculateTotals();
+    this.calculateTotals();
 
-  if (this.invoiceForm.invalid) {
-    this.invoiceForm.markAllAsTouched();
-    return;
-  }
+    if (this.invoiceForm.invalid) {
+      this.invoiceForm.markAllAsTouched();
+      return;
+    }
 
-  const payload = this.invoiceForm.getRawValue();
+    const payload = this.invoiceForm.getRawValue();
 
-  this.invoiceService.saveInvoiceDetails(payload)
-    .subscribe({
-      next: (response: any) => {
+    this.invoiceService.saveInvoiceDetails(payload)
+      .subscribe({
+        next: (response: any) => {
 
-        console.log('API RESPONSE:', response);
+          console.log('API RESPONSE:', response);
 
-        // ===== API LEVEL SUCCESS =====
-        if (response?.responseCode === '200') {
+          // ===== API LEVEL SUCCESS =====
+          if (response?.responseCode === '200') {
 
-          const respPayload = response.payload;
+            const respPayload = response.payload;
 
-          // ===== BUSINESS SUCCESS =====
-          if (respPayload?.respCode === '200') {
-const pdfUrl = `http://localhost/mycrm//download/invoice`+ `?invoiceNumber=DFL-02/0104`+ `&superadminId=1234567890`;
+            // ===== BUSINESS SUCCESS =====
+            if (respPayload?.respCode === '200') {
+              const pdfUrl = `http://localhost/mycrm//download/invoice` + `?invoiceNumber=DFL-02/0104` + `&superadminId=1234567890`;
 
-  window.open(pdfUrl, '_blank');
+              window.open(pdfUrl, '_blank');
 
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Success',
-              detail: respPayload.respMesg || 'Invoice generated successfully'
-            });
+              this.messageService.add({
+                severity: 'success',
+                summary: 'Success',
+                detail: respPayload.respMesg || 'Invoice generated successfully'
+              });
 
-            // Optional reset
-            // this.resetForm();
+            } else {
+              // ===== BUSINESS FAILURE =====
+              this.messageService.add({
+                severity: 'error',
+                summary: respPayload?.respCode || 'Error',
+                detail: respPayload?.respMesg || 'Operation failed'
+              });
+            }
 
           } else {
-            // ===== BUSINESS FAILURE =====
+            // ===== API FAILURE =====
             this.messageService.add({
               severity: 'error',
-              summary: respPayload?.respCode || 'Error',
-              detail: respPayload?.respMesg || 'Operation failed'
+              summary: response?.responseCode || 'Error',
+              detail: response?.responseMessage || 'Request failed'
             });
           }
+        },
 
-        } else {
-          // ===== API FAILURE =====
+        error: (err) => {
+          console.error('SERVER ERROR:', err);
           this.messageService.add({
             severity: 'error',
-            summary: response?.responseCode || 'Error',
-            detail: response?.responseMessage || 'Request failed'
+            summary: '500',
+            detail: 'Internal Server Error'
           });
         }
-      },
-
-      error: (err) => {
-        console.error('SERVER ERROR:', err);
-        this.messageService.add({
-          severity: 'error',
-          summary: '500',
-          detail: 'Internal Server Error'
-        });
-      }
-    });
-}
-
-
-// submitInvoice(): void {
-
-//   this.calculateTotals();
-
-//   const payload = this.invoiceForm.getRawValue();
-
-//   this.invoiceService.saveInvoiceDetails(payload).subscribe({
-//     next: (response: any) => {
-
-//       console.log('API RESPONSE:', response);
-
-//       if (response?.responseCode !== 200) {
-//         this.messageService.add({
-//           severity: 'error',
-//           summary: response.responseCode.toString(),
-//           detail: response.responseMessage
-//         });
-//         return;
-//       }
-
-//       const respPayload = response.payload;
-
-//       if (respPayload?.respCode === '200') {
-//         this.messageService.add({
-//           severity: 'success',
-//           summary: 'Success',
-//           detail: respPayload.respMesg
-//         });
-//       } else {
-//         this.messageService.add({
-//           severity: 'error',
-//           summary: respPayload?.respCode || 'Error',
-//           detail: respPayload?.respMesg || 'Failed'
-//         });
-//       }
-//     },
-
-//     error: () => {
-//       this.messageService.add({
-//         severity: 'error',
-//         summary: '500',
-//         detail: 'Internal Server Error'
-//       });
-//     }
-//   });
-// }
+      });
+  }
 
 
   // ================= RESET FORM =================
