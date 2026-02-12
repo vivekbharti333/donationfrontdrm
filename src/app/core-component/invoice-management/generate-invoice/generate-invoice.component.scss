@@ -1,105 +1,119 @@
-/* ===============================
-   INVOICE LAYOUT
-================================ */
-.invoice {
+.invoice-container {
   max-width: 1100px;
-  margin: auto;
-  font-size: 14px;
-  color: #212529;
 }
 
-.invoice--header {
-  border: 2px solid #000;
+.invoice-header {
+  background: linear-gradient(135deg, #f8f9ff, #ffffff);
 }
 
-.invoice__title {
-  font-weight: 700;
-  letter-spacing: 1px;
-}
-
-.invoice__number {
-  font-size: 15px;
-  color: #555;
-}
-
-/* ===============================
-   SECTION HEADERS
-================================ */
-.invoice__section-title {
-  background-color: #f8f9fa;
-  font-weight: 600;
+.table th {
   font-size: 13px;
   text-transform: uppercase;
-  padding: 6px 10px;
+  letter-spacing: 0.5px;
 }
 
-/* ===============================
-   TABLES (ITEMS & TOTALS)
-================================ */
-.invoice-table {
-  width: 100%;
-  border-collapse: collapse;
+.table td {
+  vertical-align: middle;
 }
 
-.invoice-table th {
-  background-color: #f8f9fa;
-  font-weight: 600;
+.card {
+  border-radius: 12px;
 }
 
-.invoice-table th,
-.invoice-table td {
-  padding: 6px 8px;
-  vertical-align: top;
+.btn {
+  border-radius: 8px;
 }
 
-.invoice-totals th {
+input, textarea, select {
+  border-radius: 6px !important;
+}
+
+hr {
+  margin: 1rem 0;
+}
+.bank-box {
+  background: linear-gradient(135deg, #f8f9fa, #ffffff);
+}
+
+.card-header {
+  border-bottom: 1px solid #eee;
+}
+
+.form-label {
   font-weight: 500;
 }
 
-.invoice-totals__grand {
-  border-top: 2px solid #000;
-  font-size: 16px;
-  font-weight: 600;
+.table th {
+  font-size: 13px;
+  letter-spacing: 0.5px;
 }
 
-/* ===============================
-   COMPACT MODE (PDF / PRINT)
-================================ */
-.invoice--compact .card-header {
-  padding: 4px 8px;
-  font-size: 12px;
+.btn-lg {
+  border-radius: 8px;
 }
 
-.invoice--compact .card-body {
-  padding: 6px 8px;
-}
+/* ===== COMPACT MODE ===== */
 
-.invoice--compact input,
-.invoice--compact textarea {
-  font-size: 12px;
-  padding: 4px 6px;
-}
-
-/* ===============================
-   BUTTONS
-================================ */
-.btn--xs {
-  padding: 4px 8px;
+.compact-card .card-header {
   font-size: 14px;
+  padding: 6px 12px;
 }
 
-/* ===============================
-   PRINT OPTIMIZATION
-================================ */
-@media print {
-  button {
-    display: none !important;
-  }
-
-  input,
-  textarea {
-    border: none !important;
-    box-shadow: none !important;
-    padding: 0 !important;
-  }
+.compact-box {
+  background: #fafbfc;
 }
+
+.compact-card .form-label {
+  font-size: 12px;
+}
+
+.compact-card input,
+.compact-card textarea,
+.compact-card select {
+  padding: 4px 8px;
+  font-size: 13px;
+}
+
+.compact-card textarea {
+  resize: none;
+}
+
+.compact-card h6 {
+  font-size: 13px;
+}
+
+.form-check-input-sm {
+  width: 14px;
+  height: 14px;
+}
+
+/* ===== COMPACT MODE ===== */
+
+.compact-card .card-header {
+  font-size: 14px;
+  padding: 6px 12px;
+}
+
+.compact-box {
+  background: #fafbfc;
+}
+
+.compact-card .form-label {
+  font-size: 12px;
+}
+
+.compact-card input,
+.compact-card textarea,
+.compact-card select {
+  padding: 4px 8px;
+  font-size: 13px;
+}
+
+.compact-card textarea {
+  resize: none;
+}
+
+.compact-card h6 {
+  font-size: 13px;
+}
+

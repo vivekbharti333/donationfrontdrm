@@ -30,7 +30,7 @@ export class GenerateInvoiceService {
       payload: {
 
         // ===== CORE CONTEXT =====
-        superadminId: invoiceDetails.superadminId,
+        superadminId: '6202203047',
         companyId: invoiceDetails.companyId,
 
         companyLogo: invoiceDetails.companyLogo,
@@ -59,16 +59,7 @@ export class GenerateInvoiceService {
         // ===== AMOUNTS =====
         subtotal: invoiceDetails.subtotal ?? 0,
         discount: invoiceDetails.discount ?? 0,
-
-        cgstRate: invoiceDetails.cgstRate ?? 0,
-        cgstAmount: invoiceDetails.cgstAmount ?? 0,
-
-        sgstRate: invoiceDetails.sgstRate ?? 0,
-        sgstAmount: invoiceDetails.sgstAmount ?? 0,
-
-        igstRate: invoiceDetails.igstRate ?? 0,
-        igstAmount: invoiceDetails.igstAmount ?? 0,
-
+        taxAmount: invoiceDetails.taxAmount ?? 0,
         totalAmount: invoiceDetails.totalAmount ?? 0,
 
         // ===== PAYMENT & STATUS =====
@@ -88,7 +79,17 @@ export class GenerateInvoiceService {
           description: item.description,
           rate: item.rate,
           quantity: item.quantity,
-          amount: item.amount ?? (item.rate * item.quantity)
+
+          cgstRate: item.cgstRate ?? 0,
+          cgstAmount: item.cgstAmount ?? 0,
+
+          sgstRate: item.sgstRate ?? 0,
+          sgstAmount: item.sgstAmount ?? 0,
+
+          igstRate: item.igstRate ?? 0,
+          igstAmount: item.igstAmount ?? 0,
+
+          amount: item.amount ?? ((item.rate * item.quantity)+item.igstAmount)
         }))
       }
     };

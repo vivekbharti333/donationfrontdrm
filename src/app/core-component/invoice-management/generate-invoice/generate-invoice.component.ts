@@ -2,8 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
 import { MessageService } from 'primeng/api';
 import { GenerateInvoiceService } from './generate-invoice.service';
-import { ToastModule } from 'primeng/toast';
-import { ReceiptHeaderListService } from '../../receipt-management/receipt-header-list/receipt-header-list.service';
 
 export interface Customer {
   id: number;
@@ -20,60 +18,39 @@ export interface Company {
   serialNumber: string;
 }
 
-
-            
-
 @Component({
   selector: 'app-generate-invoice',
   templateUrl: './generate-invoice.component.html',
-  styleUrl: './generate-invoice.component.scss',
-  providers: [MessageService, ToastModule],
+  styleUrls: ['./generate-invoice.component.scss'],
+  providers: [MessageService]
 })
 export class GenerateInvoiceComponent implements OnInit {
 
   invoiceForm!: FormGroup;
-
   customerList: any;
   invoiceHeaderList: any;
-
-  companyFirstName!: string;
-  companyLastName!: string;
-  companyLastNameColor!: string;
-  backgroundColor!: string;
-  officeAddress!: string;
-  regAddress!: string;
-  mobileNo!: string;
-  alternateMobile!: string;
-  emailId!: string;
-  website!: string;
-  gstNumber!: string;
-  panNumber!: string;
-
 
   constructor(
     private fb: FormBuilder,
     private messageService: MessageService,
     private invoiceService: GenerateInvoiceService
-  ) { }
+  ) {}
 
   ngOnInit(): void {
-    this.createInvoiceForm();
-    this.addItem(); // default one item
+    this.createForm();
+    this.addItem();
     this.getCustomerDetails();
-    this.getInvoiceTypeList();
+     this.getInvoiceTypeList();
   }
 
-  // ================= CREATE INVOICE FORM =================
-  createInvoiceForm(): void {
+  createForm(): void {
+
     const today = new Date().toISOString().substring(0, 10);
 
     this.invoiceForm = this.fb.group({
 
-      // ===== SYSTEM =====
-      superadminId: ['6202203047', Validators.required],
-      companyId: [1, Validators.required],
-
-      // ===== COMPANY =====
+       // ===== COMPANY =====
+      companyId: [''],
       companyLogo: [''],
       companyName: [''],
       officeAddress: [''],
@@ -92,109 +69,174 @@ export class GenerateInvoiceComponent implements OnInit {
       billingAddress: [''],
       deliveryAddresses: [''],
 
-      // ===== INVOICE =====
-      // invoiceNumber: ['DFL-02/0104', Validators.required],
-      invoiceNumber: ['', Validators.required],
-      invoiceDate: [today, Validators.required],
+      invoiceNumber: ['INV-001', Validators.required],
+      invoiceDate: [today],
       dueDate: [''],
 
-      // ===== AMOUNTS (NEVER NULL) =====
-      subtotal: [0, Validators.required],
+      subtotal: [0],
       discount: [0],
+      taxAmount: [0],
+      totalAmount: [0],
 
-      cgstRate: [0],
-      cgstAmount: [0],
-
-      sgstRate: [0],
-      sgstAmount: [0],
-
-      igstRate: [18],
-      igstAmount: [0],
-
-      totalAmount: [0, Validators.required],
-
-      // ===== PAYMENT / STATUS =====
       status: ['ACTIVE'],
       paymentMode: ['ONLINE'],
       transactionId: [''],
       paymentStatus: ['UNPAID'],
       invoiceStatus: ['GENERATED'],
 
-      // ===== AUDIT =====
-      createdAt: [today],
-      createdBy: ['6202203047'],
-
-      // ===== ITEMS =====
       items: this.fb.array([])
     });
   }
 
-  // ================= ITEMS ARRAY =================
   get items(): FormArray {
     return this.invoiceForm.get('items') as FormArray;
   }
 
-  // ================= ADD ITEM =================
   addItem(): void {
-    this.items.push(
-      this.fb.group({
-        productName: ['', Validators.required],
-        description: [''],
-        rate: [0, [Validators.required, Validators.min(1)]],
-        quantity: [1, [Validators.required, Validators.min(1)]],
+  this.items.push(
+    this.fb.group({
+      productName: ['', Validators.required],
+      description: [''],
+      rate: [0, Validators.required],
+      quantity: [1, Validators.required],
+      taxType: [''],
 
-        // IMPORTANT: do NOT disable (DB NOT NULL)
-        amount: [0, Validators.required]
-      })
-    );
-  }
+      // 🔹 ADD THESE
+      igstRate: [0],
+      cgstRate: [0],
+      sgstRate: [0],
 
-  // ================= REMOVE ITEM =================
+      cgstAmount: [0],
+      sgstAmount: [0],
+      igstAmount: [0],
+      taxAmount: [0],   // 👈 IMPORTANT
+
+      amount: [0]
+    })
+  );
+}
+
+
   removeItem(index: number): void {
     this.items.removeAt(index);
     this.calculateTotals();
   }
 
-  // ================= CALCULATE TOTALS =================
-  calculateTotals(): void {
+ onTaxTypeChange(index: number): void {
 
-    let subtotal = 0;
+  const item = this.items.at(index) as FormGroup;
+  const taxType = item.get('taxType')?.value;
 
-    this.items.controls.forEach(item => {
-      const rate = Number(item.get('rate')?.value) || 0;
-      const qty = Number(item.get('quantity')?.value) || 0;
-      const amount = rate * qty;
-
-      // 🔥 critical: ensure NOT NULL
-      item.get('amount')?.setValue(amount);
-
-      subtotal += amount;
-    });
-
-    const discount = Number(this.invoiceForm.get('discount')?.value) || 0;
-
-    const cgstRate = Number(this.invoiceForm.get('cgstRate')?.value) || 0;
-    const sgstRate = Number(this.invoiceForm.get('sgstRate')?.value) || 0;
-    const igstRate = Number(this.invoiceForm.get('igstRate')?.value) || 0;
-
-    const taxableAmount = subtotal - discount;
-
-    const cgstAmount = (taxableAmount * cgstRate) / 100;
-    const sgstAmount = (taxableAmount * sgstRate) / 100;
-    const igstAmount = (taxableAmount * igstRate) / 100;
-
-    const totalAmount = taxableAmount + cgstAmount + sgstAmount + igstAmount;
-
-    this.invoiceForm.patchValue({
-      subtotal,
-      cgstAmount,
-      sgstAmount,
-      igstAmount,
-      totalAmount
-    });
+  if (taxType === 'IGST') {
+    item.patchValue({ cgstRate: 0, sgstRate: 0 });
   }
 
-  // ================= GET INVOICE HEADER ===========
+  if (taxType === 'CGST_SGST') {
+    item.patchValue({ igstRate: 0 });
+  }
+
+  this.calculateTotals();
+}
+
+calculateTotals(): void {
+
+  let subtotal = 0;
+  let totalCgst = 0;
+  let totalSgst = 0;
+  let totalIgst = 0;
+
+  // 🔹 Step 1: Calculate subtotal
+  this.items.controls.forEach(control => {
+    const item = control as FormGroup;
+
+    const rate = +item.get('rate')?.value || 0;
+    const qty = +item.get('quantity')?.value || 0;
+
+    const base = rate * qty;
+    subtotal += base;
+  });
+
+  // 🔹 Step 2: Apply discount (percentage)
+  const discountPercent = +this.invoiceForm.get('discount')?.value || 0;
+  const discountAmount = subtotal * discountPercent / 100;
+  const taxableAmount = subtotal - discountAmount;
+
+  // 🔹 Step 3: Calculate tax per item
+  this.items.controls.forEach(control => {
+
+    const item = control as FormGroup;
+
+    const rate = +item.get('rate')?.value || 0;
+    const qty = +item.get('quantity')?.value || 0;
+    const taxType = item.get('taxType')?.value;
+
+    const base = rate * qty;
+
+    const ratio = subtotal ? base / subtotal : 0;
+    const discountedBase = taxableAmount * ratio;
+
+    let cgst = 0;
+    let sgst = 0;
+    let igst = 0;
+
+    const igstRate = +item.get('igstRate')?.value || 0;
+    const cgstRate = +item.get('cgstRate')?.value || 0;
+    const sgstRate = +item.get('sgstRate')?.value || 0;
+
+    if (taxType === 'IGST') {
+      igst = discountedBase * igstRate / 100;
+    }
+
+    if (taxType === 'CGST_SGST') {
+      cgst = discountedBase * cgstRate / 100;
+      sgst = discountedBase * sgstRate / 100;
+    }
+
+    const rowTax = cgst + sgst + igst;
+
+    totalCgst += cgst;
+    totalSgst += sgst;
+    totalIgst += igst;
+
+    item.patchValue({
+      cgstAmount: cgst,
+      sgstAmount: sgst,
+      igstAmount: igst,
+      taxAmount: rowTax,   // 👈 FIXED
+      amount: discountedBase + rowTax
+    }, { emitEvent: false });
+
+  });
+
+  const totalTax = totalCgst + totalSgst + totalIgst;
+  const grandTotal = taxableAmount + totalTax;
+
+  this.invoiceForm.patchValue({
+    subtotal: subtotal,
+    taxAmount: totalTax,
+    totalAmount: grandTotal
+  }, { emitEvent: false });
+
+}
+
+
+
+
+  syncDeliveryAddress(event: any): void {
+
+  if (event.target.checked) {
+    const billing = this.invoiceForm.get('billingAddress')?.value;
+    this.invoiceForm.patchValue({
+      deliveryAddresses: billing
+    });
+  } else {
+    this.invoiceForm.patchValue({
+      deliveryAddresses: ''
+    });
+  }
+}
+
+// ================= GET INVOICE HEADER ===========
   public getInvoiceTypeList() {
     this.invoiceService.getInvoiceHeaderList()
       .subscribe({
@@ -225,6 +267,7 @@ export class GenerateInvoiceComponent implements OnInit {
       invoiceNumber: (company.invoiceInitial + company.serialNumber),
 
       companyLogo: company.companyLogo,
+      companyId: company.id,
       companyName: company.companyName,
       officeAddress: company.officeAddress,
       regAddress: company.regAddress,
@@ -236,8 +279,7 @@ export class GenerateInvoiceComponent implements OnInit {
     });
   }
 
-  // ================= GET CUSTOMER ==================
-  public getCustomerDetails() {
+ public getCustomerDetails() {
     this.invoiceService.getCustomerDetails()
       .subscribe({
         next: (response: any) => {
@@ -270,6 +312,7 @@ export class GenerateInvoiceComponent implements OnInit {
   });
 }
 
+
   // ================= SUBMIT INVOICE =================
   submitInvoice(): void {
 
@@ -281,7 +324,7 @@ export class GenerateInvoiceComponent implements OnInit {
     }
 
     const payload = this.invoiceForm.getRawValue();
-
+    console.log(this.invoiceForm.getRawValue().value)
     this.invoiceService.saveInvoiceDetails(payload)
       .subscribe({
         next: (response: any) => {
@@ -295,14 +338,14 @@ export class GenerateInvoiceComponent implements OnInit {
 
             // ===== BUSINESS SUCCESS =====
             if (respPayload?.respCode === '200') {
-              const pdfUrl = `http://localhost/mycrm//download/invoice` + `?invoiceNumber=DFL-02/0104` + `&superadminId=1234567890`;
+              const pdfUrl = `http://localhost/mycrm//download/invoice?invoiceNumber=DFL-02/0104&superadminId=1234567890`;
 
               window.open(pdfUrl, '_blank');
 
               this.messageService.add({
                 severity: 'success',
                 summary: 'Success',
-                detail: respPayload.respMesg || 'Invoice generated successfully'
+                detail: respPayload.respCode || respPayload.respMesg
               });
 
             } else {
@@ -336,11 +379,5 @@ export class GenerateInvoiceComponent implements OnInit {
   }
 
 
-  // ================= RESET FORM =================
-  resetForm(): void {
-    this.invoiceForm.reset();
-    this.items.clear();
-    this.createInvoiceForm();
-    this.addItem();
-  }
+
 }
