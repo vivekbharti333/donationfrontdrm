@@ -231,6 +231,25 @@ export class SidebarService {
           ],
         },
         {
+          menuValue: 'Invoice Management',
+          hasSubRoute: true,
+          showSubRoute: false,
+          icon: 'users',
+          // base1: 'usermang',
+          subMenus: [
+            {
+              menuValue: 'Generate Invoice',
+              route: routes.generateInvoice,
+              permission: 'generate-invoice',
+            }, 
+            {
+              menuValue: 'Invoice List',
+              route: routes.invoiceList,
+              permission: 'invoice-list',
+            }, 
+          ],
+        },
+        {
           menuValue: 'Lead Management',
           hasSubRoute: true,
           showSubRoute: false,
