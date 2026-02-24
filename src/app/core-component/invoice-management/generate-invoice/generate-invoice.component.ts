@@ -139,102 +139,6 @@ export class GenerateInvoiceComponent implements OnInit {
 
   onTaxTypeChange(index: number): void {
 
-<<<<<<< HEAD
-    const item = this.items.at(index) as FormGroup;
-    const taxType = item.get('taxType')?.value;
-
-    if (taxType === 'IGST') {
-      item.patchValue({ cgstRate: 0, sgstRate: 0 });
-    }
-
-    if (taxType === 'CGST_SGST') {
-      item.patchValue({ igstRate: 0 });
-    }
-
-    this.calculateTotals();
-  }
-
-  calculateTotals(): void {
-
-    let subtotal = 0;
-    let totalCgst = 0;
-    let totalSgst = 0;
-    let totalIgst = 0;
-
-    // 🔹 Step 1: Calculate subtotal
-    this.items.controls.forEach(control => {
-      const item = control as FormGroup;
-
-      const rate = +item.get('rate')?.value || 0;
-      const qty = +item.get('quantity')?.value || 0;
-
-      const base = rate * qty;
-      subtotal += base;
-    });
-
-    // 🔹 Step 2: Apply discount (percentage)
-    const discountPercent = +this.invoiceForm.get('discount')?.value || 0;
-    const discountAmount = subtotal * discountPercent / 100;
-    const taxableAmount = subtotal - discountAmount;
-
-    // 🔹 Step 3: Calculate tax per item
-    this.items.controls.forEach(control => {
-
-      const item = control as FormGroup;
-
-      const rate = +item.get('rate')?.value || 0;
-      const qty = +item.get('quantity')?.value || 0;
-      const taxType = item.get('taxType')?.value;
-
-      const base = rate * qty;
-
-      const ratio = subtotal ? base / subtotal : 0;
-      const discountedBase = taxableAmount * ratio;
-
-      let cgst = 0;
-      let sgst = 0;
-      let igst = 0;
-
-      const igstRate = +item.get('igstRate')?.value || 0;
-      const cgstRate = +item.get('cgstRate')?.value || 0;
-      const sgstRate = +item.get('sgstRate')?.value || 0;
-
-      if (taxType === 'IGST') {
-        igst = discountedBase * igstRate / 100;
-      }
-
-      if (taxType === 'CGST_SGST') {
-        cgst = discountedBase * cgstRate / 100;
-        sgst = discountedBase * sgstRate / 100;
-      }
-
-      const rowTax = cgst + sgst + igst;
-
-      totalCgst += cgst;
-      totalSgst += sgst;
-      totalIgst += igst;
-
-      item.patchValue({
-        cgstAmount: cgst,
-        sgstAmount: sgst,
-        igstAmount: igst,
-        taxAmount: rowTax,   // 👈 FIXED
-        amount: discountedBase + rowTax
-      }, { emitEvent: false });
-
-    });
-
-    const totalTax = totalCgst + totalSgst + totalIgst;
-    const grandTotal = taxableAmount + totalTax;
-
-    this.invoiceForm.patchValue({
-      subtotal: subtotal,
-      taxAmount: totalTax,
-      totalAmount: grandTotal
-    }, { emitEvent: false });
-
-  }
-=======
   const item = this.items.at(index) as FormGroup;
   const taxType = item.get('taxType')?.value;
 
@@ -309,7 +213,6 @@ calculateTotals(): void {
   }, { emitEvent: false });
 
 }
->>>>>>> 8e39b98eab5a72deaedc663158ee1994410c126b
 
   syncDeliveryAddress(event: any): void {
 
