@@ -118,4 +118,13 @@ export class GenerateInvoiceService {
     return this.http.post<InvoiceRequest>(Constant.Site_Url + "getInvoiceHeaderList", request);
   }
 
+  getProductList(){
+    let request: InvoiceRequest = {
+      payload: {
+        requestFor: 'BY_SUPERADMIN',
+        superadminId: '1',
+      }
+    };
+    return this.http.post<InvoiceRequest>(Constant.Site_Url + "getProductDetails", request);
+  }
 }

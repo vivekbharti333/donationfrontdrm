@@ -244,22 +244,24 @@
               [formGroupName]="i">
 
             <td class="fw-semibold">{{ i + 1 }}</td>
-
+            
             <td style="min-width:220px;">
-              <input class="form-control form-control-sm mb-1"
-                     formControlName="productName"
-                     placeholder="Product Name">
-              <textarea rows="1"
-                        class="form-control form-control-sm"
-                        formControlName="description"
-                        placeholder="Description"></textarea>
-            </td>
-
+              <!-- <input class="form-control form-control-sm mb-1"
+                                 formControlName="productName"
+                                 placeholder="Product Name"> -->
+            
+              <select class="form-select form-select-sm" formControlName="productName" (change)="onProductSelect($event, i)">
+                <option value="">-- Select Product --</option>
+                <option *ngFor="let product of productList" [value]="product.productName">
+                  {{ product.productName }}
+                </option>
+              </select>
+            
+              <textarea rows="1" class="form-control form-control-sm" formControlName="description" placeholder="Description">
+            </textarea>
             <td>
-              <input type="number"
-                     class="form-control form-control-sm text-end"
-                     formControlName="quantity"
-                     (input)="calculateTotals()">
+              <input type="number" class="form-control form-control-sm text-end" formControlName="quantity"
+                (input)="calculateTotals()">
             </td>
 
             <td>

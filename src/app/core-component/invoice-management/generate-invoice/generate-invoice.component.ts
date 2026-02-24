@@ -18,6 +18,18 @@ export interface Company {
   serialNumber: string;
 }
 
+export interface Product {
+  id: number;
+  productName: string;
+  description: string;
+  rate: number;
+  quantityType: string;
+  quantity: number;
+  createdAt: number;
+  createdBy: string;
+  superadminId: string;
+}
+
 @Component({
   selector: 'app-generate-invoice',
   templateUrl: './generate-invoice.component.html',
@@ -29,18 +41,21 @@ export class GenerateInvoiceComponent implements OnInit {
   invoiceForm!: FormGroup;
   customerList: any;
   invoiceHeaderList: any;
+  productList: Product[] = [];
 
   constructor(
     private fb: FormBuilder,
     private messageService: MessageService,
     private invoiceService: GenerateInvoiceService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.createForm();
     this.addItem();
     this.getCustomerDetails();
-     this.getInvoiceTypeList();
+    this.getInvoiceTypeList();
+    this.getProducttList();
+
   }
 
   createForm(): void {
@@ -49,7 +64,7 @@ export class GenerateInvoiceComponent implements OnInit {
 
     this.invoiceForm = this.fb.group({
 
-       // ===== COMPANY =====
+      // ===== COMPANY =====
       companyId: [''],
       companyLogo: [''],
       companyName: [''],
@@ -93,28 +108,28 @@ export class GenerateInvoiceComponent implements OnInit {
   }
 
   addItem(): void {
-  this.items.push(
-    this.fb.group({
-      productName: ['', Validators.required],
-      description: [''],
-      rate: [0, Validators.required],
-      quantity: [1, Validators.required],
-      taxType: [''],
+    this.items.push(
+      this.fb.group({
+        productName: ['', Validators.required],
+        description: [''],
+        rate: [0, Validators.required],
+        quantity: [1, Validators.required],
+        taxType: [''],
 
-      // 🔹 ADD THESE
-      igstRate: [0],
-      cgstRate: [0],
-      sgstRate: [0],
+        // 🔹 ADD THESE
+        igstRate: [0],
+        cgstRate: [0],
+        sgstRate: [0],
 
-      cgstAmount: [0],
-      sgstAmount: [0],
-      igstAmount: [0],
-      taxAmount: [0],   // 👈 IMPORTANT
+        cgstAmount: [0],
+        sgstAmount: [0],
+        igstAmount: [0],
+        taxAmount: [0],   // 👈 IMPORTANT
 
-      amount: [0]
-    })
-  );
-}
+        amount: [0]
+      })
+    );
+  }
 
 
   removeItem(index: number): void {
@@ -122,121 +137,121 @@ export class GenerateInvoiceComponent implements OnInit {
     this.calculateTotals();
   }
 
- onTaxTypeChange(index: number): void {
+  onTaxTypeChange(index: number): void {
 
-  const item = this.items.at(index) as FormGroup;
-  const taxType = item.get('taxType')?.value;
-
-  if (taxType === 'IGST') {
-    item.patchValue({ cgstRate: 0, sgstRate: 0 });
-  }
-
-  if (taxType === 'CGST_SGST') {
-    item.patchValue({ igstRate: 0 });
-  }
-
-  this.calculateTotals();
-}
-
-calculateTotals(): void {
-
-  let subtotal = 0;
-  let totalCgst = 0;
-  let totalSgst = 0;
-  let totalIgst = 0;
-
-  // 🔹 Step 1: Calculate subtotal
-  this.items.controls.forEach(control => {
-    const item = control as FormGroup;
-
-    const rate = +item.get('rate')?.value || 0;
-    const qty = +item.get('quantity')?.value || 0;
-
-    const base = rate * qty;
-    subtotal += base;
-  });
-
-  // 🔹 Step 2: Apply discount (percentage)
-  const discountPercent = +this.invoiceForm.get('discount')?.value || 0;
-  const discountAmount = subtotal * discountPercent / 100;
-  const taxableAmount = subtotal - discountAmount;
-
-  // 🔹 Step 3: Calculate tax per item
-  this.items.controls.forEach(control => {
-
-    const item = control as FormGroup;
-
-    const rate = +item.get('rate')?.value || 0;
-    const qty = +item.get('quantity')?.value || 0;
+    const item = this.items.at(index) as FormGroup;
     const taxType = item.get('taxType')?.value;
 
-    const base = rate * qty;
-
-    const ratio = subtotal ? base / subtotal : 0;
-    const discountedBase = taxableAmount * ratio;
-
-    let cgst = 0;
-    let sgst = 0;
-    let igst = 0;
-
-    const igstRate = +item.get('igstRate')?.value || 0;
-    const cgstRate = +item.get('cgstRate')?.value || 0;
-    const sgstRate = +item.get('sgstRate')?.value || 0;
-
     if (taxType === 'IGST') {
-      igst = discountedBase * igstRate / 100;
+      item.patchValue({ cgstRate: 0, sgstRate: 0 });
     }
 
     if (taxType === 'CGST_SGST') {
-      cgst = discountedBase * cgstRate / 100;
-      sgst = discountedBase * sgstRate / 100;
+      item.patchValue({ igstRate: 0 });
     }
 
-    const rowTax = cgst + sgst + igst;
+    this.calculateTotals();
+  }
 
-    totalCgst += cgst;
-    totalSgst += sgst;
-    totalIgst += igst;
+  calculateTotals(): void {
 
-    item.patchValue({
-      cgstAmount: cgst,
-      sgstAmount: sgst,
-      igstAmount: igst,
-      taxAmount: rowTax,   // 👈 FIXED
-      amount: discountedBase + rowTax
+    let subtotal = 0;
+    let totalCgst = 0;
+    let totalSgst = 0;
+    let totalIgst = 0;
+
+    // 🔹 Step 1: Calculate subtotal
+    this.items.controls.forEach(control => {
+      const item = control as FormGroup;
+
+      const rate = +item.get('rate')?.value || 0;
+      const qty = +item.get('quantity')?.value || 0;
+
+      const base = rate * qty;
+      subtotal += base;
+    });
+
+    // 🔹 Step 2: Apply discount (percentage)
+    const discountPercent = +this.invoiceForm.get('discount')?.value || 0;
+    const discountAmount = subtotal * discountPercent / 100;
+    const taxableAmount = subtotal - discountAmount;
+
+    // 🔹 Step 3: Calculate tax per item
+    this.items.controls.forEach(control => {
+
+      const item = control as FormGroup;
+
+      const rate = +item.get('rate')?.value || 0;
+      const qty = +item.get('quantity')?.value || 0;
+      const taxType = item.get('taxType')?.value;
+
+      const base = rate * qty;
+
+      const ratio = subtotal ? base / subtotal : 0;
+      const discountedBase = taxableAmount * ratio;
+
+      let cgst = 0;
+      let sgst = 0;
+      let igst = 0;
+
+      const igstRate = +item.get('igstRate')?.value || 0;
+      const cgstRate = +item.get('cgstRate')?.value || 0;
+      const sgstRate = +item.get('sgstRate')?.value || 0;
+
+      if (taxType === 'IGST') {
+        igst = discountedBase * igstRate / 100;
+      }
+
+      if (taxType === 'CGST_SGST') {
+        cgst = discountedBase * cgstRate / 100;
+        sgst = discountedBase * sgstRate / 100;
+      }
+
+      const rowTax = cgst + sgst + igst;
+
+      totalCgst += cgst;
+      totalSgst += sgst;
+      totalIgst += igst;
+
+      item.patchValue({
+        cgstAmount: cgst,
+        sgstAmount: sgst,
+        igstAmount: igst,
+        taxAmount: rowTax,   // 👈 FIXED
+        amount: discountedBase + rowTax
+      }, { emitEvent: false });
+
+    });
+
+    const totalTax = totalCgst + totalSgst + totalIgst;
+    const grandTotal = taxableAmount + totalTax;
+
+    this.invoiceForm.patchValue({
+      subtotal: subtotal,
+      taxAmount: totalTax,
+      totalAmount: grandTotal
     }, { emitEvent: false });
 
-  });
-
-  const totalTax = totalCgst + totalSgst + totalIgst;
-  const grandTotal = taxableAmount + totalTax;
-
-  this.invoiceForm.patchValue({
-    subtotal: subtotal,
-    taxAmount: totalTax,
-    totalAmount: grandTotal
-  }, { emitEvent: false });
-
-}
+  }
 
 
 
 
   syncDeliveryAddress(event: any): void {
 
-  if (event.target.checked) {
-    const billing = this.invoiceForm.get('billingAddress')?.value;
-    this.invoiceForm.patchValue({
-      deliveryAddresses: billing
-    });
-  } else {
-    this.invoiceForm.patchValue({
-      deliveryAddresses: ''
-    });
+    if (event.target.checked) {
+      const billing = this.invoiceForm.get('billingAddress')?.value;
+      this.invoiceForm.patchValue({
+        deliveryAddresses: billing
+      });
+    } else {
+      this.invoiceForm.patchValue({
+        deliveryAddresses: ''
+      });
+    }
   }
-}
 
-// ================= GET INVOICE HEADER ===========
+  // ================= GET INVOICE HEADER ===========
   public getInvoiceTypeList() {
     this.invoiceService.getInvoiceHeaderList()
       .subscribe({
@@ -253,6 +268,50 @@ calculateTotals(): void {
       });
   }
 
+  public getProducttList() {
+    this.invoiceService.getProductList()
+      .subscribe({
+        next: (response: any) => {
+          if (response['responseCode'] == '200') {
+            this.productList = JSON.parse(JSON.stringify(response['listPayload']));
+            console.log(this.productList)
+            // this.toastr.success(response['responseMessage'], response['responseCode']);
+          } else {
+            //this.toastr.error(response['responseMessage'], response['responseCode']);
+          }
+        },
+        // error: (error: any) => this.toastr.error('Server Error', '500'),
+      });
+  }
+
+  /** 🔁 Reusable logic */
+  onProductSelect(event: Event, index: number): void {
+    const productName = (event.target as HTMLSelectElement).value;
+    this.updateDescription(productName, index);
+  }
+
+
+
+  updateDescription(productName: string, index: number): void {
+
+    const product = this.productList.find(
+      p => p.productName === productName
+    );
+
+    console.log('Matched product:', product);
+
+    const itemsArray = this.invoiceForm.get('items') as FormArray;
+    const rowGroup = itemsArray.at(index) as FormGroup;
+
+    rowGroup.patchValue({
+      description: product?.description ?? ''
+    });
+
+    console.log(
+      'Row description:',
+      rowGroup.get('description')?.value
+    );
+  }
 
   onCompanyChange(event: Event) {
     const companyId = Number((event.target as HTMLSelectElement).value);
@@ -279,7 +338,7 @@ calculateTotals(): void {
     });
   }
 
- public getCustomerDetails() {
+  public getCustomerDetails() {
     this.invoiceService.getCustomerDetails()
       .subscribe({
         next: (response: any) => {
@@ -295,22 +354,22 @@ calculateTotals(): void {
   }
 
   onCustomerChange(event: Event) {
-  const customerId = Number((event.target as HTMLSelectElement).value);
+    const customerId = Number((event.target as HTMLSelectElement).value);
 
-  const customer = this.customerList.find(
-    (c: Customer) => c.id === customerId
-  );
+    const customer = this.customerList.find(
+      (c: Customer) => c.id === customerId
+    );
 
-  if (!customer) return;
+    if (!customer) return;
 
-  this.invoiceForm.patchValue({
-    customerName: customer.customerName,
-    email: customer.email,
-    phone: customer.phone,
-    gstNumber: customer.gstNumber,
-    billingAddress: customer.billingAddress
-  });
-}
+    this.invoiceForm.patchValue({
+      customerName: customer.customerName,
+      email: customer.email,
+      phone: customer.phone,
+      gstNumber: customer.gstNumber,
+      billingAddress: customer.billingAddress
+    });
+  }
 
 
   // ================= SUBMIT INVOICE =================
@@ -378,6 +437,8 @@ calculateTotals(): void {
       });
   }
 
+
+  // http://localhost:4200/#/invoice-management/generate-invoice
 
 
 }
