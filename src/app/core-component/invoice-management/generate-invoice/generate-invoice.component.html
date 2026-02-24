@@ -207,31 +207,31 @@
             <td class="fw-semibold">{{ i + 1 }}</td>
             
             <td style="min-width:220px;">
-<<<<<<< HEAD
               <!-- <input class="form-control form-control-sm mb-1"
-                                 formControlName="productName"
-                                 placeholder="Product Name"> -->
-            
-              <select class="form-select form-select-sm" formControlName="productName" (change)="onProductSelect($event, i)">
-                <option value="">-- Select Product --</option>
-                <option *ngFor="let product of productList" [value]="product.productName">
-                  {{ product.productName }}
-                </option>
-              </select>
-            
-              <textarea rows="1" class="form-control form-control-sm" formControlName="description" placeholder="Description">
-            </textarea>
-=======
-              <input class="form-control form-control-sm mb-1"
                      formControlName="productName"
                      placeholder="Iteam Name">
               <textarea rows="1"
                         class="form-control form-control-sm"
                         formControlName="description"
-                        placeholder="Description"></textarea>
+                        placeholder="Description"></textarea> -->
+
+                        <select class="form-select form-select-sm"
+        formControlName="productName"
+        (change)="onProductSelect($event, i)">
+  <option value="">-- Select Product --</option>
+  <option *ngFor="let product of productList"
+          [value]="product.productName">
+    {{ product.productName }}
+  </option>
+</select>
+
+<textarea rows="1"
+          class="form-control form-control-sm"
+          formControlName="description"
+          placeholder="Description">
+</textarea>
             </td>
 
->>>>>>> 8e39b98eab5a72deaedc663158ee1994410c126b
             <td>
               <input type="number" class="form-control form-control-sm text-end" formControlName="quantity"
                 (input)="calculateTotals()">
