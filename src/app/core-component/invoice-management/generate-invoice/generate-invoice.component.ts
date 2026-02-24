@@ -139,6 +139,7 @@ export class GenerateInvoiceComponent implements OnInit {
 
   onTaxTypeChange(index: number): void {
 
+<<<<<<< HEAD
     const item = this.items.at(index) as FormGroup;
     const taxType = item.get('taxType')?.value;
 
@@ -233,9 +234,82 @@ export class GenerateInvoiceComponent implements OnInit {
     }, { emitEvent: false });
 
   }
+=======
+  const item = this.items.at(index) as FormGroup;
+  const taxType = item.get('taxType')?.value;
 
+  if (taxType === 'IGST') {
+    item.patchValue({ cgstRate: 0, sgstRate: 0 });
+  }
 
+  if (taxType === 'CGST_SGST') {
+    item.patchValue({ igstRate: 0 });
+  }
 
+  this.calculateTotals();
+}
+
+calculateTotals(): void {
+
+  let subtotal = 0;
+  let totalTax = 0;
+
+  const discount = +this.invoiceForm.get('discount')?.value || 0;
+
+  this.items.controls.forEach(control => {
+
+    const item = control as FormGroup;
+
+    const rate = +item.get('rate')?.value || 0;
+    const qty = +item.get('quantity')?.value || 0;
+    const taxType = item.get('taxType')?.value;
+
+    const base = rate * qty;
+    subtotal += base;
+
+    let cgst = 0;
+    let sgst = 0;
+    let igst = 0;
+
+    const igstRate = +item.get('igstRate')?.value || 0;
+    const cgstRate = +item.get('cgstRate')?.value || 0;
+    const sgstRate = +item.get('sgstRate')?.value || 0;
+
+    if (taxType === 'IGST') {
+      igst = base * igstRate / 100;
+    }
+
+    if (taxType === 'CGST_SGST') {
+      cgst = base * cgstRate / 100;
+      sgst = base * sgstRate / 100;
+    }
+
+    const rowTax = cgst + sgst + igst;
+    totalTax += rowTax;
+
+    item.patchValue({
+      cgstAmount: cgst,
+      sgstAmount: sgst,
+      igstAmount: igst,
+      taxAmount: rowTax,
+      amount: base + rowTax
+    }, { emitEvent: false });
+
+  });
+
+  const grandTotal = subtotal + totalTax;
+
+  // 🔥 Your Required Formula
+  const finalTotal = grandTotal - discount;
+
+  this.invoiceForm.patchValue({
+    subtotal: subtotal,
+    taxAmount: totalTax,
+    totalAmount: finalTotal
+  }, { emitEvent: false });
+
+}
+>>>>>>> 8e39b98eab5a72deaedc663158ee1994410c126b
 
   syncDeliveryAddress(event: any): void {
 
@@ -327,7 +401,7 @@ export class GenerateInvoiceComponent implements OnInit {
 
       companyLogo: company.companyLogo,
       companyId: company.id,
-      companyName: company.companyName,
+      companyName: company.companyFirstName + ' ' + company.companyLastName,
       officeAddress: company.officeAddress,
       regAddress: company.regAddress,
       mobileNo: company.mobileNo,
