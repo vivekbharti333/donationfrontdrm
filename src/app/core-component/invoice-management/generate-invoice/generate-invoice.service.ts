@@ -112,7 +112,7 @@ export class GenerateInvoiceService {
     let request: InvoiceRequest = {
       payload: {
         requestFor: 'BYSUPERADMINID',
-        superadminId: '9220208888',
+        superadminId: '8800689752',
       }
     };
     return this.http.post<InvoiceRequest>(Constant.Site_Url + "getInvoiceHeaderList", request);
@@ -122,7 +122,7 @@ export class GenerateInvoiceService {
     let request: InvoiceRequest = {
       payload: {
         requestFor: 'BY_SUPERADMIN',
-        superadminId: '1',
+        superadminId: '8800689752',
       }
     };
     return this.http.post<InvoiceRequest>(Constant.Site_Url + "getProductDetails", request);
