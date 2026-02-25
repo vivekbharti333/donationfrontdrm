@@ -30,7 +30,7 @@ export class GenerateInvoiceService {
       payload: {
 
         // ===== CORE CONTEXT =====
-        superadminId: '6202203047',
+        superadminId: this.loginUser['superadminId'],
         companyId: invoiceDetails.companyId,
 
         companyLogo: invoiceDetails.companyLogo,
@@ -59,7 +59,7 @@ export class GenerateInvoiceService {
         // ===== AMOUNTS =====
         subtotal: invoiceDetails.subtotal ?? 0,
         discount: invoiceDetails.discount ?? 0,
-        taxAmount: invoiceDetails.taxAmount ?? 0,
+        totalTaxAmount: invoiceDetails.taxAmount ?? 0,
         totalAmount: invoiceDetails.totalAmount ?? 0,
 
         // ===== PAYMENT & STATUS =====
@@ -101,8 +101,8 @@ export class GenerateInvoiceService {
     const request: any = {
       payload: {
         requestFor: 'BY_SUPERADMIN',
-        superadminId: '1234567890',
-        // superadminId: this.loginUser['superadminId'],
+        // superadminId: '1234567890',
+        superadminId: this.loginUser['superadminId'],
       },
     };
     return this.http.post<any>(Constant.Site_Url + 'getCustomerDetails', request);
@@ -112,7 +112,7 @@ export class GenerateInvoiceService {
     let request: InvoiceRequest = {
       payload: {
         requestFor: 'BYSUPERADMINID',
-        superadminId: '8800689752',
+        superadminId: this.loginUser['superadminId'],
       }
     };
     return this.http.post<InvoiceRequest>(Constant.Site_Url + "getInvoiceHeaderList", request);
@@ -122,7 +122,7 @@ export class GenerateInvoiceService {
     let request: InvoiceRequest = {
       payload: {
         requestFor: 'BY_SUPERADMIN',
-        superadminId: '8800689752',
+        superadminId: this.loginUser['superadminId'],
       }
     };
     return this.http.post<InvoiceRequest>(Constant.Site_Url + "getProductDetails", request);

@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
 import { MessageService } from 'primeng/api';
 import { GenerateInvoiceService } from './generate-invoice.service';
+import { ToastModule } from 'primeng/toast';
+
 
 export interface Customer {
   id: number;
@@ -374,15 +376,22 @@ calculateTotals(): void {
 
             // ===== BUSINESS SUCCESS =====
             if (respPayload?.respCode === '200') {
-              const pdfUrl = `http://localhost/mycrm//download/invoice?invoiceNumber=DFL-02/0104&superadminId=1234567890`;
+              // const pdfUrl = `http://localhost/mycrm//download/invoice?invoiceNumber='+this.invoiceForm['invoiceNumber']+'&superadminId=8800689752`;
+              // window.open(pdfUrl, '_blank');
 
-              window.open(pdfUrl, '_blank');
+              const { invoiceNumber } = this.invoiceForm.getRawValue();
 
-              this.messageService.add({
-                severity: 'success',
-                summary: 'Success',
-                detail: respPayload.respCode || respPayload.respMesg
-              });
+              const url = `http://localhost/mycrm/download/invoice?invoiceNumber=${encodeURIComponent(invoiceNumber)}&superadminId=8800689752`;
+              window.open(url, '_blank');
+
+              console.log(url)
+
+               this.messageService.add({ severity: 'success', summary: 'Success', detail: response['payload']['respMesg'] });
+              // this.messageService.add({
+              //   severity: 'success',
+              //   summary: 'Success',
+              //   detail: respPayload.respCode || respPayload.respMesg
+              // });
 
             } else {
               // ===== BUSINESS FAILURE =====
