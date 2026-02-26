@@ -1,66 +1,67 @@
+/* ========================= */
+/* GENERAL LAYOUT */
+/* ========================= */
+
 .invoice-container {
   max-width: 1100px;
 }
 
 .invoice-header {
   background: linear-gradient(135deg, #f8f9ff, #ffffff);
+  position: relative;
 }
 
+/* Cards */
+.card {
+  border-radius: 12px;
+}
+
+/* Buttons */
+.btn,
+.btn-lg {
+  border-radius: 8px;
+}
+
+/* Inputs */
+input, textarea, select {
+  border-radius: 6px !important;
+}
+
+/* Divider */
+hr {
+  margin: 1rem 0;
+}
+
+/* Bank box */
+.bank-box {
+  background: linear-gradient(135deg, #f29304, #ffffff);
+}
+
+/* Card header */
+.card-header {
+  border-bottom: 1px solid #eee;
+}
+
+/* Labels */
+.form-label {
+  font-weight: 500;
+}
+
+/* Table */
 .table th {
   font-size: 13px;
-  // text-transform: uppercase;
   letter-spacing: 0.5px;
+  white-space: nowrap;
 }
 
 .table td {
   vertical-align: middle;
 }
 
-.card {
-  border-radius: 12px;
-}
-
-.btn {
-  border-radius: 8px;
-}
-
-input, textarea, select {
-  border-radius: 6px !important;
-}
-
-hr {
-  margin: 1rem 0;
-}
-.bank-box {
-  background: linear-gradient(135deg, #f29304, #ffffff);
-}
-
-.card-header {
-  border-bottom: 1px solid #eee;
-}
-
-.form-label {
-  font-weight: 500;
-}
-
-.table th {
-  font-size: 13px;
-  letter-spacing: 0.5px;
-}
-
-.btn-lg {
-  border-radius: 8px;
-}
-
-/* ===== COMPACT MODE ===== */
-
+/* Compact card */
 .compact-card .card-header {
   font-size: 14px;
   padding: 6px 12px;
-}
-
-.compact-box {
-  background: #fafbfc;
 }
 
 .compact-card .form-label {
@@ -87,39 +88,106 @@ hr {
   height: 14px;
 }
 
-/* ===== COMPACT MODE ===== */
+/* ========================= */
+/* DATE INPUT */
+/* ========================= */
 
-.compact-card .card-header {
-  font-size: 14px;
-  padding: 6px 12px;
-}
-
-.compact-box {
-  background: #fafbfc;
-}
-
-.compact-card .form-label {
-  font-size: 12px;
-}
-
-.compact-card input,
-.compact-card textarea,
-.compact-card select {
-  padding: 4px 8px;
-  font-size: 13px;
-}
-
-.compact-card textarea {
-  resize: none;
-}
-
-.compact-card h6 {
-  font-size: 13px;
-}
-
+/* Desktop */
 .date-input {
   width: 150px;
-  display: inline-block;
 }
 
+/* Mobile bigger */
+@media (max-width: 768px) {
+  .date-input {
+    width: 200px;
+  }
+}
+
+/* Very small */
+@media (max-width: 576px) {
+  .date-input {
+    width: 220px;
+  }
+}
+
+/* ========================= */
+/* INVOICE HEADER RIGHT FIX */
+/* ========================= */
+
+.invoice-header h2 {
+  text-align: right;
+  margin-right: 0;
+}
+
+/* Align invoice number exactly under heading */
+.invoice-header .editable-field {
+  display: block;
+  width: fit-content;
+  margin-left: auto !important;
+  text-align: right;
+}
+
+/* Remove unwanted spacing */
+.invoice-header .text-muted {
+  margin-right: 0 !important;
+}
+
+/* ========================= */
+/* MOBILE RESPONSIVE */
+/* ========================= */
+
+@media (max-width: 768px) {
+
+  .invoice-container {
+    padding: 0 10px;
+  }
+
+  /* Keep header RIGHT on mobile */
+  .invoice-header .text-end {
+    text-align: right !important;
+    margin-top: 0;
+  }
+
+  /* Customer stacking */
+  .compact-card .row {
+    flex-direction: column;
+  }
+
+  .border-end {
+    border-right: none !important;
+  }
+
+  /* Table scroll */
+  .table-responsive {
+    overflow-x: auto;
+  }
+
+  /* Summary full width */
+  .row.justify-content-end .col-md-5 {
+    width: 100%;
+  }
+
+  /* Button full width */
+  .btn-lg {
+    width: 100%;
+  }
+
+  /* Remove button size */
+  .btn-outline-danger {
+    padding: 6px 10px;
+    font-size: 14px;
+  }
+}
+
+/* Extra small */
+@media (max-width: 576px) {
+  h2 {
+    font-size: 20px;
+  }
+
+  .card-body {
+    padding: 12px !important;
+  }
+}
 

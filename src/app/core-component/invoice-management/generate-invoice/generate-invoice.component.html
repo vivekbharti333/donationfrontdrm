@@ -1,32 +1,27 @@
 <p-toast></p-toast>
 
-<form [formGroup]="invoiceForm"
-      (ngSubmit)="submitInvoice()"
-      class="invoice-container container my-4">
+<form [formGroup]="invoiceForm" (ngSubmit)="submitInvoice()" class="invoice-container container my-4">
 
   <!-- ================= INVOICE + COMPANY (COMBINED) ================= -->
-<div class="card shadow-sm border-0 mb-4 invoice-header">
-  <div class="card-body">
+  <div class="card shadow-sm border-0 mb-4 invoice-header">
+    <div class="card-body">
 
-    <div class="row">
+      <div class="row">
 
-      <!-- LEFT SIDE → COMPANY DETAILS -->
-      <div class="col-md-7">
-        <!-- Company Dropdown -->
-         <div class="mb-3">
-          <select class="form-select form-select-sm"
-                  formControlName="companyId"
-                  (change)="onCompanyChange($event)">
-            <option value="">-- Select Company --</option>
-            <option *ngFor="let invoiceHeader of invoiceHeaderList"
-                    [value]="invoiceHeader.id">
-              {{ invoiceHeader.companyFirstName }}
-              {{ invoiceHeader.companyLastName }}
-            </option>
-          </select>
-        </div> 
+        <!-- LEFT SIDE → COMPANY DETAILS -->
+        <div class="col-md-7">
+          <!-- Company Dropdown -->
+          <div class="mb-3">
+            <select class="form-select form-select-sm" formControlName="companyId" (change)="onCompanyChange($event)">
+              <option value="">-- Select Company --</option>
+              <option *ngFor="let invoiceHeader of invoiceHeaderList" [value]="invoiceHeader.id">
+                {{ invoiceHeader.companyFirstName }}
+                {{ invoiceHeader.companyLastName }}
+              </option>
+            </select>
+          </div>
 
-          <!-- Company Info --> 
+          <!-- Company Info -->
           <input type="text" formControlName="companyName"
             class="form-control form-control-sm border-0 fw-bold p-0 mb-2" placeholder="Company Name" />
           <div class="row small">
@@ -34,147 +29,137 @@
                 class="form-control form-control-sm border-0 p-0 d-inline w-auto" placeholder="GST Number" /> </div>
             <div class="col-md-6 mb-1"> <strong>Mobile: </strong> <input type="text" formControlName="mobileNo"
                 class="form-control form-control-sm border-0 p-0 d-inline w-auto" placeholder="Mobile Number" /> </div>
-            <div class="col-md-12 mb-1"> <strong>Office Address: </strong> <textarea rows="2" formControlName="officeAddress"
-                class="form-control form-control-sm border-0 p-0" placeholder="Office Address"></textarea> </div>
-            <div class="col-md-12 mb-1"> <strong>Registered Address: </strong> <textarea rows="2" formControlName="regAddress"
-                class="form-control form-control-sm border-0 p-0" placeholder="Registered Address"></textarea> </div>
+            <div class="col-md-12 mb-1"> <strong>Office Address: </strong> <textarea rows="2"
+                formControlName="officeAddress" class="form-control form-control-sm border-0 p-0"
+                placeholder="Office Address"></textarea> </div>
+            <div class="col-md-12 mb-1"> <strong>Registered Address: </strong> <textarea rows="2"
+                formControlName="regAddress" class="form-control form-control-sm border-0 p-0"
+                placeholder="Registered Address"></textarea> </div>
             <div class="col-md-6 mb-1"> <strong>Website: </strong> <input type="text" formControlName="website"
                 class="form-control form-control-sm border-0 p-0 d-inline w-auto" placeholder="Website" /> </div>
             <div class="col-md-6 mb-1"> <strong>Email: </strong> <input type="email" formControlName="emailId"
                 class="form-control form-control-sm border-0 p-0 d-inline w-auto" placeholder="Email" /> </div>
           </div>
 
+        </div>
+
+        <!-- RIGHT SIDE → INVOICE HEADER -->
+        <div class="col-md-5 text-end">
+
+          <h2 class="fw-bold text-primary mb-1">INVOICE</h2>
+
+          <div class="text-muted mb-3 d-flex justify-content-end align-items-center me-3">
+
+            <input type="text" formControlName="invoiceNumber"
+              class="form-control form-control-sm border-0 p-0 editable-field text-end w-auto "
+              style="min-width: 120px;" placeholder="#INV-001">
+
           </div>
 
-      <!-- RIGHT SIDE → INVOICE HEADER -->
-      <div class="col-md-5 text-end">
 
-        <h2 class="fw-bold text-primary mb-1">INVOICE</h2>
 
-        <div class="text-muted mb-3 d-flex justify-content-end align-items-center me-3">
+          <div class="d-flex justify-content-end align-items-center mb-2 small">
+            <span class="text-muted me-2">Date : &nbsp;</span>
+            <input type="date" class="form-control form-control-sm text-end date-input" formControlName="invoiceDate">
+          </div>
 
-          <input type="text"
-                formControlName="invoiceNumber"
-                class="form-control form-control-sm border-0 p-0 editable-field text-end w-auto "
-                style="min-width: 120px;"
-                placeholder="#INV-001">
+          <div class="d-flex justify-content-end align-items-center small">
+            <span class="text-muted me-2">Due Date : &nbsp;</span>
+            <input type="date" class="form-control form-control-sm text-end date-input" formControlName="dueDate">
+          </div>
+
 
         </div>
-
-
-
-        <div class="d-flex justify-content-end align-items-center mb-2 small">
-          <span class="text-muted me-2">Date :</span>
-          <input type="date" class="form-control form-control-sm text-end date-input" formControlName="invoiceDate">
-        </div>
-        
-        <div class="d-flex justify-content-end align-items-center small">
-          <span class="text-muted me-2">Due Date :</span>
-          <input type="date" class="form-control form-control-sm text-end date-input" formControlName="dueDate">
-        </div>
-
 
       </div>
 
     </div>
-
   </div>
-</div>
 
 
   <!-- ================= CUSTOMER SECTION (COMPACT) ================= -->
-<div class="card shadow-sm border-0 mb-3 compact-card">
-  <div class="card-body p-3">
+  <div class="card shadow-sm border-0 mb-3 compact-card">
+    <div class="card-body p-3">
 
-    <!-- Customer Dropdown -->
-    <div class="mb-3">
-      <label class="form-label small text-muted mb-1">
-        Select Customer
-      </label>
-
-      <select class="form-select form-select-sm"
-              formControlName="customerId"
-              (change)="onCustomerChange($event)">
-        <option value="">-- Select Customer --</option>
-        <option *ngFor="let customer of customerList"
-                [value]="customer.id">
-          {{ customer.customerName }}
-        </option>
-      </select>
-    </div>
-
-    <div class="row align-items-stretch">
-
-  <!-- BILL TO -->
-  <div class="col-md-6 pe-4 border-end">
-
-    <h6 class="fw-semibold mb-2 text-primary small"> Bill To </h6>
-
-    <input type="text"
-           formControlName="customerName"
-           class="form-control form-control-sm border-0 fw-bold p-0 mb-2 editable-field"
-           placeholder="Customer Name">
-
-    <div class="small">
-
-      <div class="mb-1 d-flex">
-        <strong class="me-2">GSTIN:</strong>
-        <textarea rows="1"
-                  formControlName="customerGstNumber"
-                  class="form-control form-control-sm border-0 p-0 editable-field flex-grow-1"
-                  placeholder="Gst Number"></textarea>
-      </div>
-
-      <div class="mb-1 d-flex">
-        <strong class="me-2">Address:</strong>
-        <textarea rows="1"
-                  formControlName="billingAddress"
-                  class="form-control form-control-sm border-0 p-0 editable-field flex-grow-1"
-                  placeholder="Billing Address"></textarea>
-      </div>
-    </div>
-  </div>
-
-  <!-- DELIVERY TO -->
-  <div class="col-md-6 ps-4">
-
-    <div class="d-flex justify-content-between align-items-center mb-2">
-      <h6 class="fw-semibold text-primary small mb-0"> Delivery To </h6>
-
-      <div class="form-check m-0">
-        <input class="form-check-input form-check-input-sm"
-               type="checkbox"
-               id="sameAddress"
-               (change)="syncDeliveryAddress($event)">
-        <label class="form-check-label small ms-1">
-          Same as Billing
+      <!-- Customer Dropdown -->
+      <div class="mb-3">
+        <label class="form-label small text-muted mb-1">
+          Select Customer
         </label>
-      </div>
-    </div>
 
-    <div class="small">
-
-      <div class="mb-1 d-flex">
-        <strong class="me-2">Address:</strong>
-        <textarea rows="1"
-                  formControlName="deliveryAddresses"
-                  class="form-control form-control-sm border-0 p-0 editable-field flex-grow-1"
-                  placeholder="Delivery Address"></textarea>
+        <select class="form-select form-select-sm" formControlName="customerId" (change)="onCustomerChange($event)">
+          <option value="">-- Select Customer --</option>
+          <option *ngFor="let customer of customerList" [value]="customer.id">
+            {{ customer.customerName }}
+          </option>
+        </select>
       </div>
 
+      <div class="row align-items-stretch">
+
+        <!-- BILL TO -->
+        <div class="col-md-6 pe-4 border-end">
+
+          <h6 class="fw-semibold mb-2 text-primary small"> Bill To </h6>
+
+          <input type="text" formControlName="customerName"
+            class="form-control form-control-sm border-0 fw-bold p-0 mb-2 editable-field" placeholder="Customer Name">
+
+          <div class="small">
+
+            <div class="mb-1 d-flex">
+              <strong class="me-2">GSTIN:</strong>
+              <textarea rows="1" formControlName="customerGstNumber"
+                class="form-control form-control-sm border-0 p-0 editable-field flex-grow-1"
+                placeholder="Gst Number"></textarea>
+            </div>
+
+            <div class="mb-1 d-flex">
+              <strong class="me-2">Address:</strong>
+              <textarea rows="1" formControlName="billingAddress"
+                class="form-control form-control-sm border-0 p-0 editable-field flex-grow-1"
+                placeholder="Billing Address"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- DELIVERY TO -->
+        <div class="col-md-6 ps-4">
+
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <h6 class="fw-semibold text-primary small mb-0"> Place of Supply </h6>
+
+            <div class="form-check m-0">
+              <input class="form-check-input form-check-input-sm" type="checkbox" id="sameAddress"
+                (change)="syncDeliveryAddress($event)">
+              <label class="form-check-label small ms-1">
+                Same as Billing
+              </label>
+            </div>
+          </div>
+
+          <div class="small">
+
+            <div class="mb-1 d-flex">
+              <strong class="me-2">Address:</strong>
+              <textarea rows="1" formControlName="deliveryAddresses"
+                class="form-control form-control-sm border-0 p-0 editable-field flex-grow-1"
+                placeholder="Delivery Address"></textarea>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
     </div>
-
   </div>
 
-</div>
 
 
-  </div>
-</div>
-
-
-
- <!-- ================= ITEMS ================= -->
+<!-- ================= ITEMS ================= -->
 <div class="card shadow-sm border-0 mb-4">
   <div class="card-header bg-white fw-semibold d-flex justify-content-between align-items-center">
     <span>Invoice Items</span>
@@ -184,7 +169,9 @@
   </div>
 
   <div class="card-body p-0" formArrayName="items">
-    <div class="table-responsive">
+
+    <!-- ================= DESKTOP / TABLET TABLE ================= -->
+    <div class="table-responsive d-none d-md-block">
       <table class="table align-middle mb-0">
         <thead class="table-light">
           <tr>
@@ -204,37 +191,29 @@
           <tr *ngFor="let item of items.controls; let i = index"
               [formGroupName]="i">
 
-            <td class="fw-semibold">{{ i + 1 }}</td>
-            
+            <td>{{ i + 1 }}</td>
+
+
             <td style="min-width:220px;">
-              <!-- <input class="form-control form-control-sm mb-1"
-                     formControlName="productName"
-                     placeholder="Iteam Name">
-              <textarea rows="1"
-                        class="form-control form-control-sm"
+              <select class="form-select form-select-sm" formControlName="productName" (change)="onProductSelect($event, i)">
+                <option value="">-- Select Item --</option>
+                <option *ngFor="let product of productList"
+                        [value]="product.productName">
+                  {{ product.productName }}
+                </option>
+              </select>
+
+              <textarea rows="2"
+                        class="form-control form-control-sm mt-1"
                         formControlName="description"
-                        placeholder="Description"></textarea> -->
-
-                        <select class="form-select form-select-sm"
-        formControlName="productName"
-        (change)="onProductSelect($event, i)">
-  <option value="">-- Select Product --</option>
-  <option *ngFor="let product of productList"
-          [value]="product.productName">
-    {{ product.productName }}
-  </option>
-</select>
-
-<textarea rows="1"
-          class="form-control form-control-sm"
-          formControlName="description"
-          placeholder="Description">
-</textarea>
+                        placeholder="Description"></textarea>
             </td>
 
             <td>
-              <input type="number" class="form-control form-control-sm text-end" formControlName="quantity"
-                (input)="calculateTotals()">
+              <input type="number"
+                     class="form-control form-control-sm text-end"
+                     formControlName="quantity"
+                     (input)="calculateTotals()">
             </td>
 
             <td>
@@ -243,6 +222,7 @@
                      formControlName="rate"
                      (input)="calculateTotals()">
             </td>
+
             <td>
               <select class="form-select form-select-sm"
                       formControlName="taxType"
@@ -253,7 +233,6 @@
               </select>
             </td>
 
-            <!-- Tax Rate Column -->
             <td>
               <ng-container *ngIf="item.get('taxType')?.value === 'IGST'">
                 <input type="number"
@@ -279,21 +258,9 @@
               </ng-container>
             </td>
 
-            <!-- <td class="text-end">
-              {{
-                (
-                  (+item.get('cgstAmount')?.value || 0) +
-                  (+item.get('sgstAmount')?.value || 0) +
-                  (+item.get('igstAmount')?.value || 0)
-                ) | number:'1.2-2'
-              }}
-            </td> -->
-
             <td class="text-end">
-  {{ item.get('taxAmount')?.value | number:'1.2-2' }}
-</td>
-
-
+              {{ item.get('taxAmount')?.value | number:'1.2-2' }}
+            </td>
 
             <td>
               <input class="form-control form-control-sm text-end fw-semibold"
@@ -306,11 +273,108 @@
                       class="btn btn-outline-danger btn-sm"
                       (click)="removeItem(i)">✕</button>
             </td>
-
           </tr>
         </tbody>
       </table>
     </div>
+
+    <!-- ================= MOBILE CARD VIEW ================= -->
+    <div class="d-block d-md-none">
+
+      <div *ngFor="let item of items.controls; let i = index" [formGroupName]="i" class="item-card mb-3 border rounded p-3">
+
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <strong>Item {{ i + 1 }}</strong>
+          <button type="button"
+                  class="btn btn-danger btn-sm"
+                  (click)="removeItem(i)">✕</button>
+        </div>
+
+        <div class="mb-2">
+          <label class="small text-muted">Product</label>
+          <select class="form-select form-select-sm"
+                  formControlName="productName"
+                  (change)="onProductSelect($event, i)">
+            <option value="">-- Select Product --</option>
+            <option *ngFor="let product of productList"
+                    [value]="product.productName">
+              {{ product.productName }}
+            </option>
+          </select>
+        </div>
+
+        <div class="mb-2">
+          <label class="small text-muted">Description</label>
+          <textarea rows="2"
+                    class="form-control form-control-sm"
+                    formControlName="description"></textarea>
+        </div>
+
+        <div class="row g-2 mb-2">
+          <div class="col-6">
+            <label class="small text-muted">Qty</label>
+            <input type="number"
+                   class="form-control form-control-sm"
+                   formControlName="quantity"
+                   (input)="calculateTotals()">
+          </div>
+
+          <div class="col-6">
+            <label class="small text-muted">Rate</label>
+            <input type="number"
+                   class="form-control form-control-sm"
+                   formControlName="rate"
+                   (input)="calculateTotals()">
+          </div>
+        </div>
+
+        <div class="mb-2">
+          <label class="small text-muted">Tax Type</label>
+          <select class="form-select form-select-sm"
+                  formControlName="taxType"
+                  (change)="onTaxTypeChange(i)">
+            <option value="">No Tax</option>
+            <option value="IGST">IGST</option>
+            <option value="CGST_SGST">CGST + SGST</option>
+          </select>
+        </div>
+
+        <div class="mb-2" *ngIf="item.get('taxType')?.value === 'IGST'">
+          <label class="small text-muted">IGST %</label>
+          <input type="number"
+                 class="form-control form-control-sm"
+                 formControlName="igstRate"
+                 (input)="calculateTotals()">
+        </div>
+
+        <div class="row g-2 mb-2"
+             *ngIf="item.get('taxType')?.value === 'CGST_SGST'">
+          <div class="col-6">
+            <label class="small text-muted">CGST %</label>
+            <input type="number"
+                   class="form-control form-control-sm"
+                   formControlName="cgstRate"
+                   (input)="calculateTotals()">
+          </div>
+          <div class="col-6">
+            <label class="small text-muted">SGST %</label>
+            <input type="number"
+                   class="form-control form-control-sm"
+                   formControlName="sgstRate"
+                   (input)="calculateTotals()">
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-between">
+          <span class="fw-semibold">Amount</span>
+          <span class="fw-bold">
+            ₹ {{ item.get('amount')?.value }}
+          </span>
+        </div>
+
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -338,10 +402,8 @@
 
           <div class="d-flex justify-content-between align-items-center mb-2">
             <span class="text-muted">Discount</span>
-            <input type="number"
-                   class="form-control form-control-sm text-end w-50"
-                   formControlName="discount"
-                   (input)="calculateTotals()">
+            <input type="number" class="form-control form-control-sm text-end w-50" formControlName="discount"
+              (input)="calculateTotals()">
           </div>
 
           <hr>
@@ -360,88 +422,82 @@
   </div>
 
   <!-- ================= PAYMENT DETAILS ================= -->
-<div class="card shadow-sm border-0 mb-4">
-  <div class="card-header bg-white fw-semibold">
-    Payment Details
-  </div>
-
-  <div class="card-body">
-
-    <div class="row">
-
-      <!-- Payment Mode -->
-      <div class="col-md-4 mb-3">
-        <label class="form-label small text-muted">Payment Mode</label>
-        <select class="form-select"
-                formControlName="paymentMode">
-          <option value="ONLINE">Online</option>
-          <option value="CASH">Cash</option>
-          <option value="CHEQUE">Cheque</option>
-          <option value="UPI">UPI</option>
-        </select>
-      </div>
-
-      <!-- Transaction ID -->
-      <div class="col-md-4 mb-3">
-        <label class="form-label small text-muted">Transaction ID</label>
-        <input type="text"
-               class="form-control"
-               formControlName="transactionId"
-               placeholder="Enter Transaction ID">
-      </div>
-
-      <!-- Payment Status -->
-      <div class="col-md-4 mb-3">
-        <label class="form-label small text-muted">Payment Status</label>
-        <select class="form-select"
-                formControlName="paymentStatus">
-          <option value="UNPAID">Unpaid</option>
-          <option value="PAID">Paid</option>
-          <option value="PARTIAL">Partial</option>
-        </select>
-      </div>
-
+  <div class="card shadow-sm border-0 mb-4">
+    <div class="card-header bg-white fw-semibold">
+      Payment Details
     </div>
 
-    <hr>
+    <div class="card-body">
 
-    <!-- Bank Details Box -->
-    <div class="bank-box p-3 rounded bg-light border">
+      <div class="row">
 
-      <h6 class="fw-semibold mb-3 text-secondary">
-        Bank Details
-      </h6>
-
-      <div class="row small">
-
-        <div class="col-md-6 mb-2">
-          <strong>Account Name:</strong> Datfuslab Technologies Pvt. Ltd.
+        <!-- Payment Mode -->
+        <div class="col-md-4 mb-3">
+          <label class="form-label small text-muted">Payment Mode</label>
+          <select class="form-select" formControlName="paymentMode">
+            <option value="ONLINE">Online</option>
+            <option value="CASH">Cash</option>
+            <option value="CHEQUE">Cheque</option>
+            <option value="UPI">UPI</option>
+          </select>
         </div>
 
-        <div class="col-md-6 mb-2">
-          <strong>Bank:</strong> HDFC Bank
+        <!-- Transaction ID -->
+        <div class="col-md-4 mb-3">
+          <label class="form-label small text-muted">Transaction ID</label>
+          <input type="text" class="form-control" formControlName="transactionId" placeholder="Enter Transaction ID">
         </div>
 
-        <div class="col-md-6 mb-2">
-          <strong>Account Number:</strong> 123456789012
+        <!-- Payment Status -->
+        <div class="col-md-4 mb-3">
+          <label class="form-label small text-muted">Payment Status</label>
+          <select class="form-select" formControlName="paymentStatus">
+            <option value="UNPAID">Unpaid</option>
+            <option value="PAID">Paid</option>
+            <option value="PARTIAL">Partial</option>
+          </select>
         </div>
 
-        <div class="col-md-6 mb-2">
-          <strong>IFSC Code:</strong> HDFC0001234
+      </div>
+
+      <hr>
+
+      <!-- Bank Details Box -->
+      <div class="bank-box p-3 rounded bg-light border">
+
+        <h6 class="fw-semibold mb-3 text-secondary">
+          Bank Details
+        </h6>
+
+        <div class="row small">
+
+          <div class="col-md-6 mb-2">
+            <strong>Account Name:</strong> Datfuslab Technologies Pvt. Ltd.
+          </div>
+
+          <div class="col-md-6 mb-2">
+            <strong>Bank:</strong> HDFC Bank
+          </div>
+
+          <div class="col-md-6 mb-2">
+            <strong>Account Number:</strong> 123456789012
+          </div>
+
+          <div class="col-md-6 mb-2">
+            <strong>IFSC Code:</strong> HDFC0001234
+          </div>
+
         </div>
 
       </div>
 
     </div>
-
   </div>
-</div>
 
 
   <!-- ================= BUTTON ================= -->
   <div class="text-end">
-    <button class="btn btn-success btn-lg px-4 shadow-sm"
-            type="submit">
+    <button class="btn btn-success btn-lg px-4 shadow-sm" type="submit">
       Generate Invoice
     </button>
   </div>

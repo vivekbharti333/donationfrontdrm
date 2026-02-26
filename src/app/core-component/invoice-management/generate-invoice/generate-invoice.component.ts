@@ -88,7 +88,7 @@ export class GenerateInvoiceComponent implements OnInit {
 
       invoiceNumber: ['INV-001', Validators.required],
       invoiceDate: [today],
-      dueDate: [''],
+      dueDate: [today],
 
       subtotal: [0],
       discount: [0],
