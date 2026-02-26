@@ -8,6 +8,8 @@ import { sharedModule } from 'src/app/shared/shared.module';
 import { InvoiceManagementComponent } from './invoice-management.component';
 import { GenerateInvoiceComponent } from './generate-invoice/generate-invoice.component';
 import { InvoiceListComponent } from './invoice-list/invoice-list.component';
+import { CustomerDetailsComponent } from './customer-details/customer-details.component';
+import { ItemDetailsComponent } from './item-details/item-details.component';
 import { InvoiceManagementRoutingModule } from './invoice-management-routing.module';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatTabsModule} from '@angular/material/tabs';
@@ -22,7 +24,9 @@ import {NgxPaginationModule} from 'ngx-pagination';
   declarations: [
     InvoiceManagementComponent,
     GenerateInvoiceComponent,
-    InvoiceListComponent
+    InvoiceListComponent,
+    CustomerDetailsComponent,
+    ItemDetailsComponent
   ],
   imports: [
     InvoiceManagementRoutingModule,

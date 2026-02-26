@@ -4,6 +4,8 @@ import { CommonModule } from '@angular/common';
 import { InvoiceManagementComponent } from './invoice-management.component';
 import { GenerateInvoiceComponent } from './generate-invoice/generate-invoice.component';
 import { InvoiceListComponent } from './invoice-list/invoice-list.component';
+import { CustomerDetailsComponent } from './customer-details/customer-details.component';
+import { ItemDetailsComponent } from './item-details/item-details.component';
 
 const routes: Routes = [
   {
@@ -17,6 +19,14 @@ const routes: Routes = [
       {
         path: 'invoice-list',
         component: InvoiceListComponent,
+      },
+      {
+        path: 'customer-details',
+        component: CustomerDetailsComponent,
+      },
+      {
+        path: 'item-details',
+        component: ItemDetailsComponent,
       },
     ],
   },

@@ -250,6 +250,36 @@ export class SidebarService {
           ],
         },
         {
+          menuValue: 'Customer Management',
+          hasSubRoute: true,
+          showSubRoute: false,
+          icon: 'users',
+          // base1: 'usermang',
+          subMenus: [
+            {
+              menuValue: 'Customer Details',
+              route: routes.customerDetails,
+              permission: 'customer-details',
+            }, 
+           
+          ],
+        },
+        {
+          menuValue: 'Item Management',
+          hasSubRoute: true,
+          showSubRoute: false,
+          icon: 'users',
+          // base1: 'usermang',
+          subMenus: [
+            {
+              menuValue: 'Item Details',
+              route: routes.itemDetails,
+              permission: 'item-details',
+            }, 
+           
+          ],
+        },
+        {
           menuValue: 'Lead Management',
           hasSubRoute: true,
           showSubRoute: false,

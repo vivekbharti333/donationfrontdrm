@@ -1104,5 +1104,11 @@ export class routes {
   public static get invoiceList(): string {
     return this.invoiceManagement + '/invoice-list';
   }
+  public static get customerDetails(): string {
+    return this.invoiceManagement + '/customer-details';
+  }
+  public static get itemDetails(): string {
+    return this.invoiceManagement + '/item-details';
+  }
   // core pages child routes *ends*
 }
