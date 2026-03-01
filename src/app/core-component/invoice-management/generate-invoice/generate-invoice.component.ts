@@ -283,7 +283,8 @@ calculateTotals(): void {
     const rowGroup = itemsArray.at(index) as FormGroup;
 
     rowGroup.patchValue({
-      description: product?.description ?? ''
+      description: product?.description ?? '',
+      rate: product?.rate ?? ''
     });
 
     console.log(
@@ -345,7 +346,7 @@ calculateTotals(): void {
       customerName: customer.customerName,
       email: customer.email,
       phone: customer.phone,
-      gstNumber: customer.gstNumber,
+      customerGstNumber: customer.gstNumber,
       billingAddress: customer.billingAddress
     });
   }
@@ -376,6 +377,7 @@ calculateTotals(): void {
 
             // ===== BUSINESS SUCCESS =====
             if (respPayload?.respCode === '200') {
+              // const pdfUrl = 'https://datfuslab.in/drmapinew//download/invoice?invoiceNumber=DFLT-0303/26/001&superadminId=8800689752';
               // const pdfUrl = `http://localhost/mycrm//download/invoice?invoiceNumber='+this.invoiceForm['invoiceNumber']+'&superadminId=8800689752`;
               // window.open(pdfUrl, '_blank');
 
