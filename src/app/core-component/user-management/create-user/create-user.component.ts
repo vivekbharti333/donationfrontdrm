@@ -243,7 +243,7 @@ onPermissionChange(event: any) {
   }
 
   saveUserDetails() {
-    alert('Enter here')
+    // alert('Enter here')
     this.userManagementService.saveUserDetails(this.addUserForm.value)
       .subscribe({
         next: (response: any) => {
