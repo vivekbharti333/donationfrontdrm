@@ -73,7 +73,7 @@ export class CreateUserComponent {
   createForms() {
     this.addUserForm = this.fb.group({
       firstName: ['', [Validators.required, Validators.pattern('^[A-Za-z]+(?:[ .][A-Za-z]+)*$')]],
-      astName: ['', [Validators.required, Validators.pattern('^[A-Za-z]+(?:[ .][A-Za-z]+)*$')]],
+      lastName: ['', [Validators.required, Validators.pattern('^[A-Za-z]+(?:[ .][A-Za-z]+)*$')]],
       roleType: [''],
       createdBy: [''],
       mobileNo: ['', [Validators.required, Validators.pattern('^[0-9]*$')]],
@@ -243,6 +243,7 @@ onPermissionChange(event: any) {
   }
 
   saveUserDetails() {
+    alert('Enter here')
     this.userManagementService.saveUserDetails(this.addUserForm.value)
       .subscribe({
         next: (response: any) => {
