@@ -13,4 +13,29 @@ table {
     background-color: #f4f4f4;
   }
 
+  .stat {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* label column (UPI, CASH...) */
+.stat-label {
+  width: 80px;   /* ✅ FIXED WIDTH */
+  font-weight: 500;
+}
+
+/* value column */
+.stat-value {
+  flex: 1;
+}
+
+/////////////////
+  .mobile-dashboard .card {
+  transition: all 0.2s ease;
+}
+
+.mobile-dashboard .card:active {
+  transform: scale(0.98);
+}
   

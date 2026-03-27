@@ -62,6 +62,10 @@ export class SalesDashboardComponent {
   @ViewChild('chart') chart!: ChartComponent;
   public chartOptionsOne: Partial<ChartOptions>;
 
+  chartData: any[] = [];
+totalAmount = 0;
+chartStyle = '';
+
 
   public username!:string;
   public loginUser: any;
@@ -152,25 +156,119 @@ export class SalesDashboardComponent {
 
   ngOnInit() {
 
+    
     this.username = this.cookieService.get('firstName')+" "+this.cookieService.get('lastName');
     this.getCountAndSum();
     this.getDonationCountAndAmountGroupByCurrency('TODAY');
     this.getDonationCountAndAmountGroupByName('TODAY');
     this.getDonationPaymentModeCountAndAmountGroupByName('TODAY');
-    // this.getDonationList('TODAY');
-    // this.getInvoiceTypeList();
-    // this.getDonationTypeList();
-    // this.getCurrencyDetailBySuperadmin();
-    // this.getPaymentModeList();
-    // this.getFundrisingOfficerByTeamLeaderId();
-    // this.checkRoleType();
+
+    // this.prepareChartData();
 
     const currentDate = new Date();
     const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
     this.currentMonthName = months[currentDate.getMonth()];
-    
+    // this.prepareChartData();
   }
 
+
+prepareChartData() {
+  console.log("🔥 prepareChartData CALLED");
+
+  this.chartData = [];
+  this.totalAmount = 0;
+
+  if (!this.PaymentModeCountAmount) {
+    console.log("❌ No data");
+    return;
+  }
+
+  Object.keys(this.PaymentModeCountAmount).forEach((mode: any) => {
+
+    let rows = this.PaymentModeCountAmount[mode];
+
+    if (!rows || rows.length === 0) return;
+
+    let total = rows.reduce((sum: number, r: any) => sum + Number(r[1]), 0);
+
+    this.chartData.push({
+      label: mode,   // ✅ FIXED
+      amount: total
+    });
+
+    this.totalAmount += total;
+
+  });
+
+  console.log("✅ chartData:", this.chartData);
+
+  this.generateChart();
+}
+
+generateChart() {
+
+  if (this.totalAmount === 0) {
+    this.chartStyle = '#eee'; // fallback
+    return;
+  }
+
+  let current = 0;
+  let gradient = 'conic-gradient(';
+
+  this.chartData.forEach((item, index) => {
+
+    let percent = (item.amount / this.totalAmount) * 100;
+    let color = this.getColor(index);
+
+    gradient += `${color} ${current}% ${current + percent}%, `;
+    current += percent;
+
+  });
+
+  this.chartStyle = gradient.slice(0, -2) + ')';
+
+  console.log("🎯 chartStyle:", this.chartStyle);
+}
+
+getColor(index: number) {
+  const colors = [
+    '#34d399', // soft green
+    '#fbbf24', // soft yellow
+    '#93c5fd', // light blue
+    '#fca5a5', // soft red
+    '#c4b5fd', // soft purple
+    '#67e8f9', // cyan
+    '#fdba74', // orange
+    '#f9a8d4'  // pink
+  ];
+  return colors[index % colors.length];
+}
+
+
+//   calculateChart() {
+//   this.totalAmount = this.currencyType.reduce((sum: number, item: any) => sum + item[1], 0);
+
+//   let current = 0;
+//   let gradient = 'conic-gradient(';
+
+//   this.currencyType.forEach((item: any, index: number) => {
+//     let percent = (item[1] / this.totalAmount) * 100;
+//     let color = this.getColor(index);
+
+//     gradient += `${color} ${current}% ${current + percent}%, `;
+//     current += percent;
+//   });
+
+//   gradient = gradient.slice(0, -2) + ')'; // remove last comma
+
+//   this.chartStyle = gradient;
+// }
+
+
+// getColor(index: number) {
+//   const colors = ['#34d399', '#fbbf24', '#60a5fa', '#f87171'];
+//   return colors[index % colors.length];
+// }
 
   isCollapsed: boolean = false;
   toggleCollapse() {
@@ -318,6 +416,11 @@ export class SalesDashboardComponent {
 
                     // Now assign the grouped data to PaymentModeCountAmount
                     this.PaymentModeCountAmount = groupedData;
+
+                    // 🔥 CALL HERE (IMPORTANT)
+                    this.prepareChartData();
+
+                    console.log('PaymentModeCountAmount API : '+this.PaymentModeCountAmount)
 
                     // For debugging, check the structure of grouped data
                     

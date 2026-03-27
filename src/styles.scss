@@ -2232,3 +2232,222 @@ body .mini-sidebar .sidebar .sidebar-menu>ul>li.submenu-open ul li a {
   width: 95%;
   margin-bottom: 8px;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//////////////////////////////////////////////////////
+@media (max-width: 768px) {
+
+  /* Background */
+  .content-wrapper,
+  .page-wrapper {
+    background: #f4f6fb;
+  }
+
+  /* HEADER → convert to app header */
+  .welcome {
+    background: linear-gradient(135deg, #f9a826, #ff6ec4);
+    padding: 15px;
+    border-radius: 0 0 20px 20px;
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center;
+    color: #fff;
+  }
+
+  .welcome h3 {
+    font-size: 16px;
+    color: #fff;
+  }
+
+  .welcome h6 {
+    font-size: 12px;
+    color: #fff;
+  }
+
+  .welcome img {
+    display: none; /* remove hi icon for clean UI */
+  }
+
+  /* CARDS CONTAINER */
+  .sales-cards {
+    display: flex;
+    gap: 10px;
+    padding: 10px;
+    margin-top: -30px; /* overlap header */
+  }
+
+  .sales-cards > div {
+    flex: 1;
+    padding: 0 !important;
+  }
+
+  /* CARD BASE */
+  .sales-cards .card {
+    border-radius: 16px;
+    padding: 12px;
+    height: 90px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    border: none;
+  }
+
+  /* TEXT */
+  .sales-cards h6 {
+    font-size: 12px;
+    color: #666;
+    margin: 0;
+  }
+
+  .sales-cards h3 {
+    font-size: 18px;
+    font-weight: 700;
+    margin: 3px 0;
+  }
+
+  .sales-cards p {
+    font-size: 11px;
+    margin: 0;
+  }
+
+  /* REMOVE EXTRA ICONS */
+  .sales-cards img,
+  .sales-cards i.feather {
+    display: none !important;
+  }
+
+  /* COLORS LIKE YOUR IMAGE */
+  .default-cover {
+    background: #ffe5c7 !important;
+  }
+
+  .bg-primary {
+    background: #e6dcff !important;
+    color: #000 !important;
+  }
+
+  .bg-secondary {
+    background: #d7f5e8 !important;
+    color: #000 !important;
+  }
+
+}
+
+
+
+
+
+
+
+
+
+//////////////
+/* CARD CONTAINER */
+.donation-breakdown {
+  background: #fff;
+  margin: 10px;
+  padding: 15px;
+  border-radius: 16px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+}
+
+/* TITLE */
+.donation-breakdown h5 {
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+}
+
+/* WRAPPER (DONUT + LEGEND SIDE BY SIDE) */
+.donut-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+/* DONUT CENTER */
+.donut-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* DONUT */
+.donut-chart {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  position: relative; /* ⚠️ NO STATIC BACKGROUND HERE */
+}
+
+/* INNER WHITE CIRCLE */
+.donut-chart::after {
+  content: "";
+  position: absolute;
+  width: 70px;
+  height: 70px;
+  background: #fff;
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* LEGEND (RIGHT SIDE) */
+.donation-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 13px;
+  min-width: 140px;
+}
+
+/* EACH ROW */
+.stat {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* COLOR DOT */
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+// /* MOBILE RESPONSIVE */
+// @media (max-width: 480px) {
+//   .donut-wrapper {
+//     flex-direction: column;
+//     align-items: center;
+//   }
+
+  .donation-stats {
+    align-items: center;
+  // }
+}
