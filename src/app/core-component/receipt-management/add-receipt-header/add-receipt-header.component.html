@@ -130,6 +130,39 @@
                         <input class="form-control" pInputText type="text" formControlName="website" maxlength="50">
                     </div>
                 </div>
+
+                <div class="inner-header">Message Services Details</div>
+    
+                <div class="row">
+                    <div class="col-sm-4 form-group">
+                        <label class="form-label">Email Sevices</label>
+                        <!-- <input class="form-control" pInputText type="text" formControlName="invoiceEmail" maxlength="50"> -->
+                         <select class="form-control" formControlName="invoiceWhatsApp">
+                            <option value="GLOBAL">Global</option>
+                            <option value="INDIVITUAL">Indivitual</option>
+                            <option value="NO">No</option>
+                        </select>
+                    </div>
+                    <div class="col-sm-4 form-group">
+                        <label class="form-label">WhatsApp Service Details</label>
+                        <!-- <input class="form-control" pInputText type="text" formControlName="invoiceWhatsApp" pKeyFilter="int" pattern="[0-9]*" maxlength="50"> -->
+                        <select class="form-control" formControlName="invoiceWhatsApp">
+                            <option value="GLOBAL">Global</option>
+                            <option value="INDIVITUAL">Indivitual</option>
+                            <option value="NO">No</option>
+                        </select>
+                    </div>
+                    <div class="col-sm-4 form-group">
+                        <label class="form-label">SMS Service details</label>
+                        <!-- <input class="form-control" pInputText type="text" formControlName="invoiceSms" maxlength="50"> -->
+                         <select class="form-control" formControlName="invoiceSms">
+                            <option value="GLOBAL">Global</option>
+                            <option value="INDIVITUAL">Indivitual</option>
+                            <option value="NO">No</option>
+                        </select>
+                    </div>
+                </div>
+    
     
                 <div class="inner-header">Bank Details</div>
     

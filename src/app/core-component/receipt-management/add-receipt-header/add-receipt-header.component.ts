@@ -91,6 +91,9 @@ export class AddReceiptHeaderComponent {
       website: [''],
       gstNumber: [''],
       panNumber: [''],
+      invoiceEmail: [''],
+	    invoiceSms: [''],
+	    invoiceWhatsApp: [''],
       accountHolderName: [''],
       accountNumber: [''],
       ifscCode: [''],
@@ -197,6 +200,11 @@ export class AddReceiptHeaderComponent {
         website: this.invoiceHeaderList[0]['website'],
         gstNumber: this.invoiceHeaderList[0]['gstNumber'],
         panNumber: this.invoiceHeaderList[0]['panNumber'],
+
+        invoiceEmail: this.invoiceHeaderList[0]['invoiceEmail'],
+        invoiceSms: this.invoiceHeaderList[0]['invoiceSms'],
+        invoiceWhatsApp: this.invoiceHeaderList[0]['invoiceWhatsApp'],
+
         accountHolderName: this.invoiceHeaderList[0]['accountHolderName'],
         accountNumber: this.invoiceHeaderList[0]['accountNumber'],
         ifscCode: this.invoiceHeaderList[0]['ifscCode'],
