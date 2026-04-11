@@ -14,6 +14,8 @@ import { PaginationService, tablePageSize } from 'src/app/shared/shared.index';
 import { UserDetails } from '../../interface/user-management';
 import { MatDialog } from '@angular/material/dialog';
 
+import { Constant } from 'src/app/core/constant/constants';
+
 @Component({
   selector: 'app-student-list',
   templateUrl: './student-list.component.html',
@@ -329,5 +331,9 @@ export class StudentListComponent {
         })
       });
   }
+
+    downloadReceipt(id: number) {
+      window.open(Constant.Site_Url + "downloadAdmissionForm?id=" + id, '_blank');
+    }
 
 }

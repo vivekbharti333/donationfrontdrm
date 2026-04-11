@@ -230,6 +230,47 @@ export class SidebarService {
             }, 
           ],
         },
+
+        {
+          menuValue: 'Student Management',
+          hasSubRoute: true,
+          showSubRoute: false,
+          icon: 'users',
+          // base1: 'usermang',
+          subMenus: [
+            {
+              menuValue: 'Add Student',
+              route: routes.addStudent,
+              permission: 'add-student',
+            }, 
+            {
+              menuValue: 'Student List',
+              route: routes.studentsList,
+              permission: 'student-list',
+            }, 
+          ],
+        },
+        {
+          menuValue: 'Fee Management',
+          hasSubRoute: true,
+          showSubRoute: false,
+          icon: 'users',
+          // base1: 'usermang',
+          subMenus: [
+            {
+              menuValue: 'Generate Receipt',
+              route: routes.generateSchoolReceipt,
+              permission: 'generate-school-receipt',
+            }, 
+             {
+              menuValue: 'Receipt List',
+              route: routes.schoolReceiptList,
+              permission: 'school-receipt-list',
+            }, 
+           
+          ],
+        },
+
         {
           menuValue: 'Invoice Management',
           hasSubRoute: true,

@@ -139,6 +139,7 @@
                     onerror="this.onerror=null; this.src='https://www.shareicon.net/data/128x128/2016/05/24/770117_people_512x512.png';" />
                 </a>
               </div>
+
             </td>
             <td>{{ data.admissionNo }}</td>
             <td>{{ data.rollNumber }}</td>
@@ -160,6 +161,14 @@
                 <a class="me-2 p-2 mb-0" data-bs-toggle="modal" data-bs-target="#edit-units"
                   (click)="openEditModal(dialogTemplate, data)">
                   <i class="feather icon-edit feather-edit"></i></a>
+
+                  <div class="userimgname">
+                  <a class="me-2 p-2 mb-0"
+                       (click)="downloadReceipt(data.id)">
+                      <i class="feather icon-download feather-download"></i>
+                    </a>
+              </div>
+
                 <a class="me-2 confirm-text p-2 mb-0" href="javascript:void(0);" (click)="confirmColor(data.loginId)">
                   <i class="feather icon-trash-2 feather-trash-2"></i></a>
               </div>

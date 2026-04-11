@@ -150,11 +150,10 @@ export class SchoolManagementService {
       payload: {
         createdBy: this.cookieService.get('userId'),
         token: this.cookieService.get('token'),
-        superadminId: 'SA001'
-        // superadminId: this.cookieService.get('superadminId'),
+        // superadminId: 'SA001'
+        superadminId: this.cookieService.get('superadminId'),
       }
     };
     return this.http.post<any>(Constant.Site_Url + "getStudentDetails", request);
-    // return this.http.post<any>(Constant.Site_Url + "getDonationTypeAndAmtListBySuperadminId", request);
   }
 }
