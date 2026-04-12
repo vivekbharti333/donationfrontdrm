@@ -145,9 +145,10 @@ export class SchoolManagementService {
   }
 
 
-    getStudentDetails(): Observable<any> {
+  getStudentDetails(): Observable<any> {
     let request: any = {
       payload: {
+        requestFor: 'ALL',
         createdBy: this.cookieService.get('userId'),
         token: this.cookieService.get('token'),
         // superadminId: 'SA001'

@@ -65,4 +65,17 @@ export class GenerateSchoolReceiptService {
   return this.http.post<any>(Constant.Site_Url + "submitReceipt", request);
 }
 
+getStudentDetailsForFee(): Observable<any> {
+    let request: any = {
+      payload: {
+        requestFor: 'FOR_FEE',
+        createdBy: this.cookieService.get('userId'),
+        token: this.cookieService.get('token'),
+        // superadminId: 'SA001'
+        superadminId: this.cookieService.get('superadminId'),
+      }
+    };
+    return this.http.post<any>(Constant.Site_Url + "getStudentDetails", request);
+  }
+
 }

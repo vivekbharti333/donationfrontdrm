@@ -55,10 +55,21 @@
             <option value="">Select One</option>
             <option value="A">A</option>
             <option value="B">B</option>
-            <option value="C">c</option>
+            <option value="C">C</option>
             <option value="D">D</option>
             <option value="E">E</option>
           </select>
+        </div>
+
+        <div class="col-md-3 col-mb-3">
+                        
+          <label for="receiptType" class="form-label">Student Name</label>
+          <!-- <mat-select class="space-select select" formControlName="invoiceHeaderDetailsId"  placeholder="Select Receipt" (change)="onProgramSelect($event)">
+              <mat-option *ngFor="let studentDetail of studentDetails" [value]="studentDetail.id">
+                  {{ studentDetail.companyFirstName + ' ' + studentDetail.companyLastName }}
+              </mat-option>
+            </mat-select> -->
+      
         </div>
 
         <!-- ================= SUBMIT BUTTON ================= -->
@@ -200,7 +211,8 @@
 
   <!-- ================= ACTIONS ================= -->
   <div class="text-end">
-    <button type="submit" class="btn btn-success" [disabled]="receiptForm.invalid">
+    <!-- <button type="submit" class="btn btn-success" [disabled]="receiptForm.invalid"> -->
+      <button type="submit" class="btn btn-success">
       Generate Receipt
     </button>
     <button type="button" class="btn btn-secondary ms-2" (click)="resetForm()">

@@ -30,6 +30,10 @@ export class GenerateSchoolReceiptComponent {
 receiptForm!: FormGroup;
 studentSearchForm!: FormGroup;
 
+studentDetails: any[] = [];
+isLoading = true;
+
+
   constructor(
     private fb: FormBuilder,
     private http: HttpClient,
@@ -41,6 +45,7 @@ studentSearchForm!: FormGroup;
     this.createReceiptForm();
     this.createSearchForm();
     this.addFeeRow(); // at least one fee row by default
+
   }
 
    createSearchForm(): void {
@@ -207,5 +212,21 @@ studentSearchForm!: FormGroup;
   submitSearch(){
     
   }
+
+  
+ getStudentDetails() {
+    this.generateSchoolReceiptService.getStudentDetailsForFee().subscribe({
+      next: (res) => {
+        console.log(res); // check API response structure
+        this.studentDetails = res?.data || [];
+        this.isLoading = false;
+      },
+      error: (err) => {
+        console.error(err);
+        this.isLoading = false;
+      }
+    });
+  }
+
 
 }
