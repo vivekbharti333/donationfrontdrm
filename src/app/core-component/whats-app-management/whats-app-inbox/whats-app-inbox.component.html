@@ -1,0 +1,71 @@
+<div class="wa-container">
+
+  <!-- LEFT PANEL -->
+  <div class="whats-app-sidebar">
+
+    <div class="sidebar-top">
+      <div class="profile"></div>
+    </div>
+
+    <div class="search">
+      <input placeholder="Search or start new chat" />
+    </div>
+
+    <div class="chat-list">
+      <div 
+        class="chat-item"
+        *ngFor="let lead of leads"
+        (click)="selectLead(lead)"
+        [class.active]="lead.id === selectedLead?.id"
+      >
+        <div class="avatar">{{lead.name[0]}}</div>
+        <div class="chat-text">
+          <div class="name">{{lead.name}}</div>
+          <div class="msg">{{lead.lastMessage}}</div>
+        </div>
+        <div class="time">12:30</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="chat-area" *ngIf="selectedLead">
+
+    <!-- HEADER -->
+    <div class="chat-header">
+      <div class="avatar big">{{selectedLead.name[0]}}</div>
+      <div class="chat-title">
+        <div class="name">{{selectedLead.name}}</div>
+        <div class="status">online</div>
+      </div>
+    </div>
+
+    <!-- BODY -->
+    <div class="chat-body">
+
+      <div 
+        *ngFor="let msg of messages"
+        [class.outgoing]="msg.direction === 'OUTGOING'"
+        [class.incoming]="msg.direction === 'INCOMING'"
+        class="msg-row"
+      >
+        <div class="msg-bubble">
+          {{msg.text}}
+          <span class="msg-time">12:30</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- INPUT -->
+    <div class="chat-footer">
+      <span class="icon">😊</span>
+      <input [(ngModel)]="newMessage" (keyup.enter)="sendMessage()" placeholder="Type a message"/>
+      <span class="icon">📎</span>
+      <button (click)="sendMessage()">➤</button>
+    </div>
+
+  </div>
+
+</div>

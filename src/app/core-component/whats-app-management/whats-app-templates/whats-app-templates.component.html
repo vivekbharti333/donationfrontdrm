@@ -1,0 +1,146 @@
+<div class="template-container">
+
+  <!-- LEFT PANEL -->
+  <div class="template-form">
+
+    <!-- BASIC INFO -->
+    <div class="form-row">
+      <div class="field">
+        <label>Name your template</label>
+        <input [(ngModel)]="template.name" />
+      </div>
+
+      <div class="field small">
+        <label>Select language</label>
+        <select [(ngModel)]="template.language">
+          <option>English</option>
+          <option>Hindi</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- VARIABLE TYPE -->
+    <div class="field">
+      <label>Type of variable</label>
+      <div class="dropdown">
+        <div class="dropdown-selected" (click)="toggleVarDropdown()">
+          {{ selectedVariableType }}
+        </div>
+
+        <div class="dropdown-menu" *ngIf="showVarDropdown">
+          <div (click)="selectVariableType('Name')">Name</div>
+          <div (click)="selectVariableType('Number')">Number</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MEDIA TYPE -->
+    <div class="field">
+      <label>Media sample</label>
+      <div class="dropdown">
+        <div class="dropdown-selected" (click)="toggleMediaDropdown()">
+          {{ selectedMediaType }}
+        </div>
+
+        <div class="dropdown-menu" *ngIf="showMediaDropdown">
+          <div (click)="selectMediaType('None')">None</div>
+          <div (click)="selectMediaType('Image')">Image</div>
+          <div (click)="selectMediaType('Video')">Video</div>
+          <div (click)="selectMediaType('Document')">Document</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="section">
+
+      <div class="field">
+        <label>Header</label>
+        <input [(ngModel)]="template.header" />
+      </div>
+
+      <div class="field">
+        <label>Body</label>
+
+        <div class="body-container">
+
+          <textarea
+            [(ngModel)]="template.body"
+            (ngModelChange)="onBodyChange()"
+            maxlength="1024"
+            rows="5">
+          </textarea>
+
+          <div class="char-count">
+            {{ template.body?.length || 0 }}/1024
+          </div>
+
+          <div class="toolbar">
+            <span>😊</span>
+            <span><b>B</b></span>
+            <span><i>I</i></span>
+
+            <span class="add-variable" (click)="addVariable()">
+              + Add variable
+            </span>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Footer</label>
+        <input [(ngModel)]="template.footer" />
+      </div>
+
+    </div>
+
+    <!-- VARIABLES -->
+    <div class="variable-section" *ngIf="variables.length">
+      <h4>Variable samples</h4>
+
+      <div class="var-row" *ngFor="let v of variables">
+        <div class="var-key">{{ v }}</div>
+
+        <input [(ngModel)]="variableValues[v]" />
+      </div>
+    </div>
+
+    <!-- ACTIONS -->
+    <div class="actions">
+      <button class="secondary">Previous</button>
+      <button class="primary" (click)="submitTemplate()">
+        Submit for Review
+      </button>
+    </div>
+
+  </div>
+
+  <!-- RIGHT PREVIEW -->
+  <div class="template-preview">
+
+    <h3>Template preview</h3>
+
+    <div class="phone">
+      <div class="chat-bubble">
+
+        <div class="whats-app-header" *ngIf="template.header">
+          {{ template.header }}
+        </div>
+
+        <div class="body">
+          {{ getPreviewText() || 'Your message preview...' }}
+        </div>
+
+        <div class="footer" *ngIf="template.footer">
+          {{ template.footer }}
+        </div>
+
+        <div class="time">11:22</div>
+
+      </div>
+    </div>
+
+  </div>
+
+</div>

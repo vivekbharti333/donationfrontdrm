@@ -70,6 +70,12 @@ const routes: Routes = [
         loadChildren: () =>
           import('./pages/pages.module').then((m) => m.PagesModule),
       },
+      {
+        path: 'whats-app-management',
+        loadChildren: () =>
+          import('./whats-app-management/whats-app-management.module').then((m) => m.WhatsAppManagementModule),
+        // canActivate: [AuthGuard],
+      },
 
       {
         path: 'receipt-management',

@@ -1094,7 +1094,7 @@ export class routes {
     return this.schoolManagement + '/school-receipt-list';
   }
 
-  //Invoice Management
+  // Invoice Management
   public static get invoiceManagement(): string {
     return this.core + '/invoice-management';
   }
@@ -1109,6 +1109,17 @@ export class routes {
   }
   public static get itemDetails(): string {
     return this.invoiceManagement + '/item-details';
+  }
+
+  // Whats App Management
+  public static get whatsAppManagement(): string {
+    return this.core + '/whats-app-management';
+  }
+  public static get whatsAppInbox(): string {
+    return this.whatsAppManagement + '/whats-app-inbox';
+  }
+  public static get whatsAppTemplates(): string {
+    return this.whatsAppManagement + '/whats-app-templates';
   }
   // core pages child routes *ends*
 }
