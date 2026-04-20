@@ -248,7 +248,7 @@ export class AllDonationListComponent {
 
 
   public getDonationList(tabName: string): void {
-this.showCustomFilter = false;
+  this.showCustomFilter = false;
   this.tabName = tabName;
 
   // 🔥 CLEAR OLD DATA BEFORE API CALL

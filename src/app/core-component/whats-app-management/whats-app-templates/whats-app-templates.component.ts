@@ -1,4 +1,21 @@
-import { Component, HostListener } from '@angular/core';
+import { Component, importProvidersFrom, TemplateRef } from '@angular/core';
+import { FormGroup, FormBuilder, Validators, AbstractControl, FormControl } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
+import { Sort } from '@angular/material/sort';
+import { MatTableDataSource } from '@angular/material/table';
+import {
+  DataService,
+  pageSelection,
+  apiResultFormat,
+  SidebarService,
+} from 'src/app/core/core.index';
+import { routes } from 'src/app/core/helpers/routes';
+import { PaginationService, tablePageSize } from 'src/app/shared/shared.index';
+import { Constant } from 'src/app/core/constant/constants';
+import { DonationDetails, DonationListForExcel } from '../../interface/donation-management';
+import { AuthenticationService } from 'src/app/auth/authentication.service';
+import { CustomPaginationComponent } from 'src/app/shared/custom-pagination/custom-pagination.component';
+import { WhatsAppTemplatesService } from './whats-app-templates.service';
 
 @Component({
   selector: 'app-whats-app-templates',
@@ -6,6 +23,8 @@ import { Component, HostListener } from '@angular/core';
   styleUrls: ['./whats-app-templates.component.scss']
 })
 export class WhatsAppTemplatesComponent {
+
+  public editTemplateDialog: any;
 
   /* ================= TEMPLATE ================= */
   template = {
@@ -52,7 +71,173 @@ export class WhatsAppTemplatesComponent {
   messages: any[] = [];
   newMessage: string = '';
 
+  // pagination variables
+  public routes = routes;
+  public tableData: Array<any> = [];
+  public pageSize = 10;
+  public serialNumberArray: Array<number> = [];
+  public totalData = 0;
+  showFilter = false;
+  dataSource!: MatTableDataSource<any>;
+  public searchDataValue = '';
+  //** / pagination variables
+
+
+  public lastIndex = 0;
+  // public totalData = 0;
+  public skip = 0;
+  public limit: number = this.pageSize;
+  public pageIndex = 0;
+  // public serialNumberArray: Array<number> = [];
+  public currentPage = 1;
+  public pageNumberArray: Array<number> = [];
+  public pageSelection: Array<pageSelection> = [];
+  public totalPages = 0;
+
+  public fullData: any[] = [];
+  public showCustomFilter: boolean = false;
+
+
   /* ================= CHAT LOGIC ================= */
+
+  constructor(
+    private sidebar: SidebarService,
+    private pagination: PaginationService,
+    private dialog: MatDialog,
+    private whatsAppTemplatesService: WhatsAppTemplatesService,
+
+  ) {
+
+  }
+
+  ngOnInit() {
+    this.getWhatsAppTemplate("h")
+  }
+
+  public getWhatsAppTemplate(tabName: string): void {
+    // this.showCustomFilter = false;
+    // this.tabName = tabName;
+
+    // 🔥 CLEAR OLD DATA BEFORE API CALL
+    this.tableData = [];
+    this.fullData = [];
+    this.serialNumberArray = [];
+    this.totalData = 0;
+
+    this.dataSource = new MatTableDataSource<DonationDetails>([]);
+
+    // 🔥 Reset pagination to page 1
+    this.pagination.tablePageSize.next({
+      skip: 0,
+      limit: this.pageSize,
+      pageSize: this.pageSize
+    });
+
+    // 🔥 API CALL
+    this.whatsAppTemplatesService.getWhatsAppTemplate()
+      .subscribe((apiRes: any) => {
+
+        // Assign new data
+        this.totalData = apiRes.totalNumber || 0;
+        this.fullData = apiRes.listPayload || [];
+
+        // Load page 1 immediately
+        this.prepareTableData(this.fullData, {
+          skip: 0,
+          limit: this.pageSize
+        });
+      });
+  }
+
+
+  dataTableClear() {
+    this.showCustomFilter = true;
+    this.tableData = [];
+    this.pageSize = 10;
+    this.serialNumberArray = [];
+    this.totalData = 0;
+    this.showFilter = false;
+
+  }
+
+  private prepareTableData(apiRes: DonationDetails[], pageOption: pageSelection): void {
+    const start = pageOption.skip;
+    const end = pageOption.limit;
+
+    this.dataSource = new MatTableDataSource<DonationDetails>([]);
+
+    // Slice data for current page
+    this.tableData = apiRes.slice(start, end);
+
+    // Serial numbers (1-based)
+    this.serialNumberArray = this.tableData.map((_, i) => start + i + 1);
+
+    // Material table
+    this.dataSource = new MatTableDataSource<DonationDetails>(this.tableData);
+
+    // Notify pagination service
+    this.pagination.calculatePageSize.next({
+      totalData: this.totalData,
+      pageSize: this.pageSize,
+      tableData: this.tableData,
+      serialNumberArray: this.serialNumberArray,
+    });
+  }
+
+  public sortData(sort: Sort) {
+    const data = this.tableData.slice();
+    if (!sort.active || sort.direction === '') {
+      this.tableData = data;
+    } else {
+      this.tableData = data.sort((a, b) => {
+        const aValue = (a as never)[sort.active];
+        const bValue = (b as never)[sort.active];
+        return (aValue < bValue ? -1 : 1) * (sort.direction === 'asc' ? 1 : -1);
+      });
+    }
+  }
+
+
+  public searchData(value: string): void {
+    const searchTerm = value.trim().toLowerCase();
+
+    if (searchTerm) {
+      // Filter data
+      const filteredData = this.fullData.filter((donation: DonationDetails) =>
+        Object.values(donation).some((field: any) =>
+          String(field).toLowerCase().includes(searchTerm)
+        )
+      );
+
+      this.totalData = filteredData.length;
+
+      // Always reset to page 1
+      this.prepareTableData(filteredData, { skip: 0, limit: this.pageSize });
+    } else {
+      // Search cleared → reset table & page to page 1
+      this.totalData = this.fullData.length;
+
+      this.prepareTableData(this.fullData, { skip: 0, limit: this.pageSize });
+
+      // Reset pagination to page 1
+      this.pagination.tablePageSize.next({
+        skip: 0,
+        limit: this.pageSize,
+        pageSize: this.pageSize
+      });
+    }
+  }
+
+    isCollapsed: boolean = false;
+  toggleCollapse() {
+    this.sidebar.toggleCollapse();
+    this.isCollapsed = !this.isCollapsed;
+  }
+  public filter = false;
+  openFilter() {
+    this.filter = !this.filter;
+  }
+  ///////////////////
 
   selectLead(lead: any) {
     this.selectedLead = lead;
@@ -137,18 +322,31 @@ export class WhatsAppTemplatesComponent {
     this.showMediaDropdown = false;
   }
 
-  @HostListener('document:click', ['$event'])
-  closeDropdown(event: any) {
-    if (!event.target.closest('.dropdown')) {
-      this.showVarDropdown = false;
-      this.showMediaDropdown = false;
-    }
-  }
+  // @HostListener('document:click', ['$event'])
+  // closeDropdown(event: any) {
+  //   if (!event.target.closest('.dropdown')) {
+  //     this.showVarDropdown = false;
+  //     this.showMediaDropdown = false;
+  //   }
+  // }
 
   submitTemplate() {
     console.log('FINAL DATA:', {
       ...this.template,
       variables: this.variableValues
     });
+  }
+
+
+
+  openEditModal(templateRef: TemplateRef<any>, rowData: any) {
+
+    this.editTemplateDialog = this.dialog.open(templateRef, {
+      width: '1400px', // Set your desired width
+      // height: '600px', // Set your desired height
+      disableClose: true, // Optional: prevent closing by clicking outside
+      panelClass: 'custom-modal', // Optional: add custom class for additional styling
+    });
+
   }
 }

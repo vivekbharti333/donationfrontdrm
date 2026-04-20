@@ -1,3 +1,144 @@
+<div class="page-header">
+  <div class="add-item d-flex">
+    <div class="page-title">
+      <h4>Template List</h4>
+      <h6>Manage Your Donation Receipt</h6>
+      <p-toast></p-toast>
+    </div>
+  </div>
+  <ul class="table-top-head">
+    <li>
+      
+    </li>
+    <li>
+      <a (click)="toggleCollapse()" data-bs-toggle="tooltip" data-bs-placement="top" matTooltip="Collapse"
+        matTooltipPosition="above" id="collapse-header">
+        @if (!isCollapsed) {
+        <i class="feather icon-chevron-up feather-chevron-up"></i>
+        } @if (isCollapsed) {
+        <i class="feather icon-chevron-down feather-chevron-down"></i>
+        }</a>
+    </li>
+  </ul>
+  <div class="page-btn">
+  </div>
+</div>
+
+<!-- <div class="card table-list-card">
+  <div class="card-body">
+    <div class="table-top">
+      <div class="search-set">
+        <div class="search-input">
+          <a href="javascript:void(0);" class="btn btn-searchset"><i class="feather icon-search feather-search"></i></a>
+          <div class="dataTables_filter">
+            <label>
+              <input [(ngModel)]="searchDataValue" [ngModelOptions]="{ standalone: true }"
+                (ngModelChange)="searchData(searchDataValue)" type="search" class="form-control"
+                placeholder="Search..." />
+            </label>
+          </div>
+        </div>
+      </div>
+      
+    </div>
+
+
+
+  </div>
+
+</div> -->
+
+<div class="desktop-table">
+      <div class="tab-pane show active" id="solid-justified-tab">
+        <div class="table-responsive">
+          <table matSort (matSortChange)="sortData($event)" class="table datanew">
+            <thead>
+              <tr>
+                <th mat-sort-header="userName">Name</th>
+                <th mat-sort-header="loginId">Mobile</th>
+                <th mat-sort-header="phone">Amount</th>
+                <th mat-sort-header="role">Payment Mode</th>
+                <th mat-sort-header="createdOn">Received By</th>
+                <th mat-sort-header="program">Program</th>
+                <th mat-sort-header="date&Time">Date & Time</th>
+                <th mat-sort-header="invoiceNumber">Invoice Number</th>
+                <th mat-sort-header="invoiceDownload">Invoice Download</th>
+                <th mat-sort-header="status">Status</th>
+                <th class="no-sort">Action</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              @for (data of tableData; track data) {
+              <tr>
+                <td>{{ data.donorName }}</td>
+                <td>{{ data.mobileNumber }}</td>
+                <td>{{ data.amount }} {{ data.currencyCode }}</td>
+                <td>{{ data.paymentMode }}</td>
+                <td>{{ data.createdbyName }}</td>
+                <td>{{ data.programName }}</td>
+                <td>{{ data.createdAt | date : "dd-MM-yyyy | HH:mm" }}</td>
+                <td>{{ data.invoiceNumber }}</td>
+
+                <td>
+                  <button class="badge-button"
+                          [ngClass]="{
+                            'badge-linesuccess': data.invoiceDownloadStatus === 'NO',
+                            'badge-linedanger': data.invoiceDownloadStatus === 'YES'
+                          }">
+                    {{ data.invoiceDownloadStatus }}
+                  </button>
+                </td>
+
+                <td>
+                  <button class="badge-button"
+                          [ngClass]="{
+                            'badge-linesuccess': data.status === 'ACTIVE',
+                            'badge-linedanger': data.status === 'INACTIVE'
+                          }"
+                          >
+                    {{ data.status }}
+                  </button>
+                </td>
+
+                <td class="action-table-data">
+                  <div class="edit-delete-action">
+                    <a class="me-2 p-2 mb-0"
+                       (click)="openEditModal(dialogTemplate, data)">
+                      <i class="feather icon-edit feather-edit"></i>
+                    </a>
+
+                    
+
+                    
+                  </div>
+                </td>
+              </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+
+
+<button class="edit-btn" (click)="openEditModal(dialogTemplate, 'd')">
+  <i class="feather icon-edit feather-edit"></i>
+</button>
+
+
+<ng-template #dialogTemplate let-dialog>
+  <div class="modalHeaderContainer">
+    <h2 mat-dialog-title class="p-0">Edit Templates</h2>
+    <div mat-dialog-close class="closeBtn">
+      <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  </div>
+
+  Hi this is popup
 <div class="template-container">
 
   <!-- LEFT PANEL -->
@@ -144,3 +285,5 @@
   </div>
 
 </div>
+
+</ng-template>
