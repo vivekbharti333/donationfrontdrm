@@ -8,6 +8,7 @@ import { WhatsAppTemplatesComponent } from './whats-app-templates/whats-app-temp
 import { sharedModule } from 'src/app/shared/shared.module';
 
 import { NgxEditorModule } from 'ngx-editor';
+import { MatDialogModule } from '@angular/material/dialog';
 
 @NgModule({
   declarations: [
@@ -19,7 +20,8 @@ import { NgxEditorModule } from 'ngx-editor';
     CommonModule,
     WhatsAppManagementRoutingModule,
     sharedModule,
-    NgxEditorModule
+    NgxEditorModule,
+    MatDialogModule
   ]
 })
 export class WhatsAppManagementModule { }

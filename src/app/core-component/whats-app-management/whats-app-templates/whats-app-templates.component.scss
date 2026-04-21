@@ -14,8 +14,9 @@
   border-radius: 8px;
   display: flex;
   flex-direction: column;
-  position: relative;   /* 🔥 IMPORTANT */
-  overflow: visible;    /* 🔥 IMPORTANT */
+  position: relative;
+  overflow: visible;
+  z-index: 1;
 }
 
 .form-row {
@@ -28,7 +29,8 @@
   display: flex;
   flex-direction: column;
   margin-bottom: 15px;
-  position: relative;   /* 🔥 for dropdown */
+  position: relative;
+  z-index: 50; /* 🔥 ensure dropdown area is above */
 }
 
 .field.small {
@@ -86,10 +88,20 @@
 
 /* PHONE */
 .phone {
-  background: #d1d7db;
+  position: relative;
+
+  background:
+    linear-gradient(rgba(255,255,255,0.6), rgba(255,255,255,0.6)),
+    url('/assets/img/wa-message-mobile-bg.png');
+
+  background-repeat: repeat;
+  background-size: 300px;
+  background-color: #e5ddd5;
+
   padding: 20px;
   border-radius: 10px;
-  height: 300px;
+  height: 500px;
+
   display: flex;
   align-items: flex-start;
 }
@@ -133,6 +145,7 @@
 .dropdown {
   position: relative;
   width: 100%;
+  z-index: 100; /* 🔥 */
 }
 
 .dropdown-selected {
@@ -153,7 +166,7 @@
   border-radius: 6px;
   margin-top: 5px;
 
-  z-index: 9999;   /* 🔥 FIX (MOST IMPORTANT) */
+  z-index: 999999; /* 🔥 SUPER HIGH */
 }
 
 .dropdown-menu div {
@@ -195,11 +208,13 @@
   border: 1px solid #ccc;
 }
 
+/* BODY CONTAINER FIX */
 .body-container {
   position: relative;
   border: 1px solid #ccc;
   border-radius: 8px;
   background: white;
+  z-index: 1; /* 🔥 lower than dropdown */
 }
 
 /* TEXTAREA */
@@ -211,6 +226,8 @@
   resize: none;
   font-size: 14px;
   border-radius: 8px;
+  position: relative;
+  z-index: 1; /* 🔥 prevent overlap */
 }
 
 /* CHAR COUNT */
@@ -231,6 +248,8 @@
   gap: 12px;
   font-size: 14px;
   color: #555;
+  position: relative;
+  z-index: 1; /* 🔥 keep below dropdown */
 }
 
 .toolbar span {
@@ -247,3 +266,74 @@
   color: #1877f2;
   font-weight: 500;
 }
+
+.dropdown-menu {
+  background: red !important;
+}
+
+.dialog-content {
+  max-height: 70vh;   /* controls height */
+  overflow-y: auto;   /* enables scroll */
+}
+
+/* PHONE CONTAINER */
+// .phone {
+//   background: #d1d7db;
+//   padding: 20px;
+//   border-radius: 10px;
+
+//   height: 400px;            /* 🔥 increased height */
+//   display: flex;
+//   align-items: flex-start;
+
+//   overflow: hidden;         /* 🔥 prevent outer overflow */
+// }
+
+/* CHAT BUBBLE */
+.chat-bubble {
+  background: white;
+  padding: 12px;
+  border-radius: 10px;
+  max-width: 100%;
+  font-size: 14px;
+
+  max-height: 100%;         /* 🔥 limit inside phone */
+  overflow-y: auto;         /* 🔥 scroll when content large */
+}
+
+/* BODY TEXT */
+.body {
+  white-space: pre-wrap;    /* 🔥 keep formatting */
+  word-break: break-word;   /* 🔥 break long words */
+  overflow-wrap: anywhere;  /* 🔥 prevent overflow */
+}
+
+/* OPTIONAL: SCROLLBAR STYLING */
+.chat-bubble::-webkit-scrollbar {
+  width: 6px;
+}
+
+.chat-bubble::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 6px;
+}
+
+.badge-linewarning {
+  background: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeeba;
+}
+
+
+// .chat-bubble {
+//   position: relative;
+
+//   background-image: url('/assets/img/wa-message-mobile-bg.png');
+//   background-repeat: repeat;
+//   background-size: 300px;
+
+//   background-color: #e5ddd5; /* WhatsApp bg color */
+
+//   border-radius: 10px;
+//   padding: 15px;
+// }

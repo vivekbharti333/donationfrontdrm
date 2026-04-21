@@ -2,13 +2,13 @@
   <div class="add-item d-flex">
     <div class="page-title">
       <h4>Template List</h4>
-      <h6>Manage Your Donation Receipt</h6>
-      <p-toast></p-toast>
+      <h6>Manage Your Template List</h6>
+      <!-- <p-toast></p-toast> -->
     </div>
   </div>
   <ul class="table-top-head">
     <li>
-      
+
     </li>
     <li>
       <a (click)="toggleCollapse()" data-bs-toggle="tooltip" data-bs-placement="top" matTooltip="Collapse"
@@ -24,7 +24,7 @@
   </div>
 </div>
 
-<!-- <div class="card table-list-card">
+<div class="card table-list-card">
   <div class="card-body">
     <div class="table-top">
       <div class="search-set">
@@ -32,38 +32,30 @@
           <a href="javascript:void(0);" class="btn btn-searchset"><i class="feather icon-search feather-search"></i></a>
           <div class="dataTables_filter">
             <label>
-              <input [(ngModel)]="searchDataValue" [ngModelOptions]="{ standalone: true }"
-                (ngModelChange)="searchData(searchDataValue)" type="search" class="form-control"
-                placeholder="Search..." />
+              <input [(ngModel)]="searchDataValue" (ngModelChange)="searchData(searchDataValue)" type="search"
+                class="form-control" placeholder="Search..." />
             </label>
           </div>
         </div>
       </div>
-      
+
     </div>
 
 
 
-  </div>
 
-</div> -->
 
-<div class="desktop-table">
+    <div class="desktop-table">
       <div class="tab-pane show active" id="solid-justified-tab">
         <div class="table-responsive">
           <table matSort (matSortChange)="sortData($event)" class="table datanew">
             <thead>
               <tr>
-                <th mat-sort-header="userName">Name</th>
-                <th mat-sort-header="loginId">Mobile</th>
-                <th mat-sort-header="phone">Amount</th>
-                <th mat-sort-header="role">Payment Mode</th>
-                <th mat-sort-header="createdOn">Received By</th>
-                <th mat-sort-header="program">Program</th>
-                <th mat-sort-header="date&Time">Date & Time</th>
-                <th mat-sort-header="invoiceNumber">Invoice Number</th>
-                <th mat-sort-header="invoiceDownload">Invoice Download</th>
-                <th mat-sort-header="status">Status</th>
+                <th mat-sort-header="templateId">Template Id</th>
+                <th mat-sort-header="templateName">Template Name</th>
+                <th mat-sort-header="language">language</th>
+                <th mat-sort-header="category">category</th>
+                <th mat-sort-header="status">status</th>
                 <th class="no-sort">Action</th>
               </tr>
             </thead>
@@ -71,46 +63,25 @@
             <tbody>
               @for (data of tableData; track data) {
               <tr>
-                <td>{{ data.donorName }}</td>
-                <td>{{ data.mobileNumber }}</td>
-                <td>{{ data.amount }} {{ data.currencyCode }}</td>
-                <td>{{ data.paymentMode }}</td>
-                <td>{{ data.createdbyName }}</td>
-                <td>{{ data.programName }}</td>
-                <td>{{ data.createdAt | date : "dd-MM-yyyy | HH:mm" }}</td>
-                <td>{{ data.invoiceNumber }}</td>
-
+                <td>{{ data.templateId }}</td>
+                <td>{{ data.templateName }}</td>
+                <td>{{ data.language }}</td>
+                <td>{{ data.category }} {{ data.currencyCode }}</td>
                 <td>
-                  <button class="badge-button"
-                          [ngClass]="{
-                            'badge-linesuccess': data.invoiceDownloadStatus === 'NO',
-                            'badge-linedanger': data.invoiceDownloadStatus === 'YES'
+                  <button class="badge-button" [ngClass]="{
+                            'badge-linesuccess': data.status === 'APPROVED',
+                            'badge-linedanger': data.status === 'PENDING'
+                            
                           }">
-                    {{ data.invoiceDownloadStatus }}
-                  </button>
-                </td>
-
-                <td>
-                  <button class="badge-button"
-                          [ngClass]="{
-                            'badge-linesuccess': data.status === 'ACTIVE',
-                            'badge-linedanger': data.status === 'INACTIVE'
-                          }"
-                          >
                     {{ data.status }}
                   </button>
                 </td>
-
                 <td class="action-table-data">
                   <div class="edit-delete-action">
-                    <a class="me-2 p-2 mb-0"
-                       (click)="openEditModal(dialogTemplate, data)">
+                    <a class="me-2 p-2 mb-0" (click)="openEditModal(dialogTemplate, data)">
                       <i class="feather icon-edit feather-edit"></i>
                     </a>
 
-                    
-
-                    
                   </div>
                 </td>
               </tr>
@@ -121,169 +92,205 @@
       </div>
     </div>
 
-
-
-<button class="edit-btn" (click)="openEditModal(dialogTemplate, 'd')">
-  <i class="feather icon-edit feather-edit"></i>
-</button>
-
-
-<ng-template #dialogTemplate let-dialog>
-  <div class="modalHeaderContainer">
-    <h2 mat-dialog-title class="p-0">Edit Templates</h2>
-    <div mat-dialog-close class="closeBtn">
-      <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
-      </button>
-    </div>
   </div>
-
-  Hi this is popup
-<div class="template-container">
-
-  <!-- LEFT PANEL -->
-  <div class="template-form">
-
-    <!-- BASIC INFO -->
-    <div class="form-row">
-      <div class="field">
-        <label>Name your template</label>
-        <input [(ngModel)]="template.name" />
-      </div>
-
-      <div class="field small">
-        <label>Select language</label>
-        <select [(ngModel)]="template.language">
-          <option>English</option>
-          <option>Hindi</option>
-        </select>
-      </div>
-    </div>
-
-    <!-- VARIABLE TYPE -->
-    <div class="field">
-      <label>Type of variable</label>
-      <div class="dropdown">
-        <div class="dropdown-selected" (click)="toggleVarDropdown()">
-          {{ selectedVariableType }}
-        </div>
-
-        <div class="dropdown-menu" *ngIf="showVarDropdown">
-          <div (click)="selectVariableType('Name')">Name</div>
-          <div (click)="selectVariableType('Number')">Number</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- MEDIA TYPE -->
-    <div class="field">
-      <label>Media sample</label>
-      <div class="dropdown">
-        <div class="dropdown-selected" (click)="toggleMediaDropdown()">
-          {{ selectedMediaType }}
-        </div>
-
-        <div class="dropdown-menu" *ngIf="showMediaDropdown">
-          <div (click)="selectMediaType('None')">None</div>
-          <div (click)="selectMediaType('Image')">Image</div>
-          <div (click)="selectMediaType('Video')">Video</div>
-          <div (click)="selectMediaType('Document')">Document</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- CONTENT -->
-    <div class="section">
-
-      <div class="field">
-        <label>Header</label>
-        <input [(ngModel)]="template.header" />
-      </div>
-
-      <div class="field">
-        <label>Body</label>
-
-        <div class="body-container">
-
-          <textarea
-            [(ngModel)]="template.body"
-            (ngModelChange)="onBodyChange()"
-            maxlength="1024"
-            rows="5">
-          </textarea>
-
-          <div class="char-count">
-            {{ template.body?.length || 0 }}/1024
-          </div>
-
-          <div class="toolbar">
-            <span>😊</span>
-            <span><b>B</b></span>
-            <span><i>I</i></span>
-
-            <span class="add-variable" (click)="addVariable()">
-              + Add variable
-            </span>
-          </div>
-
-        </div>
-      </div>
-
-      <div class="field">
-        <label>Footer</label>
-        <input [(ngModel)]="template.footer" />
-      </div>
-
-    </div>
-
-    <!-- VARIABLES -->
-    <div class="variable-section" *ngIf="variables.length">
-      <h4>Variable samples</h4>
-
-      <div class="var-row" *ngFor="let v of variables">
-        <div class="var-key">{{ v }}</div>
-
-        <input [(ngModel)]="variableValues[v]" />
-      </div>
-    </div>
-
-    <!-- ACTIONS -->
-    <div class="actions">
-      <button class="secondary">Previous</button>
-      <button class="primary" (click)="submitTemplate()">
-        Submit for Review
-      </button>
-    </div>
-
-  </div>
-
-  <!-- RIGHT PREVIEW -->
-  <div class="template-preview">
-
-    <h3>Template preview</h3>
-
-    <div class="phone">
-      <div class="chat-bubble">
-
-        <div class="whats-app-header" *ngIf="template.header">
-          {{ template.header }}
-        </div>
-
-        <div class="body">
-          {{ getPreviewText() || 'Your message preview...' }}
-        </div>
-
-        <div class="footer" *ngIf="template.footer">
-          {{ template.footer }}
-        </div>
-
-        <div class="time">11:22</div>
-
-      </div>
-    </div>
-
-  </div>
-
 </div>
+
+
+
+
+
+<ng-template #dialogTemplate>
+
+  <!-- HEADER -->
+  <div class="modalHeaderContainer">
+    <h2 mat-dialog-title>Edit Templates</h2>
+
+    <button mat-dialog-close class="closeBtn" aria-label="Close">
+      <span>&times;</span>
+    </button>
+  </div>
+
+  <!-- SCROLLABLE CONTENT -->
+  <mat-dialog-content class="dialog-content">
+
+    <form [formGroup]="editTemplateForm">
+
+      <div class="template-container">
+
+        <!-- LEFT FORM -->
+        <div class="template-form">
+
+          <!-- BASIC -->
+          <div class="form-row">
+            <div class="field">
+              <label>Name your template</label>
+              <input formControlName="templateName" />
+            </div>
+
+            <div class="field small">
+              <label>Select language</label>
+              <select formControlName="language">
+                <option value="en">English </option>
+                <option value="en_IN">English (IND)</option>
+                <option value="en_US">English (US)</option>
+                <option value="hi">Hindi </option>
+
+              </select>
+            </div>
+          </div>
+
+          <!-- VARIABLE TYPE + MEDIA -->
+          <div class="form-row">
+
+            <div class="field">
+              <label>Type of variable</label>
+
+              <div class="dropdown">
+                <div class="dropdown-selected" (click)="toggleVarDropdown($event)">
+                  {{ editTemplateForm.get('variableType')?.value }}
+                </div>
+
+                <div class="dropdown-menu" *ngIf="showVarDropdown" (click)="$event.stopPropagation()">
+
+                  <div (click)="selectVariableType('Name')">Name</div>
+                  <div (click)="selectVariableType('Number')">Number</div>
+
+                </div>
+              </div>
+            </div>
+
+            <div class="field">
+              <label>Media sample</label>
+
+              <div class="dropdown">
+                <div class="dropdown-selected" (click)="toggleMediaDropdown($event)">
+                  {{ editTemplateForm.get('mediaType')?.value }}
+                </div>
+
+                <div class="dropdown-menu" *ngIf="showMediaDropdown" (click)="$event.stopPropagation()">
+
+                  <div (click)="selectMediaType('None')">None</div>
+                  <div (click)="selectMediaType('Image')">Image</div>
+                  <div (click)="selectMediaType('Video')">Video</div>
+                  <div (click)="selectMediaType('Document')">Document</div>
+
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- HEADER -->
+          <div class="field">
+            <label>Header</label>
+            <input formControlName="headerText" />
+          </div>
+
+          <!-- BODY -->
+          <div class="field">
+            <label>Body</label>
+
+            <div class="body-container">
+              <textarea formControlName="msgBodyText" maxlength="1024" rows="8"></textarea>
+
+              <div class="toolbar">
+                <span>😊</span>
+                <span><b>B</b></span>
+                <span><i>I</i></span>
+
+                <span class="add-variable" (click)="addVariable()">
+                  + Add variable
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- FOOTER -->
+          <div class="field">
+            <label>Footer</label>
+            <input formControlName="footerText" />
+          </div>
+
+          <!-- VARIABLES -->
+          <div formArrayName="msgBodyVariable" class="variable-section" *ngIf="variablesArray.length">
+
+            <h4>Variable samples</h4>
+
+            <div class="var-row" *ngFor="let v of variablesArray.controls; let i = index" [formGroupName]="i">
+
+              <div class="var-key">
+                {{ v.value.key }}
+              </div>
+
+              <input formControlName="value" placeholder="Enter value" />
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- RIGHT PREVIEW -->
+        <div class="template-preview">
+
+          <h3>Template preview</h3>
+
+          <div class="phone">
+            <div class="chat-bubble">
+
+              <!-- HEADER -->
+              <div class="whats-app-header" *ngIf="editTemplateForm.get('headerText')?.value as header">
+                {{ header }}
+              </div>
+
+              <!-- BODY -->
+              <div class="body">
+                {{ getPreviewText() || 'Your message preview...' }}
+              </div>
+
+              <!-- FOOTER -->
+              <div class="footer" *ngIf="editTemplateForm.get('footerText')?.value as footer">
+                {{ footer }}
+              </div>
+
+              <!-- META INFO -->
+              <div class="time">11:22</div>
+
+              <!-- EXTRA INFO (OPTIONAL DEBUG / UX) -->
+              <!-- <div class="meta-info">
+
+                <div class="meta-row">
+                  <span class="label">Variable Type:</span>
+                  <span class="value">
+                    {{ editTemplateForm.get('variableType')?.value || 'Not selected' }}
+                  </span>
+                </div>
+
+                <div class="meta-row">
+                  <span class="label">Media:</span>
+                  <span class="value">
+                    {{ editTemplateForm.get('mediaType')?.value || 'None' }}
+                  </span>
+                </div>
+
+              </div> -->
+
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </form>
+
+  </mat-dialog-content>
+
+  <!-- ACTIONS -->
+  <mat-dialog-actions align="end">
+    <button mat-button mat-dialog-close>Close</button>
+    <button mat-button color="primary" (click)="submitTemplate()">
+      Submit
+    </button>
+  </mat-dialog-actions>
 
 </ng-template>

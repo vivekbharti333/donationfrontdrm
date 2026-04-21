@@ -1,8 +1,9 @@
-import { Component, importProvidersFrom, TemplateRef } from '@angular/core';
-import { FormGroup, FormBuilder, Validators, AbstractControl, FormControl } from '@angular/forms';
+import { Component, importProvidersFrom, TemplateRef, HostListener } from '@angular/core';
+import { FormGroup, FormArray, FormBuilder, Validators, AbstractControl, FormControl } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { Sort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
+// import { MatDialogRef } from '@angular/material/dialog';
 import {
   DataService,
   pageSelection,
@@ -25,47 +26,25 @@ import { WhatsAppTemplatesService } from './whats-app-templates.service';
 export class WhatsAppTemplatesComponent {
 
   public editTemplateDialog: any;
+  public editTemplateForm!: FormGroup;
+
+// get variablesArray(): FormArray {
+//   return this.editTemplateForm.get('msgBodyVariable') as FormArray;
+// }
+
 
   /* ================= TEMPLATE ================= */
-  template = {
-    name: '',
-    language: 'English',
-    header: '',
-    body: '',
-    footer: ''
-  };
+
 
   variables: string[] = [];
   variableValues: Record<string, string> = {};
 
-  selectedVariableType: any = 'Name';
+  selectedVariableType: any;
   showVarDropdown = false;
 
-  selectedMediaType: any = 'None';
+  selectedMediaType: any;
   showMediaDropdown = false;
 
-  /* ================= CHAT DATA ================= */
-
-  leads = [
-    {
-      id: 1,
-      name: 'Rahul Sharma',
-      lastMessage: 'Yes interested',
-      messages: [
-        { text: 'Hello', direction: 'OUTGOING', time: '12:30 PM' },
-        { text: 'Yes interested', direction: 'INCOMING', time: '12:31 PM' }
-      ]
-    },
-    {
-      id: 2,
-      name: 'NGO XYZ',
-      lastMessage: 'Hello',
-      messages: [
-        { text: 'Hi', direction: 'OUTGOING', time: '10:00 AM' },
-        { text: 'Hello', direction: 'INCOMING', time: '10:01 AM' }
-      ]
-    }
-  ];
 
   selectedLead: any = null;
   messages: any[] = [];
@@ -99,8 +78,9 @@ export class WhatsAppTemplatesComponent {
 
 
   /* ================= CHAT LOGIC ================= */
-
   constructor(
+    // private dialogRef: MatDialogRef<any>,
+    private fb: FormBuilder,
     private sidebar: SidebarService,
     private pagination: PaginationService,
     private dialog: MatDialog,
@@ -111,19 +91,63 @@ export class WhatsAppTemplatesComponent {
   }
 
   ngOnInit() {
-    this.getWhatsAppTemplate("h")
+    this.getWhatsAppTemplate("h");
+  }
+
+ createForms() {
+  this.editTemplateForm = this.fb.group({
+    requestFor: [null],
+    templateId: [null],
+    templateName: [''],
+
+    parameterFormat: ['POSITIONAL'],
+
+    headerFormat: [null],
+    headerText: [''],
+
+    msgBodyText: [''],
+
+    // ✅ FIXED STRUCTURE
+    msgBodyVariable: this.fb.array([
+      this.createVariableGroup(1)
+    ]),
+
+    footerText: [''],
+
+    language: ['en'],
+    status: [null],
+    category: [null],
+    sub_category: [null],
+    toWhatsAppNumber: [null],
+
+    variableType: ['Name'],
+    mediaType: ['None']
+  });
+}
+
+get msgBodyVariableArray(): FormArray {
+  return this.editTemplateForm.get('msgBodyVariable') as FormArray;
+}
+
+ // ✅ getter
+  get variablesArray(): FormArray {
+    return this.editTemplateForm.get('msgBodyVariable') as FormArray;
+  }
+
+  // ✅ helper
+  createVariableGroup(index: number) {
+    return this.fb.group({
+      key: `{{${index}}}`,
+      value: ''
+    });
+  }
+
+  addVariable() {
+    const index = this.variablesArray.length + 1;
+    this.variablesArray.push(this.createVariableGroup(index));
   }
 
   public getWhatsAppTemplate(tabName: string): void {
-    // this.showCustomFilter = false;
-    // this.tabName = tabName;
-
-    // 🔥 CLEAR OLD DATA BEFORE API CALL
-    this.tableData = [];
-    this.fullData = [];
-    this.serialNumberArray = [];
-    this.totalData = 0;
-
     this.dataSource = new MatTableDataSource<DonationDetails>([]);
 
     // 🔥 Reset pagination to page 1
@@ -239,10 +263,10 @@ export class WhatsAppTemplatesComponent {
   }
   ///////////////////
 
-  selectLead(lead: any) {
-    this.selectedLead = lead;
-    this.messages = lead.messages;
-  }
+  // selectLead(lead: any) {
+  //   this.selectedLead = lead;
+  //   this.messages = lead.messages;
+  // }
 
   sendMessage() {
     if (!this.newMessage) return;
@@ -258,95 +282,132 @@ export class WhatsAppTemplatesComponent {
 
   /* ================= TEMPLATE LOGIC ================= */
 
-  onBodyChange() {
-    this.detectVariables();
-  }
+ onBodyChange() {
+  this.detectVariables();
+}
 
-  detectVariables() {
-    const text = this.template.body || '';
-    const matches = text.match(/{{(.*?)}}/g);
+detectVariables() {
+  const text = this.editTemplateForm.get('msgBodyText')?.value || '';
 
-    if (!matches) {
-      this.variables = [];
-      return;
-    }
+  const matches = text.match(/{{\d+}}/g); // only {{1}}, {{2}}
 
-    const unique = [...new Set(matches)];
-    this.variables = unique;
+  const formArray = this.variablesArray;
 
-    unique.forEach(v => {
-      if (!this.variableValues[v]) {
-        this.variableValues[v] = '';
-      }
-    });
-  }
+  // ✅ clear existing variables
+  formArray.clear();
 
-  getPreviewText() {
-    let text = this.template.body || '';
+  if (!matches) return;
 
-    this.variables.forEach(v => {
-      const value = this.variableValues[v] || v;
-      text = text.replaceAll(v, value);
-    });
+  // ✅ unique variables
+  const unique = [...new Set(matches)] as string[];
 
-    return text;
-  }
+ unique.forEach((v: string) => {
+  formArray.push(
+    this.fb.group({
+      key: v,
+      value: ''
+    })
+  );
+});
+}
 
-  addVariable() {
-    const variable =
-      this.selectedVariableType === 'Number' ? '{{1}}' : '{{name}}';
+getPreviewText(): string {
+  let text = this.editTemplateForm.get('msgBodyText')?.value || '';
 
-    this.template.body += ' ' + variable;
-    this.detectVariables();
-  }
+  const variables = this.variablesArray.value;
+
+  variables.forEach((v: any) => {
+    const value = v.value || v.key;
+    text = text.replaceAll(v.key, value);
+  });
+
+  return text;
+}
+
+  // addVariable() {
+  //   const variable =
+  //     this.selectedVariableType === 'Number' ? '{{1}}' : '{{name}}';
+
+  //   this.template.body += ' ' + variable;
+  //   this.detectVariables();
+  // }
 
   /* ================= DROPDOWN ================= */
 
-  toggleVarDropdown() {
-    this.showVarDropdown = !this.showVarDropdown;
-    this.showMediaDropdown = false;
-  }
+toggleVarDropdown(event: Event) {
+  event.stopPropagation(); // 🔥 THIS IS THE MAIN FIX
+
+  this.showVarDropdown = !this.showVarDropdown;
+  this.showMediaDropdown = false;
+}
 
   selectVariableType(type: any) {
     this.selectedVariableType = type;
     this.showVarDropdown = false;
   }
 
-  toggleMediaDropdown() {
-    this.showMediaDropdown = !this.showMediaDropdown;
-    this.showVarDropdown = false;
-  }
+  toggleMediaDropdown(event: Event) {
+  event.stopPropagation(); // same as var dropdown
+  this.showMediaDropdown = !this.showMediaDropdown;
+  this.showVarDropdown = false;
+}
 
   selectMediaType(type: any) {
     this.selectedMediaType = type;
     this.showMediaDropdown = false;
   }
 
-  // @HostListener('document:click', ['$event'])
-  // closeDropdown(event: any) {
-  //   if (!event.target.closest('.dropdown')) {
-  //     this.showVarDropdown = false;
-  //     this.showMediaDropdown = false;
-  //   }
-  // }
+  @HostListener('document:click', ['$event'])
+  closeDropdown(event: any) {
+    if (!event.target.closest('.dropdown')) {
+      this.showVarDropdown = false;
+      this.showMediaDropdown = false;
+    }
+  }
 
   submitTemplate() {
-    console.log('FINAL DATA:', {
-      ...this.template,
-      variables: this.variableValues
-    });
+    
+   
   }
 
 
+openEditModal(templateRef: TemplateRef<any>, data: any) {
 
-  openEditModal(templateRef: TemplateRef<any>, rowData: any) {
+  this.createForms();
 
-    this.editTemplateDialog = this.dialog.open(templateRef, {
-      width: '1400px', // Set your desired width
-      // height: '600px', // Set your desired height
-      disableClose: true, // Optional: prevent closing by clicking outside
-      panelClass: 'custom-modal', // Optional: add custom class for additional styling
-    });
+  this.editTemplateForm.patchValue({
+    requestFor: data.requestFor,
+    templateId: data.templateId,
+    templateName: data.templateName,
+    parameterFormat: data.parameterFormat,
+    headerFormat: data.headerFormat,
+    headerText: data.headerText,
+    msgBodyText: data.msgBodyText,
+    footerText: data.footerText,
+    language: data.language,
+    status: data.status,
+    category: data.category,
+    sub_category: data.sub_category,
+    toWhatsAppNumber: data.toWhatsAppNumber
+  });
 
-  }
+  // ✅ FIX HERE
+  this.variablesArray.clear();
+
+  data.msgBodyVariable?.forEach((v: any) => {
+    this.variablesArray.push(
+      this.fb.group({
+        variableType: [v.variableType || 'Name'],
+        bodyVariable: [v.bodyVariable || '']
+      })
+    );
+  });
+
+  this.editTemplateDialog = this.dialog.open(templateRef, {
+    width: '1400px',
+    disableClose: true,
+    panelClass: 'custom-modal',
+  });
+}
+
 }
