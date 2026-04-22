@@ -35,4 +35,13 @@ export class WhatsAppTemplatesService {
       };
       return this.http.post<any>(Constant.Site_Url + "getWhatsAppTemplate", request);
     }
+
+    deleteWhatsAppTemplateByName(templateName : string): Observable<any> {
+      let request: any = {
+        payload: {
+          "templateName": templateName,  
+        }
+      };
+      return this.http.post<any>(Constant.Site_Url + "deleteWhatsAppTemplateByName", request);
+    }
 }

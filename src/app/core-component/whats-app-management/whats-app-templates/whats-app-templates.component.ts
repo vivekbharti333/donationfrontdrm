@@ -91,7 +91,7 @@ export class WhatsAppTemplatesComponent {
   }
 
   ngOnInit() {
-    this.getWhatsAppTemplate("h");
+    this.getWhatsAppTemplate();
   }
 
  createForms() {
@@ -147,7 +147,7 @@ get msgBodyVariableArray(): FormArray {
     this.variablesArray.push(this.createVariableGroup(index));
   }
 
-  public getWhatsAppTemplate(tabName: string): void {
+  public getWhatsAppTemplate(): void {
     this.dataSource = new MatTableDataSource<DonationDetails>([]);
 
     // 🔥 Reset pagination to page 1
@@ -409,5 +409,21 @@ openEditModal(templateRef: TemplateRef<any>, data: any) {
     panelClass: 'custom-modal',
   });
 }
+
+
+public deleteTemplateByName(templateName: string) {
+    this.whatsAppTemplatesService.deleteWhatsAppTemplateByName(templateName)
+      .subscribe({
+        next: (response: any) => {
+          if (response['responseCode'] == '200') {
+            this.getWhatsAppTemplate();
+            // this.toastr.success(response['responseMessage'], response['responseCode']);
+          } else {
+            //  this.toastr.error(response['responseMessage'], response['responseCode']);
+          }
+        },
+        //error: (error: any) => this.toastr.error('Server Error', '500'),
+      });
+  }
 
 }
