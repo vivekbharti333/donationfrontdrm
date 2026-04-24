@@ -5,6 +5,7 @@ import { WhatsAppManagementRoutingModule } from './whats-app-management-routing.
 import { WhatsAppManagementComponent } from './whats-app-management.component';
 import { WhatsAppInboxComponent } from './whats-app-inbox/whats-app-inbox.component';
 import { WhatsAppTemplatesComponent } from './whats-app-templates/whats-app-templates.component';
+import { AddWhatsAppTemplatesComponent } from './add-whats-app-templates/add-whats-app-templates.component';
 import { sharedModule } from 'src/app/shared/shared.module';
 
 import { NgxEditorModule } from 'ngx-editor';
@@ -15,6 +16,7 @@ import { MatDialogModule } from '@angular/material/dialog';
     WhatsAppManagementComponent,
     WhatsAppInboxComponent ,
     WhatsAppTemplatesComponent,
+    AddWhatsAppTemplatesComponent,
   ],
   imports: [
     CommonModule,

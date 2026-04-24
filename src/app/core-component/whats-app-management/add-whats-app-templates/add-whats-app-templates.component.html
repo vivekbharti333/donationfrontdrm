@@ -1,0 +1,221 @@
+<form *ngIf="addTemplateForm" [formGroup]="addTemplateForm">
+
+  <div class="template-container">
+
+    <!-- LEFT FORM -->
+    <div class="template-form">
+
+      <!-- BASIC -->
+      <div class="form-row">
+        <div class="field">
+          <label>Name your template</label>
+          <input formControlName="templateName" />
+        </div>
+
+        <div class="field small">
+          <label>Select language</label>
+          <select formControlName="language">
+            <option value="en">English</option>
+            <option value="en_IN">English (IND)</option>
+            <option value="en_US">English (US)</option>
+            <option value="hi">Hindi</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- VARIABLE TYPE + MEDIA -->
+      <div class="form-row">
+
+        <!-- VARIABLE TYPE -->
+        <div class="field">
+          <label>Type of variable</label>
+          <mat-select formControlName="variableType">
+            <mat-option value="Name">Name</mat-option>
+            <mat-option value="Number">Number</mat-option>
+          </mat-select>
+        </div>
+
+        <!-- MEDIA -->
+        <div class="field">
+          <label>Media sample</label>
+          <mat-select formControlName="mediaType"
+                      (selectionChange)="selectMediaType($event.value)">
+
+            <mat-option value="None">None</mat-option>
+            <mat-option value="Image">Image</mat-option>
+            <mat-option value="Video">Video</mat-option>
+            <mat-option value="Document">Document</mat-option>
+
+          </mat-select>
+        </div>
+
+      </div>
+
+      <!-- ✅ MEDIA UPLOAD (NEW) -->
+      <div class="field"
+           *ngIf="addTemplateForm.get('mediaType')?.value !== 'None'">
+
+        <label>Upload {{ addTemplateForm.get('mediaType')?.value }}</label>
+
+        <div class="upload-box">
+
+          <!-- IMAGE -->
+          <input *ngIf="addTemplateForm.get('mediaType')?.value === 'Image'"
+                 type="file"
+                 accept="image/*"
+                 (change)="onFileSelect($event)" />
+
+          <!-- VIDEO -->
+          <input *ngIf="addTemplateForm.get('mediaType')?.value === 'Video'"
+                 type="file"
+                 accept="video/*"
+                 (change)="onFileSelect($event)" />
+
+          <!-- DOCUMENT -->
+          <input *ngIf="addTemplateForm.get('mediaType')?.value === 'Document'"
+                 type="file"
+                 accept=".pdf,.doc,.docx"
+                 (change)="onFileSelect($event)" />
+
+        </div>
+
+        <!-- PREVIEW -->
+        <div class="preview" *ngIf="filePreview">
+
+          <img *ngIf="addTemplateForm.get('mediaType')?.value === 'Image'"
+               [src]="filePreview"
+               width="200" />
+
+          <video *ngIf="addTemplateForm.get('mediaType')?.value === 'Video'"
+                 [src]="filePreview"
+                 controls
+                 width="250">
+          </video>
+
+          <div *ngIf="addTemplateForm.get('mediaType')?.value === 'Document'">
+            📄 {{ fileName }}
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- HEADER -->
+      <div class="field">
+        <label>Header</label>
+        <input formControlName="headerText" />
+      </div>
+
+      <!-- BODY -->
+      <div class="field">
+        <label>Body</label>
+
+        <div class="body-container">
+          <textarea formControlName="msgBodyText"
+                    (input)="detectVariables()"
+                    maxlength="1024"
+                    rows="8">
+          </textarea>
+
+          <div class="toolbar">
+            <span>😊</span>
+            <span><b>B</b></span>
+            <span><i>I</i></span>
+
+            <span class="add-variable" (click)="addVariable()">
+              + Add variable
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- FOOTER -->
+      <div class="field">
+        <label>Footer</label>
+        <input formControlName="footerText" />
+      </div>
+
+
+      
+
+      <!-- VARIABLES -->
+      <div formArrayName="msgBodyVariable"
+           class="variable-section"
+           *ngIf="variablesArray?.length">
+
+        <h4>Variable samples</h4>
+
+        <div class="var-row"
+             *ngFor="let v of variablesArray.controls; let i = index"
+             [formGroupName]="i">
+
+          <div class="var-key">
+            {{ v.value.key }}
+          </div>
+
+          <input formControlName="value" placeholder="Enter value" />
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- RIGHT PREVIEW -->
+    <div class="template-preview">
+
+      <h3>Template preview</h3>
+
+      <div class="phone">
+        <div class="chat-bubble">
+
+             <!-- MEDIA PREVIEW (NEW) -->
+          <img *ngIf="filePreview && addTemplateForm.get('mediaType')?.value === 'Image'"
+               [src]="filePreview" width="100%" />
+
+          <video *ngIf="filePreview && addTemplateForm.get('mediaType')?.value === 'Video'"
+                 [src]="filePreview" controls width="100%"></video>
+
+                 <!-- DOCUMENT PREVIEW -->
+          <div *ngIf="selectedFile && addTemplateForm.get('mediaType')?.value === 'Document'"
+                class="doc-preview">
+            <div class="doc-box">
+                📄 <b>{{ fileName }}</b>
+            </div>
+
+            <a *ngIf="filePreview" [href]="filePreview" target="_blank" class="doc-link"> Open Document </a>
+          </div>
+
+          <!-- HEADER -->
+          <div class="whats-app-header"
+               *ngIf="addTemplateForm.get('headerText')?.value as header">
+            {{ header }}
+          </div>
+
+          <!-- BODY -->
+          <div class="body">
+            {{ getPreviewText() || 'Your message preview...' }}
+          </div>
+
+          <!-- FOOTER -->
+          <div class="footer"
+               *ngIf="addTemplateForm.get('footerText')?.value as footer">
+            {{ footer }}
+          </div>
+
+          <div class="time">11:22</div>
+
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+</form>
+
+<!-- ACTIONS -->
+<div style="margin-top: 15px;">
+  <button mat-button color="primary" (click)="submitTemplate()">
+    Submit
+  </button>
+</div>

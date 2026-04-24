@@ -1121,5 +1121,8 @@ export class routes {
   public static get whatsAppTemplates(): string {
     return this.whatsAppManagement + '/whats-app-templates';
   }
+  public static get addWhatsAppTemplates(): string {
+    return this.whatsAppManagement + '/add-whats-app-templates';
+  }
   // core pages child routes *ends*
 }

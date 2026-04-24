@@ -1,0 +1,377 @@
+.template-container {
+  display: flex;
+  height: 100%;
+  gap: 20px;
+  padding: 20px;
+  background: #f0f2f5;
+}
+
+/* LEFT */
+.template-form {
+  flex: 2;
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: visible;
+  z-index: 1;
+}
+
+.form-row {
+  display: flex;
+  gap: 20px;
+}
+
+.field {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 15px;
+  position: relative;
+  z-index: 50; /* 🔥 ensure dropdown area is above */
+}
+
+.field.small {
+  max-width: 200px;
+}
+
+.field label {
+  font-size: 13px;
+  margin-bottom: 5px;
+}
+
+.field input,
+.field select,
+.field textarea {
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+/* SECTION */
+.section {
+  margin-top: 20px;
+}
+
+/* BUTTON */
+.actions {
+  margin-top: auto;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.primary {
+  background: #1877f2;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+}
+
+.secondary {
+  background: #e4e6eb;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+}
+
+/* RIGHT */
+.template-preview {
+  flex: 1;
+  background: #e9edef;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+/* PHONE */
+.phone {
+  position: relative;
+
+  background:
+    linear-gradient(rgba(255,255,255,0.6), rgba(255,255,255,0.6)),
+    url('/assets/img/wa-message-mobile-bg.png');
+
+  background-repeat: repeat;
+  background-size: 300px;
+  background-color: #e5ddd5;
+
+  padding: 20px;
+  border-radius: 10px;
+  height: 500px;
+
+  display: flex;
+  align-items: flex-start;
+}
+
+/* CHAT */
+.chat-bubble {
+  background: white;
+  padding: 10px;
+  border-radius: 10px;
+  max-width: 80%;
+  font-size: 14px;
+  display: inline-block;
+}
+
+.whats-app-header {
+  font-weight: bold;
+  margin-bottom: 6px;
+  color: black;
+}
+
+.body {
+  white-space: pre-line;
+  margin-bottom: 5px;
+}
+
+.footer {
+  font-size: 12px;
+  color: gray;
+}
+
+.time {
+  font-size: 10px;
+  text-align: right;
+  color: gray;
+}
+
+/* =====================
+   DROPDOWN FIX
+===================== */
+
+.dropdown {
+  position: relative;
+  width: 100%;
+  z-index: 100; /* 🔥 */
+}
+
+.dropdown-selected {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background: white;
+  cursor: pointer;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  margin-top: 5px;
+
+  z-index: 999999; /* 🔥 SUPER HIGH */
+}
+
+.dropdown-menu div {
+  padding: 10px;
+  cursor: pointer;
+}
+
+.dropdown-menu div:hover {
+  background: #f0f2f5;
+}
+
+/* VARIABLES */
+.variable-section {
+  background: #f5f6f6;
+  padding: 15px;
+  border-radius: 6px;
+  margin-top: 15px;
+}
+
+.var-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.var-key {
+  width: 120px;
+  background: #e4e6eb;
+  padding: 8px;
+  border-radius: 6px;
+  text-align: center;
+  margin-right: 10px;
+}
+
+.var-row input {
+  flex: 1;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+/* BODY CONTAINER FIX */
+.body-container {
+  position: relative;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background: white;
+  z-index: 1; /* 🔥 lower than dropdown */
+}
+
+/* TEXTAREA */
+.body-container textarea {
+  width: 100%;
+  border: none;
+  outline: none;
+  padding: 15px;
+  resize: none;
+  font-size: 14px;
+  border-radius: 8px;
+  position: relative;
+  z-index: 1; /* 🔥 prevent overlap */
+}
+
+/* CHAR COUNT */
+.char-count {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 12px;
+  color: gray;
+}
+
+/* TOOLBAR */
+.toolbar {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  border-top: 1px solid #eee;
+  gap: 12px;
+  font-size: 14px;
+  color: #555;
+  position: relative;
+  z-index: 1; /* 🔥 keep below dropdown */
+}
+
+.toolbar span {
+  cursor: pointer;
+}
+
+.toolbar span:hover {
+  color: black;
+}
+
+/* ADD VARIABLE */
+.add-variable {
+  margin-left: auto;
+  color: #1877f2;
+  font-weight: 500;
+}
+
+.dropdown-menu {
+  background: red !important;
+}
+
+.dialog-content {
+  max-height: 70vh;   /* controls height */
+  overflow-y: auto;   /* enables scroll */
+}
+
+/* PHONE CONTAINER */
+// .phone {
+//   background: #d1d7db;
+//   padding: 20px;
+//   border-radius: 10px;
+
+//   height: 400px;            /* 🔥 increased height */
+//   display: flex;
+//   align-items: flex-start;
+
+//   overflow: hidden;         /* 🔥 prevent outer overflow */
+// }
+
+/* CHAT BUBBLE */
+.chat-bubble {
+  background: white;
+  padding: 12px;
+  border-radius: 10px;
+  max-width: 100%;
+  font-size: 14px;
+
+  max-height: 100%;         /* 🔥 limit inside phone */
+  overflow-y: auto;         /* 🔥 scroll when content large */
+}
+
+/* BODY TEXT */
+.body {
+  white-space: pre-wrap;    /* 🔥 keep formatting */
+  word-break: break-word;   /* 🔥 break long words */
+  overflow-wrap: anywhere;  /* 🔥 prevent overflow */
+}
+
+/* OPTIONAL: SCROLLBAR STYLING */
+.chat-bubble::-webkit-scrollbar {
+  width: 6px;
+}
+
+.chat-bubble::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 6px;
+}
+
+// .badge-linewarning {
+//   background-color: Olive
+// }
+
+// .badge-linesuccess {
+//   background-color: green;
+// }
+
+// .badge-linedanger {
+//   background-color: red;
+// }
+
+
+// .chat-bubble {
+//   position: relative;
+
+//   background-image: url('/assets/img/wa-message-mobile-bg.png');
+//   background-repeat: repeat;
+//   background-size: 300px;
+
+//   background-color: #e5ddd5; /* WhatsApp bg color */
+
+//   border-radius: 10px;
+//   padding: 15px;
+// }
+
+.upload-box {
+  border: 1px dashed #ccc;
+  padding: 10px;
+  border-radius: 8px;
+  margin-top: 10px;
+}
+
+.preview {
+  margin-top: 10px;
+}
+
+.doc-preview {
+  margin-top: 10px;
+}
+
+.doc-box {
+  background: #f5f5f5;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.doc-link {
+  display: inline-block;
+  margin-top: 5px;
+  color: #25d366;
+  text-decoration: underline;
+}
+
+
+
+
