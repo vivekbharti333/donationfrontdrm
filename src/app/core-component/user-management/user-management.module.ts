@@ -13,7 +13,7 @@ import { MatOptionModule } from '@angular/material/core';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { CreateUserComponent } from './create-user/create-user.component';
-
+import { MessageService } from 'primeng/api';
 
 @NgModule({
   declarations: [
@@ -33,7 +33,6 @@ import { CreateUserComponent } from './create-user/create-user.component';
     MatOptionModule,
     MultiSelectModule,
     MatDialogModule
-  ],
-  // schemas: [CUSTOM_ELEMENTS_SCHEMA],
+  ], providers: [MessageService],
 })
 export class UserManagementModule { }

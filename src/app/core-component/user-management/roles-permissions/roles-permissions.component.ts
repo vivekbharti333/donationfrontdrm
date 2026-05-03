@@ -8,6 +8,7 @@ import {
   apiResultFormat,
   routes,
 } from 'src/app/core/core.index';
+import { MessageService } from 'primeng/api';
 import { SidebarService } from 'src/app/core/service/sidebar/sidebar.service';
 import { rolesPermissions } from 'src/app/shared/model/page.model';
 import { PaginationService, tablePageSize } from 'src/app/shared/shared.index';
@@ -79,6 +80,7 @@ export class RolesPermissionsComponent {
     private router: Router,
     private sidebar: SidebarService,
     private fb: FormBuilder,
+    private messageService: MessageService,
     private userManagementService: UserManagementService
   ) {
     this.data.getDataTable().subscribe((apiRes: apiResultFormat) => {
@@ -199,16 +201,16 @@ export class RolesPermissionsComponent {
 
   createForms() {
     this.changeUserPasswordForm = this.fb.group({
-      loginId: [''],
-      password: [''],
+      loginId: ['', Validators.required],
+      password: ['', Validators.required]
     });
     this.changeUserRoleForm = this.fb.group({
-      loginId: [''],
-      roleType: [''],
+      loginId: ['', Validators.required],
+      roleType: ['', Validators.required],
     });
     this.changeTeamLeaderForm = this.fb.group({
-      loginId: [''],
-      teamLeaderId: [''],
+      loginId: ['', Validators.required],
+      teamLeaderId: ['', Validators.required],
     });
   }
 
@@ -268,12 +270,19 @@ export class RolesPermissionsComponent {
             if (response['responseCode'] == '200') {
               if (response['payload']['respCode'] == '200') {
                 
+                this.messageService.add({ severity: 'success', summary: 'Success', detail: response.payload.respMesg });
+
                 this.changeUserPasswordForm.reset();
                 this.createForms();
                 this.changePasswordBtnMessage = "Submit"
                 this.changePasswordBtn = false;
                 this.isLoading = false;
               } else {
+                      this.messageService.add({
+                      summary: response['payload']['respCode'],
+                      detail: response['payload']['respMesg'],
+                      styleClass: 'danger-light-popover',
+                    });
                 // this.toastr.error(response['payload']['respMesg'], response['payload']['respCode']);
                 this.isLoading = false;
                 this.changePasswordBtnMessage = "Submit"
@@ -301,14 +310,20 @@ export class RolesPermissionsComponent {
         next: (response: any) => {
           if (response['responseCode'] == '200') {
             if (response['payload']['respCode'] == '200') {
-              // this.toastr.success(response['payload']['respMesg'], response['payload']['respCode']);
+
+              this.messageService.add({ severity: 'success', summary: 'Success', detail: response.payload.respMesg });
+
               this.changeUserRoleForm.reset();
               this.createForms();
               this.changeTeamLeaderBtnMessage = "Submit";
               this.changeTeamLeaderBtn = false;
               this.isLoading = false;
             } else {
-              // this.toastr.error(response['payload']['respMesg'], response['payload']['respCode']);
+              this.messageService.add({
+                      summary: response['payload']['respCode'],
+                      detail: response['payload']['respMesg'],
+                      styleClass: 'danger-light-popover',
+                    });
               this.isLoading = false;
               this.changeTeamLeaderBtnMessage = "Submit";
               this.changeTeamLeaderBtn = false;
@@ -332,14 +347,22 @@ export class RolesPermissionsComponent {
         next: (response: any) => {
           if (response['responseCode'] == '200') {
             if (response['payload']['respCode'] == '200') {
-              // this.toastr.success(response['payload']['respMesg'], response['payload']['respCode']);
+              
+              this.messageService.add({ severity: 'success', summary: 'Success', detail: response.payload.respMesg });
+
               this.changeUserRoleForm.reset();
               this.createForms();
               this.changeRoleBtnMessage = "Submit"
               this.changeUserRoleBtn = false;
               this.isLoading = false;
+              this.messageService.add({ severity: 'success', summary: 'Success', detail: response['payload']['respMesg'] });
+
             } else {
-              // this.toastr.error(response['payload']['respMesg'], response['payload']['respCode']);
+              this.messageService.add({
+                      summary: response['payload']['respCode'],
+                      detail: response['payload']['respMesg'],
+                      styleClass: 'danger-light-popover',
+                    });
               this.isLoading = false;
               this.changeRoleBtnMessage = "Submit"
               this.changeUserRoleBtn = false;

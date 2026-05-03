@@ -120,7 +120,7 @@
                   <!-- <td>{{ data.programAmount }}</td> -->
                   <td>
                     <button class="badge-button" (click)="changeProgramStatus(data)"
-                      [ngClass]="{'badge-linesuccess': data.status === 'ACTIVE', 'badge-linedanger': data.status === 'DEACTIVE'}">
+                      [ngClass]="{'badge-linesuccess': data.status === 'ACTIVE', 'badge-linedanger': data.status === 'INACTIVE'}">
                       {{ data.status }}
                     </button>
                   </td>

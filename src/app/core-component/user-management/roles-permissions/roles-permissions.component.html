@@ -1,3 +1,4 @@
+<p-toast></p-toast>
 <div class="page-header">
   <div class="add-item d-flex">
     <div class="page-title">
@@ -71,7 +72,8 @@
           <div class="col-lg-4 col-md-6">
             <div class="mb-3">
               <div class="submit-button">
-                <button type="submit" class="btn btn-submit">{{changePasswordBtnMessage}}</button>
+                <!-- <button type="submit" class="btn btn-submit">{{changePasswordBtnMessage}}</button> -->
+                <button type="submit" class="btn btn-submit" [disabled]="changeUserPasswordForm.invalid || isLoading">{{changePasswordBtnMessage}}</button>
               </div>
             </div>
           </div>
@@ -117,7 +119,9 @@
           <div class="col-lg-4 col-md-6">
             <div class="mb-3">
               <div class="submit-button">
-                <button type="submit" class="btn btn-submit">{{changePasswordBtnMessage}}</button>
+                <!-- <button type="submit" class="btn btn-submit">{{changePasswordBtnMessage}}</button> -->
+                <button type="submit" class="btn btn-submit" [disabled]="changeTeamLeaderForm.invalid || isLoading">{{changeTeamLeaderBtnMessage}}</button>
+
               </div>
             </div>
           </div>
@@ -164,7 +168,9 @@
           <div class="col-lg-4 col-md-6">
             <div class="mb-3">
               <div class="submit-button">
-                <button type="submit" class="btn btn-submit">{{changePasswordBtnMessage}}</button>
+                <!-- <button type="submit" class="btn btn-submit">{{changePasswordBtnMessage}}</button> -->
+                <button type="submit" class="btn btn-submit" [disabled]="changeUserRoleForm.invalid || isLoading">{{changeRoleBtnMessage}}</button>
+
               </div>
             </div>
           </div>
