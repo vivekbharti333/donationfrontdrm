@@ -105,7 +105,6 @@
               <label class="form-label requiredField">Permission</label>
               <mat-select class="space-select select" formControlName="permissions" placeholder="Select Permission"
                 multiple (selectionChange)="onPermissionChange($event)">
->
                 <mat-option *ngFor="let data of permissionsList" [value]="data.value">
                   {{data.name}}
                 </mat-option>

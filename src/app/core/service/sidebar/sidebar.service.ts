@@ -182,8 +182,7 @@ export class SidebarService {
             {
               menuValue: 'Program',
               route: routes.program,
-              // permission: 'program',
-              permission: 'add-donation',
+              permission: 'program',
             }, 
           ],
         },

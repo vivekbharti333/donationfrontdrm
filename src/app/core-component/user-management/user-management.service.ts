@@ -153,7 +153,8 @@ export class UserManagementService {
 
 
   saveUserDetails(userDetails: any): Observable<UserDetailsRequest> {
-    this.loginId = this.cookieService.get('loginId');
+    this.loginUser = this.authenticationService.getLoginUser();
+    // this.loginId = this.cookieService.get('loginId');
     this.superadminId = this.cookieService.get('superadminId');
     var creatBy ="";
     if(userDetails.roleType === Constant.fundraisingOfficer){

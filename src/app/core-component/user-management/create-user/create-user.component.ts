@@ -177,14 +177,21 @@ onPermissionChange(event: any) {
   ];
 
   permissionsList: data[] =[
-    { value: 'admin-dashboard', name: 'Lead Dashboard' },
     { value: 'sale-dashboard', name: 'Donation Dashboard' },
     { value: 'create-user', name: 'Create User' },
     { value: 'user-list', name: 'User List' },
-    { value: 'create-lead', name: 'Create Lead' },
-    { value: 'lead-list', name: 'Lead List' },
+    { value: 'add-donation', name: 'Add Donation' },
+    { value: 'all-donation-list', name: 'Donation List' },
+    { value: 'payment-mode', name: 'Payment Mode' },
+    { value: 'payment-report', name: 'Payment Report' },
+    { value: 'program', name: 'Donation Program' },
+
+    { value: 'admin-dashboard', name: 'Donation Lead Dashboard' },
+    { value: 'create-lead', name: 'Create Donation Lead' },
+    { value: 'lead-list', name: 'Donation Lead List' },
+
     { value: 'general-setting', name: 'General Setting' },
-    { value: 'company-setting', name: 'Company Setting' }
+    { value: 'company-setting', name: 'NGO Invoice Setting' }
   ];
 
   public isTeamLeaderFielsShow() {
