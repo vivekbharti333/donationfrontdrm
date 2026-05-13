@@ -124,7 +124,7 @@
             <th mat-sort-header="role">Role</th>
             <th mat-sort-header="createdOn">Created On</th>
             <th mat-sort-header="status">Status</th>
-            <th class="no-sort">Action</th>
+            <th *ngIf="isSuperadmin" class="no-sort">Action</th>
           </tr>
         </thead>
         <tbody>
@@ -149,19 +149,33 @@
             <td>{{ data.createdAt | date : "dd-MM-yyyy | HH:mm" }}</td>
             <td>
               <button class="badge-button"
+                      [ngClass]="{
+                        'badge-linesuccess': data.status === 'ACTIVE',
+                        'badge-linedanger': data.status === 'INACTIVE'
+                      }"
+                      [disabled]="isSuperadmin"
+                      (click)="!isSuperadmin && changeUserStatus(data)">
+                {{ data.status }}
+              </button>
+              <!-- <button class="badge-button"
                 [ngClass]="{'badge-linesuccess': data.status === 'ACTIVE','badge-linedanger': data.status === 'INACTIVE'}"
                 (click)="changeUserStatus(data)">
                 {{ data.status }}
-              </button>
+              </button> -->
             </td>
             <td class="action-table-data">
               <div class="edit-delete-action">
                 
-                <a class="me-2 p-2 mb-0" data-bs-toggle="modal" data-bs-target="#edit-units"
+                <a *ngIf="isSuperadmin" class="me-2 p-2 mb-0" data-bs-toggle="modal" data-bs-target="#edit-units"
                   (click)="openEditModal(dialogTemplate, data)">
                   <i class="feather icon-edit feather-edit"></i></a>
-                <a class="me-2 confirm-text p-2 mb-0" href="javascript:void(0);" (click)="confirmColor(data.loginId)">
-                  <i class="feather icon-trash-2 feather-trash-2"></i></a>
+
+                  <a *ngIf="isSuperadmin" class="me-2 confirm-text p-2 mb-0" href="javascript:void(0);" (click)="confirmColor(data.loginId)">
+                    <i class="feather icon-trash-2 feather-trash-2"></i>
+                  </a>
+
+                <!-- <a *ngif("isSuperadmin") class="me-2 confirm-text p-2 mb-0" href="javascript:void(0);" (click)="confirmColor(data.loginId)">
+                  <i class="feather icon-trash-2 feather-trash-2"></i></a> -->
               </div>
             </td>
           </tr>
@@ -209,12 +223,21 @@
                   'btn-green': u.status === 'ACTIVE',
                   'btn-red': u.status === 'INACTIVE'
                 }"
-                (click)="changeUserStatus(u)">
+                [disabled]="!isSuperadmin"
+                (click)="isSuperadmin && changeUserStatus(u)">
           {{ u.status }}
         </button>
+        <!-- <button class="status-btn"
+                [ngClass]="{
+                  'btn-green': u.status === 'ACTIVE',
+                  'btn-red': u.status === 'INACTIVE'
+                }"
+                (click)="changeUserStatus(u)">
+          {{ u.status }}
+        </button> -->
       </div>
 
-      <div class="right-actions">
+      <div *ngIf="isSuperadmin" class="right-actions">
 
         <button class="icon-btn" (click)="openEditModal(dialogTemplate, u)">
           <i class="feather icon-edit edit-icon"></i>

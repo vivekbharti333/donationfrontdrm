@@ -8,6 +8,11 @@
   color: black;
 }
 
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
 /* ---------------- RESPONSIVE TABS FOR MOBILE ---------------- */
 .tabs-wrapper {
   margin-bottom: 12px;

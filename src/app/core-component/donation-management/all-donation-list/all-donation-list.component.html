@@ -173,9 +173,18 @@
                             'badge-linesuccess': data.status === 'ACTIVE',
                             'badge-linedanger': data.status === 'INACTIVE'
                           }"
-                          (click)="updateDonationStatus(data)">
+                          [disabled]="!isSuperadmin"
+                          (click)="isSuperadmin && updateDonationStatus(data)">
                     {{ data.status }}
                   </button>
+                  <!-- <button class="badge-button" *ngIf="isSuperadmin"
+                          [ngClass]="{
+                            'badge-linesuccess': data.status === 'ACTIVE',
+                            'badge-linedanger': data.status === 'INACTIVE'
+                          }"
+                          (click)="updateDonationStatus(data)">
+                    {{ data.status }}
+                  </button> -->
                 </td>
 
                 <td class="action-table-data">
@@ -191,7 +200,7 @@
                       <i class="feather icon-share-2"></i>
                     </a>
 
-                    <a class="me-2 p-2 mb-0"
+                    <a class="me-2 p-2 mb-0" 
                        (click)="downloadInvoice(data.receiptNumber)">
                       <i class="feather icon-download feather-download"></i>
                     </a>
@@ -237,14 +246,23 @@
 
         <div class="card-actions">
           <div class="left-actions">
-            <button class="status-btn"
+            <button class="badge-button"
+                    [ngClass]="{
+                      'badge-linesuccess': d.status === 'ACTIVE',
+                      'badge-linedanger': d.status === 'INACTIVE'
+                    }"
+                    [disabled]="!isSuperadmin"
+                    (click)="isSuperadmin && updateDonationStatus(d)">
+              {{ d.status }}
+            </button>
+            <!-- <button class="status-btn"
                     [ngClass]="{
                       'btn-green': d.status === 'ACTIVE',
                       'btn-red': d.status === 'INACTIVE'
                     }"
                     (click)="updateDonationStatus(d)">
               {{ d.status }}
-            </button>
+            </button> -->
           </div>
 
           <div class="right-actions">

@@ -206,6 +206,7 @@ export class AllDonationListComponent {
       this.isSuperadmin = true;
     } else if (this.loginUser['roleType'] == Constant.teamLeader) {
       this.isTeamLeader = true;
+      this.isSuperadmin = true;
     } else if (this.loginUser['roleType'] == Constant.donorExecutive) {
       this.isDonationExecutive = true;
     }

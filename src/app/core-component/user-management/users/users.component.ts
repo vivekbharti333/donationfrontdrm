@@ -34,11 +34,12 @@ interface data {
   providers: [MessageService, ToastModule],
 })
 export class UsersComponent {
-
+  public loginUser: any;
   public isMainAdmin: boolean = false;
   public isSuperadmin: boolean = false;
   public isAdmin: boolean = false;
   public isTeamLeader: boolean = false;
+  public isDonationExecutive: boolean = false;
   public editUserForm!: FormGroup;
   public teamLeaderForm!: FormGroup;
 
@@ -53,6 +54,89 @@ export class UsersComponent {
   public userAddressList: any;
   public loginId :any;
 
+   public roleTypes = [
+    { id: 1, name: 'SUPERADIN' },
+    { id: 2, name: 'ADMIN' },
+    { id: 3, name: 'TEAMLEAER' },
+  ];
+
+  initChecked = false;
+  selectedValue1 = '';
+  selectedValue2 = '';
+  selectedValue3 = '';
+  selectedValue4 = '';
+  selectedValue5 = '';
+  selectedValue6 = '';
+  selectedValue7 = '';
+
+  public userList: any;
+
+  public routes = routes;
+  // pagination variables
+  public tableData: Array<any> = [];
+  public pageSize = 2;
+  public serialNumberArray: Array<number> = [];
+  public totalData = 0;
+  showFilter = false;
+  dataSource!: MatTableDataSource<UserDetails>;
+  public searchDataValue = '';
+  //** / pagination variables
+
+  constructor(
+    private data: DataService,
+    private pagination: PaginationService,
+    private router: Router,
+    private sidebar: SidebarService,
+    private fb: FormBuilder,
+    private authenticationService: AuthenticationService,
+    private messageService: MessageService,
+    private userManagementService: UserManagementService,
+    private dialog: MatDialog,
+    private cookieService: CookieService
+  ) {
+    this.loginUser = this.authenticationService.getLoginUser();
+  }
+
+
+  ngOnInit() {
+    this.getUserDetails();
+    this.createForms();
+    this.checkRoleType();
+    this.getUserRoleType();
+    this.getTeamleaderList();
+  }
+
+  genderType: data[] = [
+    { value: '1', name: 'MALE' },
+    { value: '2', name: 'FEMALE' },
+    { value: '3', name: 'OTHER' },
+  ];
+
+  getUserRoleType(){
+    if( this.cookieService.get('roleType') === Constant.mainAdmin){
+      this.userRoleList = [{value: Constant.superAdmin, name: 'Superadmin'}, {value: Constant.admin, name: 'Admin'}, {value:Constant.teamLeader, name: 'Team Leader'}, { value: Constant.fundraisingOfficer, name: 'Fundrising Officer'}];
+
+    }else if( this.cookieService.get('roleType') === Constant.superAdmin){
+      this.userRoleList = [{value: Constant.admin, name: 'Admin'}, {value:Constant.teamLeader, name: 'Team Leader'}, { value: Constant.fundraisingOfficer, name: 'Fundrising Officer'}, { value: Constant.donorExecutive, name: 'Donation Executive'}];
+
+    }else if( this.cookieService.get('roleType') === Constant.admin){
+      this.userRoleList = [{value: Constant.teamLeader, name: 'Team Leader'}, { value: Constant.fundraisingOfficer, name: 'Fundrising Officer'}];
+    }else if( this.cookieService.get('roleType') === Constant.teamLeader){
+      this.userRoleList = [{ value: Constant.fundraisingOfficer, name: 'Fundrising Officer'}];
+    }
+  }
+
+  permissionsList: data[] =[
+    { value: 'admin-dashboard', name: 'Lead Dashboard' },
+    { value: 'sale-dashboard', name: 'Donation Dashboard' },
+    { value: 'create-user', name: 'Create User' },
+    { value: 'user-list', name: 'User List' },
+    { value: 'create-lead', name: 'Create Lead' },
+    { value: 'lead-list', name: 'Lead List' },
+    { value: 'general-setting', name: 'General Setting' },
+    { value: 'company-setting', name: 'Company Setting' }
+  ];
+
 
   onRoleTypeChange(event: any) {
     console.log('Selected gender:', event.value);
@@ -61,18 +145,33 @@ export class UsersComponent {
   }
 
 
-  checkRoleType(){
+  // checkRoleType(){
     
-    if( this.cookieService.get('roleType') === Constant.mainAdmin){
+  //   if( this.cookieService.get('roleType') === Constant.mainAdmin){
+  //     this.isMainAdmin = true;
+  //   }else if( this.cookieService.get('roleType') === Constant.superAdmin){
+  //     this.isSuperadmin = true;
+  //   }else if( this.cookieService.get('roleType') === Constant.admin){
+  //     this.isAdmin = true;
+  //     this.isSuperadmin = true;
+  //   }else if( this.cookieService.get('roleType') === Constant.teamLeader){
+  //     this.isTeamLeader = true;
+  //   }
+  // }
+
+  checkRoleType() {
+    if (this.loginUser['roleType'] == Constant.mainAdmin) {
       this.isMainAdmin = true;
-      // this.isSuperadmin = true;
-    }else if( this.cookieService.get('roleType') === Constant.superAdmin){
+    } else if (this.loginUser['roleType'] == Constant.superAdmin) {
       this.isSuperadmin = true;
-    }else if( this.cookieService.get('roleType') === Constant.admin){
+      this.isAdmin = true;
+    } else if (this.loginUser['roleType'] == Constant.admin) {
       this.isAdmin = true;
       this.isSuperadmin = true;
-    }else if( this.cookieService.get('roleType') === Constant.teamLeader){
+    } else if (this.loginUser['roleType'] == Constant.teamLeader) {
       this.isTeamLeader = true;
+    } else if (this.loginUser['roleType'] == Constant.donorExecutive) {
+      this.isDonationExecutive = true;
     }
   }
 
@@ -172,89 +271,7 @@ export class UsersComponent {
   
   
 
-  public roleTypes = [
-    { id: 1, name: 'SUPERADIN' },
-    { id: 2, name: 'ADMIN' },
-    { id: 3, name: 'TEAMLEAER' },
-  ];
-
-  initChecked = false;
-  selectedValue1 = '';
-  selectedValue2 = '';
-  selectedValue3 = '';
-  selectedValue4 = '';
-  selectedValue5 = '';
-  selectedValue6 = '';
-  selectedValue7 = '';
-
-  public userList: any;
-
-  public routes = routes;
-  // pagination variables
-  public tableData: Array<any> = [];
-  public pageSize = 2;
-  public serialNumberArray: Array<number> = [];
-  public totalData = 0;
-  showFilter = false;
-  dataSource!: MatTableDataSource<UserDetails>;
-  public searchDataValue = '';
-  //** / pagination variables
-
-  constructor(
-    private data: DataService,
-    private pagination: PaginationService,
-    private router: Router,
-    private sidebar: SidebarService,
-    private fb: FormBuilder,
-    private authenticationService: AuthenticationService,
-    private messageService: MessageService,
-    private userManagementService: UserManagementService,
-    private dialog: MatDialog,
-    private cookieService: CookieService
-  ) {
-    // this.loginUser = this.authenticationService.getLoginUser();
-  }
-
-
-  ngOnInit() {
-    this.getUserDetails();
-    this.createForms();
-    // this.checkRoleType();
-    this.getUserRoleType();
-    this.getTeamleaderList();
-  }
-
-  genderType: data[] = [
-    { value: '1', name: 'MALE' },
-    { value: '2', name: 'FEMALE' },
-    { value: '3', name: 'OTHER' },
-  ];
-
-  getUserRoleType(){
-    if( this.cookieService.get('roleType') === Constant.mainAdmin){
-      this.userRoleList = [{value: Constant.superAdmin, name: 'Superadmin'}, {value: Constant.admin, name: 'Admin'}, {value:Constant.teamLeader, name: 'Team Leader'}, { value: Constant.fundraisingOfficer, name: 'Fundrising Officer'}];
-
-    }else if( this.cookieService.get('roleType') === Constant.superAdmin){
-      this.userRoleList = [{value: Constant.admin, name: 'Admin'}, {value:Constant.teamLeader, name: 'Team Leader'}, { value: Constant.fundraisingOfficer, name: 'Fundrising Officer'}, { value: Constant.donorExecutive, name: 'Donation Executive'}];
-
-    }else if( this.cookieService.get('roleType') === Constant.admin){
-      this.userRoleList = [{value: Constant.teamLeader, name: 'Team Leader'}, { value: Constant.fundraisingOfficer, name: 'Fundrising Officer'}];
-    }else if( this.cookieService.get('roleType') === Constant.teamLeader){
-      this.userRoleList = [{ value: Constant.fundraisingOfficer, name: 'Fundrising Officer'}];
-    }
-  }
-
-  permissionsList: data[] =[
-    { value: 'admin-dashboard', name: 'Lead Dashboard' },
-    { value: 'sale-dashboard', name: 'Donation Dashboard' },
-    { value: 'create-user', name: 'Create User' },
-    { value: 'user-list', name: 'User List' },
-    { value: 'create-lead', name: 'Create Lead' },
-    { value: 'lead-list', name: 'Lead List' },
-    { value: 'general-setting', name: 'General Setting' },
-    { value: 'company-setting', name: 'Company Setting' }
-  ];
-
+ 
   public getUserDetailsByRoleType(roleType: any): void {
     this.serialNumberArray = []; // Clear serial number array before fetching new data
   
