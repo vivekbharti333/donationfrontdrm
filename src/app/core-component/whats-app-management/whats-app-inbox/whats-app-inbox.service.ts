@@ -29,13 +29,22 @@ export class WhatsAppInboxService {
       return this.http.post<any>(Constant.Site_Url + "getWhatsAppMessage", request);
     }
 
-    sendMessage(payload: any): Observable<any> {
+    replyMessage(payload: any): Observable<any> {
+      let request: any = {
+        payload: {
+          "waId": payload.waId,
+          "messageText": payload.messageText,
+          "msgBodyText": payload.messageText
+        }
+      };
+      return this.http.post<any>(Constant.Site_Url + "replyMessage", request);
+    }
 
-  return this.http.post<any>(
-    Constant.Site_Url + 'sendMessage',
+  sendMessage(payload: any): Observable<any> {
+
+  return this.http.post<any>(Constant.Site_Url + 'sendMessage',
     payload
   );
-
 }
 
 }

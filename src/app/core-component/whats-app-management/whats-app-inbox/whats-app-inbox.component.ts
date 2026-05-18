@@ -181,7 +181,7 @@ sendMessage(): void {
   console.log('SEND PAYLOAD => ', payload);
 
   // CALL SEND API
-  this.whatsappService.sendMessage(payload).subscribe({
+  this.whatsappService.replyMessage(payload).subscribe({
 
     next: (response: any) => {
 
@@ -240,7 +240,6 @@ sendMessage(): void {
         }
 
       }, 100);
-
     },
 
     error: (error) => {
@@ -248,7 +247,6 @@ sendMessage(): void {
     }
 
   });
-
 }
 
   getMessageTime(timestamp: number): string {
