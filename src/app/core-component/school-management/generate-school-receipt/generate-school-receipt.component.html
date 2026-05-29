@@ -7,22 +7,6 @@
     </div>
     <div class="card-body">
       <div class="row">
-
-        <!-- <div class="col-md-4 mb-3">
-          <label>Admission No *</label>
-          <input class="form-control" formControlName="admissionNo">
-        </div>
-
-        <div class="col-md-4 mb-3">
-          <label>Roll Number</label>
-          <input class="form-control" formControlName="rollNumber">
-        </div>
-
-        <div class="col-md-4 mb-3">
-          <label>Student Name *</label>
-          <input class="form-control" formControlName="studentName">
-        </div> -->
-
         <div class="col-md-3 mb-3">
           <label>Academic Session</label>
           <input class="form-control" formControlName="academicSession">
@@ -51,7 +35,7 @@
         <div class="col-md-3 mb-3">
           <label>Section</label>
           <!-- <input class="form-control" formControlName="gradeSection"> -->
-          <select class="form-control" formControlName="gradeSection">
+          <select class="form-control" formControlName="gradeSection" (change)="getStudentDetails()">
             <option value="">Select One</option>
             <option value="A">A</option>
             <option value="B">B</option>
@@ -64,13 +48,43 @@
         <div class="col-md-3 col-mb-3">
                         
           <label for="receiptType" class="form-label">Student Name</label>
-          <!-- <mat-select class="space-select select" formControlName="invoiceHeaderDetailsId"  placeholder="Select Receipt" (change)="onProgramSelect($event)">
-              <mat-option *ngFor="let studentDetail of studentDetails" [value]="studentDetail.id">
-                  {{ studentDetail.companyFirstName + ' ' + studentDetail.companyLastName }}
+        <mat-select class="space-select select" formControlName="admissionNo"  placeholder="Select Receipt" (selectionChange)="onStudentChange($event.value)">
+              <mat-option *ngFor="let studentDetail of studentDetails" [value]="studentDetail">
+                  {{ studentDetail.firstName + ' ' + studentDetail.lastName }}
               </mat-option>
-            </mat-select> -->
+            </mat-select>  
       
         </div>
+
+
+
+        <div class="row mt-3" *ngIf="selectedStudent">
+
+  <div class="col-md-6">
+
+    <div class="card p-3">
+
+      <h6>Father Name</h6>
+
+      <p>{{ selectedStudent.fatherName }}</p>
+
+    </div>
+
+  </div>
+
+  <div class="col-md-6">
+
+    <div class="card p-3">
+
+      <h6>Mother Name</h6>
+
+      <p>{{ selectedStudent.motherName }}</p>
+
+    </div>
+
+  </div>
+
+</div>
 
         <!-- ================= SUBMIT BUTTON ================= -->
         <div class="col-md-3 mb-3 search-btn-wrapper">

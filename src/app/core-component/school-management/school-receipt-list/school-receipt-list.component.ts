@@ -1,5 +1,5 @@
 import { Component, TemplateRef } from '@angular/core';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { FormGroup, FormBuilder, Validators, FormArray } from '@angular/forms';
 import { SchoolReceiptListService } from './school-receipt-list.service';
 import { MessageService } from 'primeng/api';
 import { AuthenticationService } from 'src/app/auth/authentication.service';
@@ -13,6 +13,7 @@ import { routes } from 'src/app/core/helpers/routes';
 import { PaginationService, tablePageSize } from 'src/app/shared/shared.index';
 import { UserDetails } from '../../interface/user-management';
 import { MatDialog } from '@angular/material/dialog';
+import { GenerateSchoolReceiptService } from '../generate-school-receipt/generate-school-receipt.service'; 
 
 @Component({
   selector: 'app-school-receipt-list',
@@ -20,6 +21,13 @@ import { MatDialog } from '@angular/material/dialog';
   styleUrl: './school-receipt-list.component.scss'
 })
 export class SchoolReceiptListComponent {
+
+  studentSearchForm!: FormGroup;
+  receiptForm!: FormGroup;
+  // receiptDetails!: FormGroup;
+  selectedStudent: any;
+  studentDetails: any[] = [];
+  isLoading = true;
 
   public loginUser: any;
   // public editStudentForm!: FormGroup;
@@ -42,6 +50,7 @@ export class SchoolReceiptListComponent {
     private fb: FormBuilder,
     private sidebar: SidebarService,
     private schoolReceiptListService: SchoolReceiptListService,
+    private generateSchoolReceiptService: GenerateSchoolReceiptService,
     private authenticationService: AuthenticationService,
     private messageService: MessageService,
     private cookieService: CookieService,
@@ -55,14 +64,75 @@ export class SchoolReceiptListComponent {
   }
 
   ngOnInit() {
-    this.getUserDetails();
-    // this.createForms();
+    // this.getReceiptDetails();
+    this.createSearchForm();
+    this.createReceiptForm();
   }
 
-    public getUserDetails(): void {
+     createSearchForm(): void {
+    this.studentSearchForm = this.fb.group({
+      // Search Info
+      admissionNo: [''],
+      grade: [''],
+      gradeSection: [''],
+      academicSession: ['2026-2027'],
+    });
+
+  }
+
+  createReceiptForm(): void {
+    this.receiptForm = this.fb.group({
+    receiptNumber: [''],
+    admissionNo: [''],
+    rollNumber: [''],
+    studentName: [''],
+    grade: [''],
+    gradeSection: [''],
+    academicSession: [''],
+    installmentName: [''],
+    paymentMode: [''],
+    paymentDate: [''],
+    totalAmount: [''],
+    discountAmount: [''],
+    fineAmount: [''],
+    netAmount: [''],
+    status: [''],
+    createdBy:  [''],
+    createdByName: [''],
+    superadminId: [''],
+
+     // FormArray
+    receiptDetails: this.fb.array([])
+
+    });
+  }
+
+  get receiptDetails(): FormArray {
+
+  return this.receiptForm.get(
+    'receiptDetails'
+  ) as FormArray;
+}
+
+createReceiptDetailGroup(data?: any): FormGroup {
+
+  return this.fb.group({
+
+    feeType: [data?.feeType || ''],
+
+    amount: [data?.amount || 0]
+
+  });
+}
+
+    public getReceiptDetails(studentDetails:any): void {
+
+    this.studentSearchForm.patchValue({
+    admissionNo: studentDetails.admissionNo,
+   });
       this.serialNumberArray = []; // Clear serial number array before fetching new data
   
-      this.schoolReceiptListService.getReceiptDetails().subscribe((apiRes: any) => {
+      this.schoolReceiptListService.getReceiptDetails(this.studentSearchForm.value).subscribe((apiRes: any) => {
         this.totalData = apiRes.totalNumber; // Set total data count
         this.fullData = apiRes.listPayload;  // Store the full dataset
   
@@ -149,22 +219,119 @@ export class SchoolReceiptListComponent {
 
   }
 
-   openEditModal(templateRef: TemplateRef<any>, rawData: any): void {
+openEditModal(
+  templateRef: TemplateRef<any>,
+  rawData: any
+): void {
 
-   
-    this.receiptDialog = this.dialog.open(templateRef, {
-  width: '100%',          // responsive width
-  maxWidth: '900px',     // keeps receipt inside
-  height: '90vh',        // prevents vertical overflow
-  disableClose: true,
-  panelClass: 'custom-modal'
-});
+  console.log(rawData);
 
-  }
+  // Patch normal form values
+  this.receiptForm.patchValue({
+
+    receiptNumber: rawData.receiptNumber,
+
+    admissionNo: rawData.admissionNo,
+
+    rollNumber: rawData.rollNumber,
+
+    studentName: rawData.studentName,
+
+    grade: rawData.grade,
+
+    gradeSection: rawData.gradeSection,
+
+    academicSession: rawData.academicSession,
+
+    installmentName: rawData.installmentName,
+
+    paymentMode: rawData.paymentMode,
+
+    paymentDate: rawData.paymentDate,
+
+    totalAmount: rawData.totalAmount,
+
+    discountAmount: rawData.discountAmount,
+
+    fineAmount: rawData.fineAmount,
+
+    netAmount: rawData.netAmount,
+
+    status: rawData.status,
+
+    createdBy: rawData.createdBy,
+
+    createdByName: rawData.createdByName,
+
+    superadminId: rawData.superadminId
+
+  });
+
+  // Clear old FormArray
+  this.receiptDetails.clear();
+
+  // Add new receipt details
+  rawData.receiptDetails.forEach((item: any) => {
+
+    this.receiptDetails.push(
+      this.createReceiptDetailGroup(item)
+    );
+
+  });
+
+  // Open modal
+  this.receiptDialog = this.dialog.open(templateRef, {
+
+    width: '100%',
+    maxWidth: '900px',
+    height: '90vh',
+    disableClose: true,
+    panelClass: 'custom-modal'
+
+  });
+}
 
   printReceipt() {
   window.print();
 }
+
+
+asFormGroup(control: any): FormGroup {
+
+  return control as FormGroup;
+}
+
+
+
+getStudentDetails() {
+
+  const grade = this.studentSearchForm.get('grade')?.value;
+  const gradeSection = this.studentSearchForm.get('gradeSection')?.value;
+
+  if (!grade || !gradeSection) {
+    this.studentDetails = [];
+    return;
+  }
+
+  this.isLoading = true;
+  this.generateSchoolReceiptService.getStudentDetailsForFee(grade, gradeSection)
+    .subscribe({
+      next: (res) => {
+         this.studentDetails = res?.listPayload || [];
+        this.isLoading = false;
+      },
+      error: (err) => {
+        console.error(err);
+        this.isLoading = false;
+      }
+    });
+}
+
+submitSearch(){
+
+}
+  
+
 
 
 }

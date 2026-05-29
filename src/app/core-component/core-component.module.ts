@@ -11,9 +11,7 @@ import { HeaderComponent } from '../common-component/header/header.component';
 import { LayoutComponent } from '../common-component/layout/layout.component';
 import { sharedModule } from '../shared/shared.module';
 import { RouterModule } from '@angular/router';
-// import { CategoriesComponent } from './categories-management/categories/categories.component';
-// import { LeadManagementComponent } from './lead-management/lead-management.component';
-// import { CreateLeadComponent } from './lead-management/create-lead/create-lead/create-lead.component';
+
 
 @NgModule({
   declarations: [
@@ -23,9 +21,7 @@ import { RouterModule } from '@angular/router';
     SidebarTwoComponent,
     SidebarThreeComponent,
     LayoutComponent,
-    // CategoriesComponent,
-    // LeadManagementComponent,
-    // CreateLeadComponent,
+
   ],
   imports: [CommonModule, CoreComponentRoutingModule, sharedModule, RouterModule],
   providers: [],

@@ -20,8 +20,8 @@
           class="feather icon-printer feather-rotate-ccw"></i></a>
     </li>
     <li>
-      <a data-bs-toggle="tooltip" data-bs-placement="top" matTooltip="Refresh" matTooltipPosition="above"
-        (click)="getUserDetails()"><i class="feather icon-rotate-ccw feather-rotate-ccw"></i></a>
+      <!-- <a data-bs-toggle="tooltip" data-bs-placement="top" matTooltip="Refresh" matTooltipPosition="above"
+        (click)="getUserDetails()"><i class="feather icon-rotate-ccw feather-rotate-ccw"></i></a> -->
     </li>
     <li>
       <!-- <a (click)="toggleCollapse()" data-bs-toggle="tooltip" data-bs-placement="top" matTooltip="Collapse"
@@ -111,6 +111,93 @@
       </div>
     </div>
   </div>
+
+  <div class="card table-list-card">
+    <div class="card-body">
+      <div class="table-top">
+        <form [formGroup]="studentSearchForm" (ngSubmit)="submitSearch()">
+
+          <!-- ================= STUDENT INFORMATION ================= -->
+          <div class="card mb-3">
+            <div class="card-header">
+              <h5>Student Information</h5>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-3 mb-3">
+                  <label>Academic Session</label>
+                  <input class="form-control" formControlName="academicSession">
+                </div>
+
+                <div class="col-md-3 mb-3">
+                  <label>Grade</label>
+                  <!-- <input class="form-control" formControlName="grade"> -->
+                  <select class="form-control" formControlName="grade">
+                    <option value="">Select One</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                    <option value="9">9</option>
+                    <option value="10">10</option>
+                    <option value="11">11</option>
+                    <option value="12">12</option>
+                  </select>
+                </div>
+
+                <div class="col-md-3 mb-3">
+                  <label>Section</label>
+                  <!-- <input class="form-control" formControlName="gradeSection"> -->
+                  <select class="form-control" formControlName="gradeSection" (change)="getStudentDetails()">
+                    <option value="">Select One</option>
+                    <option value="A">A</option>
+                    <option value="B">B</option>
+                    <option value="C">C</option>
+                    <option value="D">D</option>
+                    <option value="E">E</option>
+                  </select>
+                </div>
+
+                <div class="col-md-3 col-mb-3">
+
+                  <label for="receiptType" class="form-label">Student Name</label>
+                  <mat-select class="space-select select" formControlName="admissionNo" placeholder="Select Student"
+                    (selectionChange)="getReceiptDetails($event.value)">
+
+                    <mat-option *ngFor="let studentDetail of studentDetails" [value]="studentDetail">
+
+                      {{ studentDetail.firstName }}
+                      {{ studentDetail.lastName }}
+
+                    </mat-option>
+
+                  </mat-select>
+
+                </div>
+
+                <!-- ================= SUBMIT BUTTON ================= -->
+                <div class="col-md-3 mb-3 search-btn-wrapper">
+                  <button type="submit" class="btn btn-primary">Search Student</button>
+                </div>
+
+
+              </div>
+            </div>
+          </div>
+
+
+        </form>
+
+      </div>
+    </div>
+  </div>
+
+
+
   <!-- /Filter -->
   <div class="desktop-view">
     <div class="table-responsive">
@@ -138,17 +225,20 @@
             <td>{{ data.paymentDate | date : "dd-MM-yyyy | HH:mm" }}</td>
             <td>
               <button class="badge-button"
-                [ngClass]="{'badge-linesuccess': data.status === 'PAID','badge-linedanger': data.status === 'CANCEL'}"
-                >
+                [ngClass]="{'badge-linesuccess': data.status === 'PAID','badge-linedanger': data.status === 'CANCEL'}">
                 {{ data.status }}
               </button>
             </td>
             <td class="action-table-data">
               <div class="edit-delete-action">
 
-                <a class="me-2 p-2 mb-0" data-bs-toggle="modal" data-bs-target="#edit-units"
+                <a
+                  class="me-2 p-2 mb-0"
                   (click)="openEditModal(dialogTemplate, data)">
-                  <i class="feather icon-edit feather-edit"></i></a>
+
+                  <i class="feather icon-edit feather-edit"></i>
+
+                </a>
                 <a class="me-2 confirm-text p-2 mb-0" href="javascript:void(0);" (click)="confirmColor(data.loginId)">
                   <i class="feather icon-trash-2 feather-trash-2"></i></a>
               </div>
@@ -159,6 +249,281 @@
       </table>
     </div>
   </div>
+
+
+<!-- <ng-template #dialogTemplate>
+
+
+  <div class="modalHeaderContainer">
+    <h2 mat-dialog-title class="p-0">Payment Receipt</h2>
+
+    <button
+      mat-icon-button
+      mat-dialog-close
+      aria-label="Close">
+
+      ✕
+
+    </button>
+  </div>
+
+  <mat-dialog-content class="dialog-content">
+
+    <div id="printArea"> -->
+
+      <!-- ================= STUDENT COPY ================= -->
+      <!-- <div class="print-copy">
+
+        <div class="page">
+
+          <div class="receipt">
+
+            <div class="copy-label">
+              Student Copy
+            </div>
+
+           
+            <div class="school-details">
+
+              <div class="logo">
+                <img src="cia.png" alt="School Logo">
+              </div>
+
+              <div class="school-info">
+
+                <div class="school-name">
+                  CHAMPARAN INTERNATIONAL ACADEMY
+                </div>
+
+                <div class="school-address">
+                  Masjid Tola, Near Batakh Miya Mazar,
+                  Bajrang Chowk, Agari
+                </div>
+
+                <div class="school-contact">
+                  Contact: 7321978565 |
+                  Email:
+                  champaraninternationalacademygmail.com
+                </div>
+
+              </div>
+
+            </div>
+
+            <div class="fee-title">
+              FEE RECEIPT
+            </div>
+
+            <table class="no-border">
+
+              <tr>
+
+                <td>
+                  <b>BILL NO:</b>
+
+                  {{ receiptForm.value.receiptNumber }}
+                </td>
+
+                <td>
+                  <b>MONTH:</b>
+
+                  {{ receiptForm.value.installmentName }}
+                </td>
+
+                <td>
+                  <b>DATE:</b>
+
+                  {{ receiptForm.value.paymentDate | date:'dd-MM-yyyy' }}
+                </td>
+
+              </tr>
+
+              <tr>
+
+                <td>
+                  <b>NAME:</b>
+
+                  {{ receiptForm.value.studentName }}
+                </td>
+
+                <td>
+                  <b>CLASS:</b>
+
+                  {{ receiptForm.value.grade }}
+                  ({{ receiptForm.value.gradeSection }})
+                </td>
+
+                <td>
+                  <b>ADM/ROLL NO:</b>
+
+                  {{ receiptForm.value.admissionNo }}
+                  /
+                  {{ receiptForm.value.rollNumber }}
+                </td>
+
+              </tr>
+
+              <tr>
+
+                <td>
+                  <b>FATHER:</b>
+
+                  {{ selectedStudent?.fatherName }}
+                </td>
+
+                <td>
+                  <b>MOTHER:</b>
+
+                  {{ selectedStudent?.motherName }}
+                </td>
+
+                <td>
+                  <b>CONTACT NO:</b>
+
+                  {{ selectedStudent?.fatherMobileNo }}
+                </td>
+
+              </tr>
+
+            </table>
+
+            <table class="fee-table">
+
+              <thead>
+
+                <tr>
+
+                  <th>Fee Head</th>
+
+                  <th class="text-right">
+                    Amount
+                  </th>
+
+                  <th class="text-right">
+                    Concession
+                  </th>
+
+                  <th class="text-right">
+                    Total
+                  </th>
+
+                </tr>
+
+              </thead>
+
+              <tbody>
+
+                <tr
+                  *ngFor="
+                    let item of receiptDetails.controls;
+                    let i = index
+                  "
+                  [formGroup]="asFormGroup(item)">
+
+                  <td>
+                    {{ item.value.feeType }}
+                  </td>
+
+                  <td class="text-right">
+                    {{ item.value.amount }}
+                  </td>
+
+                  <td class="text-right">
+                    {{ receiptForm.value.discountAmount || 0 }}
+                  </td>
+
+                  <td class="text-right">
+                    {{ item.value.amount }}
+                  </td>
+
+                </tr>
+
+               
+                <tr class="bold">
+
+                  <td>Total</td>
+
+                  <td class="text-right">
+                    {{ receiptForm.value.totalAmount }}
+                  </td>
+
+                  <td class="text-right">
+                    {{ receiptForm.value.discountAmount }}
+                  </td>
+
+                  <td class="text-right">
+                    {{ receiptForm.value.netAmount }}
+                  </td>
+
+                </tr>
+
+              </tbody>
+
+            </table>
+
+           
+            <div class="footer">
+
+              <b>Paid:</b>
+              {{ receiptForm.value.netAmount }}
+
+              &nbsp;&nbsp;
+
+              <b>Discount:</b>
+              {{ receiptForm.value.discountAmount }}
+
+              &nbsp;&nbsp;
+
+              <b>Fine:</b>
+              {{ receiptForm.value.fineAmount }}
+
+              &nbsp;&nbsp;
+
+              <b>Mode:</b>
+              {{ receiptForm.value.paymentMode }}
+
+            </div>
+
+            <div class="signature">
+
+              _______________________
+
+              <br>
+
+              (Authorized Signature)
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div> 
+
+    </div>
+
+
+<div class="receipt-separator office-copy">
+  ------------------------------ CUT HERE ------------------------------
+</div>
+
+
+
+
+  </mat-dialog-content>
+
+
+  <button
+    mat-raised-button
+    color="primary"
+    (click)="printReceipt()">
+
+    Print
+
+  </button>
+
+</ng-template>-->
+
 
 
 
@@ -206,14 +571,16 @@
             <!-- STUDENT DETAILS -->
             <table class="no-border">
               <tr>
-                <td><b>BILL NO:</b> B/2526-00145</td>
-                <td><b>MONTH:</b> JULY, AUG, SEP, OCT</td>
-                <td><b>DATE:</b> 29-12-2025</td>
+                <td><b>BILL NO:</b> {{ receiptForm.value.receiptNumber }}</td>
+                <td><b>MONTH:</b> {{ receiptForm.value.installmentName }}</td>
+                <td><b>DATE:</b> {{ receiptForm.value.paymentDate | date:'dd-MM-yyyy' }}</td>
               </tr>
               <tr>
-                <td><b>NAME:</b> RISHU KUMAR</td>
-                <td><b>CLASS:</b> FOURTH (A)</td>
-                <td><b>ADM/ROLL NO:</b> 43 / 3</td>
+                <td><b>NAME:</b> {{ receiptForm.value.studentName }}</td>
+                <td><b>CLASS:</b> {{ receiptForm.value.grade }} ({{ receiptForm.value.gradeSection }})</td>
+                <td><b>ADM/ROLL NO:</b>{{ receiptForm.value.admissionNo }}
+                  /
+                  {{ receiptForm.value.rollNumber }}</td>
               </tr>
               <tr>
                 <td><b>FATHER:</b> NIRAJ KUMAR</td>
@@ -224,68 +591,92 @@
 
             <!-- FEE TABLE -->
             <table class="fee-table">
-              <colgroup>
-                <col style="width:50%">
-                <col style="width:20%">
-                <col style="width:15%">
-                <col style="width:15%">
-              </colgroup>
 
               <thead>
+
                 <tr>
+
                   <th>Fee Head</th>
-                  <th class="text-right">Amount</th>
-                  <th class="text-right">Concession</th>
-                  <th class="text-right">Total</th>
+
+                  <th class="text-right">
+                    Amount
+                  </th>
+
+                  <th class="text-right">
+                    Concession
+                  </th>
+
+                  <th class="text-right">
+                    Total
+                  </th>
+
                 </tr>
+
               </thead>
 
               <tbody>
-                <tr>
-                  <td>Old Balance</td>
-                  <td class="text-right">100</td>
-                  <td class="text-right">0</td>
-                  <td class="text-right">100</td>
+
+                <tr
+                  *ngFor="
+                    let item of receiptDetails.controls;
+                    let i = index
+                  "
+                  [formGroup]="asFormGroup(item)">
+
+                  <td>
+                    {{ item.value.feeType }}
+                  </td>
+
+                  <td class="text-right">
+                    {{ item.value.amount }}
+                  </td>
+
+                  <td class="text-right">
+                    {{ receiptForm.value.discountAmount || 0 }}
+                  </td>
+
+                  <td class="text-right">
+                    {{ item.value.amount }}
+                  </td>
+
                 </tr>
-                <tr>
-                  <td>Exam Fee</td>
-                  <td class="text-right">150</td>
-                  <td class="text-right">0</td>
-                  <td class="text-right">150</td>
-                </tr>
-                <tr>
-                  <td>Late Fine</td>
-                  <td class="text-right">200</td>
-                  <td class="text-right">0</td>
-                  <td class="text-right">200</td>
-                </tr>
-                <tr>
-                  <td>Monthly Fee</td>
-                  <td class="text-right">2000</td>
-                  <td class="text-right">0</td>
-                  <td class="text-right">2000</td>
-                </tr>
+
+               
                 <tr class="bold">
+
                   <td>Total</td>
-                  <td class="text-right">2450</td>
-                  <td class="text-right">0</td>
-                  <td class="text-right">2450</td>
+
+                  <td class="text-right">
+                    {{ receiptForm.value.totalAmount }}
+                  </td>
+
+                  <td class="text-right">
+                    {{ receiptForm.value.discountAmount }}
+                  </td>
+
+                  <td class="text-right">
+                    {{ receiptForm.value.netAmount }}
+                  </td>
+
                 </tr>
+
               </tbody>
+
             </table>
+
 
             <!-- FOOTER -->
             <div class="footer">
-              <b>Paid:</b> 2450 &nbsp;&nbsp;
-              <b>Discount:</b> 0 &nbsp;&nbsp;
+              <b>Paid:</b> {{ receiptForm.value.netAmount }} &nbsp;&nbsp;
+              <b>Discount:</b> {{ receiptForm.value.discountAmount }} &nbsp;&nbsp;
               <b>Dues:</b> 0 &nbsp;&nbsp;
-              <b>Mode:</b> Cash
+              <b>Mode:</b> {{ receiptForm.value.paymentMode }}
             </div>
 
             <!-- SIGNATURE -->
-            <div class="signature">
+            <div class="signature"><br>
               _______________________<br>
-              (Authorized Signature)
+              (Authorized Signature) <br><br>
             </div>
 
           </div>
@@ -326,14 +717,16 @@
             <!-- STUDENT DETAILS -->
             <table class="no-border">
               <tr>
-                <td><b>BILL NO:</b> B/2526-00145</td>
-                <td><b>MONTH:</b> JULY, AUG, SEP, OCT</td>
-                <td><b>DATE:</b> 29-12-2025</td>
+                <td><b>BILL NO:</b> {{ receiptForm.value.receiptNumber }}</td>
+                <td><b>MONTH:</b> {{ receiptForm.value.installmentName }}</td>
+                <td><b>DATE:</b> {{ receiptForm.value.paymentDate | date:'dd-MM-yyyy' }}</td>
               </tr>
               <tr>
-                <td><b>NAME:</b> RISHU KUMAR</td>
-                <td><b>CLASS:</b> FOURTH (A)</td>
-                <td><b>ADM/ROLL NO:</b> 43 / 3</td>
+                <td><b>NAME:</b> {{ receiptForm.value.studentName }}</td>
+                <td><b>CLASS:</b> {{ receiptForm.value.grade }} ({{ receiptForm.value.gradeSection }})</td>
+                <td><b>ADM/ROLL NO:</b>{{ receiptForm.value.admissionNo }}
+                  /
+                  {{ receiptForm.value.rollNumber }}</td>
               </tr>
               <tr>
                 <td><b>FATHER:</b> NIRAJ KUMAR</td>
@@ -343,63 +736,87 @@
             </table>
 
             <!-- FEE TABLE -->
-            <table class="fee-table">
-              <colgroup>
-                <col style="width:50%">
-                <col style="width:20%">
-                <col style="width:15%">
-                <col style="width:15%">
-              </colgroup>
+                       <table class="fee-table">
 
               <thead>
+
                 <tr>
+
                   <th>Fee Head</th>
-                  <th class="text-right">Amount</th>
-                  <th class="text-right">Concession</th>
-                  <th class="text-right">Total</th>
+
+                  <th class="text-right">
+                    Amount
+                  </th>
+
+                  <th class="text-right">
+                    Concession
+                  </th>
+
+                  <th class="text-right">
+                    Total
+                  </th>
+
                 </tr>
+
               </thead>
 
               <tbody>
-                <tr>
-                  <td>Old Balance</td>
-                  <td class="text-right">100</td>
-                  <td class="text-right">0</td>
-                  <td class="text-right">100</td>
+
+                <tr
+                  *ngFor="
+                    let item of receiptDetails.controls;
+                    let i = index
+                  "
+                  [formGroup]="asFormGroup(item)">
+
+                  <td>
+                    {{ item.value.feeType }}
+                  </td>
+
+                  <td class="text-right">
+                    {{ item.value.amount }}
+                  </td>
+
+                  <td class="text-right">
+                    {{ receiptForm.value.discountAmount || 0 }}
+                  </td>
+
+                  <td class="text-right">
+                    {{ item.value.amount }}
+                  </td>
+
                 </tr>
-                <tr>
-                  <td>Exam Fee</td>
-                  <td class="text-right">150</td>
-                  <td class="text-right">0</td>
-                  <td class="text-right">150</td>
-                </tr>
-                <tr>
-                  <td>Late Fine</td>
-                  <td class="text-right">200</td>
-                  <td class="text-right">0</td>
-                  <td class="text-right">200</td>
-                </tr>
-                <tr>
-                  <td>Monthly Fee</td>
-                  <td class="text-right">2000</td>
-                  <td class="text-right">0</td>
-                  <td class="text-right">2000</td>
-                </tr>
+
+               
                 <tr class="bold">
+
                   <td>Total</td>
-                  <td class="text-right">2450</td>
-                  <td class="text-right">0</td>
-                  <td class="text-right">2450</td>
+
+                  <td class="text-right">
+                    {{ receiptForm.value.totalAmount }}
+                  </td>
+
+                  <td class="text-right">
+                    {{ receiptForm.value.discountAmount }}
+                  </td>
+
+                  <td class="text-right">
+                    {{ receiptForm.value.netAmount }}
+                  </td>
+
                 </tr>
+
               </tbody>
+
             </table>
+
 
             <!-- FOOTER -->
             <div class="footer">
-              <b>Paid:</b> 2450 &nbsp;&nbsp;
-              <b>Discount:</b> 0 &nbsp;&nbsp;
+              <b>Paid:</b> {{ receiptForm.value.netAmount }} &nbsp;&nbsp;
+              <b>Discount:</b> {{ receiptForm.value.discountAmount }} &nbsp;&nbsp;
               <b>Dues:</b> 0 &nbsp;&nbsp;
-              <b>Mode:</b> Cash
+              <b>Mode:</b> {{ receiptForm.value.paymentMode }}
             </div>
 
             <!-- SIGNATURE -->

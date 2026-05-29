@@ -23,16 +23,17 @@ export class SchoolReceiptListService {
     this.loginUser = this.authenticationService.getLoginUser();
   }
 
-  getReceiptDetails() {
+  getReceiptDetails(studentSearchForm:any) {
   const request: any = {
     payload: {
-      // superadminId: this.loginUser['superadminId'],   // e.g. "SA001"
-      superadminId: "SA001", 
-      academicSession: "2024-2025",
-      grade: "10",
-      gradeSection: "A",
-      studentName: "Rahul",
-      rollNumber: "15"
+      admissionNo: studentSearchForm.admissionNo,
+      academicSession: studentSearchForm.academicSession,
+      superadminId: this.loginUser['superadminId'],
+      // grade: "10",
+      // gradeSection: "A",
+      // studentName: "Rahul",
+      // rollNumber: "15",
+
     }
   };
 

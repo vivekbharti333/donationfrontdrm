@@ -20,6 +20,17 @@ export class GenerateSchoolReceiptService {
     private cookieService: CookieService
   ) {
     this.loginUser = this.authenticationService.getLoginUser();
+
+     let details = this.cookieService.get('loginDetails');
+
+  console.log('COOKIE DETAILS => ', details);
+
+  if (details) {
+
+    this.loginUser = JSON.parse(details);
+
+    console.log('LOGIN USER => ', this.loginUser);
+  }
   }
 
   submitReceipt(receiptDetasils: any): Observable<any> {
@@ -65,14 +76,18 @@ export class GenerateSchoolReceiptService {
   return this.http.post<any>(Constant.Site_Url + "submitReceipt", request);
 }
 
-getStudentDetailsForFee(): Observable<any> {
+getStudentDetailsForFee( grade: string, gradeSection: string): Observable<any> {
     let request: any = {
       payload: {
-        requestFor: 'FOR_FEE',
-        createdBy: this.cookieService.get('userId'),
-        token: this.cookieService.get('token'),
+        // requestFor: 'FOR_FEE',
+        requestFor: 'ALL',
+        grade: grade,
+        gradeSection: gradeSection,
+        createdBy: this.loginUser?.userId,
+        token: this.loginUser?.token,
+        superadminId: this.loginUser?.superadminId
         // superadminId: 'SA001'
-        superadminId: this.cookieService.get('superadminId'),
+        // superadminId: this.loginUser['superadminId'],
       }
     };
     return this.http.post<any>(Constant.Site_Url + "getStudentDetails", request);

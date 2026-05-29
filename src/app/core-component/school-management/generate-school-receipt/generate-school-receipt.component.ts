@@ -30,6 +30,8 @@ export class GenerateSchoolReceiptComponent {
 receiptForm!: FormGroup;
 studentSearchForm!: FormGroup;
 
+selectedStudent: any;
+
 studentDetails: any[] = [];
 isLoading = true;
 
@@ -50,13 +52,11 @@ isLoading = true;
 
    createSearchForm(): void {
     this.studentSearchForm = this.fb.group({
-
       // Search Info
       grade: [''],
       gradeSection: [''],
       academicSession: ['2026-2027'],
-
-
+      admissionNo: ['']
     });
   }
 
@@ -82,15 +82,11 @@ isLoading = true;
       receiptDetails: this.fb.array([]),
 
       // Amount Summary
-      totalAmount: [{ value: 0, disabled: true }],
+      totalAmount: [0],
       discountAmount: [0],
       fineAmount: [0],
-      netAmount: [{ value: 0, disabled: true }],
+      netAmount: [0],
 
-      // Audit
-      createdBy: ['admin01'],
-      createdByName: ['Super Admin'],
-      superadminId: ['SA001'],
       status: ['PAID']
     });
   }
@@ -139,12 +135,12 @@ isLoading = true;
   // ================= SUBMIT RECEIPT =================
 
   submitReceipt() {
+    console.log("hjhhjh : "+this.receiptForm.value.admissionNo);
     this.generateSchoolReceiptService.submitReceipt(this.receiptForm.value)
       .subscribe({
         next: (response: any) => {
           if (response['responseCode'] == '200') {
             if (response['payload']['respCode'] == '200') {
-
 
               this.messageService.add({
                 summary: response['payload']['respCode'],
@@ -213,12 +209,21 @@ isLoading = true;
     
   }
 
-  
- getStudentDetails() {
-    this.generateSchoolReceiptService.getStudentDetailsForFee().subscribe({
+getStudentDetails() {
+
+  const grade = this.studentSearchForm.get('grade')?.value;
+  const gradeSection = this.studentSearchForm.get('gradeSection')?.value;
+
+  if (!grade || !gradeSection) {
+    this.studentDetails = [];
+    return;
+  }
+
+  this.isLoading = true;
+  this.generateSchoolReceiptService.getStudentDetailsForFee(grade, gradeSection)
+    .subscribe({
       next: (res) => {
-        console.log(res); // check API response structure
-        this.studentDetails = res?.data || [];
+         this.studentDetails = res?.listPayload || [];
         this.isLoading = false;
       },
       error: (err) => {
@@ -226,7 +231,54 @@ isLoading = true;
         this.isLoading = false;
       }
     });
+}
+
+
+onStudentChange(admissionNo: any) {
+
+  this.selectedStudent = this.studentDetails.find(
+    (student: any) => student.admissionNo == admissionNo
+  );
+
+  console.log(this.selectedStudent);
+
+  if (this.selectedStudent) {
+
+    this.receiptForm.patchValue({
+
+      admissionNo: this.selectedStudent.admissionNo,
+
+      rollNumber: this.selectedStudent.rollNumber,
+
+      studentName:
+        this.selectedStudent.firstName + ' ' +
+        this.selectedStudent.lastName,
+
+      grade: this.selectedStudent.grade,
+
+      gradeSection: this.selectedStudent.gradeSection,
+
+      academicSession: this.selectedStudent.sessionName
+
+    });
   }
+}
+
+// Service example:
+  
+//  getStudentDetails() {
+//     this.generateSchoolReceiptService.getStudentDetailsForFee().subscribe({
+//       next: (res) => {
+//         console.log(res); // check API response structure
+//         this.studentDetails = res?.data || [];
+//         this.isLoading = false;
+//       },
+//       error: (err) => {
+//         console.error(err);
+//         this.isLoading = false;
+//       }
+//     });
+//   }
 
 
 }
