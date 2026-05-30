@@ -94,6 +94,24 @@ public loginUser: any;
   });
 }
 
+
+onFileSelected(event: any): void {
+
+  const file = event.target.files[0];
+
+  if (file) {
+
+    const reader = new FileReader();
+
+    reader.onload = () => {
+
+      this.addStudentForm.patchValue({
+        studentPicture: reader.result
+      });
+    };
+    reader.readAsDataURL(file);
+  }
+}
   submitStudentForm() {
     this.schoolManagementService.addStudent(this.addStudentForm.value)
       .subscribe({

@@ -246,6 +246,7 @@ onPermissionChange(event: any) {
         });
       };
       reader.readAsDataURL(selectedFile);
+      
     }
   }
 
