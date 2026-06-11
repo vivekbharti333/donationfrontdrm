@@ -39,6 +39,8 @@ export class StudentListComponent {
   public searchDataValue = '';
   // pagination variables
 
+  baseUrl: string = '';
+
 
   constructor(
     private fb: FormBuilder,
@@ -57,8 +59,9 @@ export class StudentListComponent {
   }
 
   ngOnInit() {
-    this.getUserDetails();
+    this.getStudentDetails();
     this.createForms();
+    this.baseUrl = Constant.Site_Url+'studentImage/';
   }
 
   createForms() {
@@ -118,7 +121,7 @@ export class StudentListComponent {
     });
   }
 
-  public getUserDetails(): void {
+  public getStudentDetails(): void {
     this.serialNumberArray = []; // Clear serial number array before fetching new data
 
     this.schoolManagementService.getStudentDetails().subscribe((apiRes: any) => {

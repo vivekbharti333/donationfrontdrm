@@ -28,6 +28,8 @@
 
 <form [formGroup]="addStudentForm" (ngSubmit)="submitStudentForm()">
 
+
+  
   <!-- ================= STUDENT DETAILS ================= -->
   <div class="card mb-3">
     <div class="card-body">
@@ -36,6 +38,56 @@
           <h6><span><i class="feather icon-info feather-edit"></i></span>Student Information</h6>
         </div>
       </div>
+
+
+      <div class="profile-pic-upload">
+
+    <div class="profile-pic">
+
+        <ng-container *ngIf="!addStudentForm.get('studentPicture')?.value; else imagePreview">
+            <span>
+                <i class="feather icon-plus-circle"></i>
+                Profile Photo
+            </span>
+        </ng-container>
+
+        <ng-template #imagePreview>
+    <img
+        [src]="addStudentForm.get('studentPicture')?.value"
+        class="uploaded-profile-pic"
+    >
+</ng-template>
+
+    </div>
+
+    <!-- Gallery Upload -->
+    <div class="mt-2">
+        <label class="btn btn-primary">
+            Upload From Gallery
+            <input
+                type="file"
+                hidden
+                accept="image/*"
+                (change)="onFileSelected($event)"
+            >
+        </label>
+    </div>
+
+    <!-- Camera Capture -->
+    <div class="mt-2">
+        <label class="btn btn-success">
+            Take Live Photo
+            <input
+                type="file"
+                hidden
+                accept="image/*"
+                capture="environment"
+                (change)="onFileSelected($event)"
+            >
+        </label>
+    </div>
+
+</div>
 
       <div class="row">
         <div class="col-md-4 mb-3">

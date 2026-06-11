@@ -21,7 +21,7 @@
     </li>
     <li>
       <a data-bs-toggle="tooltip" data-bs-placement="top" matTooltip="Refresh" matTooltipPosition="above"
-        (click)="getUserDetails()"><i class="feather icon-rotate-ccw feather-rotate-ccw"></i></a>
+        (click)="getStudentDetails()"><i class="feather icon-rotate-ccw feather-rotate-ccw"></i></a>
     </li>
     <li>
       <!-- <a (click)="toggleCollapse()" data-bs-toggle="tooltip" data-bs-placement="top" matTooltip="Collapse"
@@ -135,8 +135,13 @@
             <td>
               <div class="userimgname">
                 <a href="javascript:void(0);" class="userslist-img bg-img">
-                  <img src="data:image/jpeg;base64,{{ data.studentPicture }}" alt="image" style="border-radius: 100%;"
-                    onerror="this.onerror=null; this.src='https://www.shareicon.net/data/128x128/2016/05/24/770117_people_512x512.png';" />
+                  <img
+                    [src]="baseUrl + data.studentPicture"
+                    alt="image"
+                    style="border-radius: 100%;"
+                    onerror="this.onerror=null; this.src='https://www.shareicon.net/data/128x128/2016/05/24/770117_people_512x512.png';"
+                  />
+
                 </a>
               </div>
 
@@ -177,6 +182,7 @@
           }
         </tbody>
       </table>
+      <app-custom-pagination></app-custom-pagination>
     </div>
   </div>
 
