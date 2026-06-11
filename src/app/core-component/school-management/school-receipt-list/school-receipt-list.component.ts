@@ -31,7 +31,7 @@ export class SchoolReceiptListComponent {
 
   public loginUser: any;
   // public editStudentForm!: FormGroup;
-   public receiptDialog: any;
+  public receiptDialog: any;
   public fullData: any[] = [];
   public routes = routes;
 
@@ -219,81 +219,56 @@ createReceiptDetailGroup(data?: any): FormGroup {
 
   }
 
-openEditModal(
-  templateRef: TemplateRef<any>,
-  rawData: any
-): void {
+  openEditModal(templateRef: TemplateRef<any>, rawData: any): void {
 
-  console.log(rawData);
+    // Patch normal form values
+    this.receiptForm.patchValue({
 
-  // Patch normal form values
-  this.receiptForm.patchValue({
+      receiptNumber: rawData.receiptNumber,
+      admissionNo: rawData.admissionNo,
+      rollNumber: rawData.rollNumber,
+      studentName: rawData.studentName,
+      grade: rawData.grade,
+      gradeSection: rawData.gradeSection,
+      academicSession: rawData.academicSession,
+      installmentName: rawData.installmentName,
+      paymentMode: rawData.paymentMode,
+      paymentDate: rawData.paymentDate,
+      totalAmount: rawData.totalAmount,
+      discountAmount: rawData.discountAmount,
+      fineAmount: rawData.fineAmount,
+      netAmount: rawData.netAmount,
+      status: rawData.status,
+      createdBy: rawData.createdBy,
+      createdByName: rawData.createdByName,
+      superadminId: rawData.superadminId
+    });
 
-    receiptNumber: rawData.receiptNumber,
+    // Clear old FormArray
+    this.receiptDetails.clear();
 
-    admissionNo: rawData.admissionNo,
+    // Add new receipt details
+    rawData.receiptDetails.forEach((item: any) => {
 
-    rollNumber: rawData.rollNumber,
+      this.receiptDetails.push(this.createReceiptDetailGroup(item)
+      );
+    });
 
-    studentName: rawData.studentName,
+    // Open modal
+    this.receiptDialog = this.dialog.open(templateRef, {
 
-    grade: rawData.grade,
+      width: '100%',
+      maxWidth: '900px',
+      height: '90vh',
+      disableClose: true,
+      panelClass: 'custom-modal'
 
-    gradeSection: rawData.gradeSection,
-
-    academicSession: rawData.academicSession,
-
-    installmentName: rawData.installmentName,
-
-    paymentMode: rawData.paymentMode,
-
-    paymentDate: rawData.paymentDate,
-
-    totalAmount: rawData.totalAmount,
-
-    discountAmount: rawData.discountAmount,
-
-    fineAmount: rawData.fineAmount,
-
-    netAmount: rawData.netAmount,
-
-    status: rawData.status,
-
-    createdBy: rawData.createdBy,
-
-    createdByName: rawData.createdByName,
-
-    superadminId: rawData.superadminId
-
-  });
-
-  // Clear old FormArray
-  this.receiptDetails.clear();
-
-  // Add new receipt details
-  rawData.receiptDetails.forEach((item: any) => {
-
-    this.receiptDetails.push(
-      this.createReceiptDetailGroup(item)
-    );
-
-  });
-
-  // Open modal
-  this.receiptDialog = this.dialog.open(templateRef, {
-
-    width: '100%',
-    maxWidth: '900px',
-    height: '90vh',
-    disableClose: true,
-    panelClass: 'custom-modal'
-
-  });
-}
+    });
+  }
 
   printReceipt() {
-  window.print();
-}
+    window.print();
+  }
 
 
 asFormGroup(control: any): FormGroup {

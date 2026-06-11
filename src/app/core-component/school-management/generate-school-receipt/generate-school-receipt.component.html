@@ -235,3 +235,316 @@
   </div>
 
 </form>
+
+
+<ng-template #dialogTemplate>
+
+  <!-- DIALOG HEADER -->
+  <div class="modalHeaderContainer">
+    <h2 mat-dialog-title class="p-0">Payment Receipt</h2>
+    <button mat-icon-button mat-dialog-close aria-label="Close">✕</button>
+  </div>
+
+  <mat-dialog-content class="dialog-content">
+
+    <!-- ================= PRINT AREA ================= -->
+    <div id="printArea">
+
+      <!-- ================= STUDENT COPY ================= -->
+      <div class="print-copy">
+
+        <div class="page">
+          <div class="receipt">
+
+            <div class="copy-label">Student Copy</div>
+
+            <!-- HEADER -->
+            <div class="school-details">
+              <div class="logo">
+                <img src="cia.png" alt="School Logo">
+              </div>
+
+              <div class="school-info">
+                <div class="school-name">CHAMPARAN INTERNATIONAL ACADEMY</div>
+                <div class="school-address">
+                  Masjid Tola, Near Batakh Miya Mazar, Bajrang Chowk, Agari
+                </div>
+                <div class="school-contact">
+                  Contact: 7321978565 |
+                  Email: champaraninternationalacademy&#64;gmail.com
+                </div>
+              </div>
+            </div>
+
+            <div class="fee-title">FEE RECEIPT</div>
+
+            <!-- STUDENT DETAILS -->
+            <table class="no-border">
+              <tr>
+                <td><b>BILL NO:</b> {{ receiptForm.value.receiptNumber }}</td>
+                <td><b>MONTH:</b> {{ receiptForm.value.installmentName }}</td>
+                <td><b>DATE:</b> {{ receiptForm.value.paymentDate | date:'dd-MM-yyyy' }}</td>
+              </tr>
+              <tr>
+                <td><b>NAME:</b> {{ receiptForm.value.studentName }}</td>
+                <td><b>CLASS:</b> {{ receiptForm.value.grade }} ({{ receiptForm.value.gradeSection }})</td>
+                <td><b>ADM/ROLL NO:</b>{{ receiptForm.value.admissionNo }}
+                  /
+                  {{ receiptForm.value.rollNumber }}</td>
+              </tr>
+              <tr>
+                <td><b>FATHER:</b> NIRAJ KUMAR</td>
+                <td><b>MOTHER:</b> GEETA DEVI</td>
+                <td><b>CONTACT NO:</b> 6202014654</td>
+              </tr>
+            </table>
+
+            <!-- FEE TABLE -->
+            <table class="fee-table">
+
+              <thead>
+
+                <tr>
+
+                  <th>Fee Head</th>
+
+                  <th class="text-right">
+                    Amount
+                  </th>
+
+                  <th class="text-right">
+                    Concession
+                  </th>
+
+                  <th class="text-right">
+                    Total
+                  </th>
+
+                </tr>
+
+              </thead>
+
+              <tbody>
+
+                <tr
+                  *ngFor="
+                    let item of receiptDetails.controls;
+                    let i = index
+                  "
+                  [formGroup]="asFormGroup(item)">
+
+                  <td>
+                    {{ item.value.feeType }}
+                  </td>
+
+                  <td class="text-right">
+                    {{ item.value.amount }}
+                  </td>
+
+                  <td class="text-right">
+                    {{ receiptForm.value.discountAmount || 0 }}
+                  </td>
+
+                  <td class="text-right">
+                    {{ item.value.amount }}
+                  </td>
+
+                </tr>
+
+               
+                <tr class="bold">
+
+                  <td>Total</td>
+
+                  <td class="text-right">
+                    {{ receiptForm.value.totalAmount }}
+                  </td>
+
+                  <td class="text-right">
+                    {{ receiptForm.value.discountAmount }}
+                  </td>
+
+                  <td class="text-right">
+                    {{ receiptForm.value.netAmount }}
+                  </td>
+
+                </tr>
+
+              </tbody>
+
+            </table>
+
+
+            <!-- FOOTER -->
+            <div class="footer">
+              <b>Paid:</b> {{ receiptForm.value.netAmount }} &nbsp;&nbsp;
+              <b>Discount:</b> {{ receiptForm.value.discountAmount }} &nbsp;&nbsp;
+              <b>Dues:</b> 0 &nbsp;&nbsp;
+              <b>Mode:</b> {{ receiptForm.value.paymentMode }}
+            </div>
+
+            <!-- SIGNATURE -->
+            <div class="signature"><br>
+              _______________________<br>
+              (Authorized Signature) <br><br>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== CUT LINE ===== -->
+      <div class="receipt-separator print-only">
+        ------------------------------ CUT HERE ------------------------------
+      </div>
+
+      <!-- ================= OFFICE COPY (PRINT ONLY) ================= -->
+      <div class="print-copy print-only">
+        <!-- SAME RECEIPT AGAIN -->
+        <div class="page">
+          <div class="receipt">
+            <div class="copy-label">Office Copy</div>
+            <!-- HEADER -->
+            <div class="school-details">
+              <div class="logo">
+                <img src="cia.png" alt="School Logo">
+              </div>
+
+              <div class="school-info">
+                <div class="school-name">CHAMPARAN INTERNATIONAL ACADEMY</div>
+                <div class="school-address">
+                  Masjid Tola, Near Batakh Miya Mazar, Bajrang Chowk, Agari
+                </div>
+                <div class="school-contact">
+                  Contact: 7321978565 |
+                  Email: champaraninternationalacademy&#64;gmail.com
+                </div>
+              </div>
+            </div>
+
+            <div class="fee-title">FEE RECEIPT</div>
+
+            <!-- STUDENT DETAILS -->
+            <table class="no-border">
+              <tr>
+                <td><b>BILL NO:</b> {{ receiptForm.value.receiptNumber }}</td>
+                <td><b>MONTH:</b> {{ receiptForm.value.installmentName }}</td>
+                <td><b>DATE:</b> {{ receiptForm.value.paymentDate | date:'dd-MM-yyyy' }}</td>
+              </tr>
+              <tr>
+                <td><b>NAME:</b> {{ receiptForm.value.studentName }}</td>
+                <td><b>CLASS:</b> {{ receiptForm.value.grade }} ({{ receiptForm.value.gradeSection }})</td>
+                <td><b>ADM/ROLL NO:</b>{{ receiptForm.value.admissionNo }}
+                  /
+                  {{ receiptForm.value.rollNumber }}</td>
+              </tr>
+              <tr>
+                <td><b>FATHER:</b> NIRAJ KUMAR</td>
+                <td><b>MOTHER:</b> GEETA DEVI</td>
+                <td><b>CONTACT NO:</b> 6202014654</td>
+              </tr>
+            </table>
+
+            <!-- FEE TABLE -->
+                       <table class="fee-table">
+
+              <thead>
+
+                <tr>
+
+                  <th>Fee Head</th>
+
+                  <th class="text-right">
+                    Amount
+                  </th>
+
+                  <th class="text-right">
+                    Concession
+                  </th>
+
+                  <th class="text-right">
+                    Total
+                  </th>
+
+                </tr>
+
+              </thead>
+
+              <tbody>
+
+                <tr
+                  *ngFor="
+                    let item of receiptDetails.controls;
+                    let i = index
+                  "
+                  [formGroup]="asFormGroup(item)">
+
+                  <td>
+                    {{ item.value.feeType }}
+                  </td>
+
+                  <td class="text-right">
+                    {{ item.value.amount }}
+                  </td>
+
+                  <td class="text-right">
+                    {{ receiptForm.value.discountAmount || 0 }}
+                  </td>
+
+                  <td class="text-right">
+                    {{ item.value.amount }}
+                  </td>
+
+                </tr>
+
+               
+                <tr class="bold">
+
+                  <td>Total</td>
+
+                  <td class="text-right">
+                    {{ receiptForm.value.totalAmount }}
+                  </td>
+
+                  <td class="text-right">
+                    {{ receiptForm.value.discountAmount }}
+                  </td>
+
+                  <td class="text-right">
+                    {{ receiptForm.value.netAmount }}
+                  </td>
+
+                </tr>
+
+              </tbody>
+
+            </table>
+
+
+            <!-- FOOTER -->
+            <div class="footer">
+              <b>Paid:</b> {{ receiptForm.value.netAmount }} &nbsp;&nbsp;
+              <b>Discount:</b> {{ receiptForm.value.discountAmount }} &nbsp;&nbsp;
+              <b>Dues:</b> 0 &nbsp;&nbsp;
+              <b>Mode:</b> {{ receiptForm.value.paymentMode }}
+            </div>
+
+            <!-- SIGNATURE -->
+            <div class="signature">
+              _______________________<br>
+              (Authorized Signature)
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </mat-dialog-content>
+
+  <!-- PRINT BUTTON -->
+  <button mat-raised-button color="primary" (click)="printReceipt()">
+    Print
+  </button>
+
+</ng-template>

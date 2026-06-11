@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { AuthenticationService } from 'src/app/auth/authentication.service';
@@ -27,21 +27,26 @@ import { GenerateSchoolReceiptService } from './generate-school-receipt.service'
 })
 export class GenerateSchoolReceiptComponent {
 
-receiptForm!: FormGroup;
-studentSearchForm!: FormGroup;
+  @ViewChild('dialogTemplate')
+  dialogTemplate!: TemplateRef<any>;
+    
+  public receiptDialog: any;
+  receiptForm!: FormGroup;
+  studentSearchForm!: FormGroup;
 
-selectedStudent: any;
+  selectedStudent: any;
 
-studentDetails: any[] = [];
-isLoading = true;
+  studentDetails: any[] = [];
+  isLoading = true;
 
 
   constructor(
     private fb: FormBuilder,
     private http: HttpClient,
+    private dialog: MatDialog,
     private messageService: MessageService,
     private generateSchoolReceiptService: GenerateSchoolReceiptService,
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.createReceiptForm();
@@ -50,7 +55,7 @@ isLoading = true;
 
   }
 
-   createSearchForm(): void {
+  createSearchForm(): void {
     this.studentSearchForm = this.fb.group({
       // Search Info
       grade: [''],
@@ -135,18 +140,21 @@ isLoading = true;
   // ================= SUBMIT RECEIPT =================
 
   submitReceipt() {
-    console.log("hjhhjh : "+this.receiptForm.value.admissionNo);
     this.generateSchoolReceiptService.submitReceipt(this.receiptForm.value)
       .subscribe({
         next: (response: any) => {
-          if (response['responseCode'] == '200') {
-            if (response['payload']['respCode'] == '200') {
+          if (response['responseCode'] === 200) {
+            if (response['payload']['respCode'] === 200) {
 
               this.messageService.add({
                 summary: response['payload']['respCode'],
                 detail: response['payload']['respMesg'],
                 styleClass: 'success-background-popover',
               });
+
+              // Open receipt modal
+              this.openEditModal(response['payload']);
+
             } else {
               this.messageService.add({
                 summary: response['payload']['respCode'],
@@ -170,34 +178,6 @@ isLoading = true;
       });
   }
 
-  // submitReceipt(): void {
-
-  //   if (this.receiptForm.invalid) {
-  //     this.receiptForm.markAllAsTouched();
-  //     return;
-  //   }
-
-  //   const payload = {
-  //     ...this.receiptForm.getRawValue()
-  //   };
-
-  //   const request = {
-  //     payload: payload
-  //   };
-
-  //   this.http.post('http://localhost:8080/addReceipt', request)
-  //     .subscribe({
-  //       next: (res: any) => {
-  //         alert('Receipt generated successfully');
-  //         this.resetForm();
-  //       },
-  //       error: (err) => {
-  //         console.error(err);
-  //         alert('Failed to generate receipt');
-  //       }
-  //     });
-  // }
-
   // ================= RESET FORM =================
   resetForm(): void {
     this.receiptForm.reset();
@@ -205,80 +185,136 @@ isLoading = true;
     this.addFeeRow();
   }
 
-  submitSearch(){
-    
+  submitSearch() {
+
   }
 
-getStudentDetails() {
+  getStudentDetails() {
 
-  const grade = this.studentSearchForm.get('grade')?.value;
-  const gradeSection = this.studentSearchForm.get('gradeSection')?.value;
+    const grade = this.studentSearchForm.get('grade')?.value;
+    const gradeSection = this.studentSearchForm.get('gradeSection')?.value;
 
-  if (!grade || !gradeSection) {
-    this.studentDetails = [];
-    return;
+    if (!grade || !gradeSection) {
+      this.studentDetails = [];
+      return;
+    }
+
+    this.isLoading = true;
+    this.generateSchoolReceiptService.getStudentDetailsForFee(grade, gradeSection)
+      .subscribe({
+        next: (res) => {
+          this.studentDetails = res?.listPayload || [];
+          this.isLoading = false;
+        },
+        error: (err) => {
+          console.error(err);
+          this.isLoading = false;
+        }
+      });
   }
 
-  this.isLoading = true;
-  this.generateSchoolReceiptService.getStudentDetailsForFee(grade, gradeSection)
-    .subscribe({
-      next: (res) => {
-         this.studentDetails = res?.listPayload || [];
-        this.isLoading = false;
-      },
-      error: (err) => {
-        console.error(err);
-        this.isLoading = false;
-      }
-    });
-}
+
+  onStudentChange(admissionNo: any) {
+
+    this.selectedStudent = this.studentDetails.find(
+      (student: any) => student.admissionNo == admissionNo
+    );
 
 
-onStudentChange(admissionNo: any) {
+    if (this.selectedStudent) {
 
-  this.selectedStudent = this.studentDetails.find(
-    (student: any) => student.admissionNo == admissionNo
+      this.receiptForm.patchValue({
+
+        admissionNo: this.selectedStudent.admissionNo,
+
+        rollNumber: this.selectedStudent.rollNumber,
+
+        studentName:
+          this.selectedStudent.firstName + ' ' +
+          this.selectedStudent.lastName,
+
+        grade: this.selectedStudent.grade,
+
+        gradeSection: this.selectedStudent.gradeSection,
+
+        academicSession: this.selectedStudent.sessionName
+
+      });
+    }
+  }
+
+openEditModal(rawData: any): void {
+
+  // Clear old rows
+  this.receiptDetails.clear();
+
+  // Add receipt details
+  rawData?.receiptDetails?.forEach((item: any) => {
+
+    this.receiptDetails.push(
+      this.createReceiptDetailGroup(item)
+    );
+
+  });
+
+  // Patch form values
+  this.receiptForm.patchValue({
+
+    receiptNumber: rawData?.receiptNumber || '',
+    admissionNo: rawData?.admissionNo || '',
+    rollNumber: rawData?.rollNumber || '',
+    studentName: rawData?.studentName || '',
+    grade: rawData?.grade || '',
+    gradeSection: rawData?.gradeSection || '',
+    academicSession: rawData?.academicSession || '',
+    installmentName: rawData?.installmentName || '',
+    paymentMode: rawData?.paymentMode || '',
+
+    paymentDate: rawData?.paymentDate
+      ? rawData.paymentDate.split('T')[0]
+      : '',
+
+    totalAmount: rawData?.totalAmount || 0,
+    discountAmount: rawData?.discountAmount || 0,
+    fineAmount: rawData?.fineAmount || 0,
+    netAmount: rawData?.netAmount || 0,
+
+    status: rawData?.status || '',
+    createdBy: rawData?.createdBy || '',
+    createdByName: rawData?.createdByName || '',
+    superadminId: rawData?.superadminId || ''
+
+  });
+
+  // Open dialog
+  this.receiptDialog = this.dialog.open(
+    this.dialogTemplate,
+    {
+      width: '100%',
+      maxWidth: '900px',
+      height: '90vh',
+      disableClose: true,
+      panelClass: 'custom-modal'
+    }
   );
 
-  console.log(this.selectedStudent);
-
-  if (this.selectedStudent) {
-
-    this.receiptForm.patchValue({
-
-      admissionNo: this.selectedStudent.admissionNo,
-
-      rollNumber: this.selectedStudent.rollNumber,
-
-      studentName:
-        this.selectedStudent.firstName + ' ' +
-        this.selectedStudent.lastName,
-
-      grade: this.selectedStudent.grade,
-
-      gradeSection: this.selectedStudent.gradeSection,
-
-      academicSession: this.selectedStudent.sessionName
-
-    });
-  }
 }
 
-// Service example:
-  
-//  getStudentDetails() {
-//     this.generateSchoolReceiptService.getStudentDetailsForFee().subscribe({
-//       next: (res) => {
-//         console.log(res); // check API response structure
-//         this.studentDetails = res?.data || [];
-//         this.isLoading = false;
-//       },
-//       error: (err) => {
-//         console.error(err);
-//         this.isLoading = false;
-//       }
-//     });
-//   }
+createReceiptDetailGroup(data?: any): FormGroup {
 
+  return this.fb.group({
+    feeType: [data?.feeType || ''],
+    amount: [data?.amount || 0]
+  });
+}
+
+  printReceipt() {
+    window.print();
+  }
+
+  asFormGroup(control: any): FormGroup {
+
+  return control as FormGroup;
+}
 
 }
