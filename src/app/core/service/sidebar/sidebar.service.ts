@@ -140,19 +140,37 @@ export class SidebarService {
           ],
         },
         {
-          menuValue: 'Reports Management',
+          menuValue: 'Report Management',
           hasSubRoute: true,
           showSubRoute: false,
           icon: 'database',
           subMenus: [
             {
-              menuValue: 'Payment Report',
-              route: routes.paymentReport,
-              permission: 'payment-report',
+              menuValue: 'Fundrising Officer Report',
+              route: routes.getFundrisingOfficerReport,
+              permission: 'fundrising-officer-report',
             }, 
-            
+            {
+              menuValue: 'Payment Mode Report',
+              route: routes.getPaymentModeReport,
+              permission: 'pay-mode-report',
+            },
           ],
         },
+        // {
+        //   menuValue: 'Reports Management',
+        //   hasSubRoute: true,
+        //   showSubRoute: false,
+        //   icon: 'database',
+        //   subMenus: [
+        //     {
+        //       menuValue: 'Payment Report',
+        //       route: routes.paymentReport,
+        //       permission: 'payment-report',
+        //     }, 
+            
+        //   ],
+        // },
         {
           menuValue: 'Payment Mode Management',
           hasSubRoute: true,

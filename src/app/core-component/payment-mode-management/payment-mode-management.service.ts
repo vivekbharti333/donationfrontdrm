@@ -20,6 +20,7 @@ export class PaymentModeManagementService {
    getMasterPaymentModeList(){
     let request: any = {
       payload: {
+        roleType: this.loginUser['roleType'],
       }
     };
     return this.http.post<any>(Constant.Site_Url + "getMasterPaymentModeList", request);
