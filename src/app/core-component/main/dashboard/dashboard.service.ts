@@ -72,13 +72,40 @@ export class DashboardService {
     return  this.http.post<any>(Constant.Site_Url+"getDonationCountAndAmountGroupByName",request);
   }
 
+  getDonationCountAndAmountGroupByNameCustom(firstDate:any, lastDate:any){
+    let request: any = {
+      payload: {
+        requestedFor: 'CUSTOM',
+        firstDate: firstDate,
+        lastDate: lastDate,
+        roleType: this.cookieService.get('roleType'),
+        token: this.cookieService.get('token'),
+        createdBy: this.cookieService.get('loginId'),
+        superadminId: this.cookieService.get('superadminId'),
+      }
+    };
+    return  this.http.post<any>(Constant.Site_Url+"getDonationCountAndAmountGroupByName",request);
+  }
+
   getDonationPaymentModeCountAndAmountGroupByName(tabName:string){
-    // this.loginId = localStorage.getItem('loginId');
-    // this.superadminId = localStorage.getItem('superadminId');
-  
     let request: any = {
       payload: {
         requestedFor: tabName,
+        roleType: this.cookieService.get('roleType'),
+        token: this.cookieService.get('token'),
+        createdBy: this.cookieService.get('loginId'),
+        superadminId: this.cookieService.get('superadminId'),
+      }
+    };
+    return  this.http.post<any>(Constant.Site_Url+"getDonationPaymentModeCountAndAmountGroupByName",request);
+  }
+
+  getDonationPaymentModeCountAndAmountGroupByNameCustom(firstDate:any, lastDate:any){
+    let request: any = {
+      payload: {
+        requestedFor: 'CUSTOM',
+        firstDate: firstDate,
+        lastDate: lastDate,
         roleType: this.cookieService.get('roleType'),
         token: this.cookieService.get('token'),
         createdBy: this.cookieService.get('loginId'),

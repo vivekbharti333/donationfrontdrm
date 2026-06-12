@@ -1,0 +1,107 @@
+<div class="page-header">
+  <div class="add-item d-flex">
+    <div class="page-title">
+      <h4>Payment Mode Reports</h4>
+      <h6>Manage Your Report</h6>
+      <p-toast></p-toast>
+    </div>
+  </div>
+  <ul class="table-top-head">
+    <li>
+      <a data-bs-toggle="tooltip" data-bs-placement="top" matTooltip="Pdf" matTooltipPosition="above"><img
+          src="assets/img/icons/pdf.svg" alt="img" /></a>
+    </li>
+    <li>
+      <a data-bs-toggle="tooltip" data-bs-placement="top" matTooltip="Excel" matTooltipPosition="above"><img
+          src="assets/img/icons/excel.svg" alt="img" /></a>
+    </li>
+    <li>
+      <a data-bs-toggle="tooltip" data-bs-placement="top" matTooltip="Print" matTooltipPosition="above"><i
+          class="feather icon-printer feather-rotate-ccw"></i></a>
+    </li>
+    <li>
+      <a data-bs-toggle="tooltip" data-bs-placement="top" matTooltip="Refresh" matTooltipPosition="above"
+        ><i class="feather icon-rotate-ccw feather-rotate-ccw"></i></a>
+    </li>
+    <li>
+      <a (click)="toggleCollapse()" data-bs-toggle="tooltip" data-bs-placement="top" matTooltip="Collapse"
+        matTooltipPosition="above" id="collapse-header">
+        @if (!isCollapsed) {
+        <i class="feather icon-chevron-up feather-chevron-up"></i>
+        } @if (isCollapsed) {
+        <i class="feather icon-chevron-down feather-chevron-down"></i>
+        }</a>
+    </li>
+  </ul>
+  <div class="page-btn">
+    <!-- <a [routerLink] = "routes.addusers" class="btn btn-added"><i class="feather icon-plus-circle me-2"></i>Add New User</a>  -->
+  </div>
+</div>
+
+<div class="row align-items-end g-2" style="margin: 2%;">
+
+  <div class="col-auto">
+    <label class="filter-label">From</label>
+    <input type="date" class="form-control" style="width: 180px;" #firstDate>
+  </div>
+
+  <div class="col-auto">
+    <label class="filter-label">To</label>
+    <input type="date" class="form-control" style="width: 180px;" #lastDate>
+  </div>
+
+  <div class="col-auto">
+    <button
+      type="button"
+      class="btn btn-warning"
+      (click)="getDonationPaymentModeCountAndAmountGroupByNameCustom(firstDate.value, lastDate.value)">
+      <i class="feather icon-search"></i>
+      Search
+    </button>
+  </div>
+
+</div>
+
+
+  <div class="col-sm-12 col-md-12 col-xl-8 d-flex">
+    <div class="card flex-fill default-cover w-100 mb-4">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h4 class="card-title mb-0">Payment Mode Reports</h4>
+      </div>
+
+<div class="card-body">
+        <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+          <table class="table table-borderless best-seller" style="table-layout: fixed;">
+            <thead>
+              <tr>
+                <th style="width: 40%;">Mode</th>
+                <!-- <th style="width: 30%;">Currency</th> -->
+                <th style="width: 20%;">Count</th>
+                <th style="width: 30%;">Amount</th>
+
+              </tr>
+            </thead>
+            <tbody class="table-body">
+              <!-- Iterate through the PaymentModeCountAmount object -->
+              <ng-container *ngFor="let paymentMode of objectKeys(PaymentModeCountAmount)">
+                <ng-container *ngFor="let row of PaymentModeCountAmount[paymentMode]">
+                  <tr>
+                    <!-- Display the Payment Mode (only once for each payment mode) -->
+                    <td *ngIf="row === PaymentModeCountAmount[paymentMode][0]"
+                      [attr.rowspan]="PaymentModeCountAmount[paymentMode].length">
+                      {{ paymentMode }}
+                    </td>
+                    <!-- Display Count, Amount, Currency, and Symbol -->
+                    <td>{{ row[0] }}</td>
+                    <!-- <td></td> -->
+                    <td> {{ row[3] }} {{ row[1] }} ({{ row[2] }})</td>
+                  </tr>
+                </ng-container>
+              </ng-container>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+
+      </div>

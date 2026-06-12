@@ -630,6 +630,24 @@ export class SidebarService {
           ],
         },
         {
+          menuValue: 'Donation Reports',
+          hasSubRoute: true,
+          showSubRoute: false,
+          icon: 'users',
+          subMenus: [
+            {
+              menuValue: 'Fundrising Officer Report',
+              route: routes.getFundrisingOfficerReport,
+              permission: 'fundrising-officer-report',
+            }, 
+            {
+              menuValue: 'Payment Mode Report',
+              route: routes.getPaymentModeReport,
+              permission: 'payment-mode-report',
+            },
+          ],
+        },
+        {
           menuValue: 'Payment Mode Management',
           hasSubRoute: true,
           showSubRoute: false,

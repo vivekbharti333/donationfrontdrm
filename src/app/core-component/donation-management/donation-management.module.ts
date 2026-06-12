@@ -8,6 +8,8 @@ import { sharedModule } from 'src/app/shared/shared.module';
 import { DonationManagementComponent } from './donation-management.component'; 
 import { AddDonationComponent } from './add-donation/add-donation.component'; 
 import { AllDonationListComponent } from './all-donation-list/all-donation-list.component';
+import { FundrisingOfficerReportComponent } from './fundrising-officer-report/fundrising-officer-report.component';
+import { PaymentModeReportComponent } from './payment-mode-report/payment-mode-report.component';
 import { DonationManagementRoutingModule } from './donation-management-routing.module'; 
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatTabsModule} from '@angular/material/tabs';
@@ -21,7 +23,9 @@ import {NgxPaginationModule} from 'ngx-pagination';
   declarations: [
     DonationManagementComponent,
     AddDonationComponent,
-    AllDonationListComponent
+    AllDonationListComponent,
+    FundrisingOfficerReportComponent,
+    PaymentModeReportComponent
   ],
   imports: [
     DonationManagementRoutingModule,

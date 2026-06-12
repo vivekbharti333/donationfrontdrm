@@ -240,9 +240,6 @@ export class AllDonationListComponent {
   getDonationListByUser(event: any): void {
   }
 
-
-
-
   downloadInvoice(receiptNo: string) {
     window.open(Constant.Site_Url + "donationinvoice/" + receiptNo, '_blank');
   }

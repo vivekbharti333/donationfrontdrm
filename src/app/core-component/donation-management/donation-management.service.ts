@@ -148,8 +148,6 @@ export class DonationManagementService {
     return this.http.post<DonationDetailsRequest>(Constant.Site_Url + "updateDonation", request);
   }
  
-
-  
   updateDonationStatus(donationDetails: DonationDetails): Observable<DonationDetailsRequest> {
     let donationStatus = "";
     if (donationDetails['status'] == "INACTIVE") {

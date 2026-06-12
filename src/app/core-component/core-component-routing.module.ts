@@ -113,7 +113,7 @@ const routes: Routes = [
           import('./donation-management/donation-management.module').then(
             (m) => m.DonationManagementModule
           ),
-          canActivate: [AuthGuard],
+          // canActivate: [AuthGuard],
       },
       {
         path: 'payment-mode-management',

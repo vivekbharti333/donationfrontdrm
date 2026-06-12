@@ -3,6 +3,8 @@ import { RouterModule, Routes } from '@angular/router';
 import { DonationManagementComponent } from './donation-management.component';
 import { AddDonationComponent } from './add-donation/add-donation.component'; 
 import { AllDonationListComponent } from './all-donation-list/all-donation-list.component'; 
+import { FundrisingOfficerReportComponent } from './fundrising-officer-report/fundrising-officer-report.component';
+import { PaymentModeReportComponent } from './payment-mode-report/payment-mode-report.component';
 
 
 const routes: Routes = [
@@ -17,6 +19,15 @@ const routes: Routes = [
       {
         path: 'all-donation-list',
         component: AllDonationListComponent,
+      },
+
+      {
+        path: 'fundrising-officer-report',
+        component: FundrisingOfficerReportComponent,
+      },
+      {
+        path: 'payment-mode-report',
+        component: PaymentModeReportComponent,
       },
     ],
   },

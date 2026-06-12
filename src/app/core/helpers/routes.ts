@@ -933,6 +933,13 @@ export class routes {
   public static get allDonationList(): string {
     return this.donationManagement + '/all-donation-list';
   }
+  //Donation Report Management
+  public static get getFundrisingOfficerReport(): string {
+    return this.donationManagement + '/fundrising-officer-report';
+  }
+  public static get getPaymentModeReport(): string {
+    return this.donationManagement + '/payment-mode-report';
+  }
 
   //Reports Management
   public static get paymentReport(): string {
