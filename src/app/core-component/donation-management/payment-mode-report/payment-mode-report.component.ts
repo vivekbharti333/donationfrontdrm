@@ -2,7 +2,9 @@ import { Component } from '@angular/core';
 import { CommonService, SidebarService, routes } from 'src/app/core/core.index';
 import { DashboardService } from '../../main/dashboard/dashboard.service';
 import { AuthenticationService } from 'src/app/auth/authentication.service';
+import { UserManagementService } from '../../user-management/user-management.service';
 import { CookieService } from 'ngx-cookie-service';
+import { Constant } from 'src/app/core/constant/constants';
 
 
 @Component({
@@ -12,32 +14,78 @@ import { CookieService } from 'ngx-cookie-service';
 })
 export class PaymentModeReportComponent {
 
-
+  public userList: any;
   public loginUser: any;
   public objectKeys1 = Object.keys;
   public PaymentModeCountAmount: any = {};
+
+  public isMainAdmin: boolean = false;
+  public isSuperadmin: boolean = false;
+  public isAdmin: boolean = false;
+  public isTeamLeader: boolean = false;
+  public isDonationExecutive: boolean = false;
+  public showExcelReport: boolean = false;
+  public teamLeaderList: any;
 
   constructor(
     private sidebar: SidebarService,
     private dashboardService: DashboardService,
     private authenticationService: AuthenticationService,
+     private userManagementService: UserManagementService,
     private cookieService: CookieService
   ) {
 
     this.loginUser = this.authenticationService.getLoginUser();
   }
 
+  
   ngOnInit() {
-    this.getDonationPaymentModeCountAndAmountGroupByNameCustom('', '');
+    this.getDonationPaymentModeCountAndAmountGroupByNameCustom('', '', '');
+    this.getUserDetailsList();
+    this.checkRoleType();
+  }
+
+    checkRoleType() {
+      if (this.loginUser['roleType'] == Constant.mainAdmin) {
+        this.isMainAdmin = true;
+      } else if (this.loginUser['roleType'] == Constant.superAdmin) {
+        this.isSuperadmin = true;
+        this.isAdmin = true;
+      } else if (this.loginUser['roleType'] == Constant.admin) {
+        this.isAdmin = true;
+        this.isSuperadmin = true;
+      } else if (this.loginUser['roleType'] == Constant.teamLeader) {
+        this.isTeamLeader = true;
+        this.isSuperadmin = true;
+      } else if (this.loginUser['roleType'] == Constant.donorExecutive) {
+        this.isDonationExecutive = true;
+      }
+    }
+
+    public getUserDetailsList() {
+    this.userManagementService.getUserDetailsList()
+      .subscribe({
+        next: (response: any) => {
+         
+          if (response['responseCode'] == '200') {
+            this.userList = JSON.parse(JSON.stringify(response['listPayload']));
+            
+          } else {
+           
+          }
+         
+        },
+        // error: (error: any) => this.toastr.error('Server Error', '500'),
+      });
   }
 
   objectKeys(obj: any): string[] {
     return Object.keys(obj);
   }
 
-  getDonationPaymentModeCountAndAmountGroupByNameCustom(firstDate:any, lastDate:any) {
+  getDonationPaymentModeCountAndAmountGroupByNameCustom(loginId:any, firstDate:any, lastDate:any) {
     this.PaymentModeCountAmount = {}; // Initialize as an empty object
-    this.dashboardService.getDonationPaymentModeCountAndAmountGroupByNameCustom(firstDate, lastDate)
+    this.dashboardService.getDonationPaymentModeCountAndAmountGroupByNameCustom(loginId, firstDate, lastDate)
       .subscribe({
         next: (response: any) => {
 

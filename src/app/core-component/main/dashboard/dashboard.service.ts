@@ -100,20 +100,29 @@ export class DashboardService {
     return  this.http.post<any>(Constant.Site_Url+"getDonationPaymentModeCountAndAmountGroupByName",request);
   }
 
-  getDonationPaymentModeCountAndAmountGroupByNameCustom(firstDate:any, lastDate:any){
-    let request: any = {
-      payload: {
-        requestedFor: 'CUSTOM',
-        firstDate: firstDate,
-        lastDate: lastDate,
-        roleType: this.cookieService.get('roleType'),
-        token: this.cookieService.get('token'),
-        createdBy: this.cookieService.get('loginId'),
-        superadminId: this.cookieService.get('superadminId'),
-      }
-    };
-    return  this.http.post<any>(Constant.Site_Url+"getDonationPaymentModeCountAndAmountGroupByName",request);
+getDonationPaymentModeCountAndAmountGroupByNameCustom(loginId: any, firstDate: any, lastDate: any) {
+
+  let createdBy: any = '';
+
+  if (this.cookieService.get('roleType') === Constant.fundraisingOfficer) {
+    createdBy = this.cookieService.get('loginId');
+  } else {
+    createdBy = loginId;
   }
+
+  const request = {
+    payload: {
+      requestedFor: 'CUSTOM',
+      firstDate: firstDate,
+      lastDate: lastDate,
+      createdBy: createdBy,
+      roleType: this.cookieService.get('roleType'),
+      token: this.cookieService.get('token'),
+      superadminId: this.cookieService.get('superadminId')
+    }
+  };
+  return this.http.post<any>(Constant.Site_Url + 'getDonationPaymentModeCountAndAmountGroupByName', request);
+}
 
 
 }
