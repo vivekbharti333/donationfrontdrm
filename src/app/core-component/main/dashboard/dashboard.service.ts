@@ -109,14 +109,15 @@ getDonationPaymentModeCountAndAmountGroupByNameCustom(loginId: any, firstDate: a
   } else {
     createdBy = loginId;
   }
-
   const request = {
     payload: {
-      requestedFor: 'CUSTOM',
+      requestedFor: 'INDIVIDUAL',
+      // requestedFor: 'CUSTOM',
       firstDate: firstDate,
       lastDate: lastDate,
       createdBy: createdBy,
-      roleType: this.cookieService.get('roleType'),
+      roleType: Constant.fundraisingOfficer,
+      // roleType: this.cookieService.get('roleType'),
       token: this.cookieService.get('token'),
       superadminId: this.cookieService.get('superadminId')
     }

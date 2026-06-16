@@ -1,12 +1,12 @@
 <div class="page-header">
   <div class="add-item d-flex">
     <div class="page-title">
-      <h4>Payment Mode Reports</h4>
+      <h4>Payment Reports</h4>
       <h6>Manage Your Report</h6>
       <p-toast></p-toast>
     </div>
   </div>
-  <ul class="table-top-head">
+  <!-- <ul class="table-top-head">
     <li>
       <a data-bs-toggle="tooltip" data-bs-placement="top" matTooltip="Pdf" matTooltipPosition="above"><img
           src="assets/img/icons/pdf.svg" alt="img" /></a>
@@ -32,214 +32,166 @@
         <i class="feather icon-chevron-down feather-chevron-down"></i>
         }</a>
     </li>
-  </ul>
+  </ul> -->
   <div class="page-btn">
     <!-- <a [routerLink] = "routes.addusers" class="btn btn-added"><i class="feather icon-plus-circle me-2"></i>Add New User</a>  -->
   </div>
 </div>
 
+<div class="row">
+  <div class="col-sm-12 col-md-8 col-xl-8">
+    <div class="card border-0 shadow-sm">
 
-<div class="row align-items-end">
-  <!-- Select User -->
-  <!-- <div  *ngIf="isSuperadmin" class="col-lg-2 col-md-2 col-sm-12"> -->
-  <div class="col-lg-2 col-md-2 col-sm-12">
-    <div class="mb-2">
-      <label class="form-label requiredField">Select User</label>
+      <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body">
 
-      <mat-select #loginId placeholder="Select User">
-        <mat-option *ngFor="let data of userList" [value]="data.loginId">
-          {{ data.firstName }} {{ data.lastName }}
-        </mat-option>
-      </mat-select>
+          <!-- Super Admin Filters -->
+          <div *ngIf="isSuperadmin" class="row g-3 align-items-end mb-4">
 
-    </div>
-  </div>
+            <div class="col-lg-3 col-md-6 col-12">
+              <label class="form-label requiredField">Select User</label>
+              <mat-select #loginId placeholder="Select User">
+                <mat-option *ngFor="let data of userList" [value]="data.loginId">
+                  {{ data.firstName }} {{ data.lastName }}
+                </mat-option>
+              </mat-select>
+            </div>
 
-  <!-- From Date -->
-  <div class="col-lg-2 col-md-2 col-sm-12">
-    <div class="mb-2">
-      <label class="form-label requiredField">From</label>
-      <input type="date" class="form-control" #firstDate>
-    </div>
-  </div>
+            <div class="col-lg-3 col-md-6 col-12">
+              <label class="form-label requiredField">From</label>
+              <input type="date" class="form-control" #firstDate>
+            </div>
 
-  <!-- To Date -->
-  <div class="col-lg-2 col-md-2 col-sm-12">
-    <div class="mb-2">
-      <label class="form-label requiredField">To</label>
-      <input type="date" class="form-control" #lastDate>
-    </div>
-  </div>
+            <div class="col-lg-3 col-md-6 col-12">
+              <label class="form-label requiredField">To</label>
+              <input type="date" class="form-control" #lastDate>
+            </div>
 
-  <!-- Search Button -->
-  <div class="col-lg-2 col-md-2 col-sm-12">
-    <div class="mb-2">
-      <button type="button" class="btn btn-warning w-100"
-        (click)="getDonationPaymentModeCountAndAmountGroupByNameCustom(loginId?.value, firstDate.value, lastDate.value)">
-        <i class="feather icon-search me-1"></i>
-        Search
-      </button>
-    </div>
-  </div>
-
-</div>
-
-
-<div class="col-sm-12 col-md-12 col-xl-8 ">
-  <div class="card flex-fill default-cover w-100 mb-4">
-    <div class="card-header d-flex justify-content-between align-items-center">
-      <h4 class="card-title mb-0">Payment Mode Reports</h4>
-    </div>
-
-    <div class="card-body">
-      <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
-        <table class="table table-borderless best-seller" style="table-layout: fixed;">
-          <thead>
-            <tr>
-              <th style="width: 40%;">Mode</th>
-              <th style="width: 20%;">Count</th>
-              <th style="width: 30%;">Amount</th>
-
-            </tr>
-          </thead>
-          <tbody class="table-body">
-            <!-- Iterate through the PaymentModeCountAmount object -->
-            <ng-container *ngFor="let paymentMode of objectKeys(PaymentModeCountAmount)">
-              <ng-container *ngFor="let row of PaymentModeCountAmount[paymentMode]">
-                <tr>
-                  <!-- Display the Payment Mode (only once for each payment mode) -->
-                  <td *ngIf="row === PaymentModeCountAmount[paymentMode][0]"
-                    [attr.rowspan]="PaymentModeCountAmount[paymentMode].length">
-                    {{ paymentMode }}
-                  </td>
-                  <!-- Display Count, Amount, Currency, and Symbol -->
-                  <td>{{ row[0] }}</td>
-
-                  <td> {{ row[3] }} {{ row[1] }} ({{ row[2] }})</td>
-                </tr>
-              </ng-container>
-            </ng-container>
-          </tbody>
-        </table>
-      </div>
-
-    </div>
-
-  </div>
-
-  ////////////////////
-
-  <div class="card shadow-sm border-0 mb-4">
-    <div class="card-body">
-
-      <div class="row g-3 align-items-end">
-
-        <!-- User -->
-        <div class="col-xl-3 col-lg-3 col-md-6 col-sm-12">
-          <label class="form-label fw-semibold">Select User</label>
-
-          <mat-form-field appearance="outline" class="w-100">
-            <mat-select #loginId placeholder="Select User">
-              <mat-option *ngFor="let data of userList" [value]="data.loginId">
-                {{ data.firstName }} {{ data.lastName }}
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
-        </div>
-
-        <!-- From Date -->
-        <div class="col-xl-2 col-lg-3 col-md-6 col-sm-12">
-          <label class="form-label fw-semibold">From Date</label>
-          <input type="date" class="form-control" #firstDate>
-        </div>
-
-        <!-- To Date -->
-        <div class="col-xl-2 col-lg-3 col-md-6 col-sm-12">
-          <label class="form-label fw-semibold">To Date</label>
-          <input type="date" class="form-control" #lastDate>
-        </div>
-
-        <!-- Search -->
-        <div class="col-xl-2 col-lg-3 col-md-6 col-sm-12">
-          <button type="button" class="btn btn-warning w-100" (click)="getDonationPaymentModeCountAndAmountGroupByNameCustom(
-            loginId?.value,
-            firstDate.value,
-            lastDate.value
-          )">
-            <i class="feather icon-search me-2"></i>
-            Search
-          </button>
-        </div>
-
-      </div>
-
-    </div>
-  </div>
-
-
-  <!-- Report Card -->
-  <div class="row">
-    <div class="col-12">
-
-      <div class="card shadow-sm border-0">
-
-        <div class="card-header bg-white">
-          <h4 class="card-title mb-0 fw-bold">
-            Payment Mode Reports
-          </h4>
-        </div>
-
-        <div class="card-body p-0">
-
-          <div class="table-responsive payment-report-table">
-
-            <table class="table table-hover table-striped align-middle mb-0">
-
-              <thead class="table-light sticky-top">
-                <tr>
-                  <th>Payment Mode</th>
-                  <th class="text-center">Count</th>
-                  <th class="text-end">Amount</th>
-                </tr>
-              </thead>
-
-              <tbody>
-
-                <ng-container *ngFor="let paymentMode of objectKeys(PaymentModeCountAmount)">
-                  <ng-container *ngFor="let row of PaymentModeCountAmount[paymentMode]">
-                    <tr>
-
-                      <td *ngIf="row === PaymentModeCountAmount[paymentMode][0]"
-                        [attr.rowspan]="PaymentModeCountAmount[paymentMode].length"
-                        class="fw-semibold text-primary align-middle">
-                        {{ paymentMode }}
-                      </td>
-
-                      <td class="text-center fw-medium">
-                        {{ row[0] }}
-                      </td>
-
-                      <td class="text-end fw-medium">
-                        {{ row[3] }} {{ row[1] }}
-                        <small class="text-muted">
-                          ({{ row[2] }})
-                        </small>
-                      </td>
-
-                    </tr>
-
-                  </ng-container>
-                </ng-container>
-
-              </tbody>
-
-            </table>
+            <div class="col-lg-3 col-md-6 col-12">
+              <button type="button" class="btn btn-warning w-100"
+                (click)="getDonationPaymentModeCountAndAmountGroupByNameCustom(loginId?.value, firstDate.value, lastDate.value)">
+                <i class="feather icon-search me-1"></i>
+                Search
+              </button>
+            </div>
 
           </div>
 
-        </div>
+          <!-- Normal User Filters -->
+          <div *ngIf="!isSuperadmin" class="row g-3 align-items-end mb-4">
 
+            <div class="col-lg-4 col-md-6 col-12">
+              <label class="form-label requiredField">From</label>
+              <input type="date" class="form-control" #firstDate>
+            </div>
+
+            <div class="col-lg-4 col-md-6 col-12">
+              <label class="form-label requiredField">To</label>
+              <input type="date" class="form-control" #lastDate>
+            </div>
+
+            <div class="col-lg-4 col-md-12 col-12">
+              <button type="button" class="btn btn-warning w-100"
+                (click)="getDonationPaymentModeCountAndAmountGroupByNameCustom('', firstDate.value, lastDate.value)">
+                <i class="feather icon-search me-1"></i>
+                Search
+              </button>
+            </div>
+
+          </div>
+
+          <!-- Report Table -->
+          <div class="card border-0 shadow-sm">
+            <div class="card-header">
+              <!-- <h4 class="card-title mb-0">Donation Reports</h4> -->
+            </div>
+
+            <div class="card-body p-0">
+              <div class="table-responsive" style="max-height: 450px;">
+                <table class="table table-hover align-middle mb-0">
+
+                  <thead class="table-light sticky-top">
+                    <tr>
+                      <th style="width: 40%;">Mode</th>
+                      <th style="width: 20%;" class="text-center">Count</th>
+                      <th style="width: 40%;" class="text-end">Amount</th>
+                    </tr>
+                  </thead>
+
+                  <tbody>
+  <ng-container *ngFor="let paymentMode of objectKeys(PaymentModeCountAmount)">
+    <ng-container *ngFor="let row of PaymentModeCountAmount[paymentMode]">
+      <tr>
+        <td *ngIf="row === PaymentModeCountAmount[paymentMode][0]"
+            [attr.rowspan]="PaymentModeCountAmount[paymentMode].length"
+            class="fw-semibold">
+          {{ paymentMode }}
+        </td>
+
+        <td class="text-center">{{ row[0] }}</td>
+
+        <td class="text-end">
+          {{ row[3] }} {{ row[1] }}
+          <!-- <small class="text-muted">({{ row[2] }})</small> -->
+        </td>
+      </tr>
+    </ng-container>
+  </ng-container>
+
+  <!-- <tr class="table-warning fw-bold">
+    <td>Total</td>
+    <td class="text-center">{{ totalCount }}</td>
+    <td class="text-end">{{ totalAmount | number:'1.2-2' }}</td>
+  </tr> -->
+
+  <tr *ngIf="objectKeys(PaymentModeCountAmount).length === 0">
+  <td colspan="3" class="text-center text-muted py-4">
+    No Data Found
+  </td>
+</tr>
+
+<tr *ngIf="totalCount > 0" class="table-warning fw-bold">
+  <td>Total</td>
+  <td class="text-center">{{ totalCount }}</td>
+  <td class="text-end">
+    ₹ {{ totalAmount | number:'1.2-2' }}
+  </td>
+</tr>
+  
+</tbody>
+
+                  <!-- <tbody>
+                    <ng-container *ngFor="let paymentMode of objectKeys(PaymentModeCountAmount)">
+                      <ng-container *ngFor="let row of PaymentModeCountAmount[paymentMode]">
+                        <tr>
+
+                          <td *ngIf="row === PaymentModeCountAmount[paymentMode][0]"
+                            [attr.rowspan]="PaymentModeCountAmount[paymentMode].length" class="fw-semibold">
+                            {{ paymentMode }}
+                          </td>
+
+                          <td class="text-center">
+                            {{ row[0] }}
+                          </td>
+
+                          <td class="text-end">
+                            {{ row[3] }} {{ row[1] }}
+                            <small class="text-muted">({{ row[2] }})</small>
+                          </td>
+
+                        </tr>
+                      </ng-container>
+                    </ng-container>
+                  </tbody> -->
+
+                </table>
+              </div>
+            </div>
+          </div>
+
+        </div>
       </div>
 
     </div>
   </div>
+</div>

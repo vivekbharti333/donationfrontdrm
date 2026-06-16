@@ -78,6 +78,24 @@ export class PaymentModeReportComponent {
         // error: (error: any) => this.toastr.error('Server Error', '500'),
       });
   }
+totalCount = 0;
+totalAmount = 0;
+calculateTotals(): void {
+  this.totalCount = 0;
+  this.totalAmount = 0;
+
+  for (const paymentMode of Object.keys(this.PaymentModeCountAmount)) {
+    const rows = this.PaymentModeCountAmount[paymentMode];
+
+    for (const row of rows) {
+      this.totalCount += parseInt(row[0] || 0, 10);
+      this.totalAmount += parseFloat(row[1] || 0);
+    }
+  }
+
+  console.log('Total Count:', this.totalCount);
+  console.log('Total Amount:', this.totalAmount);
+}
 
   objectKeys(obj: any): string[] {
     return Object.keys(obj);
@@ -108,6 +126,10 @@ export class PaymentModeReportComponent {
 
           // Now assign the grouped data to PaymentModeCountAmount
           this.PaymentModeCountAmount = groupedData;
+
+          // this.PaymentModeCountAmount = groupedData;
+          console.log('PaymentModeCountAmount', this.PaymentModeCountAmount);
+          this.calculateTotals();
 
           // For debugging, check the structure of grouped data
 
