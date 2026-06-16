@@ -111,8 +111,8 @@ getDonationPaymentModeCountAndAmountGroupByNameCustom(loginId: any, firstDate: a
   }
   const request = {
     payload: {
-      requestedFor: 'INDIVIDUAL',
-      // requestedFor: 'CUSTOM',
+      // requestedFor: 'INDIVIDUAL',
+      requestedFor: 'CUSTOM',
       firstDate: firstDate,
       lastDate: lastDate,
       createdBy: createdBy,
