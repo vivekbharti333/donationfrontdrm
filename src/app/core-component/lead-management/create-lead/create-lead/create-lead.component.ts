@@ -49,6 +49,7 @@ export class CreateLeadComponent {
   public  minDate!: Date;
 
   public donationList: any;
+  public masterLead: any;
   public showCurrencyBox: boolean = false;
   public currencyList: any;
   public fundRisingOffcerList: any;
@@ -87,6 +88,7 @@ export class CreateLeadComponent {
   ngOnInit() {
     this.getUserList();
     this.getDonationListForLead(this.createdBy);
+    this.getNextLeadFromMasterLead('');
     this.createForms();
     // this.getInvoiceTypeList();
     this.getDonationTypeList();
@@ -116,9 +118,14 @@ export class CreateLeadComponent {
   createForms() {
     this.leadForm = this.fb.group({
       id: [''],
-      donorName: ['', [Validators.required, Validators.pattern('[A-Za-z ]{3,150}')]],
-      mobileNumber: ['', [Validators.pattern('^[0-9]{10}$')]], // Assuming a 10-digit phone number   
+      contactName: ['', [Validators.required, Validators.pattern('[A-Za-z ]{3,150}')]],
+      mobileNumber: ['', [Validators.pattern('^[0-9]{10}$')]], // Assuming a 10-digit phone number  
+      alternateNumber: ['', [Validators.pattern('^[0-9]{10}$')]], 
       emailId: ['', [Validators.required, Validators.email]],
+      companyName: ['', [Validators.required, Validators.pattern('[A-Za-z ]{3,150}')]],
+      address: ['', [Validators.required, Validators.pattern('[A-Za-z ]{3,150}')]],
+      city: ['', [Validators.required, Validators.pattern('[A-Za-z ]{3,150}')]],
+      leadSource: [''],
       programName: [''],
       amount: ['', [Validators.required, Validators.pattern('^[0-9]+$')]],
       currency: ['', [Validators.required]],
@@ -166,8 +173,6 @@ export class CreateLeadComponent {
   }
 
   public getDonationListForLead(event: any) {
-    // alert("jhg : "+event);
-    // alert(this.createdBy);
     this.createdBy=event;
     this.donationManagementService.getDonationListForLead(this.createdBy)
       .subscribe({
@@ -189,12 +194,51 @@ export class CreateLeadComponent {
       });
   }
 
+  public getNextLeadFromMasterLead(event: any) {
+    this.createdBy=event;
+    this.donationManagementService.getNextLeadFromMasterLead(this.createdBy)
+      .subscribe({
+        next: (response: any) => {
+          if (response['responseCode'] == '200') {
+            if (response['payload']['respCode'] == '200') {
+
+            this.masterLead = JSON.parse(JSON.stringify(response['payload']));
+
+            this.donationList = this.masterLead;
+            console.log(this.donationList);
+            this.setDonationDetailsToLeadForm();
+            
+            this.setDonationDetailsToNewDonationForm();
+
+            // this.toastr.success(response['responseMessage'], response['responseCode']);
+            this.messageService.add({ severity: 'success', summary: 'Success', detail: response['payload']['respMesg'] });
+            }else {
+              this.messageService.add({ severity: 'error', summary: 'Error', detail: response['payload']['respMesg'] });
+
+              // severity: 'success'  // Green
+              // severity: 'info'     // Blue
+              // severity: 'warn'     // Yellow/Orange
+              // severity: 'error'    // Red
+            }
+          } else {
+            this.messageService.add({ severity: 'error', summary: 'Error', detail: response['responseMessage'] });
+          }
+        },
+        //error: (error: any) => this.toastr.error('Server Error', '500'),
+      });
+  }
+
   setDonationDetailsToLeadForm() {
     this.leadForm.patchValue({
       id: this.donationList['id'],
-      donorName: this.donationList['donorName'],
+      contactName: this.donationList['contactName'],
       mobileNumber: this.donationList['mobileNumber'],
+      alternateNumber: this.donationList['alternateNumber'],
       emailId: this.donationList['emailId'],
+      companyName: this.donationList['companyName'],
+      address: this.donationList['address'],
+      city: this.donationList['city'],
+      leadSource: this.donationList['leadSource'],
       programName: this.donationList['programName'],
       amount: this.donationList['amount'],
       currency: this.donationList['currency'],

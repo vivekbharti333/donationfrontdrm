@@ -101,6 +101,15 @@
                 </tr>
               </ng-container>
             </tbody>
+            <tfoot>
+              <tr style="font-weight: bold; border-top: 2px solid #ddd;">
+                <td>Total</td>
+                <td>{{ totalCount }}</td>
+                <td>|</td>
+                <td>{{ totalAmount | number:'1.2-2' }}</td>
+              </tr>
+            </tfoot>
+
           </table>
         </div>
       </div>

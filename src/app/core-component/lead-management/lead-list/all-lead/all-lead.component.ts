@@ -269,9 +269,14 @@ export class AllLeadComponent {
   createForms() {
     this.editLeadForm = this.fb.group({
       id: [''],
-      donorName: ['', [Validators.required, Validators.pattern('[A-Za-z ]{3,150}')]],
-      mobileNumber: ['', [Validators.pattern('^[0-9]{10}$')]], // Assuming a 10-digit phone number   
+      contactName: ['', [Validators.required, Validators.pattern('[A-Za-z ]{3,150}')]],
+      mobileNumber: ['', [Validators.pattern('^[0-9]{10}$')]], // Assuming a 10-digit phone number 
+      alternateNumber: ['', [Validators.pattern('^[0-9]{10}$')]], // Assuming a 10-digit phone number
       emailId: ['', [Validators.required, Validators.email]],
+      companyName: ['', [Validators.required, Validators.pattern('[A-Za-z ]{3,150}')]],
+      address: ['', [Validators.required, Validators.pattern('[A-Za-z ]{3,150}')]],
+      city: ['', [Validators.required, Validators.pattern('[A-Za-z ]{3,150}')]],
+      leadSource: [''],
       programName: [''],
       amount: ['', [Validators.required, Validators.pattern('^[0-9]+$')]],
       currency: ['', [Validators.required]],
@@ -318,12 +323,16 @@ export class AllLeadComponent {
 
     this.editLeadForm.patchValue({
       id: rowData['id'],
-      donorName: rowData['donorName'],
+      contactName: rowData['contactName'],
       mobileNumber: rowData['mobileNumber'],
+      alternateNumber: rowData['alternateNumber'],
       emailId: rowData['emailId'],
+      companyName: rowData['companyName'],
+      address: rowData['address'],
+      city: rowData['city'],
       status: rowData['status'],
+      leadSource: rowData['leadSource'],
       followupDate: this.setDateTime(rowData['followupDate']),
-      programName: rowData['programName'],
       notes: rowData['notes'],
     });
 

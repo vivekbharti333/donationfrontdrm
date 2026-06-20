@@ -33,32 +33,81 @@ export class FundrisingOfficerReportComponent {
     return Object.keys(obj);
   }
 
-  getDonationCountAndAmountGroupByNameCustom(firstDate:any, lastDate:any) {
-    this.FRToday = {};
-    this.dashboardService.getDonationCountAndAmountGroupByNameCustom(firstDate, lastDate).subscribe({
-      next: (response: any) => {
-        if (response['responseCode'] === 200) {
-          const listPayload = response['listPayload'];
+  // getDonationCountAndAmountGroupByNameCustom(firstDate:any, lastDate:any) {
+  //   this.FRToday = {};
+  //   this.dashboardService.getDonationCountAndAmountGroupByNameCustom(firstDate, lastDate).subscribe({
+  //     next: (response: any) => {
+  //       if (response['responseCode'] === 200) {
+  //         const listPayload = response['listPayload'];
 
-          const groupedData = listPayload.reduce((acc: any, row: any[]) => {
-            const key = row[0];
-            if (!acc[key]) {
-              acc[key] = [];
-            }
-            acc[key].push(row);
-            return acc;
-          }, {});
+  //         const groupedData = listPayload.reduce((acc: any, row: any[]) => {
+  //           const key = row[0];
+  //           if (!acc[key]) {
+  //             acc[key] = [];
+  //           }
+  //           acc[key].push(row);
+  //           return acc;
+  //         }, {});
 
-          this.FRToday = groupedData;
-        } else {
-          console.error("Error: Response code is not 200");
-        }
-      },
-      error: (err) => {
-        console.error("Error while fetching data:", err);
+  //         this.FRToday = groupedData;
+  //       } else {
+  //         console.error("Error: Response code is not 200");
+  //       }
+  //     },
+  //     error: (err) => {
+  //       console.error("Error while fetching data:", err);
+  //     }
+  //   });
+  // }
+
+
+totalCount: number = 0;
+totalAmount: number = 0;
+
+getDonationCountAndAmountGroupByNameCustom(firstDate: any, lastDate: any) {
+  this.FRToday = {};
+  this.totalCount = 0;
+  this.totalAmount = 0;
+
+  this.dashboardService.getDonationCountAndAmountGroupByNameCustom(firstDate, lastDate).subscribe({
+    next: (response: any) => {
+      if (response['responseCode'] === 200) {
+
+        const listPayload = response['listPayload'];
+
+        listPayload.forEach((row: any[]) => {
+
+          // Count
+          this.totalCount += Number(row[2]) || 0;
+
+          // Amount
+          this.totalAmount += Number(row[3]) || 0;
+
+        });
+
+        const groupedData = listPayload.reduce((acc: any, row: any[]) => {
+          const key = row[0];
+
+          if (!acc[key]) {
+            acc[key] = [];
+          }
+
+          acc[key].push(row);
+
+          return acc;
+        }, {});
+
+        this.FRToday = groupedData;
+
+        console.log('Total Count : ', this.totalCount);
+        console.log('Total Amount : ', this.totalAmount);
       }
-    });
-  }
+    },
+    error: (err) => {
+      console.error('Error while fetching data:', err);
+    }
+  });
+}
 
    isCollapsed: boolean = false;
   toggleCollapse() {

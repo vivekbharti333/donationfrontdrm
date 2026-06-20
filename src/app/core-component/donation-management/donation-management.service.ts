@@ -121,6 +121,19 @@ export class DonationManagementService {
     return this.http.post<DonationDetailsRequest>(Constant.Site_Url + "getDonationListForLead", request);
   }
 
+  getNextLeadFromMasterLead(event:any){
+    let request: DonationDetailsRequest = {
+      payload: {
+        // requestedFor: tabName,
+        roleType: this.cookieService.get('roleType'),
+        createdBy: this.cookieService.get('loginId'),
+        token: this.cookieService.get('token'),
+        superadminId: this.cookieService.get('superadminId'),
+      }
+    };
+    return this.http.post<DonationDetailsRequest>(Constant.Site_Url + "getNextLeadFromMasterLead", request);
+  }
+
   updateDonationDetails(donationDetails: DonationDetails): Observable<DonationDetailsRequest> {
     let request: DonationDetailsRequest = {
       payload: {
