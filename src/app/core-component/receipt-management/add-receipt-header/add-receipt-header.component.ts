@@ -226,8 +226,8 @@ export class AddReceiptHeaderComponent {
       .subscribe({
         next: (response: any) => {
 
-          if (response['responseCode'] == '200') {
-            if (response['payload']['respCode'] == '200') {
+         if (response.responseCode === 200) {
+            if (response.payload.respCode === 200) {
               this.messageService.add({ severity: 'success', summary: 'Success', detail: response['payload']['respMesg'] });
               // this.getInvoiceHeaderList();
             } else {
