@@ -743,6 +743,26 @@ export class SidebarService {
           ],
         },
         {
+          menuValue: 'Campaign Management',
+          hasSubRoute: true,
+          showSubRoute: false,
+          icon: 'users',
+          // base1: 'usermang',
+          subMenus: [
+            {
+              menuValue: 'Campaign Details',
+              route: routes.campaignDetails,
+              permission: 'campaign-details',
+            }, 
+            {
+              menuValue: 'Campaign Report',
+              route: routes.campaignReport,
+              permission: 'campaign-report',
+            }, 
+            
+          ],
+        },
+        {
           menuValue: 'Lead Management',
           hasSubRoute: true,
           showSubRoute: false,

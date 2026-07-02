@@ -113,6 +113,14 @@ const routes: Routes = [
           import('./donation-management/donation-management.module').then(
             (m) => m.DonationManagementModule
           ),
+          canActivate: [AuthGuard],
+      },
+      {
+        path: 'campaign-management',
+        loadChildren: () =>
+          import('./campaign-management/campaign-management.module').then(
+            (m) => m.CampaignManagementModule
+          ),
           // canActivate: [AuthGuard],
       },
       {

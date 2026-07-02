@@ -941,6 +941,17 @@ export class routes {
     return this.donationManagement + '/payment-mode-report';
   }
 
+  // Campaign Managenent
+   public static get campaignManagement(): string {
+    return this.core + '/campaign-management';
+  }
+   public static get campaignDetails(): string {
+    return this.campaignManagement + '/campaign-details';
+  }
+  public static get campaignReport(): string {
+    return this.campaignManagement + '/campaign-report';
+  }
+
   //Reports Management
   public static get paymentReport(): string {
     return this.reports + '/payment-report';
