@@ -8,7 +8,7 @@ import { AuthenticationService } from 'src/app/auth/authentication.service';
 @Injectable({
   providedIn: 'root'
 })
-export class CampaignDetailsService {
+export class CampaignSendService {
 
   public loginUser;
 
@@ -33,21 +33,18 @@ export class CampaignDetailsService {
     return this.http.post<any>(Constant.Site_Url + "getCampaignDetails", request);
   }
 
-  
-  saveCompaignDetails(compaignDetails: any): Observable<any> {
+  sendCompaign(campaignDetails: any): Observable<any> {
     let request: any = {
       payload: {
-        campaignType: compaignDetails.campaignType,
-        campaignName: compaignDetails.campaignName,
-        description: compaignDetails.description,
-        campaignChannel: compaignDetails.campaignChannel,
+        campaignId: campaignDetails.campaignId,
+        campaignChannel: campaignDetails.campaignChannel,
+
         token: this.cookieService.get('token'),
         createdBy: '',
         superadminId: '1234567890',
 
       }
     };
-    return this.http.post<any>(Constant.Site_Url + "addCampaignDetails", request);
+    return this.http.post<any>(Constant.Site_Url + "sendCampaign", request);
   }
-
 }

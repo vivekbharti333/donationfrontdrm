@@ -4,6 +4,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { CampaignManagementComponent } from './campaign-management.component';
 import { CampaignDetailsComponent } from './campaign-details/campaign-details.component'; 
 import { CampaignReportComponent } from './campaign-report/campaign-report.component';
+import { CampaignSendComponent } from './campaign-send/campaign-send.component';
 
 import { AuthGuard } from 'src/app/core/core.index';
 
@@ -15,6 +16,10 @@ const routes: Routes = [
       {
         path: 'campaign-details',
         component: CampaignDetailsComponent,
+      },
+      {
+        path: 'send-campaign',
+        component: CampaignSendComponent,
       },
       {
         path: 'campaign-report',

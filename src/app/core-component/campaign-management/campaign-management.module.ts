@@ -8,6 +8,7 @@ import { sharedModule } from 'src/app/shared/shared.module';
 import { CampaignManagementComponent } from './campaign-management.component';
 import { CampaignDetailsComponent } from './campaign-details/campaign-details.component';
 import { CampaignReportComponent } from './campaign-report/campaign-report.component';
+import { CampaignSendComponent } from './campaign-send/campaign-send.component';
 import { CampaignManagementRoutingModule } from './campaign-management-routing.module';
 import { MatDialogModule } from '@angular/material/dialog';
 
@@ -17,6 +18,7 @@ import { MatDialogModule } from '@angular/material/dialog';
   declarations: [
     CampaignManagementComponent,
     CampaignDetailsComponent,
+    CampaignSendComponent,
     CampaignReportComponent
   ],
   imports: [

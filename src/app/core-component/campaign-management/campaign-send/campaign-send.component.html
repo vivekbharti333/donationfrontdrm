@@ -1,0 +1,45 @@
+<p-toast></p-toast>
+
+<form [formGroup]="sendCompaignForm" (ngSubmit)="sendCompaign()">
+    <div class="card">
+        <div class="card-body">
+            <div class="new-employee-field">
+                <div class="card-title-head">
+                    <h6>
+                        <span><i class="feather icon-info feather-edit"></i></span>Send Campaign
+                    </h6>
+                </div>
+
+
+                <div class="row">
+
+                    <div class="col-sm-3 form-group">
+                        <label class="form-label">Campaign Channel</label>
+                        <mat-select formControlName="campaignChannel" class="select"
+                            placeholder="Select Campaign Channel">
+                            <mat-option value="EMAIL">Email</mat-option>
+                            <mat-option value="WHATSAPP">Whats App</mat-option>
+                            <mat-option value="SMS">SMS</mat-option>
+                        </mat-select>
+                    </div>
+                    <div class="col-sm-3 form-group">
+                        <label class="form-label">Campaign Name</label>
+                        <mat-select formControlName="campaignId" class="select" placeholder="Select CampaignName">
+                            <mat-option *ngFor="let campaignDetails of campaignDetailsList"
+                                [value]="campaignDetails.id">
+                                {{ campaignDetails.campaignName }}
+                            </mat-option>
+                        </mat-select>
+                    </div>
+
+
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+    <div class="text-mid mb-3">
+        <button type="submit" class="btn btn-submit">send Compaign</button>
+    </div>
+</form>

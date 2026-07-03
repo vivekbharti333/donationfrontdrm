@@ -948,6 +948,9 @@ export class routes {
    public static get campaignDetails(): string {
     return this.campaignManagement + '/campaign-details';
   }
+  public static get sendCampaign(): string {
+    return this.campaignManagement + '/send-campaign';
+  }
   public static get campaignReport(): string {
     return this.campaignManagement + '/campaign-report';
   }
