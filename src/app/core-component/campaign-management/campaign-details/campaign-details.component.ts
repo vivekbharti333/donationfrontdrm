@@ -79,6 +79,7 @@ export class CampaignDetailsComponent implements OnInit, OnDestroy {
       id: [''],
       campaignType: ['', [Validators.required, Validators.pattern("[0-9A-Za-z ]{3,150}")]],
       campaignName: ['', [Validators.required, Validators.pattern("[0-9A-Za-z ]{3,150}")]],
+      subject: [''],
       description: ['', [Validators.required, Validators.pattern("[0-9A-Za-z ]{3,150}")]],
       campaignChannel: ['', [Validators.required, Validators.pattern("[0-9A-Za-z ]{3,150}")]],
 

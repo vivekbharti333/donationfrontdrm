@@ -250,6 +250,31 @@ export class SidebarService {
         },
 
         {
+          menuValue: 'Campaign Management',
+          hasSubRoute: true,
+          showSubRoute: false,
+          icon: 'users',
+          subMenus: [
+            {
+              menuValue: 'Campaign Details',
+              route: routes.campaignDetails,
+              permission: 'campaign-details',
+            }, 
+            {
+              menuValue: 'Send Campaign',
+              route: routes.sendCampaign,
+              permission: 'send-campaign',
+            }, 
+            {
+              menuValue: 'Campaign Report',
+              route: routes.campaignReport,
+              permission: 'campaign-report',
+            }, 
+            
+          ],
+        },
+
+        {
           menuValue: 'Student Management',
           hasSubRoute: true,
           showSubRoute: false,
@@ -746,13 +771,17 @@ export class SidebarService {
           menuValue: 'Campaign Management',
           hasSubRoute: true,
           showSubRoute: false,
-          icon: 'users',
-          // base1: 'usermang',
+          icon: 'users1',
           subMenus: [
             {
               menuValue: 'Campaign Details',
               route: routes.campaignDetails,
               permission: 'campaign-details',
+            }, 
+            {
+              menuValue: 'Send Campaign',
+              route: routes.sendCampaign,
+              permission: 'send-campaign',
             }, 
             {
               menuValue: 'Campaign Report',
@@ -1047,6 +1076,30 @@ export class SidebarService {
               route: routes.receipt,
               permission: 'receipt-header-list',
             }, 
+          ],
+        },
+        {
+          menuValue: 'Campaign Management',
+          hasSubRoute: true,
+          showSubRoute: false,
+          icon: 'users1',
+          subMenus: [
+            {
+              menuValue: 'Campaign Details',
+              route: routes.campaignDetails,
+              permission: 'campaign-details',
+            }, 
+            {
+              menuValue: 'Send Campaign',
+              route: routes.sendCampaign,
+              permission: 'send-campaign',
+            }, 
+            {
+              menuValue: 'Campaign Report',
+              route: routes.campaignReport,
+              permission: 'campaign-report',
+            }, 
+            
           ],
         },
         {

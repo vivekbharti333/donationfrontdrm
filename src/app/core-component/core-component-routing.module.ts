@@ -121,7 +121,7 @@ const routes: Routes = [
           import('./campaign-management/campaign-management.module').then(
             (m) => m.CampaignManagementModule
           ),
-          // canActivate: [AuthGuard],
+          canActivate: [AuthGuard],
       },
       {
         path: 'payment-mode-management',

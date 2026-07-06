@@ -24,10 +24,11 @@ export class CampaignDetailsService {
     let request: any = {
       payload: {
         requestedFor: 'ALL',
-        // roleType: this.cookieService.get('roleType'),
+
+        roleType: this.cookieService.get('roleType'),
         token: this.cookieService.get('token'),
-        superadminId: '1234567890',
-        // superadminId: this.cookieService.get('superadminId'),
+        createdBy: this.cookieService.get('loginId'),
+        superadminId: this.cookieService.get('superadminId'),
       }
     };
     return this.http.post<any>(Constant.Site_Url + "getCampaignDetails", request);
@@ -39,12 +40,14 @@ export class CampaignDetailsService {
       payload: {
         campaignType: compaignDetails.campaignType,
         campaignName: compaignDetails.campaignName,
+        subject: compaignDetails.subject,
         description: compaignDetails.description,
         campaignChannel: compaignDetails.campaignChannel,
-        token: this.cookieService.get('token'),
-        createdBy: '',
-        superadminId: '1234567890',
 
+        roleType: this.cookieService.get('roleType'),
+        token: this.cookieService.get('token'),
+        createdBy: this.cookieService.get('loginId'),
+        superadminId: this.cookieService.get('superadminId'),
       }
     };
     return this.http.post<any>(Constant.Site_Url + "addCampaignDetails", request);

@@ -142,7 +142,7 @@
                         <th mat-sort-header="image">Campaign Type</th>
                         <th mat-sort-header="userName">Campaign Name</th>
                         <th mat-sort-header="userName">Campaign Channel</th>
-                        <th mat-sort-header="userName">Description</th>
+                        <!-- <th mat-sort-header="userName">Description</th> -->
                         <th mat-sort-header="status">Status</th>
                         <th mat-sort-header="createdOn">Created On</th>
                         <th class="no-sort">Action</th>
@@ -154,11 +154,11 @@
                         <td>{{ data.campaignType }}</td>
                         <td>{{ data.campaignName }}</td>
                         <td>{{ data.campaignChannel }}</td>
-                        <td>
+                        <!-- <td>
                             <div class="description-cell">
                                 {{ data.description }}
                             </div>
-                        </td>
+                        </td> -->
                         <td>
                             <button class="badge-button" [ngClass]="{
                         'badge-linesuccess': data.status === 'SENT',
@@ -229,8 +229,22 @@
                 <div class="col-lg-4 col-md-4">
                   <div class="mb-3">
                     <label class="form-label">Campaign Channel</label>
-                    <input class="form-control" type="text" formControlName="campaignChannel" />
+                    <!-- <input class="form-control" type="text" formControlName="campaignChannel" /> -->
+                    <!-- <div class="col-sm-3 form-group">
+                        <label class="form-label">Campaign Channel</label> -->
+                        <mat-select formControlName="campaignChannel" class="select"
+                            placeholder="Select Campaign Channel">
+                            <mat-option value="EMAIL">Email</mat-option>
+                            <mat-option value="WHATSAPP">Whats App</mat-option>
+                            <mat-option value="SMS">SMS</mat-option>
+                        </mat-select>
+                    <!-- </div> -->
                   </div>
+                </div>
+
+                <div class="col-10">
+                  <label class="form-label">subject</label>
+                  <input class="form-control" type="text" formControlName="subject" />
                 </div>
 
                 <div class="col-12">

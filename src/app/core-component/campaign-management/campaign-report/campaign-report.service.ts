@@ -26,10 +26,10 @@ export class CampaignReportService {
     let request: any = {
       payload: {
         // requestedFor: 'ALL',
-        // roleType: this.cookieService.get('roleType'),
+        roleType: this.cookieService.get('roleType'),
         token: this.cookieService.get('token'),
-        superadminId: '1234567890',
-        // superadminId: this.cookieService.get('superadminId'),
+        createdBy: this.cookieService.get('loginId'),
+        superadminId: this.cookieService.get('superadminId'),
       }
     };
     return this.http.post<any>(Constant.Site_Url + "getCampaignReport", request);
