@@ -53,4 +53,13 @@ export class CampaignDetailsService {
     return this.http.post<any>(Constant.Site_Url + "addCampaignDetails", request);
   }
 
+  changeCampaignStatus(rawdata: any): Observable<any> {
+  let request: any = {
+    payload: {
+      id: rawdata.id,
+    }
+  };
+  return this.http.post<any>(Constant.Site_Url + "changeCampaignStatus", request);
+  }
+
 }

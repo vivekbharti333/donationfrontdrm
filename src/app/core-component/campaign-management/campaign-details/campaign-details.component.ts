@@ -201,37 +201,37 @@ export class CampaignDetailsComponent implements OnInit, OnDestroy {
   }
 
   changeStatus(rowdata: any) {
-    // this.categoriesManagementService.changeCategoryStatus(rowdata).subscribe({
-    //   next: (response: any) => {
-    //     if (response['responseCode'] == '200') {
-    //       if (response['payload']['respCode'] == '200') {
-    //         this.messageService.add({
-    //           summary: response['payload']['respCode'],
-    //           detail: response['payload']['respMesg'],
-    //           styleClass: 'success-background-popover',
-    //         });
-    //         this.getCategoryDetailsList();
-    //       } else {
-    //         this.messageService.add({
-    //           summary: response['payload']['respCode'],
-    //           detail: response['payload']['respMesg'],
-    //           styleClass: 'danger-background-popover',
-    //         });
-    //       }
-    //     } else {
-    //       this.messageService.add({
-    //         summary: response['payload']['respCode'],
-    //         detail: response['payload']['respMesg'],
-    //         styleClass: 'danger-background-popover',
-    //       });
-    //     }
-    //   },
-    //   error: () =>
-    //     this.messageService.add({
-    //       summary: '500',
-    //       detail: 'Server Error',
-    //     }),
-    // });
+    this.campaignDetailsService.changeCampaignStatus(rowdata).subscribe({
+      next: (response: any) => {
+        if (response['responseCode'] == '200') {
+          if (response['payload']['respCode'] == '200') {
+            this.messageService.add({
+              summary: response['payload']['respCode'],
+              detail: response['payload']['respMesg'],
+              styleClass: 'success-background-popover',
+            });
+            this.getCampaignDetailsList();
+          } else {
+            this.messageService.add({
+              summary: response['payload']['respCode'],
+              detail: response['payload']['respMesg'],
+              styleClass: 'danger-background-popover',
+            });
+          }
+        } else {
+          this.messageService.add({
+            summary: response['payload']['respCode'],
+            detail: response['payload']['respMesg'],
+            styleClass: 'danger-background-popover',
+          });
+        }
+      },
+      error: () =>
+        this.messageService.add({
+          summary: '500',
+          detail: 'Server Error',
+        }),
+    });
 
   }
 

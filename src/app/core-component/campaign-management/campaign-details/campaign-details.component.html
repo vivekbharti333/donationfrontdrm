@@ -161,8 +161,8 @@
                         </td> -->
                         <td>
                             <button class="badge-button" [ngClass]="{
-                        'badge-linesuccess': data.status === 'SENT',
-                        'badge-linedanger': data.status === 'FAILED',
+                        'badge-linesuccess': data.status === 'ACTIVE',
+                        'badge-linedanger': data.status === 'INACTIVE',
                         'badge-linewarning': data.status === 'PENDING'
                     }" (click)="changeStatus(data)">
                                 {{ data.status }}

@@ -2,61 +2,52 @@
   <div class="add-item d-flex">
     <div class="page-title">
       <h4>Contact Details List</h4>
-
       <p-toast></p-toast>
-
     </div>
   </div>
-
-  <div class="page-btn">
-
-  </div>
 </div>
-
 
 <div class="card table-list-card">
   <div class="card-body">
     <div class="table-top">
       <div class="search-set">
         <div class="search-input">
-          <a href="javascript:void(0);" class="btn btn-searchset"
-            ><i class="feather icon-search feather-search"></i
-          ></a>
+          <a href="javascript:void(0);" class="btn btn-searchset">
+            <i class="feather icon-search feather-search"></i>
+          </a>
+
           <div class="dataTables_filter">
             <label>
               <input
                 [(ngModel)]="searchDataValue"
                 [ngModelOptions]="{ standalone: true }"
-                (ngModelChange)="searchData(searchDataValue)"
+                (ngModelChange)="searchData($event)"
                 type="search"
                 class="form-control"
-                placeholder="Search..."
+                placeholder="Search by name, mobile, company, city..."
               />
             </label>
           </div>
         </div>
       </div>
+
       <div class="search-path">
         <div class="d-flex align-items-center">
           <a
             class="btn btn-filter"
             id="filter_search"
             (click)="openFilter()"
-            [ngClass]="{ setclose: filter === true }"
+            [ngClass]="{ setclose: filter }"
           >
             <i class="feather icon-filter filter-icon"></i>
             <span><img src="assets/img/icons/closes.svg" alt="img" /></span>
           </a>
         </div>
       </div>
-      <div class="form-sort">
-        <i class="feather icon-sliders info-img"></i>
-
-      </div>
     </div>
 
     <div
-      class="card"
+      class="card filter-card"
       id="filter_inputs"
       [ngClass]="{ 'd-block': filter, 'd-none': !filter }"
     >
@@ -65,13 +56,14 @@
           <div class="col-lg-3 col-sm-6 col-12">
             <div class="input-blocks">
               <i class="feather icon-user info-img"></i>
-      
+              <!-- future filter input -->
             </div>
           </div>
+
           <div class="col-lg-3 col-sm-6 col-12">
             <div class="input-blocks">
               <i class="feather icon-stop-circle info-img"></i>
-    
+              <!-- future status filter -->
             </div>
           </div>
 
@@ -85,43 +77,166 @@
         </div>
       </div>
     </div>
-  
-    <div class="table-responsive">
+
+    <div class="page-btn">
+        <button class="btn btn-added" data-bs-toggle="modal" data-bs-target="#add-units"
+            (click)="openAddModal(addContactTemplate)">
+            <i class="feather icon-plus-circle me-2"></i>Add Contact
+        </button>
+    </div>
+
+    <div class="table-responsive" *ngIf="!isLoading">
       <table matSort (matSortChange)="sortData($event)" class="table datanew">
         <thead>
           <tr>
-            <th mat-sort-header="image">Contact Name</th>
-            <th mat-sort-header="image">Mobile No</th>
-            <th mat-sort-header="userName">Org Name</th>
-            <th mat-sort-header="userName">city</th>
-            <th mat-sort-header="userName">Source</th>
+            <th mat-sort-header="contactName">Contact Name</th>
+            <th mat-sort-header="mobileNumber">Mobile No</th>
+            <th mat-sort-header="companyName">Org Name</th>
+            <th mat-sort-header="city">City</th>
+            <th mat-sort-header="leadSource">Source</th>
             <th mat-sort-header="status">Status</th>
-            <th mat-sort-header="createdOn">Created On</th>
+            <th mat-sort-header="createdAt">Created On</th>
             <th class="no-sort">Action</th>
           </tr>
         </thead>
+
         <tbody>
-          @for (data of tableData; track data) {
-          <tr>
-            <td>{{ data.contactName}}</td>
-            <td>{{ data.mobileNumber }}</td>
-            <td>{{ data.companyName }}</td>
-            <td>{{ data.city }}</td>
-            <td>{{ data.leadSource }} </td>
-            <td>{{ data.status }}
-              
-            </td>
-            <td>{{ data.createdAt | date : "dd-MM-yyyy | HH:mm" }}</td>
-            <td class="action-table-data">
-              <div class="edit-delete-action">
-               
-              </div>
-            </td>
-          </tr>
+          @if (tableData.length > 0) {
+            @for (data of tableData; track $index) {
+              <tr>
+                <td>{{ data.contactName || '-' }}</td>
+                <td>{{ data.mobileNumber || '-' }}</td>
+                <td>{{ data.companyName || '-' }}</td>
+                <td>{{ data.city || '-' }}</td>
+                <td>{{ data.leadSource || '-' }}</td>
+               <td>
+                    <button class="badge-button" [ngClass]="{
+                        'badge-linesuccess': data.status === 'ACTIVE',
+                        'badge-linedanger': data.status === 'INACTIVE',
+                        'badge-linewarning': data.status === 'PENDING'}" 
+                        (click)="changeStatus(data)">
+                        {{ data.status }}
+                    </button>
+                </td>
+                <td>{{ data.createdAt | date:'dd-MM-yyyy, HH:mm' }}</td>
+                <td class="action-table-data">
+                  <div class="edit-delete-action">
+                    <!-- action buttons -->
+                  </div>
+                </td>
+              </tr>
+            }
+          } @else {
+            <tr>
+              <td colspan="8" class="text-center py-4">No contact details found</td>
+            </tr>
           }
         </tbody>
       </table>
     </div>
+
+    <div *ngIf="isLoading" class="text-center py-4">
+      Loading contact details...
+    </div>
+
     <app-custom-pagination></app-custom-pagination>
   </div>
-</div> 
+</div>
+
+<ng-template #addContactTemplate let-dialog>
+  <div class="modalHeaderContainer">
+    <h2 mat-dialog-title class="p-0">Add Contact Details</h2>
+
+    <div class="closeBtn">
+      <button type="button" mat-dialog-close class="close" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  </div>
+
+  <form [formGroup]="addContactForm" (ngSubmit)="saveContactDetails()">
+    <mat-dialog-content class="modalContent">
+      <div class="modal-body custom-modal-body">
+        <div class="card">
+          <div class="card-body">
+            <div class="new-employee-field">
+              <div class="card-title-head">
+                <h6>
+                  <span><i class="feather icon-info feather-edit"></i></span>
+                  Contact Details
+                </h6>
+              </div>
+
+              <div class="row">
+                <div class="col-lg-4 col-md-4">
+                  <div class="mb-3">
+                    <label class="form-label">Contact Name</label>
+                    <input class="form-control" type="text" formControlName="contactName" />
+                  </div>
+                </div>
+
+                <div class="col-lg-4 col-md-4">
+                  <div class="mb-3">
+                    <label class="form-label">Mobile Number</label>
+                    <input class="form-control" type="text" formControlName="mobileNumber" />
+                  </div>
+                </div>
+
+                <div class="col-lg-4 col-md-4">
+                  <div class="mb-3">
+                    <label class="form-label">Alternate Number</label>
+                    <input class="form-control" type="text" formControlName="alternateNumber" />
+                    
+                  </div>
+                </div>
+
+                <div class="col-lg-4 col-md-4">
+                <div class="mb-3">
+                  <label class="form-label">Email Id</label>
+                  <input class="form-control" type="text" formControlName="emailId" />
+                </div>
+                </div>
+
+                <div class="col-lg-4 col-md-4">
+                <div class="mb-3">
+                  <label class="form-label">Organization Name</label>
+                    <input class="form-control" type="text" formControlName="companyName" />
+                </div>  
+                </div>
+
+                <div class="col-lg-4 col-md-4">
+                <div class="mb-3">
+                  <label class="form-label">address</label>
+                    <input class="form-control" type="text" formControlName="address" />
+                </div>  
+                </div>
+
+                <div class="col-lg-4 col-md-4">
+                <div class="mb-3">
+                  <label class="form-label">city</label>
+                    <input class="form-control" type="text" formControlName="city" />
+                </div>  
+                </div>
+                <div class="col-lg-4 col-md-4">
+                <div class="mb-3">
+                  <label class="form-label">Lead Source</label>
+                    <input class="form-control" type="text" formControlName="leadSource" />
+                </div>  
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </mat-dialog-content>
+
+    <mat-dialog-actions class="dialogAction">
+      <div class="text-end mb-3 w-100">
+        <button type="submit" class="btn btn-submit">
+          Save Contact
+        </button>
+      </div>
+    </mat-dialog-actions>
+  </form>
+</ng-template>
