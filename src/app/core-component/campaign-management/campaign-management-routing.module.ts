@@ -1,12 +1,11 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { RouterModule, Routes } from '@angular/router';
 import { CampaignManagementComponent } from './campaign-management.component';
 import { CampaignDetailsComponent } from './campaign-details/campaign-details.component'; 
 import { CampaignReportComponent } from './campaign-report/campaign-report.component';
 import { CampaignSendComponent } from './campaign-send/campaign-send.component';
-
-import { AuthGuard } from 'src/app/core/core.index';
+import { ContactDetailsComponent } from './contact-details/contact-details.component';
 
 const routes: Routes = [
   {
@@ -25,7 +24,10 @@ const routes: Routes = [
         path: 'campaign-report',
         component: CampaignReportComponent,
       },
-      
+      {
+        path: 'contact-details',
+        component: ContactDetailsComponent,
+      },
       
     ],
   },

@@ -954,6 +954,9 @@ export class routes {
   public static get campaignReport(): string {
     return this.campaignManagement + '/campaign-report';
   }
+  public static get contactDetails(): string {
+    return this.campaignManagement + '/contact-details';
+  }
 
   //Reports Management
   public static get paymentReport(): string {

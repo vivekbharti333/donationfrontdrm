@@ -33,7 +33,7 @@ export class CampaignReportComponent {
   public serialNumberArray: Array<number> = [];
   public totalData = 0;
   showFilter = false;
-  dataSource!: MatTableDataSource<users>;
+  dataSource!: MatTableDataSource<any>;
   public searchDataValue = '';
   //** / pagination variables
 
@@ -80,7 +80,7 @@ constructor(
               this.serialNumberArray.push(serialNumber);
             }
           });
-          this.dataSource = new MatTableDataSource<users>(this.tableData);
+          this.dataSource = new MatTableDataSource<any>(this.tableData);
           const dataSize = this.tableData.length;
           this.pagination.calculatePageSize.next({
             totalData: this.totalData,

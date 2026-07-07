@@ -255,6 +255,11 @@ export class SidebarService {
           showSubRoute: false,
           icon: 'users',
           subMenus: [
+             {
+              menuValue: 'Contact Details',
+              route: routes.contactDetails,
+              permission: 'campaign-details',
+            }, 
             {
               menuValue: 'Campaign Details',
               route: routes.campaignDetails,
@@ -774,6 +779,11 @@ export class SidebarService {
           icon: 'users1',
           subMenus: [
             {
+              menuValue: 'Contact Details',
+              route: routes.contactDetails,
+              permission: 'campaign-details',
+            }, 
+            {
               menuValue: 'Campaign Details',
               route: routes.campaignDetails,
               permission: 'campaign-details',
@@ -1084,6 +1094,11 @@ export class SidebarService {
           showSubRoute: false,
           icon: 'users1',
           subMenus: [
+            {
+              menuValue: 'Contact Details',
+              route: routes.contactDetails,
+              permission: 'campaign-details',
+            }, 
             {
               menuValue: 'Campaign Details',
               route: routes.campaignDetails,

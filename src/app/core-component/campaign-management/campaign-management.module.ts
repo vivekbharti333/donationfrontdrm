@@ -9,6 +9,7 @@ import { CampaignManagementComponent } from './campaign-management.component';
 import { CampaignDetailsComponent } from './campaign-details/campaign-details.component';
 import { CampaignReportComponent } from './campaign-report/campaign-report.component';
 import { CampaignSendComponent } from './campaign-send/campaign-send.component';
+import { ContactDetailsComponent } from './contact-details/contact-details.component';
 import { CampaignManagementRoutingModule } from './campaign-management-routing.module';
 import { MatDialogModule } from '@angular/material/dialog';
 
@@ -19,7 +20,8 @@ import { MatDialogModule } from '@angular/material/dialog';
     CampaignManagementComponent,
     CampaignDetailsComponent,
     CampaignSendComponent,
-    CampaignReportComponent
+    CampaignReportComponent,
+    ContactDetailsComponent
   ],
   imports: [
     CommonModule,
