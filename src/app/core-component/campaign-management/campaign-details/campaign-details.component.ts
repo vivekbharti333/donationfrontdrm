@@ -28,8 +28,14 @@ import { Editor, Toolbar } from 'ngx-editor';
 })
 export class CampaignDetailsComponent implements OnInit, OnDestroy {
 
-  addCampaignDialog: any;
+  public addCampaignDialog: any;
   public addCompaignForm!: FormGroup;
+
+  public editCampaignDialog: any;
+  public editCompaignForm!: FormGroup;
+
+  public selectedCampaign: any;
+  public deleteMsgCampaignDialog: any;
 
   public routes = routes;
   public tableData: Array<any> = [];
@@ -61,7 +67,7 @@ export class CampaignDetailsComponent implements OnInit, OnDestroy {
     private campaignDetailsService: CampaignDetailsService,
     private dialog: MatDialog,
     private fb: FormBuilder,
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.getCampaignDetailsList();
@@ -76,6 +82,15 @@ export class CampaignDetailsComponent implements OnInit, OnDestroy {
 
   createForms() {
     this.addCompaignForm = this.fb.group({
+      id: [''],
+      campaignType: ['', [Validators.required, Validators.pattern("[0-9A-Za-z ]{3,150}")]],
+      campaignName: ['', [Validators.required, Validators.pattern("[0-9A-Za-z ]{3,150}")]],
+      subject: [''],
+      description: ['', [Validators.required, Validators.pattern("[0-9A-Za-z ]{3,150}")]],
+      campaignChannel: ['', [Validators.required, Validators.pattern("[0-9A-Za-z ]{3,150}")]],
+
+    });
+    this.editCompaignForm = this.fb.group({
       id: [''],
       campaignType: ['', [Validators.required, Validators.pattern("[0-9A-Za-z ]{3,150}")]],
       campaignName: ['', [Validators.required, Validators.pattern("[0-9A-Za-z ]{3,150}")]],
@@ -172,9 +187,10 @@ export class CampaignDetailsComponent implements OnInit, OnDestroy {
               //this.toastr.success(response['payload']['respMesg'], response['payload']['respCode']);
               this.messageService.add({ severity: 'success', summary: 'Success', detail: response['payload']['respMesg'] });
 
+              this.getCampaignDetailsList();
               this.addCompaignForm.reset();
               this.addCampaignDialog.close();
-             
+
             } else {
               this.messageService.add({
                 summary: response['payload']['respCode'],
@@ -199,6 +215,61 @@ export class CampaignDetailsComponent implements OnInit, OnDestroy {
         //error: (error: any) => this.toastr.error('Server Error', '500'),
       });
   }
+
+
+  openEditModal(templateRef: TemplateRef<any>, rawData: any) {
+
+    this.editCompaignForm.patchValue({
+      id: rawData['id'],
+      campaignType: rawData['campaignType'],
+      campaignName: rawData['campaignName'],
+      subject: rawData['subject'],
+      description: rawData['description'],
+      campaignChannel: rawData['campaignChannel'],
+    });
+
+    this.editCampaignDialog = this.dialog.open(templateRef, {
+      width: '1400px', // Set your desired width
+      // height: '600px', // Set your desired height
+      disableClose: true, // Optional: prevent closing by clicking outside
+      panelClass: 'custom-modal', // Optional: add custom class for additional styling
+    });
+  }
+
+
+  public updateCompaignDetails() {
+    this.campaignDetailsService.updateCampaignDetails(this.editCompaignForm.value)
+      .subscribe({
+        next: (response: any) => {
+          if (response['responseCode'] == '200') {
+            let payload = response['payload'];
+            if (response['payload']['respCode'] == '200') {
+              this.messageService.add({ severity: 'success', summary: 'Success', detail: response['payload']['respMesg'] });
+
+              this.getCampaignDetailsList();
+              this.editCompaignForm.reset();
+              this.editCampaignDialog.close();
+
+            } else {
+              this.messageService.add({
+                summary: response['payload']['respCode'],
+                detail: response['payload']['respMesg'],
+                styleClass: 'danger-light-popover',
+              });
+            }
+          } else {
+            this.messageService.add({
+              summary: response['responseCode'],
+              detail: response['responseMessage'],
+              styleClass: 'danger-light-popover',
+            });
+          }
+        },
+        //error: (error: any) => this.toastr.error('Server Error', '500'),
+      });
+  }
+
+
 
   changeStatus(rowdata: any) {
     this.campaignDetailsService.changeCampaignStatus(rowdata).subscribe({
@@ -233,6 +304,52 @@ export class CampaignDetailsComponent implements OnInit, OnDestroy {
         }),
     });
 
+  }
+
+  openDeleteModal(template: TemplateRef<any>, contact: any) {
+    this.selectedCampaign = contact;
+
+    this.deleteMsgCampaignDialog = this.dialog.open(template, {
+      width: '450px',
+      disableClose: true
+    });
+  }
+
+
+  deleteSelectedCampaign() {
+    this.deleteCampaignDetails(this.selectedCampaign);
+  }
+
+
+  public deleteCampaignDetails(rowdata: any): void {
+    this.campaignDetailsService.deleteCampaignDetails(rowdata)
+      .subscribe({
+        next: (response: any) => {
+          if (response['responseCode'] == '200') {
+            let payload = response['payload'];
+            if (response['payload']['respCode'] == '200') {
+              this.messageService.add({ severity: 'success', summary: 'Success', detail: response['payload']['respMesg'] });
+
+              this.getCampaignDetailsList();
+              this.deleteMsgCampaignDialog.close();
+
+            } else {
+              this.messageService.add({
+                summary: response['payload']['respCode'],
+                detail: response['payload']['respMesg'],
+                styleClass: 'danger-light-popover',
+              });
+            }
+          } else {
+            this.messageService.add({
+              summary: response['responseCode'],
+              detail: response['responseMessage'],
+              styleClass: 'danger-light-popover',
+            });
+          }
+        },
+        //error: (error: any) => this.toastr.error('Server Error', '500'),
+      });
   }
 
 

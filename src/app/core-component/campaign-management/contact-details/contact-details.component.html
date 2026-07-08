@@ -74,16 +74,74 @@
               </a>
             </div>
           </div>
+
+          
+          
+
         </div>
       </div>
     </div>
 
-    <div class="page-btn">
-        <button class="btn btn-added" data-bs-toggle="modal" data-bs-target="#add-units"
-            (click)="openAddModal(addContactTemplate)">
-            <i class="feather icon-plus-circle me-2"></i>Add Contact
-        </button>
+
+    <!-- <div class="page-btn upload-toolbar">
+  <button
+    class="btn btn-added"
+    data-bs-toggle="modal"
+    data-bs-target="#add-units"
+    (click)="openAddModal(addContactTemplate)">
+    <i class="feather icon-plus-circle me-2"></i>
+    Add Contact
+  </button> -->
+
+<div class="page-header-toolbar">
+  <div class="left-actions">
+
+    <button
+      class="btn add-contact-btn"
+      data-bs-toggle="modal"
+      data-bs-target="#add-units"
+      (click)="openAddModal(addContactTemplate)">
+      <i class="feather icon-plus-circle"></i>
+      <span>Add Contact</span>
+    </button>
+ OR
+    <div class="excel-upload-box">
+      <input
+        type="file"
+        #fileInput
+        id="excelFile"
+        accept=".xls,.xlsx"
+        (change)="onFileChange($event)"
+        hidden
+      />
+
+      <button type="button" class="btn choose-file-btn" (click)="fileInput.click()">
+        <i class="feather icon-paperclip"></i>
+        <span>Choose Excel</span>
+      </button>
+
+      <span class="file-name" *ngIf="selectedFileName; else noFile">
+        {{ selectedFileName }}
+      </span>
+
+      <ng-template #noFile>
+        <span class="file-placeholder">No file chosen</span>
+      </ng-template>
+
+      <button
+        type="button"
+        class="btn upload-btn"
+        [disabled]="!selectedFile"
+        (click)="uploadFile()">
+        <i class="feather icon-upload"></i>
+        <span>Upload</span>
+      </button>
     </div>
+
+  </div>
+</div>
+    
+
 
     <div class="table-responsive" *ngIf="!isLoading">
       <table matSort (matSortChange)="sortData($event)" class="table datanew">
@@ -91,11 +149,11 @@
           <tr>
             <th mat-sort-header="contactName">Contact Name</th>
             <th mat-sort-header="mobileNumber">Mobile No</th>
-            <th mat-sort-header="companyName">Org Name</th>
+            <th mat-sort-header="companyName">Organisation Name</th>
             <th mat-sort-header="city">City</th>
             <th mat-sort-header="leadSource">Source</th>
             <th mat-sort-header="status">Status</th>
-            <th mat-sort-header="createdAt">Created On</th>
+            <!-- <th mat-sort-header="createdAt">Created On</th> -->
             <th class="no-sort">Action</th>
           </tr>
         </thead>
@@ -118,10 +176,24 @@
                         {{ data.status }}
                     </button>
                 </td>
-                <td>{{ data.createdAt | date:'dd-MM-yyyy, HH:mm' }}</td>
+                <!-- <td>{{ data.createdAt | date:'dd-MM-yyyy, HH:mm' }}</td> -->
                 <td class="action-table-data">
                   <div class="edit-delete-action">
-                    <!-- action buttons -->
+                    
+                    <!-- Delete button -->
+                    <a class="me-2 confirm-text p-2 mb-0"
+                      href="javascript:void(0);"
+                      (click)="openDeleteModal(deleteTemplate,data)">
+                        <i class="feather icon-trash-2 feather-trash-2"></i>
+                    </a>
+
+                    <!-- Edit button -->
+                    <a class="me-2 p-2 mb-0"
+                      data-bs-toggle="modal" data-bs-target="#edit-units"
+                      (click)="openEditModal(editContactTemplate, data)">
+                      <i class="feather icon-edit feather-edit"></i>
+                    </a>
+
                   </div>
                 </td>
               </tr>
@@ -143,7 +215,106 @@
   </div>
 </div>
 
-<ng-template #addContactTemplate let-dialog>
+<ng-template #editContactTemplate let-dialog>
+  <div class="modalHeaderContainer">
+    <h2 mat-dialog-title class="p-0">Update Contact Details</h2>
+
+    <div class="closeBtn">
+      <button type="button" mat-dialog-close class="close" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  </div>
+
+  <form [formGroup]="editContactForm" (ngSubmit)="updateContactDetails()">
+    <mat-dialog-content class="modalContent">
+      <div class="modal-body custom-modal-body">
+        <div class="card">
+          <div class="card-body">
+            <div class="new-employee-field">
+              <div class="card-title-head">
+                <h6>
+                  <span><i class="feather icon-info feather-edit"></i></span>
+                   Contact Details
+                </h6>
+              </div>
+
+              <div class="row">
+                <div class="col-lg-4 col-md-4">
+                  <div class="mb-3">
+                    <label class="form-label">Contact Name</label>
+                    <input class="form-control" type="text" formControlName="contactName" />
+                  </div>
+                </div>
+
+                <div class="col-lg-4 col-md-4">
+                  <div class="mb-3">
+                    <label class="form-label">Mobile Number</label>
+                    <input class="form-control" type="text" formControlName="mobileNumber" />
+                  </div>
+                </div>
+
+                <div class="col-lg-4 col-md-4">
+                  <div class="mb-3">
+                    <label class="form-label">Alternate Number</label>
+                    <input class="form-control" type="text" formControlName="alternateNumber" />
+                    
+                  </div>
+                </div>
+
+                <div class="col-lg-4 col-md-4">
+                <div class="mb-3">
+                  <label class="form-label">Email Id</label>
+                  <input class="form-control" type="text" formControlName="emailId" />
+                </div>
+                </div>
+
+                <div class="col-lg-4 col-md-4">
+                <div class="mb-3">
+                  <label class="form-label">Organization Name</label>
+                    <input class="form-control" type="text" formControlName="companyName" />
+                </div>  
+                </div>
+
+                <div class="col-lg-4 col-md-4">
+                <div class="mb-3">
+                  <label class="form-label">address</label>
+                    <input class="form-control" type="text" formControlName="address" />
+                </div>  
+                </div>
+
+                <div class="col-lg-4 col-md-4">
+                <div class="mb-3">
+                  <label class="form-label">city</label>
+                    <input class="form-control" type="text" formControlName="city" />
+                </div>  
+                </div>
+                <div class="col-lg-4 col-md-4">
+                <div class="mb-3">
+                  <label class="form-label">Lead Source</label>
+                    <input class="form-control" type="text" formControlName="leadSource" />
+                </div>  
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </mat-dialog-content>
+
+    <mat-dialog-actions class="dialogAction">
+      <div class="text-end mb-3 w-100">
+        <button type="submit" class="btn btn-submit">
+          Update Contact
+        </button>
+      </div>
+    </mat-dialog-actions>
+  </form>
+</ng-template>
+
+<!-- Edit -->
+ <ng-template #addContactTemplate let-dialog>
   <div class="modalHeaderContainer">
     <h2 mat-dialog-title class="p-0">Add Contact Details</h2>
 
@@ -239,4 +410,64 @@
       </div>
     </mat-dialog-actions>
   </form>
+</ng-template>
+
+<!-- Delete -->
+<!-- <ng-template #deleteContactTemplate let-modal>
+  <div class="modalHeaderContainer">
+    <h2 mat-dialog-title class="p-0">Delete Contact</h2>
+    <div class="closeBtn" (click)="closeDeleteModal()">
+      <button type="button" class="close" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="modal-body p-3">
+    <p class="mb-2 fw-semibold">Are you sure you want to delete this contact?</p>
+    <p class="text-danger mb-0">After deleting, you cannot recover this record.</p>
+  </div>
+
+  <div class="modal-footer border-0 pt-0">
+    <button type="button" class="btn btn-secondary" (click)="closeDeleteModal()">
+      Cancel
+    </button>
+
+    <button type="button" class="btn btn-danger" (click)="confirmDelete()">
+      Delete
+    </button>
+  </div>
+</ng-template> -->
+
+<ng-template #deleteTemplate let-dialog>
+
+<div class="modalHeaderContainer">
+    <h2 mat-dialog-title>Delete Contact</h2>
+</div>
+
+<div mat-dialog-content>
+
+    <p>Are you sure you want to delete this contact?</p>
+
+    <div class="alert alert-danger">
+        <strong>Warning!</strong><br>
+        After deleting this contact, it cannot be recovered.
+    </div>
+
+</div>
+
+<div mat-dialog-actions align="end">
+
+    <button class="btn btn-secondary"
+        (click)="deleteMsgContactDialog.close()">
+    Cancel
+  </button>
+
+    <button class="btn btn-danger ms-2"
+        (click)="deleteSelectedContact()">
+    Delete
+    </button>
+
+</div>
+
 </ng-template>

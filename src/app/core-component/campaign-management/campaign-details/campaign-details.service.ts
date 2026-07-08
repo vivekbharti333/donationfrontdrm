@@ -53,6 +53,25 @@ export class CampaignDetailsService {
     return this.http.post<any>(Constant.Site_Url + "addCampaignDetails", request);
   }
 
+  updateCampaignDetails(compaignDetails: any): Observable<any> {
+    let request: any = {
+      payload: {
+        id: compaignDetails.id,
+        campaignType: compaignDetails.campaignType,
+        campaignName: compaignDetails.campaignName,
+        subject: compaignDetails.subject,
+        description: compaignDetails.description,
+        campaignChannel: compaignDetails.campaignChannel,
+
+        roleType: this.cookieService.get('roleType'),
+        token: this.cookieService.get('token'),
+        createdBy: this.cookieService.get('loginId'),
+        superadminId: this.cookieService.get('superadminId'),
+      }
+    };
+    return this.http.post<any>(Constant.Site_Url + "updateCampaignDetails", request);
+  }
+
   changeCampaignStatus(rawdata: any): Observable<any> {
   let request: any = {
     payload: {
@@ -60,6 +79,15 @@ export class CampaignDetailsService {
     }
   };
   return this.http.post<any>(Constant.Site_Url + "changeCampaignStatus", request);
+  }
+
+  deleteCampaignDetails(rawdata: any): Observable<any> {
+    let request: any = {
+      payload: {
+        id: rawdata.id,
+      }
+    };
+    return this.http.post<any>(Constant.Site_Url + "deleteCampaignDetails", request);
   }
 
 }

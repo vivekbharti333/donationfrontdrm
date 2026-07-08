@@ -19,6 +19,15 @@ public loginUser;
     this.loginUser = this.authenticationService.getLoginUser();
   }
 
+  uploadExcel(file: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('createdBy', this.cookieService.get('loginId'));
+    formData.append('superadminId', this.cookieService.get('superadminId'));
+
+    return this.http.post<any>(Constant.Site_Url + 'uploadExcel', formData);
+  }
+
   getContactDetails(): Observable<any> {
     let request: any = {
       payload: {
@@ -61,4 +70,38 @@ public loginUser;
     };
     return this.http.post<any>(Constant.Site_Url + "changeContactStatus", request);
   }
+
+  deleteContactDetails(rawdata: any): Observable<any> {
+    let request: any = {
+      payload: {
+        id: rawdata.id,
+      }
+    };
+    return this.http.post<any>(Constant.Site_Url + "deleteContactDetails", request);
+  }
+
+  updateContactDetails(updateContactDetails: any): Observable<any> {
+    let request: any = {
+      payload: {
+        id: updateContactDetails.id,
+        contactName: updateContactDetails.contactName,
+        mobileNumber: updateContactDetails.mobileNumber,
+        alternateNumber: updateContactDetails.alternateNumber,
+        emailId: updateContactDetails.emailId,
+        companyName: updateContactDetails.companyName,
+        address: updateContactDetails.address,
+        city: updateContactDetails.city,
+        leadSource: updateContactDetails.leadSource,
+        // assignedTo: updateContactDetails.assignedTo,
+
+        roleType: this.cookieService.get('roleType'),
+        token: this.cookieService.get('token'),
+        createdBy: this.cookieService.get('loginId'),
+        superadminId: this.cookieService.get('superadminId'),
+      }
+    };
+    return this.http.post<any>(Constant.Site_Url + "updateContactDetails", request);
+  }
+
+
 }

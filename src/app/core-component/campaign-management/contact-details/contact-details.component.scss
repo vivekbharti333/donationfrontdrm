@@ -24,3 +24,416 @@
   border: 1px solid #d97706;
   background-color: #fffbeb;
 }
+
+// .table tbody tr td {
+//   padding: 1px 8px !important;   /* reduce row height */
+//   vertical-align: middle;
+//   font-size: 14px;
+//   line-height: 1.2;
+// }
+
+
+// .upload-toolbar {
+//   display: flex;
+//   align-items: center;
+//   gap: 12px;
+//   flex-wrap: wrap;
+// }
+
+// .excel-upload-box {
+//   display: flex;
+//   align-items: center;
+//   gap: 10px;
+//   flex-wrap: wrap;
+//   background: #fff;
+//   border: 1px solid #e4e7ec;
+//   border-radius: 10px;
+//   padding: 8px 12px;
+// }
+
+// .choose-file-btn {
+//   background: #f8f9fa;
+//   border: 1px solid #d0d5dd;
+//   color: #344054;
+//   padding: 8px 14px;
+//   border-radius: 8px;
+//   font-size: 14px;
+//   font-weight: 500;
+// }
+
+// .choose-file-btn:hover {
+//   background: #eef2f6;
+// }
+
+// .upload-btn {
+//   background: #ff9f43;
+//   border: 1px solid #ff9f43;
+//   color: #fff;
+//   padding: 8px 16px;
+//   border-radius: 8px;
+//   font-size: 14px;
+//   font-weight: 600;
+// }
+
+// .upload-btn:hover {
+//   background: #ff8a1f;
+//   border-color: #ff8a1f;
+//   color: #fff;
+// }
+
+// .upload-btn:disabled {
+//   background: #ffc98f;
+//   border-color: #ffc98f;
+//   cursor: not-allowed;
+// }
+
+// .file-name,
+// .file-placeholder {
+//   font-size: 14px;
+//   max-width: 220px;
+//   white-space: nowrap;
+//   overflow: hidden;
+//   text-overflow: ellipsis;
+// }
+
+// .file-name {
+//   color: #101828;
+//   font-weight: 500;
+// }
+
+// .file-placeholder {
+//   color: #98a2b3;
+// }
+
+// @media (max-width: 768px) {
+//   .upload-toolbar {
+//     flex-direction: column;
+//     align-items: stretch;
+//   }
+
+//   .excel-upload-box {
+//     width: 100%;
+//     justify-content: space-between;
+//   }
+
+//   .file-name,
+//   .file-placeholder {
+//     max-width: 100%;
+//     flex: 1;
+//   }
+// }
+
+
+
+// .page-header-toolbar {
+//   display: flex;
+//   align-items: center;
+//   justify-content: space-between;
+//   gap: 14px;
+//   flex-wrap: wrap;
+//   margin-bottom: 14px;
+// }
+
+// .left-actions,
+// .right-actions {
+//   display: flex;
+//   align-items: center;
+//   gap: 12px;
+// }
+
+// /* Add Contact Button */
+// .add-contact-btn {
+//   display: inline-flex;
+//   align-items: center;
+//   gap: 8px;
+//   background: linear-gradient(135deg, #ff9f43, #ff7b2c);
+//   color: #fff !important;
+//   border: none;
+//   border-radius: 10px;
+//   padding: 10px 18px;
+//   font-size: 14px;
+//   font-weight: 600;
+//   margin-left: 20px;
+//   box-shadow: 0 4px 14px rgba(255, 159, 67, 0.28);
+//   transition: all 0.25s ease;
+// }
+
+// .add-contact-btn i {
+//   font-size: 16px;
+// }
+
+// .add-contact-btn:hover {
+//   transform: translateY(-1px);
+//   box-shadow: 0 8px 18px rgba(255, 123, 44, 0.35);
+//   background: linear-gradient(135deg, #ff8f2f, #ff6d1f);
+//   color: #fff !important;
+// }
+
+// /* Upload box */
+// .excel-upload-box {
+//   display: flex;
+//   align-items: left;
+//   gap: 10px;
+//   flex-wrap: wrap;
+//   background: #fff;
+//   border: 1px solid #e5e7eb;
+//   border-radius: 12px;
+//   padding: 8px 12px;
+//   box-shadow: 0 2px 8px rgba(16, 24, 40, 0.05);
+// }
+
+// .choose-file-btn,
+// .upload-btn {
+//   display: inline-flex;
+//   align-items: center;
+//   gap: 7px;
+//   border-radius: 8px;
+//   padding: 9px 14px;
+//   font-size: 14px;
+//   font-weight: 600;
+//   transition: all 0.25s ease;
+// }
+
+// .choose-file-btn {
+//   background: #fff7ed;
+//   color: #d97706;
+//   border: 1px solid #fed7aa;
+// }
+
+// .choose-file-btn:hover {
+//   background: #ffedd5;
+//   border-color: #fdba74;
+// }
+
+// .upload-btn {
+//   background: #ff9f43;
+//   border: 1px solid #ff9f43;
+//   color: #fff;
+// }
+
+// .upload-btn:hover {
+//   background: #ff8a1f;
+//   border-color: #ff8a1f;
+//   color: #fff;
+// }
+
+// .upload-btn:disabled {
+//   background: #fdc58a;
+//   border-color: #fdc58a;
+//   cursor: not-allowed;
+//   box-shadow: none;
+// }
+
+// .file-name,
+// .file-placeholder {
+//   font-size: 14px;
+//   line-height: 1.4;
+//   max-width: 220px;
+//   white-space: nowrap;
+//   overflow: hidden;
+//   text-overflow: ellipsis;
+// }
+
+// .file-name {
+//   color: #111827;
+//   font-weight: 500;
+// }
+
+// .file-placeholder {
+//   color: #9ca3af;
+// }
+
+// /* Responsive */
+// @media (max-width: 991px) {
+//   .page-header-toolbar {
+//     flex-direction: column;
+//     align-items: stretch;
+//   }
+
+//   .left-actions,
+//   .right-actions {
+//     width: 100%;
+//   }
+
+//   .excel-upload-box {
+//     width: 100%;
+//   }
+// }
+
+// @media (max-width: 576px) {
+//   .add-contact-btn,
+//   .choose-file-btn,
+//   .upload-btn {
+//     width: 100%;
+//     justify-content: center;
+//   }
+
+//   .excel-upload-box {
+//     flex-direction: column;
+//     align-items: stretch;
+//   }
+
+//   .file-name,
+//   .file-placeholder {
+//     max-width: 100%;
+//     text-align: center;
+//   }
+// }
+
+.page-header-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;   /* important */
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+
+.left-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+/* Add Contact Button */
+.add-contact-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #ff9f43, #ff7b2c);
+  color: #fff !important;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  margin-left: 20px;
+  box-shadow: 0 4px 14px rgba(255, 159, 67, 0.28);
+  transition: all 0.25s ease;
+  white-space: nowrap;
+}
+
+.add-contact-btn i {
+  font-size: 16px;
+}
+
+.add-contact-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(255, 123, 44, 0.35);
+  background: linear-gradient(135deg, #ff8f2f, #ff6d1f);
+  color: #fff !important;
+}
+
+/* Upload box */
+.excel-upload-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 8px 12px;
+  box-shadow: 0 2px 8px rgba(16, 24, 40, 0.05);
+}
+
+/* Buttons inside upload */
+.choose-file-btn,
+.upload-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border-radius: 8px;
+  padding: 9px 14px;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.25s ease;
+  white-space: nowrap;
+}
+
+.choose-file-btn {
+  background: #fff7ed;
+  color: #d97706;
+  border: 1px solid #fed7aa;
+}
+
+.choose-file-btn:hover {
+  background: #ffedd5;
+  border-color: #fdba74;
+}
+
+.upload-btn {
+  background: #ff9f43;
+  border: 1px solid #ff9f43;
+  color: #fff;
+}
+
+.upload-btn:hover {
+  background: #ff8a1f;
+  border-color: #ff8a1f;
+  color: #fff;
+}
+
+.upload-btn:disabled {
+  background: #fdc58a;
+  border-color: #fdc58a;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.file-name,
+.file-placeholder {
+  font-size: 14px;
+  line-height: 1.4;
+  max-width: 220px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.file-name {
+  color: #111827;
+  font-weight: 500;
+}
+
+.file-placeholder {
+  color: #9ca3af;
+}
+
+/* Responsive */
+@media (max-width: 991px) {
+  .page-header-toolbar {
+    justify-content: flex-start;
+  }
+
+  .left-actions {
+    width: 100%;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .excel-upload-box {
+    width: 100%;
+  }
+}
+
+@media (max-width: 576px) {
+  .add-contact-btn,
+  .choose-file-btn,
+  .upload-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .excel-upload-box {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .file-name,
+  .file-placeholder {
+    max-width: 100%;
+    text-align: center;
+  }
+}

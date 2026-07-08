@@ -22,6 +22,11 @@ export class ContactDetailsComponent implements OnInit, OnDestroy {
 
   public addContactDialog: any;
   public addContactForm!: FormGroup;
+  public editContactDialog: any;
+  public editContactForm!: FormGroup;
+
+  selectedContact: any;
+  public deleteMsgContactDialog: any;
 
   // table data
   public allTableData: any[] = [];   // full API data
@@ -84,6 +89,18 @@ export class ContactDetailsComponent implements OnInit, OnDestroy {
   //   }
   createForms() {
   this.addContactForm = this.fb.group({
+    id: [''],
+    contactName: ['',[Validators.required, Validators.minLength(3), Validators.maxLength(100), Validators.pattern(/^[A-Za-z][A-Za-z\s.'-]{2,99}$/) ]],
+    mobileNumber: ['',[Validators.required, Validators.pattern(/^[6-9]\d{9}$/)]],
+    alternateNumber: ['',[Validators.pattern(/^[6-9]\d{9}$/)]],
+    emailId: ['',[Validators.required,Validators.email, Validators.maxLength(150)]],
+    companyName: ['', [Validators.required, Validators.minLength(2),Validators.maxLength(150), Validators.pattern(/^[A-Za-z0-9][A-Za-z0-9\s.&()'-]{1,149}$/)]],
+    address: ['', [Validators.maxLength(250),Validators.pattern(/^[A-Za-z0-9\s,./#()-]*$/)]],
+    city: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(80), Validators.pattern(/^[A-Za-z\s.'-]+$/)]],
+    leadSource: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(100)]]
+  });
+  
+  this.editContactForm = this.fb.group({
     id: [''],
     contactName: ['',[Validators.required, Validators.minLength(3), Validators.maxLength(100), Validators.pattern(/^[A-Za-z][A-Za-z\s.'-]{2,99}$/) ]],
     mobileNumber: ['',[Validators.required, Validators.pattern(/^[6-9]\d{9}$/)]],
@@ -296,4 +313,155 @@ export class ContactDetailsComponent implements OnInit, OnDestroy {
         //error: (error: any) => this.toastr.error('Server Error', '500'),
       });
   }
+
+
+openDeleteModal(template: TemplateRef<any>, contact: any) {
+  this.selectedContact = contact;
+
+  this.deleteMsgContactDialog = this.dialog.open(template, {
+    width: '450px',
+    disableClose: true
+  });
+}
+
+
+deleteSelectedContact() {
+  this.deleteContactDetails(this.selectedContact);
+}
+
+
+  public deleteContactDetails(rowdata: any): void {
+    this.contactDetailsService.deleteContactDetails(rowdata)
+      .subscribe({
+        next: (response: any) => {
+          if (response['responseCode'] == '200') {
+            let payload = response['payload'];
+            if (response['payload']['respCode'] == '200') {
+              this.messageService.add({ severity: 'success', summary: 'Success', detail: response['payload']['respMesg'] });
+
+              this.loadContactDetails();
+              this.deleteMsgContactDialog.close();
+             
+            } else {
+              this.messageService.add({
+                summary: response['payload']['respCode'],
+                detail: response['payload']['respMesg'],
+                styleClass: 'danger-light-popover',
+              });
+            }
+          } else {
+            this.messageService.add({
+              summary: response['responseCode'],
+              detail: response['responseMessage'],
+              styleClass: 'danger-light-popover',
+            });
+          }
+        },
+        //error: (error: any) => this.toastr.error('Server Error', '500'),
+      });
+  }
+
+  openEditModal(templateRef: TemplateRef<any>, rawData: any) {
+
+     this.editContactForm.patchValue({
+        id: rawData['id'],
+        contactName: rawData['contactName'],
+        mobileNumber: rawData['mobileNumber'],
+        alternateNumber: rawData['alternateNumber'],
+        emailId: rawData['emailId'],
+        companyName: rawData['companyName'],
+        address: rawData['address'],
+        city: rawData['city'],
+        leadSource: rawData['leadSource'],
+      });
+
+      this.editContactDialog = this.dialog.open(templateRef, {
+        width: '1400px', // Set your desired width
+        // height: '600px', // Set your desired height
+        disableClose: true, // Optional: prevent closing by clicking outside
+        panelClass: 'custom-modal', // Optional: add custom class for additional styling
+      });
+    }
+
+
+    public updateContactDetails() {
+    this.contactDetailsService.saveContactDetails(this.editContactForm.value)
+      .subscribe({
+        next: (response: any) => {
+          if (response['responseCode'] == '200') {
+            let payload = response['payload'];
+            if (response['payload']['respCode'] == '200') {
+              this.messageService.add({ severity: 'success', summary: 'Success', detail: response['payload']['respMesg'] });
+
+              this.loadContactDetails();
+              this.editContactForm.reset();
+              this.editContactDialog.close();
+             
+            } else {
+              this.messageService.add({
+                summary: response['payload']['respCode'],
+                detail: response['payload']['respMesg'],
+                styleClass: 'danger-light-popover',
+              });
+            }
+          } else {
+            this.messageService.add({
+              summary: response['responseCode'],
+              detail: response['responseMessage'],
+              styleClass: 'danger-light-popover',
+            });
+          }
+        },
+        //error: (error: any) => this.toastr.error('Server Error', '500'),
+      });
+  }
+
+
+ 
+
+selectedFile: File | null = null;
+selectedFileName: string = '';
+
+onFileChange(event: any): void {
+  const file = event.target.files[0];
+
+  if (file) {
+    const allowedExtensions = ['xls', 'xlsx'];
+    const extension = file.name.split('.').pop()?.toLowerCase();
+
+    if (!extension || !allowedExtensions.includes(extension)) {
+      alert('Please select a valid Excel file (.xls or .xlsx)');
+      event.target.value = '';
+      this.selectedFile = null;
+      this.selectedFileName = '';
+      return;
+    }
+
+    this.selectedFile = file;
+    this.selectedFileName = file.name;
+  }
+}
+
+uploadFile(): void {
+  if (!this.selectedFile) {
+    alert('Please select a file first');
+    return;
+  }
+
+  this.contactDetailsService
+    .uploadExcel(this.selectedFile)
+    .subscribe({
+      next: (res) => {
+        console.log('Upload success', res);
+        alert('File uploaded successfully');
+        this.selectedFile = null;
+        this.selectedFileName = '';
+      },
+      error: (err) => {
+        console.error('Upload failed', err);
+        alert('File upload failed');
+      }
+    });
+}
+
 }
