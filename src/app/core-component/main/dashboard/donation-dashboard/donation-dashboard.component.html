@@ -4,9 +4,9 @@
     <!-- ========================= TOP BAR ========================= -->
     <div class="dashboard-topbar">
         <div class="topbar-left">
-            <button class="menu-btn">
+            <!-- <button class="menu-btn">
                 <i class="bi bi-list"></i>
-            </button>
+            </button> -->
 
             <div class="welcome-box">
                 <h2>👋 Hi Nitesh Misaal,</h2>
@@ -15,25 +15,25 @@
         </div>
 
         <div class="topbar-right">
-            <div class="date-range-box">
+            <!-- <div class="date-range-box">
                 <i class="bi bi-calendar3"></i>
                 <span>9 Jul, 2025 - 9 Jul, 2025</span>
                 <i class="bi bi-chevron-down"></i>
-            </div>
+            </div> -->
 
-            <button class="export-btn">
+            <!-- <button class="export-btn">
                 <i class="bi bi-download"></i>
                 Export Report
-            </button>
+            </button> -->
 
-            <div class="profile-box">
+            <!-- <div class="profile-box">
                 <img src="https://i.pravatar.cc/80?img=12" alt="user" />
                 <div class="profile-info">
                     <h6>Nitesh Misaal</h6>
                     <span>SUPERADMIN</span>
                 </div>
                 <i class="bi bi-chevron-down"></i>
-            </div>
+            </div> -->
         </div>
     </div>
 
@@ -53,7 +53,7 @@
             <div class="mini-line orange-line"></div>
         </div>
 
-         <div class="summary-card green">
+        <div class="summary-card green">
             <div class="summary-left">
                 <div class="summary-icon">
                     <i class="bi bi-cash-stack"></i>
@@ -94,8 +94,8 @@
 
                     <p class="summary-title">User</p>
                     <div class="count-row">
-                    <h3>{{ activeUserCount }}</h3>
-                    <span class="status-text">Active User</span>
+                        <h3>{{ activeUserCount }}</h3>
+                        <span class="status-text">Active User</span>
                     </div>
                     <span class="growth up">{{activeUserCount+activeUserCount}} Total User</span>
                     <!-- <span class="growth up">↑ 18% vs last month</span> -->
@@ -111,68 +111,63 @@
     <div class="dashboard-grid row-1">
 
         <!-- Payment Mode -->
-<div class="dashboard-card">
-  <div class="card-head">
-    <h5>Payment Mode</h5>
+        <div class="dashboard-card">
+            <div class="card-head">
+                <h5>Payment Mode</h5>
 
-    <div class="tab-pills">
-      <button
-        [ngClass]="{ active: selectedPaymentTab === 'Today' }"
-        (click)="changePaymentTab('Today')">
-        Today
-      </button>
+                <div class="tab-pills">
+                    <button [ngClass]="{ active: selectedPaymentTab === 'Today' }" (click)="changePaymentTab('Today')">
+                        Today
+                    </button>
 
-      <button
-        [ngClass]="{ active: selectedPaymentTab === 'Yesterday' }"
-        (click)="changePaymentTab('Yesterday')">
-        Yesterday
-      </button>
+                    <button [ngClass]="{ active: selectedPaymentTab === 'Yesterday' }"
+                        (click)="changePaymentTab('Yesterday')">
+                        Yesterday
+                    </button>
 
-      <button
-        [ngClass]="{ active: selectedPaymentTab === 'MONTH' }"
-        (click)="changePaymentTab('MONTH')">
-        This Month
-      </button>
-    </div>
-  </div>
+                    <button [ngClass]="{ active: selectedPaymentTab === 'MONTH' }" (click)="changePaymentTab('MONTH')">
+                        This Month
+                    </button>
+                </div>
+            </div>
 
-  <div class="payment-wrapper">
-    <div class="payment-chart-box">
-      <canvas id="paymentChart"></canvas>
+            <div class="payment-wrapper">
+                <div class="payment-chart-box">
+                    <canvas id="paymentChart"></canvas>
 
-      <div class="chart-center">
-        <span>Total</span>
-        <h4>
-          {{ paymentCurrencySymbol }} {{ paymentTotalAmount | number:'1.0-2' }}
-        </h4>
-      </div>
-    </div>
+                    <div class="chart-center">
+                        <span>Total</span>
+                        <h4>
+                            {{ paymentCurrencySymbol }} {{ paymentTotalAmount | number:'1.0-2' }}
+                        </h4>
+                    </div>
+                </div>
 
-    <div class="payment-legend">
-      <ng-container *ngIf="paymentModes && paymentModes.length > 0; else noPaymentData">
-        <div class="legend-row" *ngFor="let item of paymentModes">
-          <div class="legend-left">
-            <span class="dot" [style.background]="item.color"></span>
-            <span>{{ item.mode }}</span>
-          </div>
+                <div class="payment-legend">
+                    <ng-container *ngIf="paymentModes && paymentModes.length > 0; else noPaymentData">
+                        <div class="legend-row" *ngFor="let item of paymentModes">
+                            <div class="legend-left">
+                                <span class="dot" [style.background]="item.color"></span>
+                                <span>{{ item.mode }}</span>
+                            </div>
 
-          <div class="legend-right">
-            {{ item.currencySymbol }} {{ item.amount | number:'1.0-2' }}
-            ({{ getPaymentPercentage(item.amount) | number:'1.0-0' }}%)
-          </div>
+                            <div class="legend-right">
+                                {{ item.currencySymbol }} {{ item.amount | number:'1.0-2' }}
+                                ({{ getPaymentPercentage(item.amount) | number:'1.0-0' }}%)
+                            </div>
+                        </div>
+                    </ng-container>
+
+                    <ng-template #noPaymentData>
+                        <div class="no-donor-data">No payment data found</div>
+                    </ng-template>
+
+                    <!-- <a href="javascript:void(0)" class="view-link">
+                        View Details <i class="bi bi-arrow-right"></i>
+                    </a> -->
+                </div>
+            </div>
         </div>
-      </ng-container>
-
-      <ng-template #noPaymentData>
-        <div class="no-donor-data">No payment data found</div>
-      </ng-template>
-
-      <a href="javascript:void(0)" class="view-link">
-        View Details <i class="bi bi-arrow-right"></i>
-      </a>
-    </div>
-  </div>
-</div>
 
         <!-- Top Fundrising Officer -->
         <div class="dashboard-card top-donor-card">
@@ -189,8 +184,7 @@
                         Yesterday
                     </button>
 
-                    <button [class.active]="selectedTopDonorTab === 'This Month'"
-                        (click)="changeTopDonorTab('Month')">
+                    <button [class.active]="selectedTopDonorTab === 'This Month'" (click)="changeTopDonorTab('Month')">
                         This Month
                     </button>
                 </div>
@@ -243,35 +237,35 @@
         </div>
 
         <!-- Donation Trend -->
-        <div class="dashboard-card">
-    <div class="card-head">
-        <h5>Donation Trend</h5>
-        <select class="dropdown-pill trend-filter" [(ngModel)]="selectedTrendFilter"
-                (change)="onDonationTrendFilterChange()">
-            <option value="THIS_MONTH">This Month</option>
-            <option value="LAST_6_MONTHS">Last 6 Months</option>
-        </select>
-    </div>
-
-    <div class="trend-chart-wrap">
-        <canvas id="donationTrendChart"></canvas>
-    </div>
-
-    <div class="trend-bottom-cards">
-        <div class="mini-info-card">
-            <span>Total Donations</span>
-            <h6>{{ totalDonationCount }}</h6>
-        </div>
-        <div class="mini-info-card">
-            <span>Total Amount</span>
-            <h6>₹ {{ totalDonationAmount | number:'1.0-2' }}</h6>
-        </div>
-        <div class="mini-info-card">
-            <span>Avg. Donation</span>
-            <h6>₹ {{ avgDonationAmount | number:'1.0-2' }}</h6>
-        </div>
-    </div>
-</div>
+        <!-- <div class="dashboard-card">
+            <div class="card-head">
+                <h5>Donation Trend</h5>
+                <select class="dropdown-pill trend-filter" [(ngModel)]="selectedTrendFilter"
+                    (change)="onDonationTrendFilterChange()">
+                    <option value="THIS_MONTH">This Month</option>
+                    <option value="LAST_6_MONTHS">Last 6 Months</option>
+                </select>
+            </div>
+        
+            <div class="trend-chart-wrap">
+                <canvas id="donationTrendChart"></canvas>
+            </div>
+        
+            <div class="trend-bottom-cards">
+                <div class="mini-info-card">
+                    <span>Total Donations</span>
+                    <h6>{{ totalDonationCount }}</h6>
+                </div>
+                <div class="mini-info-card">
+                    <span>Total Amount</span>
+                    <h6>₹ {{ totalDonationAmount | number:'1.0-2' }}</h6>
+                </div>
+                <div class="mini-info-card">
+                    <span>Avg. Donation</span>
+                    <h6>₹ {{ avgDonationAmount | number:'1.0-2' }}</h6>
+                </div>
+            </div>
+        </div> -->
 
     </div>
 
@@ -281,35 +275,30 @@
         <!-- Total Amount -->
         <div class="dashboard-card">
             <div class="card-head">
-                <h5>Total Amount</h5>
-
-                <div class="right-head-actions">
-                    <div class="tab-pills">
-                        <button class="active">Today</button>
-                        <button>Yesterday</button>
-                        <button>This Month</button>
-                        <button>Custom</button>
-                    </div>
-
-                    <div class="dropdown-pill">INR (₹) <i class="bi bi-chevron-down"></i></div>
-                </div>
+                <h5>Donation Graph</h5>
+                <select class="dropdown-pill trend-filter" [(ngModel)]="selectedTrendFilter"
+                    (change)="onDonationTrendFilterChange()">
+                    <option value="THIS_MONTH">This Month</option>
+                    <option value="LAST_6_MONTHS">Last 6 Months</option>
+                </select>
             </div>
 
-            <div class="amount-wrapper">
-                <div class="amount-left-panel">
-                    <h3>₹ 542</h3>
-                    <p>Total Amount (Today)</p>
+            <div class="trend-chart-wrap">
+                <canvas id="donationTrendChart"></canvas>
+            </div>
 
-                    <div class="circle-progress">
-                        <div class="circle-inner">
-                            <h5>+20%</h5>
-                            <span>vs yesterday</span>
-                        </div>
-                    </div>
+            <div class="trend-bottom-cards">
+                <div class="mini-info-card">
+                    <span>Total Donations</span>
+                    <h6>{{ totalDonationCount }}</h6>
                 </div>
-
-                <div class="amount-chart-wrap">
-                    <canvas id="totalAmountChart"></canvas>
+                <div class="mini-info-card">
+                    <span>Total Amount</span>
+                    <h6>₹ {{ totalDonationAmount | number:'1.0-2' }}</h6>
+                </div>
+                <div class="mini-info-card">
+                    <span>Avg. Donation</span>
+                    <h6>₹ {{ avgDonationAmount | number:'1.0-2' }}</h6>
                 </div>
             </div>
         </div>
@@ -317,75 +306,72 @@
         <!-- Donation Overview -->
         <div class="dashboard-card">
             <div class="card-head">
-                <h5>Donation Overview</h5>
+                <h5>Currency Report</h5>
             </div>
 
 
             <div class="card-head">
-  <h5>Report</h5>
+                <!-- <h5>Report</h5> -->
 
-  <div class="tab-pills">
-    <button
-      [ngClass]="{ active: selectedCurrencyReportTab === 'Today' }"
-      (click)="changeCurrencyReportTab('Today')">
-      Today
-    </button>
+                <div class="tab-pills">
+                    <button [ngClass]="{ active: selectedCurrencyReportTab === 'Today' }"
+                        (click)="changeCurrencyReportTab('Today')">
+                        Today
+                    </button>
 
-    <button
-      [ngClass]="{ active: selectedCurrencyReportTab === 'Yesterday' }"
-      (click)="changeCurrencyReportTab('Yesterday')">
-      Yesterday
-    </button>
+                    <button [ngClass]="{ active: selectedCurrencyReportTab === 'Yesterday' }"
+                        (click)="changeCurrencyReportTab('Yesterday')">
+                        Yesterday
+                    </button>
 
-    <button
-      [ngClass]="{ active: selectedCurrencyReportTab === 'Month' }"
-      (click)="changeCurrencyReportTab('Month')">
-      This Month
-    </button>
-  </div>
-</div>
-
-<div class="top-donor-table-wrapper">
-  <table class="table donor-table mb-0">
-    <thead>
-      <tr>
-        <th>Currency</th>
-        <th class="text-center">Donations</th>
-        <th class="text-end">Amount</th>
-      </tr>
-    </thead>
-
-    <tbody *ngIf="currencyReportList && currencyReportList.length > 0">
-      <tr *ngFor="let item of currencyReportList">
-        <td>
-          <div class="donor-user">
-            <div class="donor-avatar">
-              {{ item.currencyName ? item.currencyName.trim().charAt(0) : 'C' }}
+                    <button [ngClass]="{ active: selectedCurrencyReportTab === 'Month' }"
+                        (click)="changeCurrencyReportTab('Month')">
+                        This Month
+                    </button>
+                </div>
             </div>
-            <span class="donor-name" [title]="item.currencyName">
-              {{ item.currencyName }}
-            </span>
-          </div>
-        </td>
 
-        <td class="text-center">{{ item.donationCount }}</td>
+            <div class="top-donor-table-wrapper">
+                <table class="table donor-table mb-0">
+                    <thead>
+                        <tr>
+                            <th>Currency</th>
+                            <th class="text-center">Donations</th>
+                            <th class="text-end">Amount</th>
+                        </tr>
+                    </thead>
 
-        <td class="text-end">
-          {{ item.currencySymbol }} {{ item.totalAmount | number:'1.0-2' }}
-        </td>
-      </tr>
-    </tbody>
+                    <tbody *ngIf="currencyReportList && currencyReportList.length > 0">
+                        <tr *ngFor="let item of currencyReportList">
+                            <td>
+                                <div class="donor-user">
+                                    <div class="donor-avatar">
+                                        {{ item.currencyName ? item.currencyName.trim().charAt(0) : 'C' }}
+                                    </div>
+                                    <span class="donor-name" [title]="item.currencyName">
+                                        {{ item.currencyName }}
+                                    </span>
+                                </div>
+                            </td>
 
-    <tbody *ngIf="!currencyReportList || currencyReportList.length === 0">
-      <tr>
-        <td colspan="3" class="text-center py-3 text-muted">
-          No report data found
-        </td>
-      </tr>
-    </tbody>
-  </table>
-</div>
-        
+                            <td class="text-center">{{ item.donationCount }}</td>
+
+                            <td class="text-end">
+                                {{ item.currencySymbol }} {{ item.totalAmount | number:'1.0-2' }}
+                            </td>
+                        </tr>
+                    </tbody>
+
+                    <tbody *ngIf="!currencyReportList || currencyReportList.length === 0">
+                        <tr>
+                            <td colspan="3" class="text-center py-3 text-muted">
+                                No report data found
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
 
 
             <!-- <div class="overview-cards">
@@ -413,8 +399,8 @@
                     <p>Repeat Donors</p>
                 </div>
             </div> -->
-
-            <div class="goal-box">
+<!-- <br><br> -->
+            <!-- <div class="goal-box">
                 <div class="goal-head">
                     <span>Goal Progress (This Month)</span>
                     <strong>₹ 1,793 / ₹ 5,000</strong>
@@ -428,7 +414,7 @@
                     <span class="goal-tag">35.86%</span>
                     <p>Great job! You're making an impact. 🎉</p>
                 </div>
-            </div>
+            </div> -->
         </div>
 
     </div>
@@ -445,7 +431,9 @@
             </div>
         </div>
 
-        <button class="full-report-btn">View Full Report</button>
+        <!-- <button class="full-report-btn" routerLink="/all-donation-list">
+            View Full Report
+        </button> -->
     </div>
 
 </div>

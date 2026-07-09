@@ -97,7 +97,7 @@ export class DonationDashboardComponent implements AfterViewInit {
   ngAfterViewInit(): void {
     this.initPaymentChart();
     this.initDonationTrendChart();
-    this.initTotalAmountChart();
+    // this.initTotalAmountChart();
     this.getDonationCountAndAmountGroupByDate('THIS_MONTH');
     this.getDonationCountAndAmountGroupByCurrency('TODAY');
     this.getPaymentModeData('TODAY');
@@ -335,67 +335,67 @@ export class DonationDashboardComponent implements AfterViewInit {
     });
   }
 
-  initTotalAmountChart(): void {
-    const canvas = document.getElementById('totalAmountChart') as HTMLCanvasElement;
-    if (!canvas) return;
+  // initTotalAmountChart(): void {
+  //   const canvas = document.getElementById('totalAmountChart') as HTMLCanvasElement;
+  //   if (!canvas) return;
 
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+  //   const ctx = canvas.getContext('2d');
+  //   if (!ctx) return;
 
-    const gradient = ctx.createLinearGradient(0, 0, 0, 260);
-    gradient.addColorStop(0, 'rgba(255, 123, 33, 0.24)');
-    gradient.addColorStop(1, 'rgba(255, 123, 33, 0.02)');
+  //   const gradient = ctx.createLinearGradient(0, 0, 0, 260);
+  //   gradient.addColorStop(0, 'rgba(255, 123, 33, 0.24)');
+  //   gradient.addColorStop(1, 'rgba(255, 123, 33, 0.02)');
 
-    new Chart(canvas, {
-      type: 'line',
-      data: {
-        labels: ['12 AM', '2 AM', '4 AM', '6 AM', '8 AM', '10 AM', '12 PM', '2 PM', '4 PM', '6 PM', '8 PM', '10 PM'],
-        datasets: [{
-          data: [80, 160, 100, 360, 150, 520, 300, 640, 480, 760, 620, 900],
-          borderColor: '#ff7b21',
-          backgroundColor: gradient,
-          fill: true,
-          tension: 0.42,
-          pointRadius: 3,
-          pointHoverRadius: 4,
-          pointBackgroundColor: '#ff7b21',
-          pointBorderWidth: 0
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: { display: false }
-        },
-        scales: {
-          x: {
-            grid: {
-              display: false,
-              //  drawBorder: false
-            },
-            ticks: {
-              color: '#8a94a6',
-              font: { size: 11, family: 'Inter' }
-            }
-          },
-          y: {
-            beginAtZero: true,
-            suggestedMax: 1000,
-            grid: {
-              color: 'rgba(0,0,0,0.05)',
-              // drawBorder: false
-            },
-            ticks: {
-              color: '#8a94a6',
-              font: { size: 11, family: 'Inter' },
-              callback: (value: any) => `₹ ${value}`
-            }
-          }
-        }
-      }
-    });
-  }
+  //   new Chart(canvas, {
+  //     type: 'line',
+  //     data: {
+  //       labels: ['12 AM', '2 AM', '4 AM', '6 AM', '8 AM', '10 AM', '12 PM', '2 PM', '4 PM', '6 PM', '8 PM', '10 PM'],
+  //       datasets: [{
+  //         data: [80, 160, 100, 360, 150, 520, 300, 640, 480, 760, 620, 900],
+  //         borderColor: '#ff7b21',
+  //         backgroundColor: gradient,
+  //         fill: true,
+  //         tension: 0.42,
+  //         pointRadius: 3,
+  //         pointHoverRadius: 4,
+  //         pointBackgroundColor: '#ff7b21',
+  //         pointBorderWidth: 0
+  //       }]
+  //     },
+  //     options: {
+  //       responsive: true,
+  //       maintainAspectRatio: false,
+  //       plugins: {
+  //         legend: { display: false }
+  //       },
+  //       scales: {
+  //         x: {
+  //           grid: {
+  //             display: false,
+  //             //  drawBorder: false
+  //           },
+  //           ticks: {
+  //             color: '#8a94a6',
+  //             font: { size: 11, family: 'Inter' }
+  //           }
+  //         },
+  //         y: {
+  //           beginAtZero: true,
+  //           suggestedMax: 1000,
+  //           grid: {
+  //             color: 'rgba(0,0,0,0.05)',
+  //             // drawBorder: false
+  //           },
+  //           ticks: {
+  //             color: '#8a94a6',
+  //             font: { size: 11, family: 'Inter' },
+  //             callback: (value: any) => `₹ ${value}`
+  //           }
+  //         }
+  //       }
+  //     }
+  //   });
+  // }
 
   currencyReportList: any[] = [];
   selectedCurrencyReportTab: string = 'Today';
@@ -468,12 +468,12 @@ export class DonationDashboardComponent implements AfterViewInit {
 
           const colorPalette = [
             '#ff9a3d',
+            '#14b8a6',
             '#8b5cf6',
             '#ff6b1a',
             '#5b61d6',
             '#5bc8bd',
             '#ef4444',
-            '#14b8a6',
             '#2066e7',
             '#0a21ee',
           ];
