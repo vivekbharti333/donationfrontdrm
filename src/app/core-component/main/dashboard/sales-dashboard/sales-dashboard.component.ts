@@ -216,15 +216,13 @@ export class SalesDashboardComponent {
               }
               // this.drawChart();
             } else {
-              // this.toastr.error(response['payload']['respMesg'], response['payload']['respCode']);
+              
             }
-          // } else {
-          //   this.toastr.error(response['responseMessage'], response['responseCode']);
-          // }
         },
-        //error: (error: any) => this.toastr.error('Server Error', '500'),
+        
       });
   }
+
 
   // getDonationCountAndAmountGroupByName(tabName: string) {
   //   this.FRToday= null;
@@ -316,14 +314,7 @@ export class SalesDashboardComponent {
                         return acc;
                     }, {});
 
-                    // Now assign the grouped data to PaymentModeCountAmount
                     this.PaymentModeCountAmount = groupedData;
-
-                    // For debugging, check the structure of grouped data
-                    
-                // } else {
-                //     alert('Error: ' + response['responseMessage']);
-                // }
             },
             error: (error: any) => {
                 console.error('Server Error', error);

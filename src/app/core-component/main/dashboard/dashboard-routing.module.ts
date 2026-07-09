@@ -3,6 +3,8 @@ import { RouterModule, Routes } from '@angular/router';
 import { DashboardComponent } from './dashboard.component';
 import { AdminDashboardComponent } from './admin-dashboard/admin-dashboard.component';
 import { SalesDashboardComponent } from './sales-dashboard/sales-dashboard.component';
+import { CampaignDashboardComponent } from './campaign-dashboard/campaign-dashboard.component';
+import { DonationDashboardComponent } from './donation-dashboard/donation-dashboard.component';
 import { AuthGuard } from 'src/app/core/core.index';
 
 const routes: Routes = [{ path: '', component: DashboardComponent,
@@ -19,6 +21,14 @@ children: [
   {
     path: 'sales-dashboard',
     component: SalesDashboardComponent, canActivate: [AuthGuard]
+  },
+  {
+    path: 'campaign-dashboard',
+    component: CampaignDashboardComponent
+  },
+  {
+    path: 'donation-dashboard',
+    component: DonationDashboardComponent
   }
 ]
 }];

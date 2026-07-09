@@ -72,6 +72,19 @@ export class DashboardService {
     return  this.http.post<any>(Constant.Site_Url+"getDonationCountAndAmountGroupByName",request);
   }
 
+  getDonationCountAndAmountGroupByDate(tabName:string){
+    let request: any = {
+      payload: {
+        requestedFor: tabName,
+        roleType: this.cookieService.get('roleType'),
+        token: this.cookieService.get('token'),
+        createdBy: this.cookieService.get('loginId'),
+        superadminId: this.cookieService.get('superadminId'),
+      }
+    };
+    return  this.http.post<any>(Constant.Site_Url+"getDonationCountAndAmountGroupByDate",request);
+  }
+
   getDonationCountAndAmountGroupByNameCustom(firstDate:any, lastDate:any){
     let request: any = {
       payload: {

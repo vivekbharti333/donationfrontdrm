@@ -1,0 +1,427 @@
+<div class="container-fluid dashboard-wrapper">
+  <!-- TOP ROW -->
+  <div class="row g-3 mb-3">
+    <div class="col-xl-3 col-md-6">
+      <div class="metric-card">
+        <div class="metric-left sms">
+          <i class="bi bi-chat-dots-fill"></i>
+        </div>
+        <div class="metric-content">
+          <div class="metric-title">Total SMS</div>
+          <div class="metric-value">125,430</div>
+          <div class="metric-subtitle">All time</div>
+        </div>
+        <div class="metric-mini-icon orange-soft">
+          <i class="bi bi-bar-chart-line-fill"></i>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+      <div class="metric-card">
+        <div class="metric-left whatsapp">
+          <i class="bi bi-whatsapp"></i>
+        </div>
+        <div class="metric-content">
+          <div class="metric-title">Total WhatsApp</div>
+          <div class="metric-value">98,765</div>
+          <div class="metric-subtitle">All time</div>
+        </div>
+        <div class="metric-mini-icon green-soft">
+          <i class="bi bi-bar-chart-line-fill"></i>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+      <div class="metric-card">
+        <div class="metric-left email">
+          <i class="bi bi-envelope-fill"></i>
+        </div>
+        <div class="metric-content">
+          <div class="metric-title">Total Email</div>
+          <div class="metric-value">67,890</div>
+          <div class="metric-subtitle">All time</div>
+        </div>
+        <div class="metric-mini-icon blue-soft">
+          <i class="bi bi-bar-chart-line-fill"></i>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+      <div class="metric-card total-consumed-card">
+        <div class="metric-left consumed">
+          <i class="bi bi-layers-fill"></i>
+        </div>
+        <div class="metric-content">
+          <div class="metric-title highlight-title">Total Consumed</div>
+          <div class="metric-value">291,085</div>
+          <div class="metric-subtitle">All time</div>
+        </div>
+        <div class="metric-mini-icon orange-soft">
+          <i class="bi bi-bar-chart-line-fill"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECOND ROW -->
+  <div class="row g-3 mb-3">
+    <div class="col-xl-3 col-md-6">
+      <div class="metric-card small-card">
+        <div class="metric-left sms">
+          <i class="bi bi-chat-dots-fill"></i>
+        </div>
+        <div class="metric-content">
+          <div class="metric-title">Consumed SMS</div>
+          <div class="metric-value">112,340</div>
+          <div class="metric-bottom">
+            <span class="metric-subtitle">This Period</span>
+            <span class="metric-percent orange-text">89.6% of Total</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+      <div class="metric-card small-card">
+        <div class="metric-left whatsapp">
+          <i class="bi bi-whatsapp"></i>
+        </div>
+        <div class="metric-content">
+          <div class="metric-title">Consumed WhatsApp</div>
+          <div class="metric-value">87,540</div>
+          <div class="metric-bottom">
+            <span class="metric-subtitle">This Period</span>
+            <span class="metric-percent green-text">88.6% of Total</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+      <div class="metric-card small-card">
+        <div class="metric-left email">
+          <i class="bi bi-envelope-fill"></i>
+        </div>
+        <div class="metric-content">
+          <div class="metric-title">Consumed Email</div>
+          <div class="metric-value">61,205</div>
+          <div class="metric-bottom">
+            <span class="metric-subtitle">This Period</span>
+            <span class="metric-percent blue-text">90.1% of Total</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SMS SUMMARY -->
+    <div class="col-xl-3 col-md-6">
+      <div class="summary-card">
+        <div class="summary-header">
+          <h6>SMS Summary</h6>
+          <button class="btn btn-sm btn-outline-warning">View Details</button>
+        </div>
+
+        <div class="summary-row">
+          <div class="summary-left">
+            <div class="status-icon success">
+              <i class="bi bi-check-lg"></i>
+            </div>
+            <span>Sent Successfully</span>
+          </div>
+          <div class="summary-right success-text">110,234 <span>(92.5%)</span></div>
+        </div>
+
+        <div class="summary-row">
+          <div class="summary-left">
+            <div class="status-icon failed">
+              <i class="bi bi-x-lg"></i>
+            </div>
+            <span>Failed</span>
+          </div>
+          <div class="summary-right failed-text">9,196 <span>(7.5%)</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHARTS + RIGHT SUMMARY -->
+  <div class="row g-3 mb-3">
+    <!-- LEFT CHARTS -->
+    <div class="col-xl-8">
+      <div class="row g-3">
+        <!-- LINE CHART -->
+        <div class="col-lg-6">
+          <div class="chart-card h-100">
+            <div class="card-header-custom">
+              <h6>Consumption Overview</h6>
+              <select class="form-select form-select-sm chart-select">
+                <option>Daily</option>
+                <option>Weekly</option>
+                <option>Monthly</option>
+              </select>
+            </div>
+            <div class="chart-container line-chart-box">
+              <canvas id="consumptionChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- DOUGHNUT CHART -->
+        <div class="col-lg-6">
+          <div class="chart-card h-100">
+            <div class="card-header-custom">
+              <h6>Channel Wise Consumption</h6>
+            </div>
+
+            <div class="donut-section">
+              <div class="donut-chart-wrapper">
+                <canvas id="channelChart"></canvas>
+              </div>
+
+              <div class="channel-legend">
+                <div class="legend-item">
+                  <div class="legend-left">
+                    <span class="legend-dot orange"></span>
+                    <span>SMS</span>
+                  </div>
+                  <div class="legend-right">
+                    <div class="legend-percentage">43%</div>
+                    <div class="legend-value">112,340</div>
+                  </div>
+                </div>
+
+                <div class="legend-item">
+                  <div class="legend-left">
+                    <span class="legend-dot green"></span>
+                    <span>WhatsApp</span>
+                  </div>
+                  <div class="legend-right">
+                    <div class="legend-percentage">34%</div>
+                    <div class="legend-value">87,540</div>
+                  </div>
+                </div>
+
+                <div class="legend-item">
+                  <div class="legend-left">
+                    <span class="legend-dot blue"></span>
+                    <span>Email</span>
+                  </div>
+                  <div class="legend-right">
+                    <div class="legend-percentage">23%</div>
+                    <div class="legend-value">61,205</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TABLE -->
+        <div class="col-12">
+          <div class="table-card">
+            <div class="card-header-custom mb-3">
+              <h6>Campaign Performance Summary</h6>
+            </div>
+
+            <div class="table-responsive">
+              <table class="table campaign-table align-middle mb-0">
+                <thead>
+                  <tr>
+                    <th>Channel</th>
+                    <th>Total Sent</th>
+                    <th>Successful</th>
+                    <th>Failed</th>
+                    <th>Success Rate</th>
+                    <th>Consumed</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <div class="channel-cell">
+                        <span class="channel-badge sms-bg"><i class="bi bi-chat-dots-fill"></i></span>
+                        SMS
+                      </div>
+                    </td>
+                    <td>110,234</td>
+                    <td>102,034</td>
+                    <td>8,200</td>
+                    <td>
+                      <div class="rate-cell">
+                        <span>92.5%</span>
+                        <div class="progress rate-progress">
+                          <div class="progress-bar bg-orange" style="width: 92.5%"></div>
+                        </div>
+                      </div>
+                    </td>
+                    <td>102,034</td>
+                  </tr>
+
+                  <tr>
+                    <td>
+                      <div class="channel-cell">
+                        <span class="channel-badge whatsapp-bg"><i class="bi bi-whatsapp"></i></span>
+                        WhatsApp
+                      </div>
+                    </td>
+                    <td>91,540</td>
+                    <td>85,567</td>
+                    <td>5,973</td>
+                    <td>
+                      <div class="rate-cell">
+                        <span class="green-text">93.2%</span>
+                        <div class="progress rate-progress">
+                          <div class="progress-bar bg-success" style="width: 93.2%"></div>
+                        </div>
+                      </div>
+                    </td>
+                    <td>85,567</td>
+                  </tr>
+
+                  <tr>
+                    <td>
+                      <div class="channel-cell">
+                        <span class="channel-badge email-bg"><i class="bi bi-envelope-fill"></i></span>
+                        Email
+                      </div>
+                    </td>
+                    <td>65,205</td>
+                    <td>59,401</td>
+                    <td>5,804</td>
+                    <td>
+                      <div class="rate-cell">
+                        <span class="blue-text">91.1%</span>
+                        <div class="progress rate-progress">
+                          <div class="progress-bar bg-primary" style="width: 91.1%"></div>
+                        </div>
+                      </div>
+                    </td>
+                    <td>59,401</td>
+                  </tr>
+
+                  <tr class="total-row">
+                    <td>Total</td>
+                    <td>266,979</td>
+                    <td>247,002</td>
+                    <td>19,977</td>
+                    <td>92.5%</td>
+                    <td>247,002</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT SIDE -->
+    <div class="col-xl-4">
+      <div class="d-flex flex-column gap-3 h-100">
+        <!-- WHATSAPP SUMMARY -->
+        <div class="summary-card">
+          <div class="summary-header">
+            <h6>WhatsApp Summary</h6>
+            <button class="btn btn-sm btn-outline-warning">View Details</button>
+          </div>
+
+          <div class="summary-row">
+            <div class="summary-left">
+              <div class="status-icon success">
+                <i class="bi bi-check-lg"></i>
+              </div>
+              <span>Sent Successfully</span>
+            </div>
+            <div class="summary-right success-text">85,567 <span>(93.2%)</span></div>
+          </div>
+
+          <div class="summary-row">
+            <div class="summary-left">
+              <div class="status-icon failed">
+                <i class="bi bi-x-lg"></i>
+              </div>
+              <span>Failed</span>
+            </div>
+            <div class="summary-right failed-text">5,973 <span>(6.8%)</span></div>
+          </div>
+        </div>
+
+        <!-- EMAIL SUMMARY -->
+        <div class="summary-card">
+          <div class="summary-header">
+            <h6>Email Summary</h6>
+            <button class="btn btn-sm btn-outline-warning">View Details</button>
+          </div>
+
+          <div class="summary-row">
+            <div class="summary-left">
+              <div class="status-icon success">
+                <i class="bi bi-check-lg"></i>
+              </div>
+              <span>Sent Successfully</span>
+            </div>
+            <div class="summary-right success-text">59,401 <span>(91.1%)</span></div>
+          </div>
+
+          <div class="summary-row">
+            <div class="summary-left">
+              <div class="status-icon failed">
+                <i class="bi bi-x-lg"></i>
+              </div>
+              <span>Failed</span>
+            </div>
+            <div class="summary-right failed-text">5,804 <span>(8.9%)</span></div>
+          </div>
+        </div>
+
+        <!-- RECENT ACTIVITY -->
+        <div class="activity-card flex-grow-1">
+          <div class="card-header-custom">
+            <h6>Recent Activity</h6>
+          </div>
+
+          <div class="activity-item">
+            <div class="activity-icon whatsapp-bg">
+              <i class="bi bi-whatsapp"></i>
+            </div>
+            <div class="activity-content">
+              <div class="activity-title">WhatsApp campaign to Customer Group</div>
+              <div class="activity-subtitle">Sent Successfully to 1,250 contacts</div>
+            </div>
+            <div class="activity-time">10:24 AM</div>
+          </div>
+
+          <div class="activity-item">
+            <div class="activity-icon sms-bg">
+              <i class="bi bi-chat-dots-fill"></i>
+            </div>
+            <div class="activity-content">
+              <div class="activity-title">SMS campaign to Users</div>
+              <div class="activity-subtitle failed-text">Failed to send to 45 contacts</div>
+            </div>
+            <div class="activity-time">09:48 AM</div>
+          </div>
+
+          <div class="activity-item">
+            <div class="activity-icon email-bg">
+              <i class="bi bi-envelope-fill"></i>
+            </div>
+            <div class="activity-content">
+              <div class="activity-title">Email campaign - Newsletter</div>
+              <div class="activity-subtitle">Sent Successfully to 2,340 contacts</div>
+            </div>
+            <div class="activity-time">09:15 AM</div>
+          </div>
+
+          <div class="activity-footer">
+            <a href="javascript:void(0)">View All Activity</a>
+            <i class="bi bi-arrow-right"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
