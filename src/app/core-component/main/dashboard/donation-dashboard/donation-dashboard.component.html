@@ -9,8 +9,10 @@
             </button> -->
 
             <div class="welcome-box">
-                <h2>👋 Hi Nitesh Misaal,</h2>
-                <p>Here's what's happening with your NGO today.</p>
+                <h2>👋 Hi {{username}},</h2>
+                <!-- <p>Here's what's happening with your NGO today.</p> -->
+                <!-- <p>Stay updated with today’s NGO activities and donations.</p> -->
+                <p>Here’s a quick overview of your NGO today.</p>
             </div>
         </div>
 
@@ -46,7 +48,7 @@
                 </div>
                 <div>
                     <p class="summary-title">Today Donations</p>
-                    <h3>{{todaysCount}}</h3>
+                    <h3 class="counters" data-count="todaysCount" [countUp]="todaysCount" [options]="{ duration: 10 }">{{todaysCount}}</h3>
                     <span class="growth up">₹{{todaysAmount}}</span>
                 </div>
             </div>
@@ -60,7 +62,7 @@
                 </div>
                 <div>
                     <p class="summary-title">Yesterday Donations</p>
-                    <h3>{{yesterdayCount}}</h3>
+                    <h3 class="counters" data-count="yesterdayCount" [countUp]="yesterdayCount" [options]="{ duration: 10 }">{{yesterdayCount}}</h3>
                     <span class="growth up">₹{{yesterdayAmount}}</span>
                 </div>
             </div>
@@ -74,7 +76,7 @@
                 </div>
                 <div>
                     <p class="summary-title">This Month Donations</p>
-                    <h3>{{monthCount}}</h3>
+                    <h3 class="counters" data-count="monthCount" [countUp]="monthCount" [options]="{ duration: 10 }">{{monthCount}}</h3>
                     <span class="growth up">₹{{monthAmount}}</span>
                 </div>
             </div>
@@ -87,14 +89,10 @@
                     <i class="bi bi-people"></i>
                 </div>
                 <div>
-                    <!-- <p class="summary-title">Active User</p>
-                    <h3>{{activeUserCount}}</h3><span class="summary-title"> Active</span>
-                    <span class="growth up">Total User : {{activeUserCount+activeUserCount}} </span> -->
-                    <!-- <span class="growth up">↑ 18% vs last month</span> -->
 
                     <p class="summary-title">User</p>
                     <div class="count-row">
-                        <h3>{{ activeUserCount }}</h3>
+                        <h3 class="counters" data-count="activeUserCount" [countUp]="activeUserCount" [options]="{ duration: 10 }">{{ activeUserCount }}</h3>
                         <span class="status-text">Active User</span>
                     </div>
                     <span class="growth up">{{activeUserCount+activeUserCount}} Total User</span>
@@ -116,17 +114,22 @@
                 <h5>Payment Mode</h5>
 
                 <div class="tab-pills">
-                    <button [ngClass]="{ active: selectedPaymentTab === 'Today' }" (click)="changePaymentTab('Today')">
+                    <button
+                        [class.active]="selectedPaymentTab === 'TODAY'"
+                        (click)="changePaymentTab('TODAY')">
                         Today
                     </button>
 
-                    <button [ngClass]="{ active: selectedPaymentTab === 'Yesterday' }"
-                        (click)="changePaymentTab('Yesterday')">
+                    <button
+                        [class.active]="selectedPaymentTab === 'YESTERDAY'"
+                        (click)="changePaymentTab('YESTERDAY')">
                         Yesterday
                     </button>
 
-                    <button [ngClass]="{ active: selectedPaymentTab === 'MONTH' }" (click)="changePaymentTab('MONTH')">
-                        This Month
+                    <button
+                        [class.active]="selectedPaymentTab === 'MONTH'"
+                        (click)="changePaymentTab('MONTH')">
+                        {{ currentMonthName || 'This Month' }}
                     </button>
                 </div>
             </div>
@@ -137,7 +140,7 @@
 
                     <div class="chart-center">
                         <span>Total</span>
-                        <h4>
+                        <h4 class="counters" data-count="paymentTotalAmount" [countUp]="paymentTotalAmount" [options]="{ duration: 10 }">
                             {{ paymentCurrencySymbol }} {{ paymentTotalAmount | number:'1.0-2' }}
                         </h4>
                     </div>
@@ -175,17 +178,16 @@
                 <h5>Report</h5>
 
                 <div class="tab-pills">
-                    <button [class.active]="selectedTopDonorTab === 'Today'" (click)="changeTopDonorTab('Today')">
+                    <button [class.active]="selectedTopDonorTab === 'TODAY'" (click)="changeTopDonorTab('TODAY')">
                         Today
                     </button>
 
-                    <button [class.active]="selectedTopDonorTab === 'Yesterday'"
-                        (click)="changeTopDonorTab('Yesterday')">
+                    <button [class.active]="selectedTopDonorTab === 'YESTERDAY'" (click)="changeTopDonorTab('YESTERDAY')">
                         Yesterday
                     </button>
 
-                    <button [class.active]="selectedTopDonorTab === 'This Month'" (click)="changeTopDonorTab('Month')">
-                        This Month
+                    <button [class.active]="selectedTopDonorTab === 'MONTH'" (click)="changeTopDonorTab('MONTH')">
+                        {{ currentMonthName || 'This Month' }}
                     </button>
                 </div>
             </div>
@@ -222,7 +224,7 @@
                     <tbody *ngIf="!topDonors || topDonors.length === 0">
                         <tr>
                             <td colspan="3" class="text-center py-3 text-muted">
-                                No donor data found
+                                No record found
                             </td>
                         </tr>
                     </tbody>
@@ -230,42 +232,11 @@
 
                 <ng-template #noTopDonorData>
                     <div class="no-donor-data">
-                        No donor data found
+                        No record found
                     </div>
                 </ng-template>
             </div>
         </div>
-
-        <!-- Donation Trend -->
-        <!-- <div class="dashboard-card">
-            <div class="card-head">
-                <h5>Donation Trend</h5>
-                <select class="dropdown-pill trend-filter" [(ngModel)]="selectedTrendFilter"
-                    (change)="onDonationTrendFilterChange()">
-                    <option value="THIS_MONTH">This Month</option>
-                    <option value="LAST_6_MONTHS">Last 6 Months</option>
-                </select>
-            </div>
-        
-            <div class="trend-chart-wrap">
-                <canvas id="donationTrendChart"></canvas>
-            </div>
-        
-            <div class="trend-bottom-cards">
-                <div class="mini-info-card">
-                    <span>Total Donations</span>
-                    <h6>{{ totalDonationCount }}</h6>
-                </div>
-                <div class="mini-info-card">
-                    <span>Total Amount</span>
-                    <h6>₹ {{ totalDonationAmount | number:'1.0-2' }}</h6>
-                </div>
-                <div class="mini-info-card">
-                    <span>Avg. Donation</span>
-                    <h6>₹ {{ avgDonationAmount | number:'1.0-2' }}</h6>
-                </div>
-            </div>
-        </div> -->
 
     </div>
 
@@ -276,11 +247,21 @@
         <div class="dashboard-card">
             <div class="card-head">
                 <h5>Donation Graph</h5>
-                <select class="dropdown-pill trend-filter" [(ngModel)]="selectedTrendFilter"
+                <!-- <select class="dropdown-pill trend-filter" [(ngModel)]="selectedTrendFilter"
                     (change)="onDonationTrendFilterChange()">
                     <option value="THIS_MONTH">This Month</option>
                     <option value="LAST_6_MONTHS">Last 6 Months</option>
-                </select>
+                </select> -->
+
+                <div class="trend-filter-wrap">
+                    <select class="dropdown-pill trend-filter"
+                            [(ngModel)]="selectedTrendFilter"
+                            (change)="onDonationTrendFilterChange()">
+                        <option value="THIS_MONTH">{{ currentMonthName || 'This Month' }}</option>
+                        <option value="LAST_6_MONTHS">Last 6 Months</option>
+                    </select>
+                    <i class="bi bi-chevron-down trend-filter-icon"></i>
+                </div>
             </div>
 
             <div class="trend-chart-wrap">
@@ -305,28 +286,31 @@
 
         <!-- Donation Overview -->
         <div class="dashboard-card">
-            <div class="card-head">
+            <!-- <div class="card-head">
                 <h5>Currency Report</h5>
-            </div>
+            </div> -->
 
 
             <div class="card-head">
-                <!-- <h5>Report</h5> -->
+               <h5>Currency Report</h5>
 
                 <div class="tab-pills">
-                    <button [ngClass]="{ active: selectedCurrencyReportTab === 'Today' }"
-                        (click)="changeCurrencyReportTab('Today')">
+                    <button
+                        [class.active]="selectedCurrencyReportTab === 'TODAY'"
+                        (click)="changeCurrencyReportTab('TODAY')">
                         Today
                     </button>
 
-                    <button [ngClass]="{ active: selectedCurrencyReportTab === 'Yesterday' }"
-                        (click)="changeCurrencyReportTab('Yesterday')">
+                    <button
+                        [class.active]="selectedCurrencyReportTab === 'YESTERDAY'"
+                        (click)="changeCurrencyReportTab('YESTERDAY')">
                         Yesterday
                     </button>
 
-                    <button [ngClass]="{ active: selectedCurrencyReportTab === 'Month' }"
-                        (click)="changeCurrencyReportTab('Month')">
-                        This Month
+                    <button
+                        [class.active]="selectedCurrencyReportTab === 'MONTH'"
+                        (click)="changeCurrencyReportTab('MONTH')">
+                        {{ currentMonthName || 'This Month' }}
                     </button>
                 </div>
             </div>
@@ -372,34 +356,6 @@
                 </table>
             </div>
 
-
-
-            <!-- <div class="overview-cards">
-                <div class="overview-box">
-                    <div class="overview-icon orange-bg"><i class="bi bi-wallet2"></i></div>
-                    <h6>₹ 542</h6>
-                    <p>Total Amount (Today)</p>
-                </div>
-
-                <div class="overview-box">
-                    <div class="overview-icon green-bg"><i class="bi bi-graph-up-arrow"></i></div>
-                    <h6>6</h6>
-                    <p>Total Donations (Today)</p>
-                </div>
-
-                <div class="overview-box">
-                    <div class="overview-icon blue-bg"><i class="bi bi-person-plus"></i></div>
-                    <h6>1</h6>
-                    <p>New Donors (Today)</p>
-                </div>
-
-                <div class="overview-box">
-                    <div class="overview-icon red-bg"><i class="bi bi-heart"></i></div>
-                    <h6>85%</h6>
-                    <p>Repeat Donors</p>
-                </div>
-            </div> -->
-<!-- <br><br> -->
             <!-- <div class="goal-box">
                 <div class="goal-head">
                     <span>Goal Progress (This Month)</span>

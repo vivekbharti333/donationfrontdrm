@@ -78,10 +78,14 @@ export class DonationDashboardComponent implements AfterViewInit {
   selectedTrendFilter: string = 'THIS_MONTH';
 
   topDonors: any[] = [];
-  selectedTopDonorTab: string = 'Today';
+  selectedTopDonorTab: string = 'TODAY';
 
   paymentModes: any[] = [];
-  selectedPaymentTab: string = 'Today';
+  selectedPaymentTab: string = 'TODAY';
+  
+  currencyReportList: any[] = [];
+  selectedCurrencyReportTab: string = 'TODAY';
+
   paymentTotalAmount: number = 0;
   paymentCurrencySymbol: string = '₹';
   paymentChart: any;
@@ -94,17 +98,24 @@ export class DonationDashboardComponent implements AfterViewInit {
   public PaymentModeCountAmount: any = {};
   public currencyType: any;
 
-  ngAfterViewInit(): void {
-    this.initPaymentChart();
-    this.initDonationTrendChart();
-    // this.initTotalAmountChart();
-    this.getDonationCountAndAmountGroupByDate('THIS_MONTH');
-    this.getDonationCountAndAmountGroupByCurrency('TODAY');
-    this.getPaymentModeData('TODAY');
-    this.getDonationCountAndAmountGroupByName('TODAY');
-    this.getCountAndSum();
 
-  }
+ ngAfterViewInit(): void {
+  this.username = this.cookieService.get('firstName') + " " + this.cookieService.get('lastName');
+
+  this.initPaymentChart();
+  this.initDonationTrendChart();
+
+  this.getDonationCountAndAmountGroupByDate('THIS_MONTH');
+  this.getDonationCountAndAmountGroupByCurrency('TODAY');
+
+  this.getPaymentModeData(this.selectedPaymentTab); // use default selected tab
+  this.getDonationCountAndAmountGroupByName('TODAY');
+  this.getCountAndSum();
+
+  const currentDate = new Date();
+  const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  this.currentMonthName = months[currentDate.getMonth()];
+}
 
   constructor(
     private dashboardService: DashboardService,
@@ -160,77 +171,6 @@ export class DonationDashboardComponent implements AfterViewInit {
     });
   }
 
-  // initDonationTrendChart(): void {
-  //   const canvas = document.getElementById('donationTrendChart') as HTMLCanvasElement;
-  //   if (!canvas) return;
-
-  //   const ctx = canvas.getContext('2d');
-  //   if (!ctx) return;
-
-  //   // destroy old chart before creating new one
-  //   if (this.donationTrendChart) {
-  //     this.donationTrendChart.destroy();
-  //   }
-
-  //   const labels = this.donationTrendList.map(item => item.donationDate);
-  //   const amountData = this.donationTrendList.map(item => item.donationAmount);
-
-  //   const maxAmount = Math.max(...amountData, 0);
-
-  //   const gradient = ctx.createLinearGradient(0, 0, 0, 220);
-  //   gradient.addColorStop(0, 'rgba(255, 123, 33, 0.22)');
-  //   gradient.addColorStop(1, 'rgba(255, 123, 33, 0.02)');
-
-  //   this.donationTrendChart = new Chart(canvas, {
-  //     type: 'line',
-  //     data: {
-  //       labels: labels,
-  //       datasets: [
-  //         {
-  //           label: 'Donation Amount',
-  //           data: amountData,
-  //           borderColor: '#ff7b21',
-  //           backgroundColor: gradient,
-  //           fill: true,
-  //           tension: 0.42,
-  //           pointRadius: 3,
-  //           pointHoverRadius: 4,
-  //           pointBackgroundColor: '#ff7b21',
-  //           pointBorderWidth: 0
-  //         }
-  //       ]
-  //     },
-  //     options: {
-  //       responsive: true,
-  //       maintainAspectRatio: false,
-  //       plugins: {
-  //         legend: { display: false }
-  //       },
-  //       scales: {
-  //         x: {
-  //           grid: {
-  //             display: false
-  //           },
-  //           ticks: {
-  //             color: '#8a94a6',
-  //             font: { size: 11, family: 'Inter' }
-  //           }
-  //         },
-  //         y: {
-  //           beginAtZero: true,
-  //           suggestedMax: maxAmount + 100,
-  //           grid: {
-  //             color: 'rgba(0,0,0,0.05)'
-  //           },
-  //           ticks: {
-  //             color: '#8a94a6',
-  //             font: { size: 11, family: 'Inter' }
-  //           }
-  //         }
-  //       }
-  //     }
-  //   });
-  // }
 
   initDonationTrendChart(): void {
   const canvas = document.getElementById('donationTrendChart') as HTMLCanvasElement;
@@ -397,8 +337,6 @@ export class DonationDashboardComponent implements AfterViewInit {
   //   });
   // }
 
-  currencyReportList: any[] = [];
-  selectedCurrencyReportTab: string = 'Today';
 
   changeCurrencyReportTab(tabName: string) {
     this.getDonationCountAndAmountGroupByCurrency(tabName);
@@ -453,9 +391,10 @@ export class DonationDashboardComponent implements AfterViewInit {
       });
   }
 
-  changePaymentTab(tabName: string) {
-    this.getPaymentModeData(tabName);
-  }
+changePaymentTab(tab: string): void {
+  this.selectedPaymentTab = tab;
+  this.getPaymentModeData(tab);
+}
 
   getPaymentModeData(tabName: string) {
     this.selectedPaymentTab = tabName;
@@ -516,9 +455,10 @@ export class DonationDashboardComponent implements AfterViewInit {
   }
 
 
-  changeTopDonorTab(tabName: string) {
-    this.getDonationCountAndAmountGroupByName(tabName);
-  }
+changeTopDonorTab(tab: string): void {
+  this.selectedTopDonorTab = tab;
+  this.getDonationCountAndAmountGroupByName(tab);
+}
 
   getDonationCountAndAmountGroupByName(tabName: string) {
     this.topDonors = [];

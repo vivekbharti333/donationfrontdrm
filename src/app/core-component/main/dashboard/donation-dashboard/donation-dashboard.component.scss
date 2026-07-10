@@ -1005,3 +1005,56 @@
   color: #6b7280;
   line-height: 1;
 }
+
+.trend-filter-wrap {
+    position: relative;
+    display: inline-block;
+    min-width: 180px;
+}
+
+.dropdown-pill.trend-filter {
+    width: 100%;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+
+    background: linear-gradient(180deg, #ffffff 0%, #fff7f1 100%);
+    border: 1px solid #f3d4bb;
+    border-radius: 14px;
+    padding: 10px 42px 10px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #374151;
+    outline: none;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(245, 158, 66, 0.08);
+    transition: all 0.25s ease;
+}
+
+.dropdown-pill.trend-filter:hover {
+    border-color: #f59e42;
+    box-shadow: 0 6px 18px rgba(245, 158, 66, 0.16);
+    background: #fffaf5;
+}
+
+.dropdown-pill.trend-filter:focus {
+    border-color: #f59e42;
+    box-shadow: 0 0 0 4px rgba(245, 158, 66, 0.15);
+    background: #fff;
+}
+
+.trend-filter-icon {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 13px;
+    color: #d97706;
+    pointer-events: none;
+}
+
+.dropdown-pill.trend-filter option {
+    color: #374151;
+    background: #fff;
+    font-weight: 500;
+}
