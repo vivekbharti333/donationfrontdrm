@@ -1,5 +1,36 @@
-// import { Component } from '@angular/core';
-import { AfterViewInit, Component } from '@angular/core';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { Component, ViewChild } from '@angular/core';
+import { MatTableDataSource } from '@angular/material/table';
+import { Router } from '@angular/router';
+import {
+  ApexAxisChartSeries,
+  ApexChart,
+  ChartComponent,
+  ApexDataLabels,
+  ApexPlotOptions,
+  ApexYAxis,
+  ApexXAxis,
+  ApexResponsive,
+  ApexLegend,
+  ApexFill,
+} from 'ng-apexcharts';
+import { apiResultFormat } from 'src/app/core/core.index';
+import { routes } from 'src/app/core/helpers/routes';
+import { CommonService } from 'src/app/core/service/common/common.service';
+import { DataService } from 'src/app/core/service/data/data.service';
+import { SettingsService } from 'src/app/core/service/settings/settings.service';
+import { expiredproduct } from 'src/app/shared/model/page.model';
+import { DashboardService } from '../dashboard.service';
+import { AuthenticationService } from 'src/app/auth/authentication.service';
+import { CookieService } from 'ngx-cookie-service';
+import {
+  PaginationService,
+  pageSelection,
+  tablePageSize,
+} from 'src/app/shared/shared.index';
+import Swal from 'sweetalert2';
+import { CampaignDashboardService } from './campaign-dashboard.service';
+import { HttpErrorResponse } from '@angular/common/http';
 import {
   Chart,
   CategoryScale,
@@ -13,6 +44,8 @@ import {
   LineController,
   Filler
 } from 'chart.js';
+
+  import {  OnInit, AfterViewInit } from '@angular/core';
 
 Chart.register(
   CategoryScale,
@@ -32,10 +65,37 @@ Chart.register(
   templateUrl: './campaign-dashboard.component.html',
   styleUrl: './campaign-dashboard.component.scss'
 })
-export class CampaignDashboardComponent {
-ngAfterViewInit(): void {
-    this.initConsumptionChart();
-    this.initChannelChart();
+// export class CampaignDashboardComponent {
+
+
+export class CampaignDashboardComponent implements OnInit, AfterViewInit {
+
+  campaignReportGroupByNameList: any[] = [];
+
+  consumptionChart!: Chart;
+  channelChart!: Chart;
+
+   constructor(
+      private common: CommonService,
+      private setting: SettingsService,
+      private data: DataService,
+      private pagination: PaginationService,
+      private router: Router,
+  
+      private campaignDetailsService: CampaignDashboardService,
+      private authenticationService: AuthenticationService,
+  
+    ){
+
+    }
+
+  ngOnInit(): void {
+      this.getCampaignReportByGroupCampaignName('TODAY');
+  }
+
+  ngAfterViewInit(): void {
+      this.initConsumptionChart();
+      this.initChannelChart();
   }
 
   initConsumptionChart(): void {
@@ -217,4 +277,96 @@ ngAfterViewInit(): void {
       plugins: [centerTextPlugin]
     });
   }
+
+
+
+
+
+totalSent = 0;
+totalSuccess = 0;
+totalFailed = 0;
+successRate = 0;
+
+changeFilter(tabName: string): void {
+
+  this.selectedFilter = tabName;
+
+  console.log(tabName);
+
+  // Call your API
+  this.getCampaignReportByGroupCampaignName(tabName);
+
+}
+
+getCampaignReportByGroupCampaignName(tabName :any): void {
+
+  this.campaignDetailsService
+      .getCampaignReportByGroupCampaignName(tabName)
+      .subscribe({
+
+        next: (response: any) => {
+
+          if (response.responseCode === 200) {
+
+            this.campaignReportGroupByNameList =
+              response.listPayload.map((item: any[]) => ({
+
+                campaignName: item[0] ?? 'N/A',
+                totalSent: Number(item[1]),
+                successCount: Number(item[2]),
+                failedCount: Number(item[3])
+
+              }));
+
+            this.calculateTotals();
+
+          } else {
+
+            this.campaignReportGroupByNameList = [];
+
+          }
+
+        },
+
+        error: (error: any) => {
+
+          console.error(error);
+
+        }
+
+      });
+
+}
+
+selectedFilter = 'TODAY';
+changePaymentTab(ty:any){
+
+}
+
+calculateTotals(): void {
+
+  this.totalSent = 0;
+  this.totalSuccess = 0;
+  this.totalFailed = 0;
+
+  this.campaignReportGroupByNameList.forEach((item: any) => {
+    this.totalSent += item.totalSent;
+    this.totalSuccess += item.successCount;
+    this.totalFailed += item.failedCount;
+  });
+
+  this.successRate = this.totalSent > 0
+    ? (this.totalSuccess * 100) / this.totalSent
+    : 0;
+}
+
+getSuccessRate(item: any): number {
+
+  if (item.totalSent === 0) {
+    return 0;
+  }
+
+  return (item.successCount * 100) / item.totalSent;
+}
+
 }

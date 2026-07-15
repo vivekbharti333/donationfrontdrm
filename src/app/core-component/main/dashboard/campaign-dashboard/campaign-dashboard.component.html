@@ -221,100 +221,150 @@
 
         <!-- TABLE -->
         <div class="col-12">
-          <div class="table-card">
-            <div class="card-header-custom mb-3">
-              <h6>Campaign Performance Summary</h6>
-            </div>
+    <div class="table-card">
 
-            <div class="table-responsive">
-              <table class="table campaign-table align-middle mb-0">
-                <thead>
-                  <tr>
-                    <th>Channel</th>
-                    <th>Total Sent</th>
-                    <th>Successful</th>
-                    <th>Failed</th>
-                    <th>Success Rate</th>
-                    <th>Consumed</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>
-                      <div class="channel-cell">
-                        <span class="channel-badge sms-bg"><i class="bi bi-chat-dots-fill"></i></span>
-                        SMS
-                      </div>
-                    </td>
-                    <td>110,234</td>
-                    <td>102,034</td>
-                    <td>8,200</td>
-                    <td>
-                      <div class="rate-cell">
-                        <span>92.5%</span>
-                        <div class="progress rate-progress">
-                          <div class="progress-bar bg-orange" style="width: 92.5%"></div>
-                        </div>
-                      </div>
-                    </td>
-                    <td>102,034</td>
-                  </tr>
-
-                  <tr>
-                    <td>
-                      <div class="channel-cell">
-                        <span class="channel-badge whatsapp-bg"><i class="bi bi-whatsapp"></i></span>
-                        WhatsApp
-                      </div>
-                    </td>
-                    <td>91,540</td>
-                    <td>85,567</td>
-                    <td>5,973</td>
-                    <td>
-                      <div class="rate-cell">
-                        <span class="green-text">93.2%</span>
-                        <div class="progress rate-progress">
-                          <div class="progress-bar bg-success" style="width: 93.2%"></div>
-                        </div>
-                      </div>
-                    </td>
-                    <td>85,567</td>
-                  </tr>
-
-                  <tr>
-                    <td>
-                      <div class="channel-cell">
-                        <span class="channel-badge email-bg"><i class="bi bi-envelope-fill"></i></span>
-                        Email
-                      </div>
-                    </td>
-                    <td>65,205</td>
-                    <td>59,401</td>
-                    <td>5,804</td>
-                    <td>
-                      <div class="rate-cell">
-                        <span class="blue-text">91.1%</span>
-                        <div class="progress rate-progress">
-                          <div class="progress-bar bg-primary" style="width: 91.1%"></div>
-                        </div>
-                      </div>
-                    </td>
-                    <td>59,401</td>
-                  </tr>
-
-                  <tr class="total-row">
-                    <td>Total</td>
-                    <td>266,979</td>
-                    <td>247,002</td>
-                    <td>19,977</td>
-                    <td>92.5%</td>
-                    <td>247,002</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
+        <div class="card-header-custom mb-3">
+            <h6>Campaign Performance Summary</h6>
         </div>
+
+        <div class="campaign-filter mb-4">
+
+            <button
+                [class.active]="selectedFilter === 'TODAY'"
+                (click)="changeFilter('TODAY')">
+                Today
+            </button>
+
+            <button
+                [class.active]="selectedFilter === 'YESTERDAY'"
+                (click)="changeFilter('YESTERDAY')">
+                Yesterday
+            </button>
+
+            <button
+                [class.active]="selectedFilter === 'MONTH'"
+                (click)="changeFilter('MONTH')">
+                July
+            </button>
+
+        </div>
+
+        <div class="table-responsive">
+
+            <table class="table campaign-table">
+
+                <thead>
+                    <tr>
+                        <th>Campaign</th>
+                        <th class="text-center">Total Sent</th>
+                        <th class="text-center">Successful</th>
+                        <th class="text-center">Failed</th>
+                        <th>Success Rate</th>
+                        <th class="text-center">Consumed</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    <tr *ngFor="let item of campaignReportGroupByNameList">
+                        <td>
+                            <div class="channel-cell">
+                                <span class="channel-badge">
+                                    <i class="bi bi-megaphone-fill"></i>
+                                </span>
+                                <div>
+                                    <div class="campaign-title">
+                                        {{ item.campaignName }}
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+
+                        <td class="text-center fw-semibold">
+                            {{ item.totalSent | number }}
+                        </td>
+
+                        <td class="text-center">
+                            <span class="success-count">
+                                {{ item.successCount | number }}
+                            </span>
+                        </td>
+
+                        <td class="text-center">
+                            <span class="failed-count">
+                                {{ item.failedCount | number }}
+                            </span>
+                        </td>
+
+                        <td>
+
+                            <div class="rate-cell">
+
+                                <span class="rate-text">
+                                    {{ getSuccessRate(item) | number:'1.1-1' }}%
+                                </span>
+
+                                <div class="progress rate-progress">
+
+                                    <div
+                                        class="progress-bar"
+                                        [style.width.%]="getSuccessRate(item)">
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </td>
+
+                        <!-- <td class="text-center fw-semibold">
+                            {{ item.successCount | number }}
+                        </td> -->
+
+                        <td class="text-center">
+                            <span class="success-count">
+                                {{ item.successCount | number }}
+                            </span>
+                        </td>
+
+                    </tr>
+
+                    <tr class="total-row" *ngIf="campaignReportGroupByNameList.length">
+
+                        <td>Total</td>
+
+                        <td class="text-center">{{ totalSent | number }}</td>
+
+                        <td class="text-center">{{ totalSuccess | number }}</td>
+
+                        <td class="text-center">{{ totalFailed | number }}</td>
+
+                        <td>{{ successRate | number:'1.1-1' }}%</td>
+
+                        <td class="text-center">{{ totalSuccess | number }}</td>
+
+                    </tr>
+
+                    <tr *ngIf="campaignReportGroupByNameList.length==0">
+
+                        <td colspan="6" class="text-center py-5">
+
+                            <i class="bi bi-inbox fs-1 text-secondary"></i>
+
+                            <h6 class="mt-3">No Campaign Data Found</h6>
+
+                        </td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+</div>
       </div>
     </div>
 
