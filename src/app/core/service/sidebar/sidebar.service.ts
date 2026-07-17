@@ -96,6 +96,17 @@ export class SidebarService {
               route: routes.adminDashboard,
               permission: 'call-dashboard',
             },
+            {
+              menuValue: 'Donation Dashboard',
+              route: routes.donationDashboard,
+              permission: 'donation-dashboard',
+            },
+            {
+              menuValue: 'Campaign Dashboard',
+              route: routes.campaignDashboard,
+              permission: 'campaign-dashboard',
+            },
+            
           ],
         },
         {
@@ -630,6 +641,16 @@ export class SidebarService {
               route: routes.adminDashboard,
               permission: 'call-dashboard',
             },
+            {
+              menuValue: 'Donation Dashboard',
+              route: routes.donationDashboard,
+              permission: 'donation-dashboard',
+            },
+            {
+              menuValue: 'Campaign Dashboard',
+              route: routes.campaignDashboard,
+              permission: 'campaign-dashboard',
+            },
           ],
         },
         {
@@ -964,6 +985,16 @@ export class SidebarService {
               route: routes.adminDashboard,
               permission: 'call-dashboard',
             },
+            {
+              menuValue: 'Donation Dashboard',
+              route: routes.donationDashboard,
+              permission: 'donation-dashboard',
+            },
+            {
+              menuValue: 'Campaign Dashboard',
+              route: routes.campaignDashboard,
+              permission: 'campaign-dashboard',
+            },
           ],
         },
         {
@@ -1282,6 +1313,20 @@ export class SidebarService {
               hasSubRoute: false,
               showSubRoute: false,
               route: routes.salesDashboard,
+              subRoutes: [],
+            },
+            {
+              tittle: 'Donation Dashboard',
+              hasSubRoute: false,
+              showSubRoute: false,
+              route: routes.donationDashboard,
+              subRoutes: [],
+            },
+            {
+              tittle: 'Campaign Dashboard',
+              hasSubRoute: false,
+              showSubRoute: false,
+              route: routes.campaignDashboard,
               subRoutes: [],
             },
           ],
@@ -2546,6 +2591,20 @@ export class SidebarService {
               hasSubRoute: false,
               showSubRoute: false,
               route: routes.salesDashboard,
+              subRoutes: [],
+            },
+            {
+              tittle: 'Donation Dashboard',
+              hasSubRoute: false,
+              showSubRoute: false,
+              route: routes.donationDashboard,
+              subRoutes: [],
+            },
+            {
+              tittle: 'Campaign Dashboard',
+              hasSubRoute: false,
+              showSubRoute: false,
+              route: routes.campaignDashboard,
               subRoutes: [],
             },
           ],

@@ -695,6 +695,12 @@ export class routes {
   public static get salesDashboard(): string {
     return this.dashboard + '/sales-dashboard';
   }
+  public static get donationDashboard(): string {
+    return this.dashboard + '/donation-dashboard';
+  }
+  public static get campaignDashboard(): string {
+    return this.dashboard + '/campaign-dashboard';
+  }
   public static get audioCall(): string {
     return this.application + '/audio-call';
   }
