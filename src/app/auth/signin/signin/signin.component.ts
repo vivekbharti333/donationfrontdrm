@@ -70,9 +70,11 @@ export class SigninComponent {
               });
               if (response['payload']['roleType'] == Constant.donorExecutive) {
                 this.router.navigate([routes.adminDashboard]);
+              } else if (response['payload']['roleType'] == Constant.superAdmin) {
+                this.router.navigate([routes.donationDashboard]);
               } else {
-                this.router.navigate([routes.salesDashboard]);
-              }
+                this.router.navigate([routes.donationDashboard]);
+              } 
             } else {
               this.messageService.add({
                 summary: response['payload']['respCode'],
