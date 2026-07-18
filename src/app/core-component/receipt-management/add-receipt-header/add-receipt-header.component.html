@@ -11,7 +11,7 @@
                 </div>
 
 
-                <div class="row">
+                <div class="row" *ngif="isSuperadmin">
                     <div class="col-sm-4 form-group">
                         <mat-select class="space-select select" formControlName="superadminId"  (selectionChange)="getInvoiceHeaderList($event.value, 'BYSUPERADMINID')" placeholder="Select Superadmin">
                             <mat-option *ngFor="let userList of superadminList" [value]="userList.loginId">

@@ -6,7 +6,8 @@ import { UserManagementService } from '../../user-management/user-management.ser
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { CalendarModule } from 'primeng/calendar';
-
+import { Constant } from 'src/app/core/constant/constants';
+import { AuthenticationService } from 'src/app/auth/authentication.service';
 import { Editor, Toolbar } from 'ngx-editor';
 
 
@@ -24,8 +25,10 @@ export class AddReceiptHeaderComponent {
   public superadminList: any;
   public invoiceHeaderList: any;
   public isInvoiceHeaderExists: Boolean = false;
+  public isSuperadmin: Boolean = false;
 
   public superadminId: any;
+    public loginUser : any;
 
   public logo: any;
 
@@ -34,8 +37,17 @@ export class AddReceiptHeaderComponent {
     private userManagementService: UserManagementService,
     private receiptManagementService: ReceiptManagementService,
     private messageService: MessageService,
+        private authenticationService: AuthenticationService
   ) {
+    this.loginUser = this.authenticationService.getLoginUser();
   }
+
+  checkRoleType(){
+        if(this.loginUser['roleType'] == Constant.superAdmin ){
+          this.isSuperadmin = true;
+        }
+          }
+  
 
   ngOnInit() {
     this.createForms();
@@ -65,7 +77,6 @@ export class AddReceiptHeaderComponent {
     // toggleBox() {
     //   this.showBox = !this.showBox;
     // }
-    
 
 
   createForms() {
