@@ -242,6 +242,7 @@ export class AllDonationListComponent {
 
   downloadInvoice(receiptNo: string) {
     window.open(Constant.Site_Url + "donationinvoice/" + receiptNo, '_blank');
+    // window.open(Constant.Site_Url + "download-donation-receipt/" + receiptNo, '_blank');
   }
 
 

@@ -31,7 +31,8 @@ export class DownloadReceiptService {
   }
 
   downloadPdf(reffNo: string): Observable<HttpResponse<Blob>> {
-    const url = Constant.Site_Url+"donationinvoice/"+reffNo;
+    const url = Constant.Site_Url+"donationinvoice/"+reffNo;  
+    // const url = Constant.Site_Url+"download-donation-receipt/"+reffNo;
     return this.http.get(url, {
       responseType: 'blob',
       observe: 'response'
