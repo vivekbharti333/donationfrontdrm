@@ -1,0 +1,64 @@
+<p-toast></p-toast>
+<div class="account-content">
+    <div class="login-wrapper bg-img">
+        <div class="login-content">
+            <div class="login-userset">
+                <div class="login-userset">
+                    <div class="login-logo logo-normal">
+                        <img src="assets/img/logo.png" alt="img">
+                    </div>
+                </div>
+                <a [routerLink]="routes.adminDashboard" class="login-logo logo-white">
+                    <img src="assets/img/logo-white.png" alt="">
+                </a>
+                <div class="login-userheading">
+                    <h3>Login With Your Email Address</h3>
+                    <h4 class="verfy-mail-content">We sent a verification code to your email. Enter the code from the
+                        email in the field below</h4>
+                </div>
+                <form [formGroup]="verifyOtpForm" (ngSubmit)="verifyOtp()" class="digit-group">
+
+                    <div class="wallet-add">
+
+                        <div class="otp-box">
+
+                            <div class="forms-block text-center">
+
+                                <input type="text" maxlength="1" #otp1 (input)="moveNext($event, otp2)">
+
+                                <input type="text" maxlength="1" #otp2 (input)="moveNext($event, otp3)">
+
+                                <input type="text" maxlength="1" #otp3 (input)="moveNext($event, otp4)">
+
+                                <input type="text" maxlength="1" #otp4 (input)="moveNext($event, otp5)">
+
+                                <input type="text" maxlength="1" #otp5 (input)="moveNext($event, otp6)">
+
+                                <input type="text" maxlength="1" #otp6 (input)="updateOtp()">
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <input type="hidden" formControlName="otp">
+
+                    <div class="Otp-expire text-center">
+                        <p>OTP will expire in 09:10</p>
+                    </div>
+
+                    <div class="form-login mt-4">
+                        <button type="submit" class="btn btn-login">
+                            Submit
+                        </button>
+                    </div>
+
+                </form>
+                <div class="my-4 d-flex justify-content-center align-items-center copyright-text">
+                    <p>Copyright &copy; 2023 DreamsPOS. All rights reserved</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

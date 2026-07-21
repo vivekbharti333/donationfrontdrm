@@ -323,4 +323,35 @@ export class UserManagementService {
     return  this.http.post<any>(Constant.Site_Url+"removeUserParmanent",request);
   }
 
+  sendOtp(otpDetails: any): Observable<UserDetailsRequest> {
+    let request: any = {
+      payload: {
+        mobileNo: otpDetails.mobileNo,
+        requestedFor: 'RESET_PASS',
+      }
+    };
+    return  this.http.post<any>(Constant.Site_Url+"sendOtp",request);
+  }
+  
+    verifyOtp(otpDetails: any): Observable<UserDetailsRequest> {
+    let request: any = {
+      payload: {
+        mobileNo: otpDetails.mobileNo,
+        otp: otpDetails.otp,
+        requestedFor: 'RESET_PASS',
+      }
+    };
+    return  this.http.post<any>(Constant.Site_Url+"verifyOtp",request);
+  }
+
+    changeUserPasswordDirect(userDetails: any): Observable<UserDetailsRequest> {
+    let request: any = {
+      payload: {
+        loginId: userDetails['loginId'],
+        password: userDetails['password']
+      }
+    };
+    return  this.http.post<any>(Constant.Site_Url+"changeUserPassword",request);
+  }
+
 }

@@ -22,6 +22,7 @@ import { SuccessComponent } from './successs/success/success.component';
 import { Success2Component } from './successs/success-2/success-2.component';
 import { Success3Component } from './successs/success-3/success-3.component';
 import { RegisterComponent } from './register/register/register.component';
+import { OtpVerificationComponent } from './otp-verification/otp-verification/otp-verification.component';
 
 const routes: Routes = [
   { path: '', redirectTo: 'signin', pathMatch: 'full' },
@@ -30,6 +31,10 @@ const routes: Routes = [
     path: '',
     component: AuthComponent,
     children: [
+      {
+        path: 'otp-verification',
+        component: OtpVerificationComponent,
+      },
       {
         path: 'email-verification',
         component: EmailVerificationComponent,

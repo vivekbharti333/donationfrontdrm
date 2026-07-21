@@ -26,6 +26,7 @@ import { Signin3Component } from './signin/signin-3/signin-3.component';
 import { ForgotPasswordComponent } from './forgot-password/forgot-password/forgot-password.component';
 import { ForgotPassword2Component } from './forgot-password/forgot-password-2/forgot-password-2.component';
 import { ForgotPassword3Component } from './forgot-password/forgot-password-3/forgot-password-3.component';
+import { OtpVerificationComponent } from './otp-verification/otp-verification/otp-verification.component';
 
 
 
@@ -53,7 +54,8 @@ import { ForgotPassword3Component } from './forgot-password/forgot-password-3/fo
     Signin3Component,
     ForgotPasswordComponent,
     ForgotPassword2Component,
-    ForgotPassword3Component
+    ForgotPassword3Component,
+    OtpVerificationComponent
   ],
   imports: [
     CommonModule,

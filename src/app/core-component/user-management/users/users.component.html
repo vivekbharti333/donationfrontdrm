@@ -148,15 +148,17 @@
             <td>{{ data.roleType }}</td>
             <td>{{ data.createdAt | date : "dd-MM-yyyy | HH:mm" }}</td>
             <td>
-              <button class="badge-button"
-                      [ngClass]="{
-                        'badge-linesuccess': data.status === 'ACTIVE',
-                        'badge-linedanger': data.status === 'INACTIVE'
-                      }"
-                      [disabled]="isSuperadmin"
-                      (click)="!isSuperadmin && changeUserStatus(data)">
+              <button
+                class="badge-button"
+                [ngClass]="{
+                  'badge-linesuccess': data.status === 'ACTIVE',
+                  'badge-linedanger': data.status === 'INACTIVE'
+                }"
+                [disabled]="!isSuperadmin"
+                (click)="changeUserStatus(data)">
                 {{ data.status }}
               </button>
+            
               <!-- <button class="badge-button"
                 [ngClass]="{'badge-linesuccess': data.status === 'ACTIVE','badge-linedanger': data.status === 'INACTIVE'}"
                 (click)="changeUserStatus(data)">
@@ -224,7 +226,7 @@
                   'btn-red': u.status === 'INACTIVE'
                 }"
                 [disabled]="!isSuperadmin"
-                (click)="isSuperadmin && changeUserStatus(u)">
+                (click)="changeUserStatus(u)">
           {{ u.status }}
         </button>
         <!-- <button class="status-btn"
@@ -253,8 +255,6 @@
   </div>
   }
 </div>
-
-
     <app-custom-pagination></app-custom-pagination>
   </div>
 </div>

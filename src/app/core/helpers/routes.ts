@@ -845,6 +845,9 @@ export class routes {
   public static get twoStepVerification(): string {
     return this.base + '/two-step-verification';
   }
+  public static get otpVerification(): string {
+    return this.base + '/otp-verification';
+  }
   public static get twoStepVerification2(): string {
     return this.base + '/two-step-verification-2';
   }
