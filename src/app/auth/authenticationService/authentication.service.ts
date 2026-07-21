@@ -71,6 +71,46 @@ export class AuthenticationService {
     return this.http.post<UserDetailsRequest>(Constant.Site_Url + "getApplicationHeaderDetailsBySuperadminId", request);
   }
 
+  // ================= RESET PASSWORD =================
+// ================= RESET PASSWORD FLOW =================
 
+setOtpSent(status: boolean): void {
+  sessionStorage.setItem('otpSent', String(status));
 }
 
+isOtpSent(): boolean {
+  return sessionStorage.getItem('otpSent') === 'true';
+}
+
+setOtpVerified(status: boolean): void {
+  sessionStorage.setItem('otpVerified', String(status));
+}
+
+isOtpVerified(): boolean {
+  return sessionStorage.getItem('otpVerified') === 'true';
+}
+
+setPasswordReset(status: boolean): void {
+  sessionStorage.setItem('passwordReset', String(status));
+}
+
+isPasswordReset(): boolean {
+  return sessionStorage.getItem('passwordReset') === 'true';
+}
+
+setResetMobileNo(mobileNo: string): void {
+  sessionStorage.setItem('resetMobileNo', mobileNo);
+}
+
+getResetMobileNo(): string | null {
+  return sessionStorage.getItem('resetMobileNo');
+}
+
+clearResetFlow(): void {
+  sessionStorage.removeItem('otpSent');
+  sessionStorage.removeItem('otpVerified');
+  sessionStorage.removeItem('passwordReset');
+  sessionStorage.removeItem('resetMobileNo');
+}
+
+}

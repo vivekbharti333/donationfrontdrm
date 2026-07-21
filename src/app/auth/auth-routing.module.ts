@@ -24,6 +24,10 @@ import { Success3Component } from './successs/success-3/success-3.component';
 import { RegisterComponent } from './register/register/register.component';
 import { OtpVerificationComponent } from './otp-verification/otp-verification/otp-verification.component';
 
+import { otpGuard } from '../core/guard/otp/otp.guard';
+import { resetPasswordGuard } from '../core/guard/reset-password/reset-password.guard';
+import { successGuard } from '../core/guard/success/success.guard';
+
 const routes: Routes = [
   { path: '', redirectTo: 'signin', pathMatch: 'full' },
 
@@ -34,6 +38,7 @@ const routes: Routes = [
       {
         path: 'otp-verification',
         component: OtpVerificationComponent,
+        canActivate: [otpGuard]
       },
       {
         path: 'email-verification',
@@ -58,6 +63,7 @@ const routes: Routes = [
       {
         path: 'reset-password',
         component: ResetPasswordComponent,
+        canActivate: [resetPasswordGuard]
       },
       {
         path: 'forgot-password',
@@ -114,6 +120,7 @@ const routes: Routes = [
       {
         path: 'success',
         component: SuccessComponent,
+         canActivate: [successGuard]
       },
       {
         path: 'success-2',

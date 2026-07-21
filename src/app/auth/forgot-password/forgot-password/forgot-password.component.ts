@@ -4,6 +4,7 @@ import { routes } from 'src/app/core/helpers/routes';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { UserManagementService } from 'src/app/core-component/user-management/user-management.service';
 import { MessageService } from 'primeng/api';
+  import { AuthenticationService } from '../../authenticationService/authentication.service';
 
 @Component({
   selector: 'app-forgot-password',
@@ -20,6 +21,7 @@ export class ForgotPasswordComponent {
     private router: Router,
     private userManagementService: UserManagementService,
     private messageService: MessageService,
+    private authenticationService: AuthenticationService
   ) { }
 
 
@@ -46,6 +48,10 @@ export class ForgotPasswordComponent {
         next: (response: any) => {
           if (response['responseCode'] === 200) {
             if (response['payload']['respCode'] === 200) {
+
+              this.authenticationService.setResetMobileNo(this.sendOtpForm.value.mobileNo);
+              this.authenticationService.setOtpSent(true);
+
 
               this.router.navigate([routes.otpVerification], {
                 state: {

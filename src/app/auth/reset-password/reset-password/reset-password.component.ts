@@ -13,6 +13,7 @@ import { MessageService } from 'primeng/api';
 import { routes } from 'src/app/core/helpers/routes';
 import { UserManagementService } from
   'src/app/core-component/user-management/user-management.service';
+  import { AuthenticationService } from '../../authenticationService/authentication.service';
 
 @Component({
   selector: 'app-reset-password',
@@ -33,7 +34,8 @@ export class ResetPasswordComponent implements OnInit {
     private fb: FormBuilder,
     private router: Router,
     private userManagementService: UserManagementService,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private authenticationService: AuthenticationService
   ) {}
 
   ngOnInit(): void {
@@ -136,6 +138,11 @@ export class ResetPasswordComponent implements OnInit {
             response?.responseCode === 200 &&
             response?.payload?.respCode === 200
           ) {
+
+            this.authenticationService.setPasswordReset(true);
+
+            this.router.navigate([routes.success]);
+
             this.messageService.add({
               severity: 'success',
               summary: 'Success',
