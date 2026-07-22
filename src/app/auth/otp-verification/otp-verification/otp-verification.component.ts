@@ -20,7 +20,7 @@ export class OtpVerificationComponent implements OnInit, OnDestroy {
   public verifyOtpForm!: FormGroup;
 
   displayTime: string = '02:00';
-  public totalSeconds = 2; // 2 minutes
+  public totalSeconds = 120; // 2 minutes
   private timer: any;
 // isOtpExpired = false;
 
@@ -86,7 +86,12 @@ updateOtp() {
 
               this.authenticationService.setOtpVerified(true);
 
-              this.router.navigate([routes.resetPassword]);
+              this.router.navigate([routes.resetPassword], {
+                state: {
+                  mobileNo: this.verifyOtpForm.value.mobileNo
+                }
+              });
+
               console.log("Enter 1 : "+response.payload.respCode+ " , "+ response.payload.respMesg);
               console.log("Enter 2 : "+response['payload']['respMesg']+" , "+response['payload']['respMesg'])
 
