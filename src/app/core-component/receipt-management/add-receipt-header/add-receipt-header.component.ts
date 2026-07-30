@@ -53,7 +53,7 @@ export class AddReceiptHeaderComponent {
     this.createForms();
     this.getSuperadminList();
     this.editor = new Editor();
-    // this.getInvoiceHeaderList();
+    this.getInvoiceHeaderList('2','');
   }
 
    editor!: Editor;

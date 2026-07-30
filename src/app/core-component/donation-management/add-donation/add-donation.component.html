@@ -10,9 +10,9 @@
                     </h6>
                 </div>
                 <div class="row">
-                    <div class="col-lg-4 col-md-4">
+                    <div class="col-lg-4 col-md-4" *ngIf="showReceiptTypeBox">
                         <div class="mb-3">
-                            <label for="receiptType" class="form-label">Receipt Type</label>
+                            <label for="receiptType" class="form-label">Receipt Type <span class="text-danger">*</span></label>
                             <mat-select class="space-select select" formControlName="invoiceHeaderDetailsId"  placeholder="Select Receipt" (change)="onProgramSelect($event)">
                                 <mat-option *ngFor="let invoiceType of invoiceTypeList" [value]="invoiceType.id">
                                     {{ invoiceType.companyFirstName + ' ' + invoiceType.companyLastName }}
@@ -22,16 +22,24 @@
                     </div>
 
                     <div class="col-lg-4 col-md-4">
-                        <div class="mb-3"> <label for="donorName" class="form-label">Donor Name</label>
+                        <div class="mb-3"> <label for="donorName" class="form-label">Donor Name <span class="text-danger">*</span></label>
                             <input id="donorName" class="form-control" type="text" pInputText
                                 formControlName="donorName" maxlength="100" placeholder="Enter donor name" />
+                            <small class="text-danger"
+                                *ngIf="addDonationForm.get('donorName')?.touched && addDonationForm.get('donorName')?.invalid">
+                                Enter a valid donor name (minimum 3 characters).
+                            </small>
                         </div>
                     </div>
                     <div class="col-lg-4 col-md-4">
                         <div class="mb-3">
-                            <label class="form-label">Mobile Number</label>
+                            <label class="form-label">Mobile Number <span class="text-danger">*</span></label>
                             <input class="form-control" type="number" pInputText formControlName="mobileNumber"
                                 maxlength="100">
+                            <small class="text-danger"
+                                *ngIf="addDonationForm.get('mobileNumber')?.touched && addDonationForm.get('mobileNumber')?.invalid">
+                                Enter a valid 10-digit mobile number.
+                            </small>
                         </div>
                     </div>
                 </div>
@@ -63,13 +71,17 @@
                 <div class="row">
                     <div class="col-lg-4 col-md-4">
                         <div class="mb-3">
-                            <label class="form-label">Program</label>
+                            <label class="form-label">Program <span class="text-danger">*</span></label>
                             <mat-select class="space-select select" formControlName="programName" placeholder="Select Program"
                                 (selectionChange)="getAmountValueByIds($event.value, '')">
                                 <mat-option *ngFor="let donationOpt of donationTypeList" [value]="donationOpt.programName">
                                     {{ donationOpt.programName }}
                                 </mat-option>
                             </mat-select>
+                            <small class="text-danger"
+                                *ngIf="addDonationForm.get('programName')?.touched && addDonationForm.get('programName')?.invalid">
+                                Please select a program.
+                            </small>
 
                         </div>
                     </div>
@@ -88,16 +100,24 @@
                     </div>
                     <div class="col-lg-2 col-md-2" *ngIf="showCurrencyBox">
                         <div class="mb-2" *ngIf="showCurrencyBox">
-                            <label class="form-label">Amount</label>
-                            <input class="form-control" type="number" pInputText pKeyFilter="int"
-                                formControlName="amount" max="99999">
+                            <label class="form-label">Amount <span class="text-danger">*</span></label>
+                            <input class="form-control" type="text" inputmode="numeric" pInputText
+                                pKeyFilter="int" formControlName="amount" maxlength="8">
+                            <small class="text-danger"
+                                *ngIf="addDonationForm.get('amount')?.touched && addDonationForm.get('amount')?.invalid">
+                                Enter a whole-number amount of no more than 8 digits.
+                            </small>
                         </div>
                     </div>
                     <div class="col-lg-4 col-md-4" *ngIf="!showCurrencyBox">
                         <div class="mb-3" *ngIf="!showCurrencyBox">
-                            <label class="form-label">Amount</label>
-                            <input class="form-control" type="number" pInputText pKeyFilter="int"
-                                formControlName="amount" maxlength="5">
+                            <label class="form-label">Amount <span class="text-danger">*</span></label>
+                            <input class="form-control" type="text" inputmode="numeric" pInputText
+                                pKeyFilter="int" formControlName="amount" maxlength="8">
+                            <small class="text-danger"
+                                *ngIf="addDonationForm.get('amount')?.touched && addDonationForm.get('amount')?.invalid">
+                                Enter a whole-number amount of no more than 8 digits.
+                            </small>
                         </div>
                     </div>
                     
@@ -113,13 +133,21 @@
                 <div class="row">
                     <div class="col-lg-4 col-md-4">
                         <div class="mb-3">
-                            <label class="form-label">Payment Mode</label>
+                            <label class="form-label">Payment Mode <span class="text-danger">*</span></label>
                             
                             <mat-select class="space-select select" formControlName="paymentMode"  placeholder="Payment Mode" >
                                 <mat-option *ngFor="let payModOpt of paymentModeList" [value]="payModOpt.paymentMode">
                                     {{payModOpt.paymentMode}}
                                 </mat-option>
                               </mat-select>
+                            <small class="text-danger"
+                                *ngIf="addDonationForm.get('invoiceHeaderDetailsId')?.touched && addDonationForm.get('invoiceHeaderDetailsId')?.invalid">
+                                Please select a receipt type.
+                            </small>
+                            <small class="text-danger"
+                                *ngIf="addDonationForm.get('paymentMode')?.touched && addDonationForm.get('paymentMode')?.invalid">
+                                Please select a payment mode.
+                            </small>
                         </div>
                     </div>
                     <div class="col-lg-4 col-md-4" *ngIf="showFundrisingOfficerList">

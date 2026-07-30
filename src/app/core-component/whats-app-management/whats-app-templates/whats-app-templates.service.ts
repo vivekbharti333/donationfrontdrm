@@ -1,9 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { HttpClient, HttpResponse } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Constant } from 'src/app/core/constant/constants'; 
 import { AuthenticationService } from 'src/app/auth/authentication.service';
-import { CookieService } from 'ngx-cookie-service';
 
 @Injectable({
   providedIn: 'root'
@@ -15,8 +14,7 @@ export class WhatsAppTemplatesService {
 
   constructor(
     private http: HttpClient,
-    private authenticationService: AuthenticationService,
-    private cookieService: CookieService
+    private authenticationService: AuthenticationService
   ) {
     this.loginUser = this.authenticationService.getLoginUser();
   }
@@ -44,4 +42,12 @@ export class WhatsAppTemplatesService {
       };
       return this.http.post<any>(Constant.Site_Url + "deleteWhatsAppTemplateByName", request);
     }
+
+  public updateWhatsAppTemplate(payload: any): Observable<any> {
+    const request = { payload };
+    return this.http.post<any>(
+      Constant.Site_Url + 'updateWhatsAppTemplate',
+      request
+    );
+  }
 }

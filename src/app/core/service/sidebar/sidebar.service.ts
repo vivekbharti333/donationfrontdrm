@@ -51,8 +51,34 @@ export class SidebarService {
   }
 
   private getPermissions(): string[] {
-    const permissions = localStorage.getItem('menuPermission');
-    return permissions ? JSON.parse(permissions) : [];
+    const storedPermissions = localStorage.getItem('menuPermission');
+    if (!storedPermissions) {
+      return [];
+    }
+
+    try {
+      const permissions = JSON.parse(storedPermissions);
+
+      if (Array.isArray(permissions)) {
+        return permissions.filter((permission): permission is string =>
+          typeof permission === 'string'
+        );
+      }
+
+      // Supports sessions created before permissions were stored as an array.
+      if (typeof permissions === 'string') {
+        const parsed = JSON.parse(permissions.replace(/'/g, '"'));
+        return Array.isArray(parsed)
+          ? parsed.filter((permission): permission is string =>
+              typeof permission === 'string'
+            )
+          : [];
+      }
+    } catch {
+      return [];
+    }
+
+    return [];
   }
 
   public getFilteredSidebarData() {

@@ -45,9 +45,9 @@ export class GenerateInvoiceService {
 
         // ===== CUSTOMER DETAILS =====
         customerName: invoiceDetails.customerName,
-        customerEmail: invoiceDetails.email,
-        customerPhone: invoiceDetails.phone,
-        customerGstNumber: invoiceDetails.gstNumber,
+        customerEmail: invoiceDetails.customerEmail,
+        customerPhone: invoiceDetails.customerPhone,
+        customerGstNumber: invoiceDetails.customerGstNumber,
         billingAddress: invoiceDetails.billingAddress,
         deliveryAddresses: invoiceDetails.deliveryAddresses,
 
@@ -96,6 +96,14 @@ export class GenerateInvoiceService {
     return this.http.post<any>(Constant.Site_Url + 'generateInvoice', request);
   }
 
+  getInvoiceDownloadUrl(invoiceNumber: string): string {
+    const params = new URLSearchParams({
+      invoiceNumber,
+      superadminId: String(this.loginUser['superadminId'])
+    });
+
+    return `${Constant.Site_Url}download/invoice?${params.toString()}`;
+  }
 
   getCustomerDetails(): Observable<any> {
     const request: any = {

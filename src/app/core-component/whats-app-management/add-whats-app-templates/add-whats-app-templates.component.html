@@ -1,19 +1,31 @@
-<form *ngIf="addTemplateForm" [formGroup]="addTemplateForm">
+<form *ngIf="addTemplateForm" [formGroup]="addTemplateForm" class="template-page">
 
   <div class="template-container">
 
     <!-- LEFT FORM -->
     <div class="template-form">
+      <div class="section-heading">
+        <span class="section-icon">1</span>
+        <div>
+          <h3>Template details</h3>
+          <p>Choose a name and language for your template.</p>
+        </div>
+      </div>
 
       <!-- BASIC -->
       <div class="form-row">
         <div class="field">
-          <label>Name your template</label>
-          <input formControlName="templateName" />
+          <label>Template name</label>
+          <input formControlName="templateName" placeholder="example_template_name" />
+          <small>Use lowercase letters, numbers and underscores.</small>
+          <span class="validation-error"
+                *ngIf="addTemplateForm.get('templateName')?.touched && addTemplateForm.get('templateName')?.invalid">
+            Enter a valid template name.
+          </span>
         </div>
 
         <div class="field small">
-          <label>Select language</label>
+          <label>Language</label>
           <select formControlName="language">
             <option value="en">English</option>
             <option value="en_IN">English (IND)</option>
@@ -23,13 +35,22 @@
         </div>
       </div>
 
+      <div class="section-heading section-divider">
+        <span class="section-icon">2</span>
+        <div>
+          <h3>Message content</h3>
+          <p>Compose the message customers will receive.</p>
+        </div>
+      </div>
+
       <!-- VARIABLE TYPE + MEDIA -->
       <div class="form-row">
 
         <!-- VARIABLE TYPE -->
         <div class="field">
-          <label>Type of variable</label>
-          <mat-select formControlName="variableType">
+          <label>Variable format</label>
+          <mat-select formControlName="variableType"
+                      (selectionChange)="changeVariableType($event.value)">
             <mat-option value="Name">Name</mat-option>
             <mat-option value="Number">Number</mat-option>
           </mat-select>
@@ -37,7 +58,7 @@
 
         <!-- MEDIA -->
         <div class="field">
-          <label>Media sample</label>
+          <label>Header media</label>
           <mat-select formControlName="mediaType"
                       (selectionChange)="selectMediaType($event.value)">
 
@@ -79,6 +100,8 @@
 
         </div>
 
+        <span class="validation-error" *ngIf="fileError">{{ fileError }}</span>
+
         <!-- PREVIEW -->
         <div class="preview" *ngIf="filePreview">
 
@@ -101,38 +124,90 @@
       </div>
 
       <!-- HEADER -->
-      <div class="field">
-        <label>Header</label>
-        <input formControlName="headerText" />
+      <div class="field" *ngIf="addTemplateForm.get('mediaType')?.value === 'None'">
+        <label>Header <span class="optional">Optional</span></label>
+        <div class="header-input-wrap">
+          <input formControlName="headerText"
+                 maxlength="60"
+                 (input)="detectHeaderVariables()"
+                 placeholder="Add a short line of text to the header" />
+          <span class="inline-counter">{{ addTemplateForm.get('headerText')?.value?.length || 0 }}/60</span>
+        </div>
+        <div class="header-tools">
+          <button type="button"
+                  class="header-variable-button"
+                  [disabled]="headerVariablesArray.length > 0"
+                  (click)="addHeaderVariable()">
+            <span>+</span> Add variable
+          </button>
+        </div>
+
+        <div formArrayName="headerVariable"
+             class="header-variable-sample"
+             *ngIf="headerVariablesArray.length">
+          <div [formGroupName]="0">
+            <span class="var-key">{{ headerVariablesArray.at(0).value.key }}</span>
+            <input formControlName="value" placeholder="Header example value" />
+            <button type="button"
+                    class="remove-variable"
+                    (click)="removeHeaderVariable()"
+                    aria-label="Remove header variable"
+                    title="Remove variable">&times;</button>
+          </div>
+        </div>
       </div>
 
       <!-- BODY -->
       <div class="field">
         <label>Body</label>
 
-        <div class="body-container">
-          <textarea formControlName="msgBodyText"
+        <div class="body-container" [class.invalid-body]="bodyVariablePositionInvalid">
+          <textarea #bodyTextarea
+                    formControlName="msgBodyText"
                     (input)="detectVariables()"
                     maxlength="1024"
+                    placeholder="Write your WhatsApp message here..."
                     rows="8">
           </textarea>
 
           <div class="toolbar">
-            <span>😊</span>
-            <span><b>B</b></span>
-            <span><i>I</i></span>
-
+            <div class="format-actions" aria-label="Text formatting">
+              <button type="button"
+                      class="format-button bold-format"
+                      title="Bold"
+                      aria-label="Make selected text bold"
+                      (click)="formatBodyText('*')">B</button>
+              <button type="button"
+                      class="format-button italic-format"
+                      title="Italic"
+                      aria-label="Make selected text italic"
+                      (click)="formatBodyText('_')">I</button>
+              <button type="button"
+                      class="format-button strike-format"
+                      title="Strikethrough"
+                      aria-label="Strike through selected text"
+                      (click)="formatBodyText('~')">S</button>
+            </div>
             <span class="add-variable" (click)="addVariable()">
               + Add variable
             </span>
+            <span class="body-count">{{ addTemplateForm.get('msgBodyText')?.value?.length || 0 }}/1024</span>
           </div>
         </div>
+        <span class="body-rule-error" *ngIf="bodyVariablePositionInvalid">
+          Variables can't be at the start or end of the message body. Add text before and after the variable.
+        </span>
+        <span class="validation-error"
+              *ngIf="addTemplateForm.get('msgBodyText')?.touched && addTemplateForm.get('msgBodyText')?.invalid">
+          Message body is required.
+        </span>
       </div>
 
       <!-- FOOTER -->
       <div class="field">
-        <label>Footer</label>
-        <input formControlName="footerText" />
+        <label>Footer <span class="optional">Optional</span></label>
+        <input formControlName="footerText" maxlength="60" placeholder="Add a short footer" />
+        <small class="counter">{{ addTemplateForm.get('footerText')?.value?.length || 0 }}/60</small>
       </div>
 
 
@@ -143,7 +218,13 @@
            class="variable-section"
            *ngIf="variablesArray?.length">
 
-        <h4>Variable samples</h4>
+        <div class="variable-heading">
+          <div>
+            <h4>Variable samples</h4>
+            <p>Enter realistic examples for each placeholder.</p>
+          </div>
+          <span>{{ variablesArray.length }}</span>
+        </div>
 
         <div class="var-row"
              *ngFor="let v of variablesArray.controls; let i = index"
@@ -153,7 +234,14 @@
             {{ v.value.key }}
           </div>
 
-          <input formControlName="value" placeholder="Enter value" />
+          <input formControlName="value" placeholder="Example value" />
+          <button type="button"
+                  class="remove-variable"
+                  (click)="removeVariable(i)"
+                  [attr.aria-label]="'Remove variable ' + v.value.key"
+                  title="Remove variable">
+            &times;
+          </button>
         </div>
 
       </div>
@@ -163,9 +251,21 @@
     <!-- RIGHT PREVIEW -->
     <div class="template-preview">
 
-      <h3>Template preview</h3>
+      <div class="preview-heading">
+        <div>
+          <h3>Template preview</h3>
+        </div>
+        <span class="whatsapp-badge">WhatsApp</span>
+      </div>
 
       <div class="phone">
+        <div class="phone-header">
+          <span class="business-avatar">B</span>
+          <div>
+            <strong>Your business</strong>
+            <small>Business account</small>
+          </div>
+        </div>
         <div class="chat-bubble">
 
              <!-- MEDIA PREVIEW (NEW) -->
@@ -192,9 +292,7 @@
           </div>
 
           <!-- BODY -->
-          <div class="body">
-            {{ getPreviewText() || 'Your message preview...' }}
-          </div>
+          <div class="body" [innerHTML]="getPreviewHtml()"></div>
 
           <!-- FOOTER -->
           <div class="footer"
@@ -202,7 +300,7 @@
             {{ footer }}
           </div>
 
-          <div class="time">11:22</div>
+          <div class="time">11:22 <span>✓✓</span></div>
 
         </div>
       </div>
@@ -214,8 +312,10 @@
 </form>
 
 <!-- ACTIONS -->
-<div style="margin-top: 15px;">
-  <button mat-button color="primary" (click)="submitTemplate()">
-    Submit
+<div class="template-actions">
+  <span class="form-error" *ngIf="formError">{{ formError }}</span>
+  <a class="cancel-button" [routerLink]="['../whats-app-templates']">Cancel</a>
+  <button type="button" class="submit-button" [disabled]="isSaving" (click)="submitTemplate()">
+    {{ isSaving ? 'Submitting...' : 'Create template' }}
   </button>
 </div>

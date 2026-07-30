@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
 import { MessageService } from 'primeng/api';
 import { GenerateInvoiceService } from './generate-invoice.service';
-import { ToastModule } from 'primeng/toast';
+import { finalize } from 'rxjs/operators';
 
 
 export interface Customer {
@@ -44,6 +44,7 @@ export class GenerateInvoiceComponent implements OnInit {
   customerList: any;
   invoiceHeaderList: any;
   productList: Product[] = [];
+  isSubmitting = false;
 
   constructor(
     private fb: FormBuilder,
@@ -67,7 +68,7 @@ export class GenerateInvoiceComponent implements OnInit {
     this.invoiceForm = this.fb.group({
 
       // ===== COMPANY =====
-      companyId: [''],
+      companyId: ['', Validators.required],
       companyLogo: [''],
       companyName: [''],
       officeAddress: [''],
@@ -79,6 +80,7 @@ export class GenerateInvoiceComponent implements OnInit {
       panNumber: [''],
 
       // ===== CUSTOMER =====
+      customerId: ['', Validators.required],
       customerName: ['', Validators.required],
       customerEmail: [''],
       customerPhone: [''],
@@ -114,8 +116,8 @@ export class GenerateInvoiceComponent implements OnInit {
       this.fb.group({
         productName: ['', Validators.required],
         description: [''],
-        rate: [0, Validators.required],
-        quantity: [1, Validators.required],
+        rate: [0, [Validators.required, Validators.min(0)]],
+        quantity: [1, [Validators.required, Validators.min(1)]],
         taxType: [''],
 
         // 🔹 ADD THESE
@@ -135,6 +137,10 @@ export class GenerateInvoiceComponent implements OnInit {
 
 
   removeItem(index: number): void {
+    if (this.items.length <= 1) {
+      return;
+    }
+
     this.items.removeAt(index);
     this.calculateTotals();
   }
@@ -284,13 +290,10 @@ calculateTotals(): void {
 
     rowGroup.patchValue({
       description: product?.description ?? '',
-      rate: product?.rate ?? ''
+      rate: product?.rate ?? 0
     });
 
-    console.log(
-      'Row description:',
-      rowGroup.get('description')?.value
-    );
+    this.calculateTotals();
   }
 
   onCompanyChange(event: Event) {
@@ -344,8 +347,8 @@ calculateTotals(): void {
 
     this.invoiceForm.patchValue({
       customerName: customer.customerName,
-      email: customer.email,
-      phone: customer.phone,
+      customerEmail: customer.email,
+      customerPhone: customer.phone,
       customerGstNumber: customer.gstNumber,
       billingAddress: customer.billingAddress
     });
@@ -359,34 +362,32 @@ calculateTotals(): void {
 
     if (this.invoiceForm.invalid) {
       this.invoiceForm.markAllAsTouched();
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Incomplete invoice',
+        detail: 'Please select a company and customer, and complete all required item details.'
+      });
       return;
     }
 
     const payload = this.invoiceForm.getRawValue();
-    console.log(this.invoiceForm.getRawValue().value)
+    this.isSubmitting = true;
     this.invoiceService.saveInvoiceDetails(payload)
+      .pipe(finalize(() => this.isSubmitting = false))
       .subscribe({
         next: (response: any) => {
 
           console.log('API RESPONSE:', response);
 
           // ===== API LEVEL SUCCESS =====
-          if (response?.responseCode === '200') {
+          if (String(response?.responseCode) === '200') {
 
             const respPayload = response.payload;
 
             // ===== BUSINESS SUCCESS =====
-            if (respPayload?.respCode === '200') {
-              // const pdfUrl = 'https://datfuslab.in/drmapinew//download/invoice?invoiceNumber=DFLT-0303/26/001&superadminId=8800689752';
-              // const pdfUrl = `http://localhost/mycrm//download/invoice?invoiceNumber='+this.invoiceForm['invoiceNumber']+'&superadminId=8800689752`;
-              // window.open(pdfUrl, '_blank');
-
+            if (String(respPayload?.respCode) === '200') {
               const { invoiceNumber } = this.invoiceForm.getRawValue();
-
-              const url = `http://localhost/mycrm/download/invoice?invoiceNumber=${encodeURIComponent(invoiceNumber)}&superadminId=8800689752`;
-              window.open(url, '_blank');
-
-              console.log(url)
+              window.open(this.invoiceService.getInvoiceDownloadUrl(invoiceNumber), '_blank');
 
                this.messageService.add({ severity: 'success', summary: 'Success', detail: response['payload']['respMesg'] });
               // this.messageService.add({

@@ -46,7 +46,7 @@ export class SigninComponent {
               this.getApplicaionHeaderDetails(response['payload']['superadminId']);
 
               localStorage.setItem('authorized', 'true');
-              let permission = response['payload']['permissions'];
+              const permission = this.parsePermissions(response['payload']['permissions']);
               localStorage.setItem('menuPermission', JSON.stringify(permission));
               localStorage.setItem('userPicture', (response['payload']['userPicture']));
 
@@ -96,6 +96,29 @@ export class SigninComponent {
           styleClass: 'danger-background-popover',
         }),
       });
+  }
+
+  private parsePermissions(permissions: unknown): string[] {
+    if (Array.isArray(permissions)) {
+      return permissions.filter((permission): permission is string =>
+        typeof permission === 'string'
+      );
+    }
+
+    if (typeof permissions !== 'string') {
+      return [];
+    }
+
+    try {
+      const parsed = JSON.parse(permissions.replace(/'/g, '"'));
+      return Array.isArray(parsed)
+        ? parsed.filter((permission): permission is string =>
+            typeof permission === 'string'
+          )
+        : [];
+    } catch {
+      return [];
+    }
   }
 
   public getApplicaionHeaderDetails(superadminId: any) {

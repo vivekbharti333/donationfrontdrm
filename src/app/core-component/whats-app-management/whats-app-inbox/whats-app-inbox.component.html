@@ -1,171 +1,125 @@
-<div class="whatsapp-container">
+<div class="inbox-shell">
+    <aside class="conversation-panel">
+        <header class="panel-header">
+            <div>
+                <span class="eyebrow">WhatsApp Management</span>
+                <h1>Inbox</h1>
+            </div>
+            <span class="conversation-count">{{contactList.length}}</span>
+        </header>
 
-    <!-- LEFT CONTACT LIST -->
-    <div class="chat-list-section">
-
-        <div class="top-header">
-            Chats
+        <div class="search-box">
+            <span class="search-icon">&#128269;</span>
+            <input type="search"
+                   [(ngModel)]="searchTerm"
+                   placeholder="Search conversations"
+                   aria-label="Search conversations">
         </div>
 
         <div class="chat-list">
-
-            <div class="chat-user"
-                 *ngFor="let contact of contactList"
-                 [class.active-user]="selectedWaId == contact.waId"
-                 (click)="selectChat(contact)">
-
-                <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png"
-                     class="user-img">
-
-                <div class="user-details">
-
-                    <div class="user-top">
-
-                        <span class="user-name">
-                            {{contact.userName}}
-                        </span>
-
-                        <span class="chat-time">
-                            {{getMessageTime(contact.lastTime)}}
-                        </span>
-
-                    </div>
-
-                    <div class="last-message">
-                        {{contact.lastMessage}}
-                    </div>
-
-                    <div class="wa-id">
-                        {{contact.waId}}
-                    </div>
-
-                </div>
-
+            <div class="state-card" *ngIf="isLoading">
+                <span class="spinner"></span>
+                Loading conversations…
             </div>
 
-        </div>
-
-    </div>
-
-    <!-- RIGHT CHAT SECTION -->
-    <div class="chat-section">
-
-        <!-- HEADER -->
-        <div class="chat-header">
-
-            <div class="chat-user-info">
-
-                <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png"
-                     class="header-user-img">
-
-                <div>
-
-                    <div class="header-name">
-                        {{selectedUserName}}
-                    </div>
-
-                    <div class="header-status">
-                        {{selectedWaId}}
-                    </div>
-
-                </div>
-
+            <div class="state-card error-state" *ngIf="!isLoading && loadError">
+                <span>{{loadError}}</span>
+                <button type="button" (click)="getMessages()">Try again</button>
             </div>
 
-        </div>
-
-        <!-- CHAT BODY -->
-        <div class="chat-body">
-
-            <div *ngFor="let msg of selectedMessages">
-
-                <!-- INCOMING -->
-                <div class="message-row incoming"
-                     *ngIf="msg.direction == 'INCOMING'">
-
-                    <div class="message incoming-message">
-
-                        <div class="message-text">
-
-                            <span *ngIf="msg.messageType == 'text'">
-                                {{msg.messageText}}
-                            </span>
-
-                            <span *ngIf="msg.messageType != 'text'">
-                                Unsupported Message
-                            </span>
-
-                        </div>
-
-                        <div class="message-footer">
-
-                            <span class="message-time">
-                                {{getMessageTime(msg.messageTimestamp)}}
-                            </span>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-                <!-- OUTGOING -->
-                <div class="message-row outgoing"
-                     *ngIf="msg.direction == 'OUTGOING'">
-
-                    <div class="message outgoing-message">
-
-                        <div class="message-text">
-
-                            <span *ngIf="msg.messageType == 'text'">
-                                {{msg.messageText}}
-                            </span>
-
-                            <span *ngIf="msg.messageType != 'text'">
-                                Unsupported Message
-                            </span>
-
-                        </div>
-
-                        <div class="message-footer">
-
-                            <span class="message-time">
-                                {{getMessageTime(msg.messageTimestamp)}}
-                            </span>
-
-                            <span class="double-tick">
-                                ✔✔
-                            </span>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
+            <div class="state-card" *ngIf="!isLoading && !loadError && filteredContacts.length === 0">
+                {{searchTerm ? 'No matching conversations' : 'No conversations yet'}}
             </div>
 
-        </div>
+            <button type="button"
+                    class="chat-user"
+                    *ngFor="let contact of filteredContacts"
+                    [class.active-user]="selectedWaId === contact.waId"
+                    (click)="selectChat(contact)">
+                <span class="avatar">{{getInitials(contact.userName, contact.waId)}}</span>
 
-        <!-- MESSAGE BOX -->
-        <div class="message-box">
-
-            <button class="icon-btn">
-                😊
+                <span class="user-details">
+                    <span class="user-top">
+                        <span class="user-name">{{contact.userName}}</span>
+                        <span class="chat-time">{{getContactTime(contact.lastTime)}}</span>
+                    </span>
+                    <span class="last-message">{{contact.lastMessage}}</span>
+                    <span class="wa-id">+{{contact.waId}}</span>
+                </span>
             </button>
-
-            <input type="text"
-                   [(ngModel)]="newMessage"
-                   (keyup.enter)="sendMessage()"
-                   placeholder="Type a message">
-
-            <button class="send-btn"
-                    (click)="sendMessage()">
-                ➤
-            </button>
-
         </div>
+    </aside>
 
-    </div>
+    <main class="chat-section">
+        <ng-container *ngIf="selectedWaId; else noConversation">
+            <header class="chat-header">
+                <div class="chat-user-info">
+                    <span class="avatar header-avatar">{{getInitials(selectedUserName, selectedWaId)}}</span>
+                    <div>
+                        <div class="header-name">{{selectedUserName}}</div>
+                        <div class="header-status">+{{selectedWaId}}</div>
+                    </div>
+                </div>
+                <span class="secure-label">&#128274; Secure conversation</span>
+            </header>
 
+            <div class="chat-body">
+                <div class="encryption-note">Messages are protected by WhatsApp</div>
+
+                <ng-container *ngFor="let msg of selectedMessages">
+                    <div class="message-row"
+                         [class.incoming]="msg.direction === 'INCOMING'"
+                         [class.outgoing]="msg.direction === 'OUTGOING'">
+                        <div class="message"
+                             [class.incoming-message]="msg.direction === 'INCOMING'"
+                             [class.outgoing-message]="msg.direction === 'OUTGOING'">
+                            <div class="message-text">
+                                <span *ngIf="msg.messageType === 'text'">{{msg.messageText}}</span>
+                                <span class="unsupported" *ngIf="msg.messageType !== 'text'">
+                                    &#128206; Unsupported message type
+                                </span>
+                            </div>
+
+                            <div class="message-footer">
+                                <span class="message-time">{{getMessageTime(msg.sortTimestamp)}}</span>
+                                <span *ngIf="msg.direction === 'OUTGOING'"
+                                      class="message-status"
+                                      [ngClass]="getStatusClass(msg.status)"
+                                      [title]="msg.status || 'Pending'">
+                                    {{getStatusLabel(msg.status)}}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </ng-container>
+            </div>
+
+            <div class="send-error" *ngIf="sendError">{{sendError}}</div>
+
+            <footer class="composer">
+                <input type="text"
+                       [(ngModel)]="newMessage"
+                       (keyup.enter)="sendMessage()"
+                       [disabled]="isSending"
+                       placeholder="Type a message"
+                       aria-label="Message">
+                <button type="button"
+                        class="send-btn"
+                        [disabled]="isSending || !newMessage.trim()"
+                        (click)="sendMessage()"
+                        aria-label="Send message">
+                    <span *ngIf="!isSending">&#10148;</span>
+                    <span class="button-spinner" *ngIf="isSending"></span>
+                </button>
+            </footer>
+        </ng-container>
+
+        <ng-template #noConversation>
+            <div class="welcome-state">
+                <div class="welcome-icon">&#128172;</div>
+                <h2>WhatsApp Inbox</h2>
+                <p>Select a conversation to read and reply to messages.</p>
+            </div>
+        </ng-template>
+    </main>
 </div>

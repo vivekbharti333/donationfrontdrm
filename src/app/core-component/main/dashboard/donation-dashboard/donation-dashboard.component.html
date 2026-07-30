@@ -49,7 +49,7 @@
                 <div>
                     <p class="summary-title">Today Donations</p>
                     <h3 class="counters" data-count="todaysCount" [countUp]="todaysCount" [options]="{ duration: 10 }">{{todaysCount}}</h3>
-                    <span class="growth up">₹{{todaysAmount}}</span>
+                    <span class="growth up">&#8377;{{ todaysAmount | number:'1.2-2' }}</span>
                 </div>
             </div>
             <div class="mini-line orange-line"></div>
@@ -63,7 +63,7 @@
                 <div>
                     <p class="summary-title">Yesterday Donations</p>
                     <h3 class="counters" data-count="yesterdayCount" [countUp]="yesterdayCount" [options]="{ duration: 10 }">{{yesterdayCount}}</h3>
-                    <span class="growth up">₹{{yesterdayAmount}}</span>
+                    <span class="growth up">&#8377;{{ yesterdayAmount | number:'1.2-2' }}</span>
                 </div>
             </div>
             <div class="mini-line green-line"></div>
@@ -77,7 +77,7 @@
                 <div>
                     <p class="summary-title">This Month Donations</p>
                     <h3 class="counters" data-count="monthCount" [countUp]="monthCount" [options]="{ duration: 10 }">{{monthCount}}</h3>
-                    <span class="growth up">₹{{monthAmount}}</span>
+                    <span class="growth up">&#8377;{{ monthAmount | number:'1.2-2' }}</span>
                 </div>
             </div>
             <div class="mini-line blue-line"></div>
@@ -95,7 +95,7 @@
                         <h3 class="counters" data-count="activeUserCount" [countUp]="activeUserCount" [options]="{ duration: 10 }">{{ activeUserCount }}</h3>
                         <span class="status-text">Active User</span>
                     </div>
-                    <span class="growth up">{{activeUserCount+activeUserCount}} Total User</span>
+                    <span class="growth up">{{ totalUserCount | number:'1.0-0' }} Total Users</span>
                     <!-- <span class="growth up">↑ 18% vs last month</span> -->
 
 

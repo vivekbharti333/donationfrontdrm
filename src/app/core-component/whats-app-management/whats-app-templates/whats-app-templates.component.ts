@@ -1,21 +1,10 @@
-import { Component, importProvidersFrom, TemplateRef, HostListener } from '@angular/core';
-import { FormGroup, FormArray, FormBuilder, Validators, AbstractControl, FormControl } from '@angular/forms';
+import { Component, HostListener, TemplateRef } from '@angular/core';
+import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { Sort } from '@angular/material/sort';
-import { MatTableDataSource } from '@angular/material/table';
-// import { MatDialogRef } from '@angular/material/dialog';
-import {
-  DataService,
-  pageSelection,
-  apiResultFormat,
-  SidebarService,
-} from 'src/app/core/core.index';
+import Swal from 'sweetalert2';
+import { SidebarService } from 'src/app/core/core.index';
 import { routes } from 'src/app/core/helpers/routes';
-import { PaginationService, tablePageSize } from 'src/app/shared/shared.index';
-import { Constant } from 'src/app/core/constant/constants';
-import { DonationDetails, DonationListForExcel } from '../../interface/donation-management';
-import { AuthenticationService } from 'src/app/auth/authentication.service';
-import { CustomPaginationComponent } from 'src/app/shared/custom-pagination/custom-pagination.component';
 import { WhatsAppTemplatesService } from './whats-app-templates.service';
 
 @Component({
@@ -24,406 +13,366 @@ import { WhatsAppTemplatesService } from './whats-app-templates.service';
   styleUrls: ['./whats-app-templates.component.scss']
 })
 export class WhatsAppTemplatesComponent {
-
+  public routes = routes;
   public editTemplateDialog: any;
   public editTemplateForm!: FormGroup;
-
-// get variablesArray(): FormArray {
-//   return this.editTemplateForm.get('msgBodyVariable') as FormArray;
-// }
-
-
-  /* ================= TEMPLATE ================= */
-
-
-  variables: string[] = [];
-  variableValues: Record<string, string> = {};
-
-  selectedVariableType: any;
-  showVarDropdown = false;
-
-  selectedMediaType: any;
-  showMediaDropdown = false;
-
-
-  selectedLead: any = null;
-  messages: any[] = [];
-  newMessage: string = '';
-
-  // pagination variables
-  public routes = routes;
-  public tableData: Array<any> = [];
-  public pageSize = 10;
-  public serialNumberArray: Array<number> = [];
-  public totalData = 0;
-  showFilter = false;
-  dataSource!: MatTableDataSource<any>;
-  public searchDataValue = '';
-  //** / pagination variables
-
-
-  public lastIndex = 0;
-  // public totalData = 0;
-  public skip = 0;
-  public limit: number = this.pageSize;
-  public pageIndex = 0;
-  // public serialNumberArray: Array<number> = [];
-  public currentPage = 1;
-  public pageNumberArray: Array<number> = [];
-  public pageSelection: Array<pageSelection> = [];
-  public totalPages = 0;
-
   public fullData: any[] = [];
-  public showCustomFilter: boolean = false;
+  public filteredData: any[] = [];
+  public tableData: any[] = [];
+  public searchDataValue = '';
+  public pageSize = 10;
+  public currentPage = 1;
+  public totalData = 0;
+  public isCollapsed = false;
+  public isLoading = false;
+  public isSaving = false;
+  public loadError = '';
+  public formError = '';
+  public showVarDropdown = false;
+  public showMediaDropdown = false;
+  private activeSort: Sort = { active: '', direction: '' };
 
-
-  /* ================= CHAT LOGIC ================= */
   constructor(
-    // private dialogRef: MatDialogRef<any>,
     private fb: FormBuilder,
     private sidebar: SidebarService,
-    private pagination: PaginationService,
     private dialog: MatDialog,
-    private whatsAppTemplatesService: WhatsAppTemplatesService,
+    private whatsAppTemplatesService: WhatsAppTemplatesService
+  ) {}
 
-  ) {
-
-  }
-
-  ngOnInit() {
+  ngOnInit(): void {
     this.getWhatsAppTemplate();
   }
 
- createForms() {
-  this.editTemplateForm = this.fb.group({
-    requestFor: [null],
-    templateId: [null],
-    templateName: [''],
-
-    parameterFormat: ['POSITIONAL'],
-
-    headerFormat: [null],
-    headerText: [''],
-
-    msgBodyText: [''],
-
-    // ✅ FIXED STRUCTURE
-    msgBodyVariable: this.fb.array([
-      this.createVariableGroup(1)
-    ]),
-
-    footerText: [''],
-
-    language: ['en'],
-    status: [null],
-    category: [null],
-    sub_category: [null],
-    toWhatsAppNumber: [null],
-
-    variableType: ['Name'],
-    mediaType: ['None']
-  });
-}
-
-get msgBodyVariableArray(): FormArray {
-  return this.editTemplateForm.get('msgBodyVariable') as FormArray;
-}
-
- // ✅ getter
   get variablesArray(): FormArray {
     return this.editTemplateForm.get('msgBodyVariable') as FormArray;
   }
 
-  // ✅ helper
-  createVariableGroup(index: number) {
+  get totalPages(): number {
+    return Math.max(1, Math.ceil(this.totalData / this.pageSize));
+  }
+
+  get pageStart(): number {
+    return this.totalData ? (this.currentPage - 1) * this.pageSize + 1 : 0;
+  }
+
+  get pageEnd(): number {
+    return Math.min(this.currentPage * this.pageSize, this.totalData);
+  }
+
+  createForms(): void {
+    this.editTemplateForm = this.fb.group({
+      requestFor: ['UPDATE'],
+      templateId: [null],
+      templateName: ['', [Validators.required, Validators.pattern(/^[a-z0-9_]+$/)]],
+      parameterFormat: ['POSITIONAL'],
+      headerFormat: ['TEXT'],
+      headerText: ['', Validators.maxLength(60)],
+      msgBodyText: ['', [Validators.required, Validators.maxLength(1024)]],
+      msgBodyVariable: this.fb.array([]),
+      footerText: ['', Validators.maxLength(60)],
+      language: ['en', Validators.required],
+      status: [null],
+      category: ['MARKETING', Validators.required],
+      sub_category: [null],
+      toWhatsAppNumber: [null],
+      variableType: ['Number'],
+      mediaType: ['None']
+    });
+  }
+
+  createVariableGroup(key: string, value = ''): FormGroup {
     return this.fb.group({
-      key: `{{${index}}}`,
-      value: ''
+      key: [key],
+      value: [value, Validators.required]
     });
   }
 
-  addVariable() {
-    const index = this.variablesArray.length + 1;
-    this.variablesArray.push(this.createVariableGroup(index));
-  }
+  getWhatsAppTemplate(): void {
+    this.isLoading = true;
+    this.loadError = '';
+    this.whatsAppTemplatesService.getWhatsAppTemplate().subscribe({
+      next: (response: any) => {
+        this.isLoading = false;
+        if (Number(response?.responseCode) !== 200) {
+          this.loadError = response?.responseMessage || 'Could not load templates.';
+          return;
+        }
 
-  public getWhatsAppTemplate(): void {
-    this.dataSource = new MatTableDataSource<DonationDetails>([]);
-
-    // 🔥 Reset pagination to page 1
-    this.pagination.tablePageSize.next({
-      skip: 0,
-      limit: this.pageSize,
-      pageSize: this.pageSize
-    });
-
-    // 🔥 API CALL
-    this.whatsAppTemplatesService.getWhatsAppTemplate()
-      .subscribe((apiRes: any) => {
-
-        // Assign new data
-        this.totalData = apiRes.totalNumber || 0;
-        this.fullData = apiRes.listPayload || [];
-
-        // Load page 1 immediately
-        this.prepareTableData(this.fullData, {
-          skip: 0,
-          limit: this.pageSize
-        });
-      });
-  }
-
-
-  dataTableClear() {
-    this.showCustomFilter = true;
-    this.tableData = [];
-    this.pageSize = 10;
-    this.serialNumberArray = [];
-    this.totalData = 0;
-    this.showFilter = false;
-
-  }
-
-  private prepareTableData(apiRes: DonationDetails[], pageOption: pageSelection): void {
-    const start = pageOption.skip;
-    const end = pageOption.limit;
-
-    this.dataSource = new MatTableDataSource<DonationDetails>([]);
-
-    // Slice data for current page
-    this.tableData = apiRes.slice(start, end);
-
-    // Serial numbers (1-based)
-    this.serialNumberArray = this.tableData.map((_, i) => start + i + 1);
-
-    // Material table
-    this.dataSource = new MatTableDataSource<DonationDetails>(this.tableData);
-
-    // Notify pagination service
-    this.pagination.calculatePageSize.next({
-      totalData: this.totalData,
-      pageSize: this.pageSize,
-      tableData: this.tableData,
-      serialNumberArray: this.serialNumberArray,
+        this.fullData = Array.isArray(response.listPayload) ? response.listPayload : [];
+        this.currentPage = 1;
+        this.applyFilters();
+      },
+      error: () => {
+        this.isLoading = false;
+        this.loadError = 'Could not load templates. Please try again.';
+      }
     });
   }
 
-  public sortData(sort: Sort) {
-    const data = this.tableData.slice();
-    if (!sort.active || sort.direction === '') {
-      this.tableData = data;
-    } else {
-      this.tableData = data.sort((a, b) => {
-        const aValue = (a as never)[sort.active];
-        const bValue = (b as never)[sort.active];
-        return (aValue < bValue ? -1 : 1) * (sort.direction === 'asc' ? 1 : -1);
-      });
+  searchData(value: string): void {
+    this.searchDataValue = value;
+    this.currentPage = 1;
+    this.applyFilters();
+  }
+
+  sortData(sort: Sort): void {
+    this.activeSort = sort;
+    this.currentPage = 1;
+    this.applyFilters();
+  }
+
+  changePageSize(value: string | number): void {
+    this.pageSize = Number(value);
+    this.currentPage = 1;
+    this.updatePage();
+  }
+
+  previousPage(): void {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+      this.updatePage();
     }
   }
 
+  nextPage(): void {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+      this.updatePage();
+    }
+  }
 
-  public searchData(value: string): void {
-    const searchTerm = value.trim().toLowerCase();
+  private applyFilters(): void {
+    const term = this.searchDataValue.trim().toLowerCase();
+    let data = !term
+      ? [...this.fullData]
+      : this.fullData.filter(template =>
+          ['templateId', 'templateName', 'language', 'category', 'status']
+            .some(key => String(template?.[key] ?? '').toLowerCase().includes(term))
+        );
 
-    if (searchTerm) {
-      // Filter data
-      const filteredData = this.fullData.filter((donation: DonationDetails) =>
-        Object.values(donation).some((field: any) =>
-          String(field).toLowerCase().includes(searchTerm)
-        )
+    if (this.activeSort.active && this.activeSort.direction) {
+      const direction = this.activeSort.direction === 'asc' ? 1 : -1;
+      const key = this.activeSort.active;
+      data = data.sort((a, b) =>
+        String(a?.[key] ?? '').localeCompare(String(b?.[key] ?? ''), undefined, {
+          numeric: true,
+          sensitivity: 'base'
+        }) * direction
       );
-
-      this.totalData = filteredData.length;
-
-      // Always reset to page 1
-      this.prepareTableData(filteredData, { skip: 0, limit: this.pageSize });
-    } else {
-      // Search cleared → reset table & page to page 1
-      this.totalData = this.fullData.length;
-
-      this.prepareTableData(this.fullData, { skip: 0, limit: this.pageSize });
-
-      // Reset pagination to page 1
-      this.pagination.tablePageSize.next({
-        skip: 0,
-        limit: this.pageSize,
-        pageSize: this.pageSize
-      });
     }
+
+    this.filteredData = data;
+    this.totalData = data.length;
+    if (this.currentPage > this.totalPages) {
+      this.currentPage = this.totalPages;
+    }
+    this.updatePage();
   }
 
-    isCollapsed: boolean = false;
-  toggleCollapse() {
+  private updatePage(): void {
+    const start = (this.currentPage - 1) * this.pageSize;
+    this.tableData = this.filteredData.slice(start, start + this.pageSize);
+  }
+
+  toggleCollapse(): void {
     this.sidebar.toggleCollapse();
     this.isCollapsed = !this.isCollapsed;
   }
-  public filter = false;
-  openFilter() {
-    this.filter = !this.filter;
+
+  addVariable(): void {
+    const bodyControl = this.editTemplateForm.get('msgBodyText');
+    const nextIndex = this.getNextVariableIndex();
+    const variable = `{{${nextIndex}}}`;
+    bodyControl?.setValue(`${bodyControl.value || ''}${bodyControl.value ? ' ' : ''}${variable}`);
+    this.detectVariables();
   }
-  ///////////////////
 
-  // selectLead(lead: any) {
-  //   this.selectedLead = lead;
-  //   this.messages = lead.messages;
-  // }
+  onBodyChange(): void {
+    this.detectVariables();
+  }
 
-  sendMessage() {
-    if (!this.newMessage) return;
+  detectVariables(): void {
+    const text = this.editTemplateForm.get('msgBodyText')?.value || '';
+    const matches = [...new Set<string>(text.match(/{{\d+}}/g) || [])];
+    const oldValues = this.variablesArray.value;
 
-    this.messages.push({
-      text: this.newMessage,
-      direction: 'OUTGOING',
-      time: 'Now'
+    this.variablesArray.clear();
+    matches.forEach(key => {
+      const existing = oldValues.find((item: any) => item.key === key);
+      this.variablesArray.push(this.createVariableGroup(key, existing?.value || ''));
     });
-
-    this.newMessage = '';
   }
 
-  /* ================= TEMPLATE LOGIC ================= */
-
- onBodyChange() {
-  this.detectVariables();
-}
-
-detectVariables() {
-  const text = this.editTemplateForm.get('msgBodyText')?.value || '';
-
-  const matches = text.match(/{{\d+}}/g); // only {{1}}, {{2}}
-
-  const formArray = this.variablesArray;
-
-  // ✅ clear existing variables
-  formArray.clear();
-
-  if (!matches) return;
-
-  // ✅ unique variables
-  const unique = [...new Set(matches)] as string[];
-
- unique.forEach((v: string) => {
-  formArray.push(
-    this.fb.group({
-      key: v,
-      value: ''
-    })
-  );
-});
-}
-
-getPreviewText(): string {
-  let text = this.editTemplateForm.get('msgBodyText')?.value || '';
-
-  const variables = this.variablesArray.value;
-
-  variables.forEach((v: any) => {
-    const value = v.value || v.key;
-    text = text.replaceAll(v.key, value);
-  });
-
-  return text;
-}
-
-  // addVariable() {
-  //   const variable =
-  //     this.selectedVariableType === 'Number' ? '{{1}}' : '{{name}}';
-
-  //   this.template.body += ' ' + variable;
-  //   this.detectVariables();
-  // }
-
-  /* ================= DROPDOWN ================= */
-
-toggleVarDropdown(event: Event) {
-  event.stopPropagation(); // 🔥 THIS IS THE MAIN FIX
-
-  this.showVarDropdown = !this.showVarDropdown;
-  this.showMediaDropdown = false;
-}
-
-  selectVariableType(type: any) {
-    this.selectedVariableType = type;
-    this.showVarDropdown = false;
+  getPreviewText(): string {
+    let text = this.editTemplateForm?.get('msgBodyText')?.value || '';
+    (this.variablesArray?.value || []).forEach((variable: any) => {
+      text = text.replaceAll(variable.key, variable.value || variable.key);
+    });
+    return text;
   }
 
-  toggleMediaDropdown(event: Event) {
-  event.stopPropagation(); // same as var dropdown
-  this.showMediaDropdown = !this.showMediaDropdown;
-  this.showVarDropdown = false;
-}
-
-  selectMediaType(type: any) {
-    this.selectedMediaType = type;
+  toggleVarDropdown(event: Event): void {
+    event.stopPropagation();
+    this.showVarDropdown = !this.showVarDropdown;
     this.showMediaDropdown = false;
   }
 
-  @HostListener('document:click', ['$event'])
-  closeDropdown(event: any) {
-    if (!event.target.closest('.dropdown')) {
-      this.showVarDropdown = false;
-      this.showMediaDropdown = false;
-    }
+  selectVariableType(type: string): void {
+    this.editTemplateForm.get('variableType')?.setValue(type);
+    this.showVarDropdown = false;
   }
 
-  submitTemplate() {
-    
-   
+  toggleMediaDropdown(event: Event): void {
+    event.stopPropagation();
+    this.showMediaDropdown = !this.showMediaDropdown;
+    this.showVarDropdown = false;
   }
 
-
-openEditModal(templateRef: TemplateRef<any>, data: any) {
-
-  this.createForms();
-
-  this.editTemplateForm.patchValue({
-    requestFor: data.requestFor,
-    templateId: data.templateId,
-    templateName: data.templateName,
-    parameterFormat: data.parameterFormat,
-    headerFormat: data.headerFormat,
-    headerText: data.headerText,
-    msgBodyText: data.msgBodyText,
-    footerText: data.footerText,
-    language: data.language,
-    status: data.status,
-    category: data.category,
-    sub_category: data.sub_category,
-    toWhatsAppNumber: data.toWhatsAppNumber
-  });
-
-  // ✅ FIX HERE
-  this.variablesArray.clear();
-
-  data.msgBodyVariable?.forEach((v: any) => {
-    this.variablesArray.push(
-      this.fb.group({
-        variableType: [v.variableType || 'Name'],
-        bodyVariable: [v.bodyVariable || '']
-      })
+  selectMediaType(type: string): void {
+    this.editTemplateForm.get('mediaType')?.setValue(type);
+    this.editTemplateForm.get('headerFormat')?.setValue(
+      type === 'None' ? 'TEXT' : type.toUpperCase()
     );
-  });
-
-  this.editTemplateDialog = this.dialog.open(templateRef, {
-    width: '1400px',
-    disableClose: true,
-    panelClass: 'custom-modal',
-  });
-}
-
-
-public deleteTemplateByName(templateName: string) {
-    this.whatsAppTemplatesService.deleteWhatsAppTemplateByName(templateName)
-      .subscribe({
-        next: (response: any) => {
-          if (response['responseCode'] == '200') {
-            this.getWhatsAppTemplate();
-            // this.toastr.success(response['responseMessage'], response['responseCode']);
-          } else {
-            //  this.toastr.error(response['responseMessage'], response['responseCode']);
-          }
-        },
-        //error: (error: any) => this.toastr.error('Server Error', '500'),
-      });
+    this.showMediaDropdown = false;
   }
 
+  @HostListener('document:click')
+  closeDropdown(): void {
+    this.showVarDropdown = false;
+    this.showMediaDropdown = false;
+  }
+
+  openEditModal(templateRef: TemplateRef<any>, data: any): void {
+    this.createForms();
+    this.formError = '';
+
+    const variables = this.normalizeVariables(data);
+    const mediaType = this.mediaTypeFromHeader(data.headerFormat);
+    this.editTemplateForm.patchValue({
+      requestFor: 'UPDATE',
+      templateId: data.templateId,
+      templateName: data.templateName,
+      parameterFormat: data.parameterFormat || 'POSITIONAL',
+      headerFormat: data.headerFormat || 'TEXT',
+      headerText: data.headerText || '',
+      msgBodyText: data.msgBodyText || '',
+      footerText: data.footerText || '',
+      language: data.language || 'en',
+      status: data.status,
+      category: data.category || 'MARKETING',
+      sub_category: data.sub_category,
+      toWhatsAppNumber: data.toWhatsAppNumber,
+      variableType: 'Number',
+      mediaType
+    });
+
+    variables.forEach(variable =>
+      this.variablesArray.push(this.createVariableGroup(variable.key, variable.value))
+    );
+    this.detectVariables();
+
+    this.editTemplateDialog = this.dialog.open(templateRef, {
+      width: '1100px',
+      maxWidth: '96vw',
+      disableClose: true,
+      panelClass: 'custom-modal'
+    });
+  }
+
+  submitTemplate(): void {
+    this.formError = '';
+    this.detectVariables();
+    if (this.editTemplateForm.invalid) {
+      this.editTemplateForm.markAllAsTouched();
+      this.formError = 'Complete all required fields and variable samples.';
+      return;
+    }
+
+    const form = this.editTemplateForm.getRawValue();
+    const payload = {
+      ...form,
+      headerAvailable: !!form.headerText || form.headerFormat !== 'TEXT',
+      headerExample: form.headerFormat === 'TEXT' ? [form.headerText || 'Sample'] : [],
+      bodyExample: [form.msgBodyVariable.map((variable: any) => variable.value)],
+      footerAvailable: !!form.footerText,
+      replyButtonAvailable: false
+    };
+
+    this.isSaving = true;
+    this.whatsAppTemplatesService.updateWhatsAppTemplate(payload).subscribe({
+      next: (response: any) => {
+        this.isSaving = false;
+        if (Number(response?.responseCode) !== 200) {
+          this.formError = response?.responseMessage || 'Template could not be updated.';
+          return;
+        }
+
+        this.editTemplateDialog?.close();
+        Swal.fire('Updated', response?.responseMessage || 'Template updated successfully.', 'success');
+        this.getWhatsAppTemplate();
+      },
+      error: (error: any) => {
+        this.isSaving = false;
+        this.formError = error?.error?.responseMessage || 'Template could not be updated.';
+      }
+    });
+  }
+
+  async deleteTemplateByName(templateName: string): Promise<void> {
+    const result = await Swal.fire({
+      title: 'Delete template?',
+      text: `"${templateName}" will be permanently deleted.`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      confirmButtonText: 'Delete'
+    });
+    if (!result.isConfirmed) {
+      return;
+    }
+
+    this.whatsAppTemplatesService.deleteWhatsAppTemplateByName(templateName).subscribe({
+      next: (response: any) => {
+        if (Number(response?.responseCode) === 200) {
+          Swal.fire('Deleted', response?.responseMessage || 'Template deleted.', 'success');
+          this.getWhatsAppTemplate();
+        } else {
+          Swal.fire('Delete failed', response?.responseMessage || 'Template could not be deleted.', 'error');
+        }
+      },
+      error: (error: any) =>
+        Swal.fire('Delete failed', error?.error?.responseMessage || 'Template could not be deleted.', 'error')
+    });
+  }
+
+  statusClass(status: string): string {
+    return `status-${String(status || 'unknown').toLowerCase()}`;
+  }
+
+  private getNextVariableIndex(): number {
+    const keys = this.variablesArray.value.map((variable: any) =>
+      Number(String(variable.key).replace(/\D/g, ''))
+    );
+    return Math.max(0, ...keys.filter(Number.isFinite)) + 1;
+  }
+
+  private normalizeVariables(data: any): Array<{ key: string; value: string }> {
+    const source = Array.isArray(data?.msgBodyVariable) ? data.msgBodyVariable : [];
+    if (source.length) {
+      return source.map((variable: any, index: number) => ({
+        key: variable.key || variable.variableType || `{{${index + 1}}}`,
+        value: variable.value || variable.bodyVariable || ''
+      }));
+    }
+
+    return [...new Set(String(data?.msgBodyText || '').match(/{{\d+}}/g) || [])]
+      .map(key => ({ key, value: '' }));
+  }
+
+  private mediaTypeFromHeader(headerFormat: string): string {
+    const format = String(headerFormat || '').toUpperCase();
+    return ['IMAGE', 'VIDEO', 'DOCUMENT'].includes(format)
+      ? format.charAt(0) + format.slice(1).toLowerCase()
+      : 'None';
+  }
 }

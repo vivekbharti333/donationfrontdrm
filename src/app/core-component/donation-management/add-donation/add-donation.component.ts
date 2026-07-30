@@ -41,6 +41,7 @@ export class AddDonationComponent {
   public showFundrisingOfficerList: boolean = false;
 
   public showCurrencyBox: boolean = false;
+  public showReceiptTypeBox: boolean = false;
   public currencyList: any;
   public fundRisingOffcerList: any;
   public invoiceTypeList: any;
@@ -107,16 +108,20 @@ export class AddDonationComponent {
   createForms() {
     this.addDonationForm = this.fb.group({
       createdBy: ['N/A'],
-      invoiceHeaderDetailsId: [''],
+      invoiceHeaderDetailsId: ['', Validators.required],
       donorName: ['', [Validators.required, Validators.pattern('[A-Za-z ]{3,150}')]],
-      mobileNumber: ['', [Validators.pattern('^[0-9]{10}$')]], // Assuming a 10-digit phone number
-      emailId: ['', [Validators.required, Validators.email]],
-      address: ['', [Validators.required, Validators.pattern('[A-Za-z0-9 ,.-]{3,150}')]],
+      mobileNumber: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
+      emailId: ['', [Validators.email]],
+      address: ['', [Validators.pattern('[A-Za-z0-9 ,.-]{3,150}')]],
       panNumber: ['', [Validators.pattern('[A-Z]{5}[0-9]{4}[A-Z]{1}')]],
-      programName: [''],
-      amount: ['', [Validators.required, Validators.pattern('^[0-9]{1,5}$')]],
-      currency: ['', [Validators.required]],
-      currencyCode: ['', [Validators.required]],
+      programName: ['', Validators.required],
+      amount: ['', [
+        Validators.required,
+        Validators.pattern('^[0-9]{1,8}$'),
+        Validators.max(99999999),
+      ]],
+      currency: [''],
+      currencyCode: [''],
       transactionId: ['', [Validators.pattern('[A-Za-z0-9]{3,150}')]],
       paymentMode: ['', [Validators.required]],
       notes: [''],
@@ -129,7 +134,7 @@ export class AddDonationComponent {
         next: (response: any) => {
           if (response['responseCode'] == '200') {
             this.invoiceTypeList = JSON.parse(JSON.stringify(response['listPayload']));
-            console.log(this.invoiceTypeList)
+            this.setReceiptTypeSelection();
             // this.toastr.success(response['responseMessage'], response['responseCode']);
           } else {
             //this.toastr.error(response['responseMessage'], response['responseCode']);
@@ -137,6 +142,21 @@ export class AddDonationComponent {
         },
         // error: (error: any) => this.toastr.error('Server Error', '500'),
       });
+  }
+
+  private setReceiptTypeSelection(): void {
+    const receiptTypes = Array.isArray(this.invoiceTypeList)
+      ? this.invoiceTypeList
+      : [];
+
+    this.showReceiptTypeBox = receiptTypes.length > 1;
+
+    if (receiptTypes.length === 1) {
+      this.addDonationForm.controls['invoiceHeaderDetailsId']
+        .setValue(receiptTypes[0].id);
+    } else {
+      this.addDonationForm.controls['invoiceHeaderDetailsId'].reset();
+    }
   }
 
   public getDonationTypeList() {
@@ -265,6 +285,16 @@ export class AddDonationComponent {
   }
 
   public saveDonationDetails() {
+    if (this.addDonationForm.invalid) {
+      this.addDonationForm.markAllAsTouched();
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Required Fields',
+        detail: 'Please fill in all mandatory fields correctly before submitting.',
+      });
+      return;
+    }
+
     this.isLoading = true;
     this.donationManagementService.saveDonationDetails(this.addDonationForm.value)
       .subscribe({
@@ -284,6 +314,7 @@ export class AddDonationComponent {
 
               this.addDonationForm.reset();
               this.addDonationForm.controls['currencyCode'].setValue(this.currencyList[0].currencyCode);
+              this.setReceiptTypeSelection();
               // this.setValueInForm();
               // this.isLoading = false;
 

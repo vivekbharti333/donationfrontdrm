@@ -8,7 +8,7 @@ import { CookieService } from 'ngx-cookie-service';
 @Component({
   selector: 'app-fundrising-officer-report',
   templateUrl: './fundrising-officer-report.component.html',
-  styleUrl: './fundrising-officer-report.component.scss'
+  styleUrls: ['./fundrising-officer-report.component.scss']
 })
 export class FundrisingOfficerReportComponent {
 

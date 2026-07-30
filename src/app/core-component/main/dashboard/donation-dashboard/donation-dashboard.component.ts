@@ -60,14 +60,18 @@ export class DonationDashboardComponent implements AfterViewInit {
 
   public username!: string;
   public loginUser: any;
-  public activeUserCount: any;
-  public inactiveUserCount: any;
-  public todaysCount: any;
-  public todaysAmount: any;
-  public yesterdayCount: any;
-  public yesterdayAmount: any;
-  public monthCount: any;
-  public monthAmount: any;
+  public activeUserCount = 0;
+  public inactiveUserCount = 0;
+  public todaysCount = 0;
+  public todaysAmount = 0;
+  public yesterdayCount = 0;
+  public yesterdayAmount = 0;
+  public monthCount = 0;
+  public monthAmount = 0;
+
+  public get totalUserCount(): number {
+    return this.activeUserCount + this.inactiveUserCount;
+  }
 
   donationTrendList: any[] = [];
   donationTrendChart: any;
@@ -375,14 +379,14 @@ export class DonationDashboardComponent implements AfterViewInit {
           if (response['responseCode'] == '200') {
             if (response['payload']['respCode'] == '200') {
 
-              this.activeUserCount = response['payload']['activeUserCount'];
-              this.inactiveUserCount = response['payload']['inactiveUserCount'];
-              this.todaysCount = response['payload']['todaysCount'];
-              this.todaysAmount = response['payload']['todaysAmount'];
-              this.yesterdayCount = response['payload']['yesterdayCount'];
-              this.yesterdayAmount = response['payload']['yesterdayAmount'];
-              this.monthCount = response['payload']['monthCount'];
-              this.monthAmount = response['payload']['monthAmount'];
+              this.activeUserCount = Number(response['payload']['activeUserCount']) || 0;
+              this.inactiveUserCount = Number(response['payload']['inactiveUserCount']) || 0;
+              this.todaysCount = Number(response['payload']['todaysCount']) || 0;
+              this.todaysAmount = Number(response['payload']['todaysAmount']) || 0;
+              this.yesterdayCount = Number(response['payload']['yesterdayCount']) || 0;
+              this.yesterdayAmount = Number(response['payload']['yesterdayAmount']) || 0;
+              this.monthCount = Number(response['payload']['monthCount']) || 0;
+              this.monthAmount = Number(response['payload']['monthAmount']) || 0;
             } else {
             }
           } else {

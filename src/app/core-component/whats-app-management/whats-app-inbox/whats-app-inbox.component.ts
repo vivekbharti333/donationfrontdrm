@@ -20,6 +20,24 @@ export class WhatsAppInboxComponent implements OnInit {
 
   newMessage: string = '';
   messageId: string = '';
+  isSending = false;
+  sendError = '';
+  isLoading = true;
+  loadError = '';
+  searchTerm = '';
+
+  get filteredContacts(): any[] {
+    const term = this.searchTerm.trim().toLowerCase();
+    if (!term) {
+      return this.contactList;
+    }
+
+    return this.contactList.filter((contact: any) =>
+      `${contact.userName} ${contact.waId} ${contact.lastMessage}`
+        .toLowerCase()
+        .includes(term)
+    );
+  }
 
   constructor(private whatsappService: WhatsAppInboxService) { }
 
@@ -28,6 +46,8 @@ export class WhatsAppInboxComponent implements OnInit {
   }
 
   getMessages(): void {
+    this.isLoading = true;
+    this.loadError = '';
 
     this.whatsappService.getWhatsAppMessage().subscribe({
 
@@ -35,21 +55,28 @@ export class WhatsAppInboxComponent implements OnInit {
 
         if (response.responseCode == 200) {
 
-          this.allMessages = response.listPayload;
+          this.allMessages = Array.isArray(response.listPayload)
+            ? response.listPayload.map((message: any) => this.normalizeMessage(message))
+            : [];
 
           // SORT MESSAGE
           this.allMessages.sort((a: any, b: any) => {
-            return a.messageTimestamp - b.messageTimestamp;
+            return a.sortTimestamp - b.sortTimestamp;
           });
 
           this.prepareContactList();
-
+          this.isLoading = false;
+        } else {
+          this.isLoading = false;
+          this.loadError = response.responseMessage || 'Could not load conversations.';
         }
 
       },
 
       error: (error) => {
         console.log(error);
+        this.isLoading = false;
+        this.loadError = 'Could not load conversations. Please try again.';
       }
 
     });
@@ -68,19 +95,23 @@ export class WhatsAppInboxComponent implements OnInit {
           waId: msg.waId,
           userName: msg.userName || msg.waId,
           lastMessage: msg.messageText || 'Unsupported Message',
-          lastTime: msg.messageTimestamp,
+          lastTime: msg.sortTimestamp,
           
         };
 
       } else {
 
-        if (msg.messageTimestamp > groupedContacts[msg.waId].lastTime) {
+        if (msg.userName) {
+          groupedContacts[msg.waId].userName = msg.userName;
+        }
+
+        if (msg.sortTimestamp >= groupedContacts[msg.waId].lastTime) {
 
           groupedContacts[msg.waId].lastMessage =
             msg.messageText || 'Unsupported Message';
 
           groupedContacts[msg.waId].lastTime =
-            msg.messageTimestamp;
+            msg.sortTimestamp;
 
         }
 
@@ -115,66 +146,23 @@ export class WhatsAppInboxComponent implements OnInit {
 
   }
 
-  sendMessage1(): void {
-
-    if (!this.newMessage || this.newMessage.trim() == '') {
-      return;
-    }
-
-    const newMsg = {
-      waId: this.selectedWaId,
-      userName: this.selectedUserName,
-      direction: 'OUTGOING',
-      messageType: 'text',
-      messageText: this.newMessage,
-      messageTimestamp: Math.floor(Date.now() / 1000),
-      messageId: this.messageId
-    };
-
-    console.log("Message : "+newMsg.waId+" , "+newMsg.messageText+" , "+newMsg.messageId);
-
-    // ADD INTO MAIN ARRAY
-    this.allMessages.push(newMsg);
-
-    // UPDATE CURRENT CHAT
-    this.selectedMessages.push(newMsg);
-
-    // REFRESH CONTACT LIST
-    this.prepareContactList();
-
-    // REFRESH CURRENT CHAT
-    this.selectedMessages = this.allMessages.filter((msg: any) => {
-      return msg.waId == this.selectedWaId;
-    });
-
-    // CLEAR INPUT
-    this.newMessage = '';
-
-    // AUTO SCROLL
-    setTimeout(() => {
-
-      const chatBody = document.querySelector('.chat-body');
-
-      if (chatBody) {
-        chatBody.scrollTop = chatBody.scrollHeight;
-      }
-
-    }, 100);
-
-  }
-
 sendMessage(): void {
 
-  if (!this.newMessage || this.newMessage.trim() == '') {
+  const messageText = this.newMessage?.trim();
+
+  if (!messageText || !this.selectedWaId || this.isSending) {
     return;
   }
+
+  this.isSending = true;
+  this.sendError = '';
 
   // SEND PAYLOAD
   const payload = {
 
     waId: this.selectedWaId,
 
-    messageText: this.newMessage
+    messageText
 
   };
 
@@ -187,7 +175,13 @@ sendMessage(): void {
 
       console.log('SEND RESPONSE => ', response);
 
-      const newMsg = {
+      if (response?.responseCode != null && response.responseCode != 200) {
+        this.isSending = false;
+        this.sendError = response.responseMessage || 'Message could not be sent.';
+        return;
+      }
+
+      const newMsg = this.normalizeMessage({
 
         waId: this.selectedWaId,
 
@@ -197,13 +191,17 @@ sendMessage(): void {
 
         messageType: 'text',
 
-        messageText: this.newMessage,
+        messageText,
 
         messageTimestamp: Math.floor(Date.now() / 1000),
 
         // REAL WHATSAPP MESSAGE ID
-        messageId: response.messageId
-      };
+        messageId: response?.messageId || response?.listPayload?.messageId || null,
+
+        status: response?.status || response?.listPayload?.status || 'SENT',
+
+        createdAt: new Date().toISOString()
+      });
 
       console.log(
         'MessageId => ',
@@ -227,6 +225,7 @@ sendMessage(): void {
 
       // CLEAR INPUT
       this.newMessage = '';
+      this.isSending = false;
 
       // AUTO SCROLL
       setTimeout(() => {
@@ -244,6 +243,8 @@ sendMessage(): void {
 
     error: (error) => {
       console.log(error);
+      this.isSending = false;
+      this.sendError = error?.error?.responseMessage || 'Message could not be sent. Please try again.';
     }
 
   });
@@ -255,13 +256,91 @@ sendMessage(): void {
       return '';
     }
 
-    const date = new Date(timestamp * 1000);
+    const date = new Date(timestamp);
 
-    return date.toLocaleTimeString([], {
+    return date.toLocaleString([], {
+      day: '2-digit',
+      month: 'short',
       hour: '2-digit',
       minute: '2-digit'
     });
 
+  }
+
+  getContactTime(timestamp: number): string {
+    if (!timestamp) {
+      return '';
+    }
+
+    const date = new Date(timestamp);
+    const today = new Date();
+    const isToday = date.toDateString() === today.toDateString();
+
+    return isToday
+      ? date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      : date.toLocaleDateString([], { day: '2-digit', month: 'short' });
+  }
+
+  getInitials(name: string, waId: string): string {
+    const displayName = name && name !== waId ? name : '';
+    if (!displayName) {
+      return (waId || '?').slice(-2);
+    }
+
+    return displayName
+      .split(/\s+/)
+      .slice(0, 2)
+      .map(part => part.charAt(0))
+      .join('')
+      .toUpperCase();
+  }
+
+  getStatusLabel(status: string | null | undefined): string {
+    switch ((status || '').toUpperCase()) {
+      case 'READ':
+      case 'DELIVERED':
+        return '✓✓';
+      case 'SENT':
+        return '✓';
+      case 'FAILED':
+      case 'FAILD':
+        return '!';
+      default:
+        return '◷';
+    }
+  }
+
+  getStatusClass(status: string | null | undefined): string {
+    const normalizedStatus = (status || '').toUpperCase();
+    if (normalizedStatus === 'READ') {
+      return 'status-read';
+    }
+    if (normalizedStatus === 'FAILED' || normalizedStatus === 'FAILD') {
+      return 'status-failed';
+    }
+    return 'status-pending';
+  }
+
+  private normalizeMessage(message: any): any {
+    const timestamp = Number(message?.messageTimestamp);
+    const createdAtTimestamp = this.parseCreatedAt(message?.createdAt);
+    const sortTimestamp = Number.isFinite(timestamp) && timestamp > 0
+      ? timestamp * 1000
+      : createdAtTimestamp;
+
+    return {
+      ...message,
+      sortTimestamp
+    };
+  }
+
+  private parseCreatedAt(createdAt: string | null | undefined): number {
+    if (!createdAt) {
+      return 0;
+    }
+
+    const parsedTimestamp = new Date(createdAt.replace(' ', 'T')).getTime();
+    return Number.isNaN(parsedTimestamp) ? 0 : parsedTimestamp;
   }
 
 }
