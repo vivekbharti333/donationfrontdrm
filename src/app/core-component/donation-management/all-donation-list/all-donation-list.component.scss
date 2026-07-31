@@ -58,6 +58,17 @@ button:disabled {
   display: none;
 }
 
+.table-state {
+  padding: 34px 16px;
+  color: #6b7280;
+  text-align: center;
+  font-size: 14px;
+}
+
+.donation-pagination {
+  margin-top: 15px;
+}
+
 /* Desktop Pagination */
 .desktop-pagination app-custom-pagination {
   display: block;

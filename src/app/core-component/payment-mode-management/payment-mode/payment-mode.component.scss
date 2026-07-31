@@ -1,0 +1,57 @@
+:host { display: block; }
+
+.payment-page { --brand: #ff9f43; --brand-hover: #ff8510; --ink: #182231; --muted: #6f7a89; --line: #e6e9ee; padding-bottom: 28px; }
+.payment-header { display: flex; align-items: center; justify-content: space-between; gap: 24px; margin-bottom: 24px; padding: 6px 2px; }
+.eyebrow { display: block; margin-bottom: 6px; color: var(--brand-hover); font-size: 11px; font-weight: 700; letter-spacing: .11em; text-transform: uppercase; }
+.payment-header h1 { margin: 0 0 7px; color: var(--ink); font-size: clamp(24px, 3vw, 32px); font-weight: 700; letter-spacing: -.035em; }
+.payment-header p, .panel-heading p { margin: 0; color: var(--muted); }
+.enabled-summary { display: flex; min-width: 190px; align-items: center; gap: 12px; padding: 12px 16px; border: 1px solid #ffe0c2; border-radius: 14px; background: #fff8f1; }
+.summary-icon { display: grid; width: 38px; height: 38px; place-items: center; border-radius: 10px; background: #ffe9d3; color: #d86b05; font-size: 18px; }
+.enabled-summary > span:last-child { display: flex; flex-direction: column; }
+.enabled-summary strong { color: var(--ink); font-size: 18px; line-height: 1.1; }
+.enabled-summary small { color: #8b735e; font-size: 11px; }
+.payment-panel { overflow: hidden; border: 1px solid var(--line); border-radius: 18px; background: #fff; box-shadow: 0 8px 28px rgba(23, 34, 49, .045); }
+.panel-heading { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 22px 24px; border-bottom: 1px solid #edf0f4; }
+.panel-heading h2 { margin: 0 0 4px; color: var(--ink); font-size: 17px; font-weight: 700; }
+.panel-heading p { font-size: 13px; }
+.auto-save { display: inline-flex; align-items: center; gap: 6px; color: #687383; font-size: 11px; font-weight: 700; white-space: nowrap; }
+.auto-save i { color: var(--brand); }
+.payment-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; padding: 24px; }
+.method-card { position: relative; display: flex; min-height: 82px; align-items: center; gap: 13px; padding: 15px 17px; border: 1px solid #e0e4ea; border-radius: 13px; background: #fff; cursor: pointer; transition: border-color .18s, background .18s, box-shadow .18s, transform .18s; }
+.method-card:hover { transform: translateY(-1px); border-color: #ffc891; box-shadow: 0 7px 18px rgba(35, 43, 54, .06); }
+.method-card--active { border-color: #9bd7b0; background: #f2fbf5; }
+.method-card--saving { pointer-events: none; }
+.method-icon { display: grid; width: 42px; height: 42px; flex: 0 0 42px; place-items: center; border-radius: 12px; background: #f3f5f7; color: #758090; font-size: 18px; }
+.method-card--active .method-icon { background: #dff4e6; color: #24854a; }
+.method-copy { display: flex; min-width: 0; flex: 1; flex-direction: column; }
+.method-copy strong { overflow: hidden; color: var(--ink); font-size: 13px; text-overflow: ellipsis; white-space: nowrap; }
+.method-copy small { margin-top: 3px; color: #8a94a2; font-size: 11px; }
+.saving-spinner { position: absolute; right: 15px; bottom: 9px; width: 12px; height: 12px; border: 2px solid #ffd8b1; border-top-color: var(--brand-hover); border-radius: 50%; animation: spin .65s linear infinite; }
+.method-skeleton { height: 82px; border-radius: 13px; background: linear-gradient(90deg, #f4f5f7 25%, #fafafa 37%, #f4f5f7 63%); background-size: 400% 100%; animation: shimmer 1.3s ease infinite; }
+.empty-state { display: grid; justify-items: center; padding: 54px 24px; text-align: center; }
+.empty-state > span { display: grid; width: 54px; height: 54px; place-items: center; border-radius: 16px; background: #fff0e1; color: var(--brand-hover); font-size: 23px; }
+.empty-state h3 { margin: 14px 0 5px; color: var(--ink); font-size: 15px; }
+.empty-state p { max-width: 430px; margin: 0; color: var(--muted); font-size: 12px; }
+.panel-footer { display: flex; align-items: center; gap: 8px; padding: 14px 24px; border-top: 1px solid #edf0f4; background: #fafbfc; color: #7a8594; font-size: 11px; }
+.panel-footer i { color: var(--brand-hover); }
+
+// Keep Angular Material's checkbox aligned with the application's orange theme.
+:host ::ng-deep .mat-mdc-checkbox.mat-accent {
+  --mdc-checkbox-selected-checkmark-color: #fff;
+  --mdc-checkbox-selected-focus-icon-color: var(--brand);
+  --mdc-checkbox-selected-hover-icon-color: var(--brand-hover);
+  --mdc-checkbox-selected-icon-color: var(--brand);
+  --mdc-checkbox-selected-pressed-icon-color: var(--brand-hover);
+  --mat-checkbox-ripple-color: rgba(255, 159, 67, .18);
+  --mat-checkbox-checked-ripple-color: rgba(255, 159, 67, .18);
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes shimmer { 0% { background-position: 100% 0; } 100% { background-position: 0 0; } }
+
+@media (max-width: 767px) {
+  .payment-header { align-items: flex-start; flex-direction: column; }
+  .enabled-summary { width: 100%; }
+  .panel-heading { align-items: flex-start; flex-direction: column; }
+  .payment-grid { grid-template-columns: 1fr; padding: 18px; }
+  .panel-heading, .panel-footer { padding-right: 18px; padding-left: 18px; }
+}

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormGroup, FormArray, FormBuilder, Validators } from '@angular/forms';
 import { ReceiptManagementService } from '../receipt-management.service';
 import { UserManagementService } from '../../user-management/user-management.service';
@@ -17,15 +17,15 @@ import { Editor, Toolbar } from 'ngx-editor';
   styleUrl: './add-receipt-header.component.scss',
   providers: [MessageService, ToastModule, CalendarModule],
 })
-export class AddReceiptHeaderComponent {
+export class AddReceiptHeaderComponent implements OnInit, OnDestroy {
 
   public superadminForm!: FormGroup;
   public addInvoiceHeaderForm!: FormGroup;
-  public loading: Boolean = false;
+  public loading = false;
   public superadminList: any;
   public invoiceHeaderList: any;
-  public isInvoiceHeaderExists: Boolean = false;
-  public isSuperadmin: Boolean = false;
+  public isInvoiceHeaderExists = false;
+  public isSuperadmin = false;
 
   public superadminId: any;
     public loginUser : any;
@@ -42,18 +42,23 @@ export class AddReceiptHeaderComponent {
     this.loginUser = this.authenticationService.getLoginUser();
   }
 
-  checkRoleType(){
-        if(this.loginUser['roleType'] == Constant.superAdmin ){
-          this.isSuperadmin = true;
-        }
-          }
+  checkRoleType(): void {
+    this.isSuperadmin = this.loginUser?.roleType === Constant.superAdmin;
+  }
   
 
   ngOnInit() {
     this.createForms();
-    this.getSuperadminList();
+    this.checkRoleType();
     this.editor = new Editor();
-    this.getInvoiceHeaderList('2','');
+    this.superadminId = this.loginUser?.superadminId || this.loginUser?.loginId;
+
+    if (!this.isSuperadmin) {
+      this.getSuperadminList();
+    }
+    if (this.superadminId) {
+      this.getInvoiceHeaderList(String(this.superadminId), 'BYSUPERADMINID');
+    }
   }
 
    editor!: Editor;
@@ -86,9 +91,9 @@ export class AddReceiptHeaderComponent {
     });
     this.addInvoiceHeaderForm = this.fb.group({
       id: [''],
-      invoiceInitial: [''],
+      invoiceInitial: ['', Validators.required],
       companyLogo: [''],
-      companyFirstName: [''],
+      companyFirstName: ['', Validators.required],
       companyFirstNameColor: [''],
       companyLastName: [''],
       companyLastNameColor: [''],
@@ -99,9 +104,9 @@ export class AddReceiptHeaderComponent {
       mobileNo: ['', [Validators.required, Validators.pattern('^[0-9]*$')]],
       alternateMobile: ['', [Validators.required, Validators.pattern('^[0-9]*$')]],
       emailId: ['', [Validators.required, Validators.email]],
-      website: [''],
-      gstNumber: [''],
-      panNumber: [''],
+      website: ['', Validators.required],
+      gstNumber: ['', Validators.required],
+      panNumber: ['', Validators.required],
       invoiceEmail: [''],
 	    invoiceSms: [''],
 	    invoiceWhatsApp: [''],
@@ -120,17 +125,27 @@ export class AddReceiptHeaderComponent {
 
   getInvoiceHeaderList(selectedValue: string, requestFor: string): void {
     this.superadminId = selectedValue;
+    this.loading = true;
     this.receiptManagementService.getInvoiceHeaderBySuperadminId(this.superadminId, "", requestFor)
       .subscribe({
         next: (response: any) => {
-          if (response['responseCode'] == '200') {
-            this.invoiceHeaderList = JSON.parse(JSON.stringify(response['listPayload']));
-            this.getAndSetInvoiceHeaderDetails();
+          this.loading = false;
+          if (Number(response?.responseCode) === 200) {
+            this.invoiceHeaderList = response?.listPayload || [];
+            if (this.invoiceHeaderList.length) {
+              this.getAndSetInvoiceHeaderDetails();
+            } else {
+              this.isInvoiceHeaderExists = false;
+              this.addInvoiceHeaderForm.reset();
+            }
           } else {
-            // this.toastr.error(response['responseMessage'], response['responseCode']);
+            this.showError(response?.responseMessage || 'Unable to load receipt headers.');
           }
         },
-        // error: (error: any) => this.toastr.error('Server Error', '500'),
+        error: () => {
+          this.loading = false;
+          this.showError('Unable to load receipt headers.');
+        },
       });
   }
 
@@ -190,55 +205,34 @@ export class AddReceiptHeaderComponent {
   }
 
   getAndSetInvoiceHeaderDetails() {
+    const header = this.invoiceHeaderList?.[0];
+    if (!header) {
+      this.isInvoiceHeaderExists = false;
+      return;
+    }
 
-    if (this.invoiceHeaderList[0]['gstNumber'] != null) {
+    if (header['gstNumber'] != null) {
       this.isInvoiceHeaderExists = true;
     }
-    this.invoiceHeaderList[0]['gstNumber'],
-
-      this.addInvoiceHeaderForm.patchValue({
-        invoiceInitial: this.invoiceHeaderList[0]['invoiceInitial'],
-        companyFirstName: this.invoiceHeaderList[0]['companyFirstName'],
-        companyFirstNameColor: this.invoiceHeaderList[0]['companyFirstNameColor'],
-        companyLastName: this.invoiceHeaderList[0]['companyLastName'],
-        companyLastNameColor: this.invoiceHeaderList[0]['companyLastNameColor'],
-        backgroundColor: this.invoiceHeaderList[0]['backgroundColor'],
-        officeAddress: this.invoiceHeaderList[0]['officeAddress'],
-        regAddress: this.invoiceHeaderList[0]['regAddress'],
-        mobileNo: this.invoiceHeaderList[0]['mobileNo'],
-        alternateMobile: this.invoiceHeaderList[0]['alternateMobile'],
-        emailId: this.invoiceHeaderList[0]['emailId'],
-        website: this.invoiceHeaderList[0]['website'],
-        gstNumber: this.invoiceHeaderList[0]['gstNumber'],
-        panNumber: this.invoiceHeaderList[0]['panNumber'],
-
-        invoiceEmail: this.invoiceHeaderList[0]['invoiceEmail'],
-        invoiceSms: this.invoiceHeaderList[0]['invoiceSms'],
-        invoiceWhatsApp: this.invoiceHeaderList[0]['invoiceWhatsApp'],
-
-        accountHolderName: this.invoiceHeaderList[0]['accountHolderName'],
-        accountNumber: this.invoiceHeaderList[0]['accountNumber'],
-        ifscCode: this.invoiceHeaderList[0]['ifscCode'],
-        bankName: this.invoiceHeaderList[0]['bankName'],
-        branchName: this.invoiceHeaderList[0]['branchName'],
-        thankYouNote: this.invoiceHeaderList[0]['thankYouNote'],
-        footer: this.invoiceHeaderList[0]['footer'],
-        companyLogo: this.invoiceHeaderList[0]['companyLogo'],
-
-        // createdBy: this.invoiceHeaderList[0]['createdBy'],
-        // superadminId: this.invoiceHeaderList.superadminId,
-      });
-    this.logo = 'data:image/png;base64,' + this.invoiceHeaderList[0]['companyLogo'];
+    this.addInvoiceHeaderForm.patchValue(header);
+    this.logo = header['companyLogo'] ? 'data:image/png;base64,' + header['companyLogo'] : null;
   }
 
 
   saveInvoiceHeader() {
+    // if (this.addInvoiceHeaderForm.invalid) {
+    //   this.addInvoiceHeaderForm.markAllAsTouched();
+    //   this.showError('Please complete all required fields with valid information.');
+    //   return;
+    // }
+
+    this.loading = true;
     this.receiptManagementService.saveInvoiceHeader(this.superadminId, this.addInvoiceHeaderForm.value)
       .subscribe({
         next: (response: any) => {
-
-         if (response.responseCode === 200) {
-            if (response.payload.respCode === 200) {
+          this.loading = false;
+         if (Number(response?.responseCode) === 200) {
+            if (Number(response?.payload?.respCode) === 200) {
               this.messageService.add({ severity: 'success', summary: 'Success', detail: response['payload']['respMesg'] });
               // this.getInvoiceHeaderList();
             } else {
@@ -256,12 +250,15 @@ export class AddReceiptHeaderComponent {
             });
           }
         },
-        error: (error: any) => this.messageService.add({
-          summary: "Server error",
-          detail: "500",
-          styleClass: 'danger-light-popover',
-        })
+        error: () => {
+          this.loading = false;
+          this.showError('The receipt header could not be saved. Please try again.');
+        }
       });
+  }
+
+  private showError(detail: string): void {
+    this.messageService.add({ severity: 'error', summary: 'Unable to continue', detail });
   }
 
 }

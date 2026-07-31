@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 import { WhatsAppIntegrationComponent } from './whats-app-integration.component';
 
@@ -8,7 +9,8 @@ describe('WhatsAppIntegrationComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [WhatsAppIntegrationComponent]
+      declarations: [WhatsAppIntegrationComponent],
+      imports: [HttpClientTestingModule]
     })
     .compileComponents();
     

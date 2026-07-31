@@ -1,21 +1,210 @@
+:host {
+    display: block;
+}
+
+.receipt-header-page {
+    min-height: 100%;
+    padding: 24px;
+    background: linear-gradient(180deg, #fff8eb 0, #fffcf7 280px);
+}
+
+.page-intro {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    max-width: 1180px;
+    margin: 0 auto 18px;
+    padding: 22px 26px;
+    border-radius: 16px;
+    color: #fff;
+    background: linear-gradient(120deg, #d97900, #f58f00);
+    box-shadow: 0 12px 30px rgba(245, 143, 0, .2);
+}
+
+.intro-icon {
+    display: grid;
+    place-items: center;
+    flex: 0 0 50px;
+    width: 50px;
+    height: 50px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, .14);
+    font-size: 24px;
+}
+
+.eyebrow {
+    display: block;
+    margin-bottom: 3px;
+    color: rgba(255, 255, 255, .7);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.25px;
+}
+
+.page-intro h2 {
+    margin: 0 0 4px;
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.page-intro p {
+    margin: 0;
+    color: rgba(255, 255, 255, .78);
+}
+
+form {
+    max-width: 1180px;
+    margin: 0 auto;
+}
+
+.form-card {
+    overflow: hidden;
+    border: 1px solid #e4eaf1;
+    border-radius: 16px;
+    box-shadow: 0 12px 32px rgba(36, 55, 78, .07);
+}
+
+.form-card .card-body {
+    padding: 28px;
+}
+
+.card-title-head {
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #e9eef4;
+}
+
+.card-title-head h6 {
+    margin: 0;
+    color: #59321f;
+    font-size: 17px;
+    font-weight: 700;
+}
+
+.account-selector {
+    margin-bottom: 22px;
+    padding: 18px 10px 2px;
+    border: 1px solid #f8d79c;
+    border-radius: 12px;
+    background: #fffaf5;
+}
+
+.logo-uploader {
+    margin-bottom: 28px;
+    padding: 18px;
+    border: 1px dashed #b9c9dc;
+    border-radius: 12px;
+    background: #fafcff;
+}
+
+.logo-upload-hint {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 9px;
+    color: #80551a;
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+.logo-upload-hint i {
+    color: #f58f00;
+    font-size: 14px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-label {
+    margin-bottom: 7px;
+    color: #3c4f67;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.form-control,
+.space-select {
+    min-height: 43px;
+    border-color: #dbe3ec;
+    border-radius: 9px;
+    color: #24364b;
+    background-color: #fff;
+}
+
+.form-control:focus {
+    border-color: #f58f00;
+    box-shadow: 0 0 0 3px rgba(245, 143, 0, .14);
+}
+
+input[type='color'].form-control {
+    padding: 5px 7px;
+    cursor: pointer;
+}
+
+.inner-header {
+    margin: 10px 0 20px;
+    padding: 11px 14px;
+    border-left: 4px solid #f58f00;
+    border-radius: 0 8px 8px 0;
+    color: #955700;
+    background: #fff4df;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.field-error {
+    display: block;
+    margin-top: 5px;
+    color: #c73535;
+    font-size: 12px;
+}
+
 .editor-container {
     min-height: 200px;
     max-height: 700px;
     width: 100%;
+    padding: 0;
     resize: vertical;
     overflow-y: auto;
 }
 
+.text-mid {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 18px;
+}
+
+.save-button {
+    min-width: 210px;
+    min-height: 46px;
+    border: 0;
+    border-radius: 10px;
+    color: #fff;
+    background: #f58f00;
+    font-weight: 700;
+    box-shadow: 0 8px 18px rgba(245, 143, 0, .24);
+}
+
+.save-button:hover:not(:disabled) {
+    background: #d97e00;
+}
+
+.save-button:disabled {
+    opacity: .7;
+}
+
 @media (max-width: 768px) {
-    .editor-container {
-        min-height: 150px;
-        max-height: 400px;
-    }
+    .receipt-header-page { padding: 14px 10px 28px; }
+    .page-intro { align-items: flex-start; padding: 19px 17px; }
+    .page-intro h2 { font-size: 21px; }
+    .page-intro p { font-size: 13px; }
+    .intro-icon { flex-basis: 42px; width: 42px; height: 42px; }
+    .form-card .card-body { padding: 20px 16px; }
+    .editor-container { min-height: 150px; max-height: 400px; }
 }
 
 @media (max-width: 576px) {
-    .editor-container {
-        min-height: 120px;
-        max-height: 300px;
-    }
+    .editor-container { min-height: 120px; max-height: 300px; }
+    .text-mid, .save-button { width: 100%; }
 }

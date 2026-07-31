@@ -1,40 +1,57 @@
-<div class="card">
-  <div class="card-body">
-    <div class="new-employee-field">
-      <div class="card-title-head">
-        <h6>
-          <span><i class="feather icon-info feather-edit"></i></span>Add Payment Mode
-        </h6>
-      </div>
-
-      <div class="row">
-        <div class="col-lg-3 col-sm-6 col-12">
-          <div class="table-responsive">
-            <table matSort class="table datanew">
-              <thead>
-                <tr>
-                  <th></th>
-                  <th mat-sort-header="userName">Mode</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let data of masterPaymentModeList">
-                  <td></td>
-                  <td>
-                    <mat-checkbox [checked]="isChecked(data.id)" (change)="toggleSelection(data.id)">
-                      {{ data.paymentMode }}
-                    </mat-checkbox>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
-
-
-
+<section class="payment-page">
+  <header class="payment-header">
+    <div>
+      <span class="eyebrow">Payment settings</span>
+      <h1>Payment modes</h1>
+      <p>Choose the payment methods available for collecting donations.</p>
     </div>
+    <div class="enabled-summary">
+      <span class="summary-icon"><i class="feather icon-credit-card"></i></span>
+      <span><strong>{{ selectedIds.length }}</strong><small>methods enabled</small></span>
+    </div>
+  </header>
+
+  <div class="payment-panel">
+    <div class="panel-heading">
+      <div>
+        <h2>Available methods</h2>
+        <p>Turn a method on or off. Each change is saved automatically.</p>
+      </div>
+      <span class="auto-save"><i class="feather icon-check-circle"></i> Auto-save</span>
+    </div>
+
+    <div *ngIf="isLoading" class="payment-grid" aria-label="Loading payment methods">
+      <div class="method-skeleton" *ngFor="let item of [1, 2, 3, 4]"></div>
+    </div>
+
+    <div *ngIf="!isLoading && masterPaymentModeList.length" class="payment-grid">
+      <label class="method-card" *ngFor="let mode of masterPaymentModeList"
+        [class.method-card--active]="isChecked(mode.id)"
+        [class.method-card--saving]="savingId === mode.id">
+        <span class="method-icon"><i class="feather" [ngClass]="getPaymentModeIcon(mode.paymentMode)"></i></span>
+        <span class="method-copy">
+          <strong>{{ mode.paymentMode }}</strong>
+          <small>{{ isChecked(mode.id) ? 'Available for donations' : 'Currently unavailable' }}</small>
+        </span>
+        <mat-checkbox
+          [checked]="isChecked(mode.id)"
+          [disabled]="savingId !== null"
+          (change)="toggleSelection(mode.id)"
+          [attr.aria-label]="(isChecked(mode.id) ? 'Disable ' : 'Enable ') + mode.paymentMode">
+        </mat-checkbox>
+        <span *ngIf="savingId === mode.id" class="saving-spinner" aria-label="Saving"></span>
+      </label>
+    </div>
+
+    <div *ngIf="!isLoading && !masterPaymentModeList.length" class="empty-state">
+      <span><i class="feather icon-credit-card"></i></span>
+      <h3>No payment modes found</h3>
+      <p>Add payment modes in Payment Mode Master, then return here to enable them.</p>
+    </div>
+
+    <footer class="panel-footer" *ngIf="!isLoading && masterPaymentModeList.length">
+      <i class="feather icon-info"></i>
+      Disabled methods will no longer appear as payment options on new donations.
+    </footer>
   </div>
-</div>
+</section>

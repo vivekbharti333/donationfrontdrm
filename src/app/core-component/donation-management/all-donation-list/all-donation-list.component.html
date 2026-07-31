@@ -131,13 +131,13 @@
           <table matSort (matSortChange)="sortData($event)" class="table datanew">
             <thead>
               <tr>
-                <th mat-sort-header="userName">Name</th>
-                <th mat-sort-header="loginId">Mobile</th>
-                <th mat-sort-header="phone">Amount</th>
-                <th mat-sort-header="role">Payment Mode</th>
-                <th mat-sort-header="createdOn">Received By</th>
-                <th mat-sort-header="program">Program</th>
-                <th mat-sort-header="date&Time">Date & Time</th>
+                <th mat-sort-header="donorName">Name</th>
+                <th mat-sort-header="mobileNumber">Mobile</th>
+                <th mat-sort-header="amount">Amount</th>
+                <th mat-sort-header="paymentMode">Payment Mode</th>
+                <th mat-sort-header="createdbyName">Received By</th>
+                <!-- <th mat-sort-header="programName">Program</th> -->
+                <th mat-sort-header="createdAt">Date & Time</th>
                 <th mat-sort-header="invoiceNumber">Invoice Number</th>
                 <th mat-sort-header="invoiceDownload">Invoice Download</th>
                 <th mat-sort-header="status">Status</th>
@@ -150,10 +150,10 @@
               <tr>
                 <td>{{ data.donorName }}</td>
                 <td>{{ data.mobileNumber }}</td>
-                <td>{{ data.amount }} {{ data.currencyCode }}</td>
+                <td>{{ data.amount }} {{ data.currency }}</td>
                 <td>{{ data.paymentMode }}</td>
                 <td>{{ data.createdbyName }}</td>
-                <td>{{ data.programName }}</td>
+                <!-- <td>{{ data.programName }}</td> -->
                 <td>{{ data.createdAt | date : "dd-MM-yyyy | HH:mm" }}</td>
                 <td>{{ data.invoiceNumber }}</td>
 
@@ -210,6 +210,10 @@
               }
             </tbody>
           </table>
+          <div *ngIf="isLoading" class="table-state">
+            <span class="spinner-border spinner-border-sm text-warning me-2"></span>Loading donations…
+          </div>
+          <div *ngIf="!isLoading && !tableData.length" class="table-state">No donations found.</div>
         </div>
       </div>
     </div>
@@ -288,17 +292,15 @@
 
       </div>
       }
+      <div *ngIf="isLoading" class="table-state">
+        <span class="spinner-border spinner-border-sm text-warning me-2"></span>Loading donations…
+      </div>
+      <div *ngIf="!isLoading && !tableData.length" class="table-state">No donations found.</div>
     </div>
 
     <!-- /Filter -->
     <!-- DESKTOP PAGINATION -->
-<!-- DESKTOP PAGINATION -->
-<div class="desktop-pagination d-none d-md-block">
-  <app-custom-pagination></app-custom-pagination>
-</div>
-
-<!-- MOBILE PAGINATION -->
-<div class="mobile-pagination d-block d-md-none">
+<div class="donation-pagination">
   <app-custom-pagination></app-custom-pagination>
 </div>
 
@@ -530,7 +532,10 @@
     </mat-dialog-content>
     <mat-dialog-actions class="dialogAction">
       <div class="text-end mb-3">
-        <button type="submit" class="btn btn-submit"> Update Receipt </button>
+        <button type="submit" class="btn btn-submit" [disabled]="editDonationForm.invalid || isLoading">
+          <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>
+          Update Receipt
+        </button>
       </div>
     </mat-dialog-actions>
   </form>

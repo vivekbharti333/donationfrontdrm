@@ -162,7 +162,7 @@ export class SidebarService {
           menuValue: 'Donation Management',
           hasSubRoute: true,
           showSubRoute: false,
-          icon: 'database',
+          icon: 'heart',
           subMenus: [
             {
               menuValue: 'Add Receipt',
@@ -180,7 +180,7 @@ export class SidebarService {
           menuValue: 'Report Management',
           hasSubRoute: true,
           showSubRoute: false,
-          icon: 'database',
+          icon: 'bar-chart-2',
           subMenus: [
             {
               menuValue: 'Donation Report',
@@ -213,7 +213,7 @@ export class SidebarService {
           menuValue: 'Payment Mode Management',
           hasSubRoute: true,
           showSubRoute: false,
-          icon: 'users',
+          icon: 'credit-card',
           // base1: 'usermang',
           subMenus: [
             {
@@ -232,7 +232,7 @@ export class SidebarService {
           menuValue: 'Program Management',
           hasSubRoute: true,
           showSubRoute: false,
-          icon: 'users',
+          icon: 'gift',
           // base1: 'usermang',
           subMenus: [
             {
@@ -246,7 +246,7 @@ export class SidebarService {
           menuValue: 'Currency Management',
           hasSubRoute: true,
           showSubRoute: false,
-          icon: 'shield',
+          icon: 'dollar-sign',
           // base1: 'usermang',
           subMenus: [
             {
@@ -265,7 +265,7 @@ export class SidebarService {
           menuValue: 'Receipt Header Management',
           hasSubRoute: true,
           showSubRoute: false,
-          icon: 'users',
+          icon: 'file-text',
           // base1: 'usermang',
           subMenus: [
             {
@@ -290,7 +290,7 @@ export class SidebarService {
           menuValue: 'Campaign Management',
           hasSubRoute: true,
           showSubRoute: false,
-          icon: 'users',
+          icon: 'radio',
           subMenus: [
              {
               menuValue: 'Contact Details',
@@ -320,7 +320,7 @@ export class SidebarService {
           menuValue: 'Student Management',
           hasSubRoute: true,
           showSubRoute: false,
-          icon: 'users',
+          icon: 'user-check',
           // base1: 'usermang',
           subMenus: [
             {
@@ -339,7 +339,7 @@ export class SidebarService {
           menuValue: 'Fee Management',
           hasSubRoute: true,
           showSubRoute: false,
-          icon: 'users',
+          icon: 'credit-card',
           // base1: 'usermang',
           subMenus: [
             {
@@ -360,7 +360,7 @@ export class SidebarService {
           menuValue: 'Invoice Management',
           hasSubRoute: true,
           showSubRoute: false,
-          icon: 'users',
+          icon: 'file',
           // base1: 'usermang',
           subMenus: [
             {
@@ -379,7 +379,7 @@ export class SidebarService {
           menuValue: 'Customer Management',
           hasSubRoute: true,
           showSubRoute: false,
-          icon: 'users',
+          icon: 'user',
           // base1: 'usermang',
           subMenus: [
             {
@@ -394,7 +394,7 @@ export class SidebarService {
           menuValue: 'Item Management',
           hasSubRoute: true,
           showSubRoute: false,
-          icon: 'users',
+          icon: 'package',
           // base1: 'usermang',
           subMenus: [
             {
@@ -409,7 +409,7 @@ export class SidebarService {
           menuValue: 'Lead Management',
           hasSubRoute: true,
           showSubRoute: false,
-          icon: 'bar-chart',
+          icon: 'trending-up',
           // base1: 'leadmang',
           subMenus: [
             {
@@ -485,7 +485,7 @@ export class SidebarService {
           menuValue: 'Category Management',
           hasSubRoute: true,
           showSubRoute: false,
-          icon: 'bar-chart',
+          icon: 'tag',
           // base1: 'leadmang',
           subMenus: [
             {
@@ -523,7 +523,7 @@ export class SidebarService {
           menuValue: 'Setting',
           hasSubRoute: true,
           showSubRoute: false,
-          icon: 'grid',
+          icon: 'settings',
           base1: 'dashboard',
           subMenus: [
             {
@@ -572,7 +572,7 @@ export class SidebarService {
          menuValue: 'Financial Settings',
           hasSubRoute: true,
           showSubRoute: false,
-          icon: 'grid',
+          icon: 'briefcase',
           base1: 'dashboard',
           subMenus: [
            {

@@ -28,13 +28,16 @@ interface data {
 })
 export class RolesPermissionsComponent {
 
-  public changePasswordBtnMessage ="Submit";
+  public activeAction: 'password' | 'teamLeader' | 'role' | null = null;
+  public showPassword = false;
+
+  public changePasswordBtnMessage ="Save password";
   public changePasswordBtn: boolean = false;
   public changeUserPasswordForm!: FormGroup;
-  public changeRoleBtnMessage = "Submit";
+  public changeRoleBtnMessage = "Save role";
   public changeUserRoleBtn: boolean = false;
   public changeUserRoleForm!: FormGroup;
-  public changeTeamLeaderBtnMessage = "Submit";
+  public changeTeamLeaderBtnMessage = "Save assignment";
   public changeTeamLeaderBtn: boolean = false;
   public changeTeamLeaderForm!: FormGroup;
   public isLoading = false;
@@ -261,8 +264,10 @@ export class RolesPermissionsComponent {
   
 
   public changePassword(){
+      if (this.changeUserPasswordForm.invalid || this.activeAction) return;
+      this.activeAction = 'password';
       this.isLoading = true;
-      this.changePasswordBtnMessage = "Processing Wait.."
+      this.changePasswordBtnMessage = "Updating..."
       this.changePasswordBtn = true;
       this.userManagementService.changeUserPassword(this.changeUserPasswordForm.value)
         .subscribe({
@@ -273,7 +278,6 @@ export class RolesPermissionsComponent {
                 this.messageService.add({ severity: 'success', summary: 'Success', detail: response.payload.respMesg });
 
                 this.changeUserPasswordForm.reset();
-                this.createForms();
                 this.changePasswordBtnMessage = "Submit"
                 this.changePasswordBtn = false;
                 this.isLoading = false;
@@ -296,14 +300,16 @@ export class RolesPermissionsComponent {
                 this.changePasswordBtn = false;
             }
           },
-          // error: (error: any) => this.toastr.error('Server Error', '500'),
+          error: () => this.finishAction('password'),
+          complete: () => this.finishAction('password'),
         });
-        // this.isLoading = false;
   }
 
   public changeTeamLeader(){
+    if (this.changeTeamLeaderForm.invalid || this.activeAction) return;
+    this.activeAction = 'teamLeader';
     this.isLoading = true;
-    this.changeTeamLeaderBtnMessage= "Processing wait.."
+    this.changeTeamLeaderBtnMessage= "Updating..."
     this.changeTeamLeaderBtn = true;
     this.userManagementService.changeTeamLeader(this.changeTeamLeaderForm.value)
       .subscribe({
@@ -313,8 +319,7 @@ export class RolesPermissionsComponent {
 
               this.messageService.add({ severity: 'success', summary: 'Success', detail: response.payload.respMesg });
 
-              this.changeUserRoleForm.reset();
-              this.createForms();
+              this.changeTeamLeaderForm.reset();
               this.changeTeamLeaderBtnMessage = "Submit";
               this.changeTeamLeaderBtn = false;
               this.isLoading = false;
@@ -333,14 +338,16 @@ export class RolesPermissionsComponent {
             this.isLoading = false;
           }
         },
-        // error: (error: any) => this.toastr.error('Server Error', '500'),
+        error: () => this.finishAction('teamLeader'),
+        complete: () => this.finishAction('teamLeader'),
       });
-      this.isLoading = false;
   }
 
   public changeUserRole(){
+    if (this.changeUserRoleForm.invalid || this.activeAction) return;
+    this.activeAction = 'role';
     this.isLoading = true;
-    this.changeRoleBtnMessage = "Processing Wait.."
+    this.changeRoleBtnMessage = "Updating..."
     this.changeUserRoleBtn = true;
     this.userManagementService.changeUserRole(this.changeUserRoleForm.value)
       .subscribe({
@@ -351,12 +358,9 @@ export class RolesPermissionsComponent {
               this.messageService.add({ severity: 'success', summary: 'Success', detail: response.payload.respMesg });
 
               this.changeUserRoleForm.reset();
-              this.createForms();
               this.changeRoleBtnMessage = "Submit"
               this.changeUserRoleBtn = false;
               this.isLoading = false;
-              this.messageService.add({ severity: 'success', summary: 'Success', detail: response['payload']['respMesg'] });
-
             } else {
               this.messageService.add({
                       summary: response['payload']['respCode'],
@@ -374,9 +378,25 @@ export class RolesPermissionsComponent {
             this.changeUserRoleBtn = false;
           }
         },
-        // error: (error: any) => this.toastr.error('Server Error', '500'),
+        error: () => this.finishAction('role'),
+        complete: () => this.finishAction('role'),
       });
-      this.isLoading = false;
+  }
+
+  public togglePasswordVisibility(): void {
+    this.showPassword = !this.showPassword;
+  }
+
+  private finishAction(action: 'password' | 'teamLeader' | 'role'): void {
+    if (this.activeAction !== action) return;
+    this.activeAction = null;
+    this.isLoading = false;
+    this.changePasswordBtn = false;
+    this.changeTeamLeaderBtn = false;
+    this.changeUserRoleBtn = false;
+    this.changePasswordBtnMessage = 'Save password';
+    this.changeTeamLeaderBtnMessage = 'Save assignment';
+    this.changeRoleBtnMessage = 'Save role';
   }
 
 

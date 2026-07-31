@@ -71,6 +71,7 @@ export class PaymentModeMasterComponent {
     ) {}
   
     ngOnInit() {
+      this.createForms();
       this.getMasterPaymentModeList();
       // this.getUserListForDropDown();
       
@@ -132,6 +133,23 @@ export class PaymentModeMasterComponent {
 
     changeUserStatus(nay:any){
 
+    }
+
+    get activePaymentModes(): number {
+      return this.masterPaymentModeList?.filter((mode: any) => mode.status === 'ACTIVE').length || 0;
+    }
+
+    getPaymentModeIcon(paymentMode: string): string {
+      const mode = (paymentMode || '').toLowerCase();
+      if (mode.includes('cash')) return 'icon-inbox';
+      if (mode.includes('card') || mode.includes('credit') || mode.includes('debit')) return 'icon-credit-card';
+      if (mode.includes('upi') || mode.includes('phone') || mode.includes('mobile')) return 'icon-smartphone';
+      if (mode.includes('bank') || mode.includes('transfer') || mode.includes('neft') || mode.includes('rtgs')) return 'icon-home';
+      if (mode.includes('cheque') || mode.includes('check')) return 'icon-file-text';
+      if (mode.includes('wallet')) return 'icon-briefcase';
+      if (mode.includes('online') || mode.includes('gateway')) return 'icon-globe';
+      if (mode.includes('qr')) return 'icon-grid';
+      return 'icon-credit-card';
     }
 
      createForms() {

@@ -1,4 +1,4 @@
-import { Component, importProvidersFrom, TemplateRef } from '@angular/core';
+import { Component, OnDestroy, TemplateRef } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, AbstractControl, FormControl } from '@angular/forms';
 import { Sort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
@@ -32,6 +32,7 @@ import * as XLSX from 'xlsx-js-style'
 // import * as XLSX from 'xlsx';
 declare var $: any;
 import { DatePipe } from '@angular/common';
+import { Subscription } from 'rxjs';
 
 interface data {
   value: string;
@@ -43,7 +44,7 @@ interface data {
   templateUrl: './all-donation-list.component.html',
   styleUrl: './all-donation-list.component.scss'
 })
-export class AllDonationListComponent {
+export class AllDonationListComponent implements OnDestroy {
 
   lastPageState: pageSelection = { skip: 0, limit: 10 };
 
@@ -51,7 +52,10 @@ export class AllDonationListComponent {
   datePipe = new DatePipe('en-US'); // Inject the DatePipe
 
   public fullData: DonationDetails[] = [];
+  private activeData: DonationDetails[] = [];
+  private paginationSubscription?: Subscription;
   public showCustomFilter: boolean = false;
+  public isLoading = false;
 
 
   public donationUpdateDialog: any;
@@ -159,18 +163,22 @@ export class AllDonationListComponent {
 
 
    // pagination
-  this.pagination.tablePageSize.subscribe((res: tablePageSize) => {
-    if (!this.fullData) return;
+  this.paginationSubscription = this.pagination.tablePageSize.subscribe((res: tablePageSize) => {
+    if (!this.activeData) return;
 
     this.pageSize = res.pageSize;
 
-    this.prepareTableData(this.fullData, {
+    this.prepareTableData(this.activeData, {
       skip: res.skip,
       limit: res.limit
     });
   });
 
 
+  }
+
+  ngOnDestroy(): void {
+    this.paginationSubscription?.unsubscribe();
   }
 
 
@@ -181,17 +189,17 @@ export class AllDonationListComponent {
       invoiceHeaderName: [''],
       createdBy: [''],
       donorName: ['', [Validators.required, Validators.pattern("[0-9A-Za-z ]{3,150}")]],
-      mobileNumber: ['', Validators.pattern('^[0-9]*$')],
-      emailId: ['', [Validators.required, Validators.pattern('^[0-9]*$')]],
-      address: ['', [Validators.required, Validators.pattern("[0-9A-Za-z ]{3,150}")]],
-      panNumber: ['', [Validators.required, Validators.pattern("[0-9A-Za-z ]{3,150}")]],
+      mobileNumber: ['', [Validators.required, Validators.pattern('^[0-9]*$')]],
+      emailId: ['', Validators.email],
+      address: [''],
+      panNumber: ['', Validators.pattern('[0-9A-Za-z ]{3,150}')],
       programName: ['', [Validators.required, Validators.pattern("[0-9A-Za-z ]{3,150}")]],
       amount: ['', [Validators.required, Validators.pattern('^[0-9]*$')]],
       currency: [''],
       currencyCode: [''],
-      transactionId: ['', [Validators.required, Validators.pattern("[0-9A-Za-z ]{3,150}")]],
+      transactionId: ['', Validators.pattern('[0-9A-Za-z ]{3,150}')],
       paymentMode: ['', [Validators.required, Validators.pattern("[0-9A-Za-z ]{3,150}")]],
-      notes: ['', [Validators.required, Validators.pattern("[0-9A-Za-z ]{3,150}")]]
+      notes: ['']
     });
   }
 
@@ -233,7 +241,7 @@ export class AllDonationListComponent {
           } else {
           }
         },
-      });
+      }); 
   }
 
 
@@ -253,6 +261,7 @@ export class AllDonationListComponent {
   // 🔥 CLEAR OLD DATA BEFORE API CALL
   this.tableData = [];
   this.fullData = [];
+  this.activeData = [];
   this.serialNumberArray = [];
   this.totalData = 0;
   this.showExcelReport = false;
@@ -266,19 +275,25 @@ export class AllDonationListComponent {
   });
 
   // 🔥 API CALL
+  this.isLoading = true;
   this.donationManagementService.getDonationList(tabName)
     .subscribe((apiRes: any) => {
 
       // Assign new data
-      this.totalData = apiRes.totalNumber || 0;
+      this.isLoading = false;
       this.fullData = apiRes.listPayload || [];
+      this.activeData = this.fullData;
+      this.totalData = this.activeData.length;
       this.showExcelReport = this.totalData > 0;
 
       // Load page 1 immediately
-      this.prepareTableData(this.fullData, {
+      this.prepareTableData(this.activeData, {
         skip: 0,
         limit: this.pageSize
       });
+    }, () => {
+      this.isLoading = false;
+      this.showError('Unable to load donations. Please try again.');
     });
 }
 
@@ -286,6 +301,7 @@ export class AllDonationListComponent {
   dataTableClear(){
     this.showCustomFilter = true;
     this.tableData = [];
+    this.activeData = [];
     this.pageSize = 10;
     this.serialNumberArray= [];
     this.totalData = 0;
@@ -295,6 +311,15 @@ export class AllDonationListComponent {
   
  getDonationListByDate(firstDate: any, lastDate: any): void {
 
+  if (!firstDate || !lastDate) {
+    this.showError('Please select both From and To dates.');
+    return;
+  }
+  if (firstDate > lastDate) {
+    this.showError('The From date cannot be later than the To date.');
+    return;
+  }
+
   // 🔥 CLEAR DATA BEFORE API CALL
   this.showExcelReport = false;
   this.donationList = [];
@@ -303,6 +328,7 @@ export class AllDonationListComponent {
 
   this.tableData = [];
   this.fullData = [];
+  this.activeData = [];
   this.serialNumberArray = [];
   this.totalData = 0;
   this.dataSource = new MatTableDataSource<DonationDetails>([]); // empty table
@@ -315,19 +341,25 @@ export class AllDonationListComponent {
   });
 
   // 🔥 API CALL
+  this.isLoading = true;
   this.donationManagementService.getDonationListByDate(firstDate, lastDate)
     .subscribe((apiRes: any) => {
 
-      this.totalData = apiRes.totalNumber || 0;
+      this.isLoading = false;
       this.fullData = apiRes.listPayload || [];
+      this.activeData = this.fullData;
+      this.totalData = this.activeData.length;
 
       this.showExcelReport = this.totalData > 0;
 
       // 🚀 Load first page
-      this.prepareTableData(this.fullData, {
+      this.prepareTableData(this.activeData, {
         skip: 0,
         limit: this.pageSize
       });
+    }, () => {
+      this.isLoading = false;
+      this.showError('Unable to load the custom donation report.');
     });
 }
 
@@ -384,15 +416,18 @@ export class AllDonationListComponent {
       )
     );
 
-    this.totalData = filteredData.length;
+    this.activeData = filteredData;
+    this.totalData = this.activeData.length;
 
     // Always reset to page 1
-    this.prepareTableData(filteredData, { skip: 0, limit: this.pageSize });
+    this.prepareTableData(this.activeData, { skip: 0, limit: this.pageSize });
+    this.pagination.tablePageSize.next({ skip: 0, limit: this.pageSize, pageSize: this.pageSize });
   } else {
     // Search cleared → reset table & page to page 1
-    this.totalData = this.fullData.length;
+    this.activeData = this.fullData;
+    this.totalData = this.activeData.length;
 
-    this.prepareTableData(this.fullData, { skip: 0, limit: this.pageSize });
+    this.prepareTableData(this.activeData, { skip: 0, limit: this.pageSize });
 
     // Reset pagination to page 1
     this.pagination.tablePageSize.next({
@@ -443,7 +478,7 @@ shareOnWhatsApp(receiptNumber: string, mobileNumber: string) {
   }
 
   const receiptUrl =
-    `https://mydonation.in/#/thank-you/receipt?receiptNo=${receiptNumber}`;
+    `${window.location.origin}${window.location.pathname}#/thank-you/receipt?receiptNo=${encodeURIComponent(receiptNumber)}`;
 
   const message =
 `Thank you for your kind donation 🙏
@@ -510,7 +545,7 @@ ${receiptUrl}`;
         next: (response: any) => {
           if (response['responseCode'] == '200') {
             this.donationTypeList = JSON.parse(JSON.stringify(response['listPayload']));
-            this.programNames = this.donationTypeList.listPayload.map((item: any) => item.programName);
+            this.programNames = this.donationTypeList.map((item: any) => item.programName).join(', ');
 
           } else {
             //  this.toastr.error(response['responseMessage'], response['responseCode']);
@@ -535,7 +570,9 @@ ${receiptUrl}`;
               this.showCurrencyBox = true;
 
             }
-            this.editDonationForm.controls['currencyCode'].setValue(this.currencyList[0].currencyCode);
+            if (this.currencyList.length) {
+              this.editDonationForm.controls['currencyCode'].setValue(this.currencyList[0].currencyCode);
+            }
           } else {
           }
         },
@@ -575,15 +612,17 @@ ${receiptUrl}`;
   }
 
   updateDonationStatus(rawData:any) {
+    this.isLoading = true;
     this.donationManagementService.updateDonationStatus(rawData)
       .subscribe({
         next: (response: any) => {
+          this.isLoading = false;
           if (response['responseCode'] == '200') {
             if (response['payload']['respCode'] == '200') {
 
               this.editDonationForm.reset();
               this.getDonationList(this.tabName);
-              this.donationUpdateDialog.close();
+              this.donationUpdateDialog?.close();
 
               this.messageService.add({
                 summary: response['payload']['respCode'],
@@ -606,20 +645,32 @@ ${receiptUrl}`;
             });
           }
         },
+        error: () => {
+          this.isLoading = false;
+          this.showError('The donation status could not be updated. Please try again.');
+        }
       });
   }
 
 
   updateDonationDetails() {
+    if (this.editDonationForm.invalid) {
+      this.editDonationForm.markAllAsTouched();
+      this.showError('Please correct the invalid receipt details before updating.');
+      return;
+    }
+
+    this.isLoading = true;
     this.donationManagementService.updateDonationDetails(this.editDonationForm.value)
       .subscribe({
         next: (response: any) => {
+          this.isLoading = false;
           if (response['responseCode'] == '200') {
             if (response['payload']['respCode'] == '200') {
 
               this.editDonationForm.reset();
               this.getDonationList(this.tabName);
-              this.donationUpdateDialog.close();
+              this.donationUpdateDialog?.close();
 
               this.messageService.add({
                 summary: response['payload']['respCode'],
@@ -642,7 +693,15 @@ ${receiptUrl}`;
             });
           }
         },
+        error: () => {
+          this.isLoading = false;
+          this.showError('The donation receipt could not be updated. Please try again.');
+        }
       });
+  }
+
+  private showError(detail: string): void {
+    this.messageService.add({ severity: 'error', summary: 'Unable to continue', detail });
   }
 
 

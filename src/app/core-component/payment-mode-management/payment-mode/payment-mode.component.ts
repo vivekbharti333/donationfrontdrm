@@ -31,10 +31,12 @@ interface PaymentMode {
 })
 export class PaymentModeComponent {
 
-  public masterPaymentModeList: any;
+  public masterPaymentModeList: PaymentMode[] = [];
   public selectedIds: number[] = [];
   // public paymentModeList:  any;
   public paymentModeList: any[] = [];
+  public isLoading = true;
+  public savingId: number | null = null;
 
 
   constructor(
@@ -57,21 +59,35 @@ export class PaymentModeComponent {
       this.selectedIds = [...this.paymentModeList];
     }
   
-    isChecked(id: number): boolean {
+  isChecked(id: number): boolean {
       return this.selectedIds.includes(id);
     }
 
+    getPaymentModeIcon(paymentMode: string): string {
+      const mode = (paymentMode || '').toLowerCase();
+
+      if (mode.includes('cash')) return 'icon-inbox';
+      if (mode.includes('card') || mode.includes('credit') || mode.includes('debit')) return 'icon-credit-card';
+      if (mode.includes('upi') || mode.includes('phone') || mode.includes('mobile')) return 'icon-smartphone';
+      if (mode.includes('bank') || mode.includes('transfer') || mode.includes('neft') || mode.includes('rtgs')) return 'icon-home';
+      if (mode.includes('cheque') || mode.includes('check')) return 'icon-file-text';
+      if (mode.includes('wallet')) return 'icon-briefcase';
+      if (mode.includes('online') || mode.includes('gateway')) return 'icon-globe';
+      if (mode.includes('qr')) return 'icon-grid';
+
+      return 'icon-credit-card';
+    }
+
     toggleSelection(id: number): void {
+      if (this.savingId !== null) return;
+      const previousIds = [...this.selectedIds];
       if (this.selectedIds.includes(id)) {
         this.selectedIds = this.selectedIds.filter((selectedId) => selectedId !== id);
       } else {
         this.selectedIds.push(id);
       }
-      console.log("1 : "+this.selectedIds);
-
-      this.selectedIds.join(',')
-
-      this.addUpdatePaymentMode(this.selectedIds.join(','));
+      this.savingId = id;
+      this.addUpdatePaymentMode(this.selectedIds.join(','), previousIds);
     }
 
   updateSelectedIds(data: any): void {
@@ -94,7 +110,8 @@ export class PaymentModeComponent {
           this.masterPaymentModeList = JSON.parse(JSON.stringify(response.listPayload));
         }
       },
-     
+      error: () => this.isLoading = false,
+      complete: () => this.isLoading = false,
     });
   }
 
@@ -117,8 +134,7 @@ export class PaymentModeComponent {
   }
   
 
-  addUpdatePaymentMode(paymentModeIds:any) {
-    console.log("Updated ")
+  addUpdatePaymentMode(paymentModeIds: string, previousIds: number[]) {
     this.paymentModeManagementService.addUpdatePaymentModeBySuperadmin(paymentModeIds).subscribe({
       next: (response: any) => {
         if (response['responseCode'] == '200') {
@@ -130,6 +146,7 @@ export class PaymentModeComponent {
             //   styleClass: 'success-background-popover',
             // });
           } else {
+            this.selectedIds = previousIds;
             // this.messageService.add({
             //   summary: response['payload']['respCode'],
             //   detail: response['payload']['respMesg'],
@@ -137,6 +154,7 @@ export class PaymentModeComponent {
             // });
           }
         } else {
+          this.selectedIds = previousIds;
           // this.messageService.add({
           //   summary: response['payload']['respCode'],
           //   detail: response['payload']['respMesg'],
@@ -144,11 +162,11 @@ export class PaymentModeComponent {
           // });
         }
       },
-      // error: () =>
-      //   this.messageService.add({
-      //     summary: '500',
-      //     detail: 'Server Error',
-      //   }),
+      error: () => {
+        this.selectedIds = previousIds;
+        this.savingId = null;
+      },
+      complete: () => this.savingId = null,
     });
   }
 
