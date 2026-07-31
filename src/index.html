@@ -27,6 +27,23 @@ href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.m
 
 <body>
   <app-root></app-root>
+
+   <script>
+    window.fbAsyncInit = function() {
+      FB.init({
+        appId: '1222137563317496',
+        cookie: true,
+        xfbml: true,
+        version: 'v22.0'
+      });
+      console.log('FB SDK v22.0 initialized from index.html');
+    };
+  </script>
+  <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js"></script>
+  
+  
 </body>
 
 </html>
+
+<!-- ng serve --ssl --host localhost --port 4200 -->

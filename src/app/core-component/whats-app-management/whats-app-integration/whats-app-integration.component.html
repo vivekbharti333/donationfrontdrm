@@ -1,0 +1,228 @@
+<div class="container-fluid">
+
+    <div class="row justify-content-center">
+
+        <div class="col-lg-9">
+
+            <div class="card shadow-sm mt-4">
+
+                <div class="card-header bg-white">
+
+                    <h3 class="mb-1">
+                        <i class="fab fa-whatsapp text-success"></i>
+                        WhatsApp Business Integration
+                    </h3>
+
+                    <small class="text-muted">
+                        Connect your WhatsApp Business Account with Donexia CRM.
+                    </small>
+
+                </div>
+
+                <div class="card-body">
+
+                    <div class="row">
+
+                        <div class="col-md-6">
+
+                            <div class="border rounded p-3 mb-3">
+                                <small class="text-muted">Connection Status</small>
+
+                                <h5 class="text-danger mt-2">
+                                    Not Connected
+                                </h5>
+                            </div>
+
+                            <div class="border rounded p-3 mb-3">
+                                <small class="text-muted">Business Name</small>
+
+                                <h6 class="mt-2">--</h6>
+                            </div>
+
+                            <div class="border rounded p-3 mb-3">
+                                <small class="text-muted">Display Name</small>
+
+                                <h6 class="mt-2">--</h6>
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <div class="border rounded p-3 mb-3">
+                                <small class="text-muted">Phone Number</small>
+
+                                <h6 class="mt-2">--</h6>
+                            </div>
+
+                            <div class="border rounded p-3 mb-3">
+                                <small class="text-muted">Phone Number ID</small>
+
+                                <h6 class="mt-2">--</h6>
+                            </div>
+
+                            <div class="border rounded p-3 mb-3">
+                                <small class="text-muted">WhatsApp Business Account</small>
+
+                                <h6 class="mt-2">--</h6>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <hr>
+
+                    <div class="text-center">
+
+                        <button
+                            class="btn btn-success btn-lg px-5"
+                            (click)="connectWhatsApp()">
+
+                            <i class="fab fa-facebook me-2"></i>
+
+                            Connect WhatsApp
+
+                        </button>
+                        
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-lg-9">
+            <div class="card shadow-sm mt-4">
+                <div class="card-header bg-white">
+                    <h3 class="mb-1">
+                        <i class="fab fa-whatsapp text-success"></i>
+                        WhatsApp Business Integration
+                    </h3>
+                    <small class="text-muted">
+                        Connect your WhatsApp to send donation receipts with your NGO's own display name.
+                    </small>
+                </div>
+
+                <div class="card-body">
+
+                    <!-- NOT CONNECTED STATE -->
+                    <div *ngIf="!isConnected &&!isConnecting">
+                        <div class="alert alert-warning">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Your donation receipts are currently sent by Donexia's display name.
+                            Connect your own WhatsApp Business to show your NGO name to donors.
+                        </div>
+                    </div>
+
+                    <!-- CONNECTING STATE -->
+                    <div *ngIf="isConnecting" class="text-center py-4">
+                        <div class="spinner-border text-success" role="status"></div>
+                        <h5 class="mt-3">Connecting WhatsApp...</h5>
+                        <small class="text-muted">Please wait, we are saving your WABA details.</small>
+                    </div>
+
+                    <!-- CONNECTED / NOT CONNECTED DETAILS -->
+                    <div class="row" *ngIf="!isConnecting">
+                        <div class="col-md-6">
+                            <div class="border rounded p-3 mb-3">
+                                <small class="text-muted">Connection Status</small>
+                                <h5 class="mt-2" [ngClass]="isConnected? 'text-success' : 'text-danger'">
+                                    <i [ngClass]="isConnected? 'fas fa-check-circle' : 'fas fa-times-circle'"></i>
+                                    {{ isConnected? 'Connected' : 'Not Connected' }}
+                                </h5>
+                            </div>
+
+                            <div class="border rounded p-3 mb-3">
+                                <small class="text-muted">Business Name</small>
+                                <h6 class="mt-2">{{ whatsappData?.businessName || '--' }}</h6>
+                            </div>
+
+                            <div class="border rounded p-3 mb-3">
+                                <small class="text-muted">Display Name</small>
+                                <h6 class="mt-2">
+                                    {{ whatsappData?.displayName || '--' }}
+                                    <span *ngIf="whatsappData?.displayNameStatus"
+                                          class="badge ms-2"
+                                          [ngClass]="whatsappData?.displayNameStatus === 'APPROVED'? 'bg-success' : 'bg-warning'">
+                                        {{ whatsappData?.displayNameStatus }}
+                                    </span>
+                                </h6>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="border rounded p-3 mb-3">
+                                <small class="text-muted">Phone Number</small>
+                                <h6 class="mt-2">{{ whatsappData?.phoneNumber || '--' }}</h6>
+                            </div>
+
+                            <div class="border rounded p-3 mb-3">
+                                <small class="text-muted">Phone Number ID</small>
+                                <h6 class="mt-2 text-truncate">{{ whatsappData?.phoneNumberId || '--' }}</h6>
+                            </div>
+
+                            <div class="border rounded p-3 mb-3">
+                                <small class="text-muted">WhatsApp Business Account ID</small>
+                                <h6 class="mt-2 text-truncate">{{ whatsappData?.wabaId || '--' }}</h6>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr *ngIf="!isConnecting">
+
+                    <div class="text-center" *ngIf="!isConnecting">
+
+                        <!-- CONNECT BUTTON -->
+                        <button *ngIf="!isConnected"
+                            class="btn btn-success btn-lg px-5"
+                            (click)="connectWhatsApp()">
+                            <i class="fab fa-facebook me-2"></i>
+                            Connect WhatsApp Business
+                        </button>
+
+                        <!-- CONNECTED ACTIONS -->
+                        <div *ngIf="isConnected">
+                            <div class="alert alert-success d-inline-block">
+                                <i class="fas fa-check me-2"></i>
+                                WhatsApp Connected Successfully!
+                            </div>
+                            <div class="mt-3">
+                                <button class="btn btn-outline-primary me-2" (click)="sendTestMessage()">
+                                    Send Test Receipt
+                                </button>
+                                <button class="btn btn-outline-danger" (click)="disconnectWhatsApp()">
+                                    Disconnect
+                                </button>
+                            </div>
+                        </div>
+
+                        <p class="text-muted mt-3" style="font-size: 12px;">
+                            By connecting, you allow Donexia to send WhatsApp messages on behalf of your NGO.
+                            Message charges will be billed by Donexia as per usage.
+                        </p>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
