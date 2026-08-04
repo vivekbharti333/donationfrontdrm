@@ -78,6 +78,16 @@ setOtpSent(status: boolean): void {
   sessionStorage.setItem('otpSent', String(status));
 }
 
+setOtpExpiry(durationSeconds = 120): void {
+  const expiresAt = Date.now() + durationSeconds * 1000;
+  sessionStorage.setItem('otpExpiresAt', String(expiresAt));
+}
+
+getOtpExpiry(): number | null {
+  const expiresAt = Number(sessionStorage.getItem('otpExpiresAt'));
+  return Number.isFinite(expiresAt) && expiresAt > 0 ? expiresAt : null;
+}
+
 isOtpSent(): boolean {
   return sessionStorage.getItem('otpSent') === 'true';
 }
@@ -111,6 +121,7 @@ clearResetFlow(): void {
   sessionStorage.removeItem('otpVerified');
   sessionStorage.removeItem('passwordReset');
   sessionStorage.removeItem('resetMobileNo');
+  sessionStorage.removeItem('otpExpiresAt');
 }
 
 }

@@ -26,6 +26,8 @@ export class ForgotPasswordComponent {
 
 
   ngOnInit(): void {
+    // Opening this page starts a new reset-password flow and invalidates stale OTP state.
+    this.authenticationService.clearResetFlow();
     this.createForms();
   }
 
@@ -51,6 +53,7 @@ export class ForgotPasswordComponent {
 
               this.authenticationService.setResetMobileNo(this.sendOtpForm.value.mobileNo);
               this.authenticationService.setOtpSent(true);
+              this.authenticationService.setOtpExpiry();
 
 
               this.router.navigate([routes.otpVerification], {

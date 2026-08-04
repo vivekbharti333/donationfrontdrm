@@ -8,9 +8,13 @@ export const otpGuard: CanActivateFn = () => {
   const authenticationService = inject(AuthenticationService);
   const router = inject(Router);
 
-  if (authenticationService.isOtpSent()) {
+  const hasActiveOtpFlow = authenticationService.isOtpSent()
+    && !!authenticationService.getResetMobileNo()
+    && authenticationService.getOtpExpiry() !== null;
+
+  if (hasActiveOtpFlow) {
     return true;
   }
 
-  return router.createUrlTree(['/sign-in']);
+  return router.createUrlTree(['/forgot-password']);
 };

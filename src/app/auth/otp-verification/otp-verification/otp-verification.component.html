@@ -3,17 +3,9 @@
     <div class="login-wrapper bg-img">
         <div class="login-content">
             <div class="login-userset">
-                <div class="login-userset">
-                    <!-- <div class="login-logo logo-normal">
-                        <img src="assets/img/logo.png" alt="img">
-                    </div> -->
-                </div>
-                <!-- <a [routerLink]="routes.adminDashboard" class="login-logo logo-white">
-                    <img src="assets/img/logo-white.png" alt="">
-                </a> -->
                 <div class="login-userheading">
                     <h3>Login With Your Login Id</h3>
-                    <h4 class="verfy-mail-content">We sent a verification code to your Whats App. Enter the code in the field below</h4>
+                    <h4 class="verfy-mail-content">We sent a verification code to your WhatsApp. Enter the code in the field below.</h4>
                 </div>
                 <form [formGroup]="verifyOtpForm" (ngSubmit)="verifyOtp()" class="digit-group">
 
@@ -47,26 +39,17 @@
                         <p>OTP will expire in 09:10</p>
                     </div> -->
                     <div class="Otp-expire text-center">
-                        <!-- <p *ngIf="totalSeconds > 0">
+                        <p *ngIf="totalSeconds > 0">
                             OTP will expire in {{ displayTime }}
                         </p>
 
-                        <div class="Otp-expire text-center"> -->
-
-    <p *ngIf="totalSeconds > 0">
-        OTP will expire in {{ displayTime }}
-    </p>
-
-    <p *ngIf="totalSeconds <= 0" class="expired-text">
-        OTP expired.
-        <span class="resend-link" (click)="resendOtp()">
-            Resend OTP
-        </span>
-    </p>
-
-
-
-                        
+                        <button
+                            type="button"
+                            class="resend-link"
+                            [disabled]="totalSeconds > 0 || isResending"
+                            (click)="resendOtp()">
+                            {{ isResending ? 'Sending...' : 'Resend OTP' }}
+                        </button>
                     </div>
 
                     <div class="form-login mt-4">
@@ -77,7 +60,10 @@
 
                 </form>
                 <div class="my-4 d-flex justify-content-center align-items-center copyright-text">
-                    <p>Copyright &copy; 2026 Datfuslab Technologies. All rights reserved</p>
+                    <p class="copyright-message">
+                        <span>Copyright &copy; 2026 Datfuslab Technologies.</span>
+                        <span>All rights reserved</span>
+                    </p>
                 </div>
             </div>
         </div>

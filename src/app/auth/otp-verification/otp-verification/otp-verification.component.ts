@@ -21,7 +21,9 @@ export class OtpVerificationComponent implements OnInit, OnDestroy {
 
   displayTime: string = '02:00';
   public totalSeconds = 120; // 2 minutes
-  private timer: any;
+  public isResending = false;
+  private timer?: ReturnType<typeof setInterval>;
+  private otpExpiresAt = 0;
 // isOtpExpired = false;
 
   constructor(
@@ -34,14 +36,15 @@ export class OtpVerificationComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.createForms();
-    this.startCountdown();
 
-    const mobileNo = history.state.mobileNo;
+    const mobileNo = history.state.mobileNo ?? this.authenticationService.getResetMobileNo();
     if (mobileNo) {
       this.verifyOtpForm.patchValue({
         mobileNo: mobileNo
       });
     }
+
+    this.startCountdown();
   }
 
   createForms() {
@@ -85,6 +88,7 @@ updateOtp() {
             if (response.payload.respCode === 200) {
 
               this.authenticationService.setOtpVerified(true);
+              sessionStorage.removeItem('otpExpiresAt');
 
               this.router.navigate([routes.resetPassword], {
                 state: {
@@ -134,37 +138,81 @@ updateOtp() {
 
 
   startCountdown(): void {
-    this.timer = setInterval(() => {
-      const minutes = Math.floor(this.totalSeconds / 60);
-      const seconds = this.totalSeconds % 60;
+    this.stopCountdown();
+    this.otpExpiresAt = this.authenticationService.getOtpExpiry() ?? Date.now();
+    this.updateCountdown();
 
-      this.displayTime =
-        String(minutes).padStart(2, '0') +
-        ':' +
-        String(seconds).padStart(2, '0');
-
-      if (this.totalSeconds <= 0) {
-        clearInterval(this.timer);
-
-        this.displayTime = '00:00';
-
-        // OTP Expired
-        // Enable Resend OTP button here if required
-      } else {
-        this.totalSeconds--;
-      }
-
-    }, 1000);
-  }
-
-  ngOnDestroy(): void {
-    if (this.timer) {
-      clearInterval(this.timer);
+    if (this.totalSeconds > 0) {
+      this.timer = setInterval(() => this.updateCountdown(), 1000);
     }
   }
 
-  resendOtp(){
+  private updateCountdown(): void {
+    this.totalSeconds = Math.max(0, Math.ceil((this.otpExpiresAt - Date.now()) / 1000));
+    const minutes = Math.floor(this.totalSeconds / 60);
+    const seconds = this.totalSeconds % 60;
+    this.displayTime = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 
+    if (this.totalSeconds === 0) {
+      this.stopCountdown();
+    }
+  }
+
+  private stopCountdown(): void {
+    if (this.timer) {
+      clearInterval(this.timer);
+      this.timer = undefined;
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.stopCountdown();
+  }
+
+  resendOtp(){
+    const mobileNo = this.verifyOtpForm.value.mobileNo
+      || this.authenticationService.getResetMobileNo();
+
+    if (!mobileNo || this.isResending) {
+      return;
+    }
+
+    this.isResending = true;
+    this.userManagementService.sendOtp({ mobileNo, requestedFor: 'RESET_PASS' })
+      .subscribe({
+        next: (response: any) => {
+          this.isResending = false;
+
+          if (response?.responseCode === 200 && response?.payload?.respCode === 200) {
+            this.authenticationService.setOtpExpiry();
+            this.verifyOtpForm.patchValue({ otp: '' });
+            document.querySelectorAll<HTMLInputElement>('.forms-block input')
+              .forEach(input => input.value = '');
+            this.startCountdown();
+
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Success',
+              detail: response.payload.respMesg || 'OTP resent successfully.'
+            });
+            return;
+          }
+
+          this.messageService.add({
+            summary: response?.payload?.respCode ?? response?.responseCode ?? 'Error',
+            detail: response?.payload?.respMesg ?? response?.responseMesg ?? 'Unable to resend OTP.',
+            styleClass: 'danger-background-popover'
+          });
+        },
+        error: () => {
+          this.isResending = false;
+          this.messageService.add({
+            summary: '500',
+            detail: 'Server Error',
+            styleClass: 'danger-background-popover'
+          });
+        }
+      });
   }
 
 }
