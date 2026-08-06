@@ -1,18 +1,24 @@
 :host { display: block; }
 
 .access-page { --ink: #182231; --muted: #677386; --line: #e5e9ef; --brand: #FF9F43; --brand-hover: #ff8510; padding-bottom: 28px; }
-.access-hero { display: flex; align-items: center; justify-content: space-between; gap: 24px; margin-bottom: 24px; padding: 6px 2px; }
 .eyebrow { display: block; margin-bottom: 6px; color: var(--brand); font-size: 11px; font-weight: 700; letter-spacing: .11em; text-transform: uppercase; }
-.access-hero h1 { margin: 0 0 7px; color: var(--ink); font-size: clamp(24px, 3vw, 32px); font-weight: 700; letter-spacing: -.035em; }
-.access-hero p, .card-heading p { margin: 0; color: var(--muted); }
-.security-badge { display: flex; align-items: center; gap: 11px; min-width: 230px; padding: 12px 15px; border: 1px solid #ffe0c2; border-radius: 14px; background: #fff8f1; color: #51351c; }
-.security-badge__icon { display: grid; width: 36px; height: 36px; place-items: center; border-radius: 10px; background: #ffead6; color: var(--brand); font-size: 18px; }
-.security-badge span:last-child { display: flex; flex-direction: column; }
-.security-badge strong { font-size: 13px; }
-.security-badge small { color: #8b735e; font-size: 11px; }
-.access-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
-.access-card { display: flex; min-height: 390px; flex-direction: column; padding: 24px; border: 1px solid var(--line); border-radius: 18px; background: #fff; box-shadow: 0 8px 28px rgba(23, 34, 49, .045); }
-.access-card--wide { grid-column: 1 / -1; min-height: auto; }
+.card-heading p { margin: 0; color: var(--muted); }
+.operation-picker { width: 100%; margin: 0 0 22px; padding: 24px; border: 1px solid var(--line); border-radius: 20px; background: linear-gradient(180deg, #fff 0%, #fffdfb 100%); box-shadow: 0 14px 40px rgba(23, 34, 49, .07); }
+.picker-heading { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; }
+.picker-heading h2 { margin: 0 0 4px; color: var(--ink); font-size: 18px; }
+.picker-heading p { margin: 0; color: var(--muted); font-size: 13px; }
+.operation-options { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.operation-options button { display: flex; align-items: center; gap: 12px; min-height: 82px; padding: 15px 16px; border: 1px solid #e1e6ec; border-radius: 14px; background: #fff; color: var(--ink); text-align: left; box-shadow: 0 3px 12px rgba(23, 34, 49, .035); transition: transform .15s, border-color .15s, background .15s, box-shadow .15s; }
+.operation-options button:hover { transform: translateY(-2px); border-color: #ffc58f; background: #fffaf5; box-shadow: 0 9px 20px rgba(255, 159, 67, .11); }
+.operation-options button.selected { border-color: var(--brand); background: #fff6ed; box-shadow: 0 0 0 3px rgba(255, 159, 67, .12), 0 9px 22px rgba(255, 159, 67, .1); }
+.operation-options button > i { display: grid; width: 38px; height: 38px; flex: 0 0 38px; place-items: center; border-radius: 10px; background: #fff0df; color: #d96d08; font-size: 19px; }
+.operation-options button span { display: flex; min-width: 0; flex-direction: column; }
+.operation-options strong { font-size: 13px; }
+.operation-options small { margin-top: 3px; color: var(--muted); font-size: 11px; }
+.access-grid { display: grid; width: min(100%, 640px); margin: 0 auto; grid-template-columns: minmax(0, 1fr); }
+.selected-card-container { scroll-margin-top: 20px; outline: none; }
+.access-card { display: flex; min-height: auto; flex-direction: column; padding: 26px; border: 1px solid var(--line); border-radius: 20px; background: #fff; box-shadow: 0 14px 40px rgba(23, 34, 49, .07); }
+.access-card--wide { grid-column: auto; min-height: auto; }
 .card-heading { display: flex; align-items: flex-start; gap: 14px; padding-bottom: 20px; border-bottom: 1px solid #edf0f4; }
 .card-heading h2 { margin: 1px 0 4px; color: var(--ink); font-size: 17px; font-weight: 700; }
 .card-heading p { font-size: 13px; line-height: 1.5; }
@@ -30,25 +36,31 @@
 .action-button { display: inline-flex; min-height: 43px; align-items: center; justify-content: center; gap: 8px; margin-top: auto; padding: 10px 18px; border: 0; border-radius: 10px; background: var(--brand); color: #fff; font-size: 13px; font-weight: 700; transition: transform .15s, background .15s, box-shadow .15s; }
 .action-button:not(:disabled):hover { transform: translateY(-1px); background: var(--brand-hover); box-shadow: 0 7px 16px rgba(255, 159, 67, .25); }
 .action-button:disabled { cursor: not-allowed; opacity: .48; }
-.password-layout { display: grid; grid-template-columns: minmax(180px, .8fr) minmax(260px, 1.2fr) auto; align-items: start; gap: 18px; padding-top: 22px; }
+.password-layout { display: grid; grid-template-columns: minmax(0, 1fr); align-items: start; gap: 18px; padding-top: 22px; }
 .password-control { position: relative; }
 .password-control .form-control { padding-right: 46px; }
 .password-control button { position: absolute; top: 4px; right: 5px; display: grid; width: 38px; height: 38px; place-items: center; border: 0; border-radius: 8px; background: transparent; color: #7b8594; }
 .password-control button:hover { background: #f3f4f7; color: var(--ink); }
-.password-action { min-width: 150px; margin-top: 25px; }
+.password-action { grid-column: auto; min-width: 150px; margin-top: 2px; }
 .button-spinner { width: 15px; height: 15px; border: 2px solid rgba(255,255,255,.45); border-top-color: #fff; border-radius: 50%; animation: spin .7s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
 @media (max-width: 991px) {
-  .password-layout { grid-template-columns: 1fr 1fr; }
-  .password-action { grid-column: 1 / -1; margin-top: 0; }
+  .operation-picker { width: 100%; }
 }
 @media (max-width: 767px) {
-  .access-hero { align-items: flex-start; flex-direction: column; }
-  .security-badge { width: 100%; }
-  .access-grid { grid-template-columns: 1fr; }
+  .access-grid { width: 100%; grid-template-columns: 1fr; }
+  .operation-options { grid-template-columns: 1fr; }
   .access-card--wide { grid-column: auto; }
   .access-card { min-height: auto; padding: 19px; }
+  .operation-picker { width: 100%; padding: 19px; border-radius: 16px; }
   .password-layout { grid-template-columns: 1fr; }
   .password-action { grid-column: auto; }
+}
+
+@media (max-width: 480px) {
+  .access-page { padding-bottom: 18px; }
+  .operation-picker, .access-card { padding: 16px; border-radius: 14px; }
+  .picker-heading, .card-heading { gap: 11px; }
+  .operation-options button { min-height: 72px; padding: 12px; }
 }

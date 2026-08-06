@@ -75,7 +75,33 @@
                              [class.outgoing-message]="msg.direction === 'OUTGOING'">
                             <div class="message-text">
                                 <span *ngIf="msg.messageType === 'text'">{{msg.messageText}}</span>
-                                <span class="unsupported" *ngIf="msg.messageType !== 'text'">
+
+                                <ng-container *ngIf="msg.messageType === 'image'">
+                                    <div class="image-placeholder"
+                                         role="img"
+                                         aria-label="Image download will be available soon">
+                                        <span class="placeholder-picture" aria-hidden="true">&#127748;</span>
+                                        <span class="media-download-sign" aria-hidden="true">&#8681;</span>
+                                        <span class="placeholder-label">Download image</span>
+                                    </div>
+                                    <span class="media-caption" *ngIf="msg.messageText">{{msg.messageText}}</span>
+                                </ng-container>
+
+                                <ng-container *ngIf="msg.messageType === 'document'">
+                                    <div class="document-card media-placeholder"
+                                         aria-label="Document download will be available soon">
+                                        <span class="document-icon">&#128196;</span>
+                                        <span class="document-details">
+                                            <strong>{{getDocumentName(msg)}}</strong>
+                                            <small>{{msg.mimeType || 'Document'}}</small>
+                                        </span>
+                                        <span class="download-icon" aria-hidden="true">&#8681;</span>
+                                    </div>
+                                    <span class="media-caption" *ngIf="msg.messageText">{{msg.messageText}}</span>
+                                </ng-container>
+
+                                <span class="unsupported"
+                                      *ngIf="msg.messageType !== 'text' && msg.messageType !== 'image' && msg.messageType !== 'document'">
                                     &#128206; Unsupported message type
                                 </span>
                             </div>

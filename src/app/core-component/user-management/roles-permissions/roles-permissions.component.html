@@ -1,23 +1,36 @@
 <p-toast></p-toast>
 
 <section class="access-page">
-  <header class="access-hero">
-    <div>
-      <span class="eyebrow">User management</span>
-      <h1>Roles & permissions</h1>
-      <p>Manage account access, reporting lines, and credentials from one place.</p>
+  <section class="operation-picker" aria-labelledby="operation-picker-title">
+    <div class="picker-heading">
+      <span class="card-icon card-icon--role"><i class="feather icon-settings"></i></span>
+      <div>
+        <h2 id="operation-picker-title">What would you like to change?</h2>
+        <p>Choose one option to continue.</p>
+      </div>
     </div>
-    <div class="security-badge" aria-label="Access controls">
-      <span class="security-badge__icon"><i class="feather icon-shield"></i></span>
-      <span><strong>Access controls</strong><small>Changes apply immediately</small></span>
+    <div class="operation-options">
+      <button type="button" [class.selected]="selectedOperation === 'role'" (click)="selectOperation('role')">
+        <i class="feather icon-user-check"></i><span><strong>Change role</strong><small>Update a user's access level</small></span>
+      </button>
+      <button type="button" [class.selected]="selectedOperation === 'teamLeader'" (click)="selectOperation('teamLeader')">
+        <i class="feather icon-users"></i><span><strong>Set team leader</strong><small>Change a user's supervisor</small></span>
+      </button>
+      <button type="button" [class.selected]="selectedOperation === 'password'" (click)="selectOperation('password')">
+        <i class="feather icon-lock"></i><span><strong>Change password</strong><small>Create a new user password</small></span>
+      </button>
     </div>
-  </header>
+  </section>
 
-  <div class="access-grid">
-    <form class="access-card" [formGroup]="changeUserRoleForm" (ngSubmit)="changeUserRole()">
+  <div #selectedCardContainer
+       class="access-grid selected-card-container"
+       *ngIf="selectedOperation"
+       tabindex="-1"
+       [attr.aria-label]="selectedOperation === 'password' ? 'Change password form' : selectedOperation === 'teamLeader' ? 'Set team leader form' : 'Change role form'">
+    <form *ngIf="selectedOperation === 'role'" class="access-card access-card--wide" [formGroup]="changeUserRoleForm" (ngSubmit)="changeUserRole()">
       <div class="card-heading">
         <span class="card-icon card-icon--role"><i class="feather icon-user-check"></i></span>
-        <div><h2>Assign a role</h2><p>Choose the access level available to a user.</p></div>
+        <div><h2>Change role</h2><p>Choose the access level available to a user.</p></div>
       </div>
       <div class="form-stack">
         <div class="field-group">
@@ -40,7 +53,7 @@
       </button>
     </form>
 
-    <form class="access-card" [formGroup]="changeTeamLeaderForm" (ngSubmit)="changeTeamLeader()">
+    <form *ngIf="selectedOperation === 'teamLeader'" class="access-card access-card--wide" [formGroup]="changeTeamLeaderForm" (ngSubmit)="changeTeamLeader()">
       <div class="card-heading">
         <span class="card-icon card-icon--team"><i class="feather icon-users"></i></span>
         <div><h2>Set team leader</h2><p>Update who supervises and supports a team member.</p></div>
@@ -66,10 +79,10 @@
       </button>
     </form>
 
-    <form class="access-card access-card--wide" [formGroup]="changeUserPasswordForm" (ngSubmit)="changePassword()">
+    <form *ngIf="selectedOperation === 'password'" class="access-card access-card--wide" [formGroup]="changeUserPasswordForm" (ngSubmit)="changePassword()">
       <div class="card-heading">
         <span class="card-icon card-icon--password"><i class="feather icon-lock"></i></span>
-        <div><h2>Reset password</h2><p>Create a new password for a user who can no longer sign in.</p></div>
+        <div><h2>Change password</h2><p>Create a new password for a user who can no longer sign in.</p></div>
       </div>
       <div class="password-layout">
         <div class="field-group">

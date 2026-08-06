@@ -94,7 +94,7 @@ export class WhatsAppInboxComponent implements OnInit {
         groupedContacts[msg.waId] = {
           waId: msg.waId,
           userName: msg.userName || msg.waId,
-          lastMessage: msg.messageText || 'Unsupported Message',
+          lastMessage: this.getMessagePreview(msg),
           lastTime: msg.sortTimestamp,
           
         };
@@ -107,8 +107,7 @@ export class WhatsAppInboxComponent implements OnInit {
 
         if (msg.sortTimestamp >= groupedContacts[msg.waId].lastTime) {
 
-          groupedContacts[msg.waId].lastMessage =
-            msg.messageText || 'Unsupported Message';
+          groupedContacts[msg.waId].lastMessage = this.getMessagePreview(msg);
 
           groupedContacts[msg.waId].lastTime =
             msg.sortTimestamp;
@@ -321,6 +320,23 @@ sendMessage(): void {
     return 'status-pending';
   }
 
+  getMessagePreview(message: any): string {
+    switch ((message?.messageType || '').toLowerCase()) {
+      case 'image':
+        return '📷 Image';
+      case 'document':
+        return `📄 ${message.fileName || 'Document'}`;
+      case 'text':
+        return message.messageText || 'Message';
+      default:
+        return 'Unsupported message';
+    }
+  }
+
+  getDocumentName(message: any): string {
+    return message?.fileName || this.getRawMediaValue(message, 'filename') || 'Document';
+  }
+
   private normalizeMessage(message: any): any {
     const timestamp = Number(message?.messageTimestamp);
     const createdAtTimestamp = this.parseCreatedAt(message?.createdAt);
@@ -332,6 +348,23 @@ sendMessage(): void {
       ...message,
       sortTimestamp
     };
+  }
+
+  private getRawMediaValue(message: any, property: 'url' | 'filename'): string | null {
+    if (!message?.rawJson) {
+      return null;
+    }
+
+    try {
+      const raw = typeof message.rawJson === 'string'
+        ? JSON.parse(message.rawJson)
+        : message.rawJson;
+      const whatsappMessage = raw?.entry?.[0]?.changes?.[0]?.value?.messages?.[0];
+      const media = whatsappMessage?.[message.messageType];
+      return media?.[property] || null;
+    } catch {
+      return null;
+    }
   }
 
   private parseCreatedAt(createdAt: string | null | undefined): number {

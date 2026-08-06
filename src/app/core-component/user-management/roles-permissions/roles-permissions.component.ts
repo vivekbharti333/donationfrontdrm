@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import { Sort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { Router } from '@angular/router';
@@ -28,6 +28,9 @@ interface data {
 })
 export class RolesPermissionsComponent {
 
+  @ViewChild('selectedCardContainer') selectedCardContainer?: ElementRef<HTMLElement>;
+
+  public selectedOperation: 'password' | 'teamLeader' | 'role' | null = null;
   public activeAction: 'password' | 'teamLeader' | 'role' | null = null;
   public showPassword = false;
 
@@ -385,6 +388,17 @@ export class RolesPermissionsComponent {
 
   public togglePasswordVisibility(): void {
     this.showPassword = !this.showPassword;
+  }
+
+  public selectOperation(operation: 'password' | 'teamLeader' | 'role'): void {
+    if (this.activeAction) return;
+    this.selectedOperation = operation;
+
+    setTimeout(() => {
+      const selectedCard = this.selectedCardContainer?.nativeElement;
+      selectedCard?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      selectedCard?.focus({ preventScroll: true });
+    });
   }
 
   private finishAction(action: 'password' | 'teamLeader' | 'role'): void {

@@ -295,6 +295,114 @@ h1 {
     font-style: italic;
 }
 
+.image-placeholder {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: min(280px, 65vw);
+    height: 175px;
+    overflow: hidden;
+    border-radius: 7px;
+    background: linear-gradient(135deg, #9eaaa7, #d1d7d4 48%, #879590);
+    color: #fff;
+}
+
+.image-placeholder::before {
+    position: absolute;
+    inset: -15px;
+    content: '';
+    background:
+        radial-gradient(circle at 25% 30%, rgba(255, 255, 255, .75) 0 10%, transparent 28%),
+        linear-gradient(25deg, #667b70 0 35%, transparent 36%),
+        linear-gradient(150deg, transparent 0 47%, #81998d 48% 70%, transparent 71%);
+    filter: blur(12px);
+    transform: scale(1.12);
+}
+
+.placeholder-picture {
+    position: absolute;
+    z-index: 1;
+    font-size: 42px;
+    filter: blur(2px);
+    opacity: .45;
+}
+
+.media-download-sign {
+    z-index: 2;
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    border: 2px solid rgba(255, 255, 255, .9);
+    border-radius: 50%;
+    background: rgba(20, 35, 31, .55);
+    font-size: 28px;
+    line-height: 1;
+}
+
+.placeholder-label {
+    position: absolute;
+    z-index: 2;
+    bottom: 17px;
+    font-size: 12px;
+    font-weight: 600;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, .45);
+}
+
+.document-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 240px;
+    padding: 10px 12px;
+    border-radius: 7px;
+    background: rgba(0, 0, 0, .055);
+    color: #203038;
+    text-decoration: none;
+}
+
+.document-icon {
+    font-size: 27px;
+}
+
+.document-details {
+    display: flex;
+    flex: 1;
+    min-width: 0;
+    flex-direction: column;
+}
+
+.document-details strong {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.document-details small,
+.media-unavailable {
+    color: #667781;
+}
+
+.download-icon {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border: 1px solid #9ba9ae;
+    border-radius: 50%;
+    font-size: 22px;
+}
+
+.media-placeholder {
+    cursor: default;
+    opacity: .86;
+}
+
+.media-caption {
+    display: block;
+    margin-top: 7px;
+}
+
 .message-footer {
     display: flex;
     align-items: center;
