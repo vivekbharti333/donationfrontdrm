@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Constant } from 'src/app/core/constant/constants'; 
 import { AuthenticationService } from 'src/app/auth/authentication.service';
 import { CookieService } from 'ngx-cookie-service';
@@ -21,15 +21,12 @@ export class GenerateSchoolReceiptService {
   ) {
     this.loginUser = this.authenticationService.getLoginUser();
 
-     let details = this.cookieService.get('loginDetails');
-
-  console.log('COOKIE DETAILS => ', details);
+    const details = this.cookieService.get('loginDetails');
 
   if (details) {
 
     this.loginUser = JSON.parse(details);
 
-    console.log('LOGIN USER => ', this.loginUser);
   }
   }
 
@@ -40,7 +37,7 @@ export class GenerateSchoolReceiptService {
   // get raw values (important: includes disabled fields)
   // const formValue = this.receiptForm.getRawValue();
 
-  let request: any = {
+  const request = {
     payload: {
 
       // ===== Student Info =====
@@ -77,7 +74,7 @@ export class GenerateSchoolReceiptService {
 }
 
 getStudentDetailsForFee( grade: string, gradeSection: string): Observable<any> {
-    let request: any = {
+    const request = {
       payload: {
         // requestFor: 'FOR_FEE',
         requestFor: 'ALL',

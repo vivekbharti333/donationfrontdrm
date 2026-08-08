@@ -1,22 +1,34 @@
+<p-toast></p-toast>
+
+<div class="receipt-page">
+  <div class="page-hero">
+    <div>
+      <span class="eyebrow">School management</span>
+      <h2>Generate fee receipt</h2>
+      <p>Find a student, add the applicable fees, and issue a professional payment receipt.</p>
+    </div>
+    <div class="hero-badge"><i class="feather icon-file-text"></i><span>Fee receipt</span></div>
+  </div>
+
 <form [formGroup]="studentSearchForm" (ngSubmit)="submitSearch()">
 
   <!-- ================= STUDENT INFORMATION ================= -->
-  <div class="card mb-3">
+  <div class="card form-card mb-3">
     <div class="card-header">
-      <h5>Student Information</h5>
+      <div class="section-heading"><span class="step-number">1</span><div><h5>Student information</h5><p>Choose a class and student to begin.</p></div></div>
     </div>
     <div class="card-body">
       <div class="row">
         <div class="col-md-3 mb-3">
-          <label>Academic Session</label>
-          <input class="form-control" formControlName="academicSession">
+          <label>Academic session</label>
+          <input class="form-control" formControlName="academicSession" readonly>
         </div>
 
         <div class="col-md-3 mb-3">
           <label>Grade</label>
           <!-- <input class="form-control" formControlName="grade"> -->
-          <select class="form-control" formControlName="grade">
-            <option value="">Select One</option>
+          <select class="form-control" formControlName="grade" (change)="getStudentDetails()">
+            <option value="">Select grade</option>
             <option value="1">1</option>
             <option value="2">2</option>
             <option value="3">3</option>
@@ -36,7 +48,7 @@
           <label>Section</label>
           <!-- <input class="form-control" formControlName="gradeSection"> -->
           <select class="form-control" formControlName="gradeSection" (change)="getStudentDetails()">
-            <option value="">Select One</option>
+            <option value="">Select section</option>
             <option value="A">A</option>
             <option value="B">B</option>
             <option value="C">C</option>
@@ -45,50 +57,37 @@
           </select>
         </div>
 
-        <div class="col-md-3 col-mb-3">
-                        
-          <label for="receiptType" class="form-label">Student Name</label>
-        <mat-select class="space-select select" formControlName="admissionNo"  placeholder="Select Receipt" (selectionChange)="onStudentChange($event.value)">
-              <mat-option *ngFor="let studentDetail of studentDetails" [value]="studentDetail">
-                  {{ studentDetail.firstName + ' ' + studentDetail.lastName }}
-              </mat-option>
-            </mat-select>  
+        <div class="col-md-3 mb-3">
+          <label class="form-label">Student Name</label>
+          <select class="form-control" formControlName="admissionNo"
+            (change)="onStudentChangeByAdmissionNo()"
+            [attr.aria-busy]="isLoading"
+            [disabled]="isLoading || !studentDetails.length">
+            <option value="">Select student</option>
+            <option *ngFor="let studentDetail of studentDetails" [value]="studentDetail.admissionNo">
+              {{ studentDetail.firstName + ' ' + studentDetail.lastName }}
+            </option>
+          </select>
+            <small class="text-muted" *ngIf="isLoading">Loading students...</small>
       
         </div>
 
 
 
-        <div class="row mt-3" *ngIf="selectedStudent">
-
-  <div class="col-md-6">
-
-    <div class="card p-3">
-
-      <h6>Father Name</h6>
-
-      <p>{{ selectedStudent.fatherName }}</p>
-
-    </div>
-
-  </div>
-
-  <div class="col-md-6">
-
-    <div class="card p-3">
-
-      <h6>Mother Name</h6>
-
-      <p>{{ selectedStudent.motherName }}</p>
-
-    </div>
-
-  </div>
-
-</div>
+        <div class="col-12" *ngIf="selectedStudent">
+          <div class="student-summary">
+            <div class="student-avatar">{{ selectedStudent.firstName?.charAt(0) || 'S' }}</div>
+            <div class="student-primary"><span>Selected student</span><strong>{{ selectedStudent.firstName }} {{ selectedStudent.lastName }}</strong><small>Admission no. {{ selectedStudent.admissionNo }}</small></div>
+            <div class="guardian-detail"><span>Father's name</span><strong>{{ selectedStudent.fatherName || 'Not available' }}</strong></div>
+            <div class="guardian-detail"><span>Mother's name</span><strong>{{ selectedStudent.motherName || 'Not available' }}</strong></div>
+          </div>
+        </div>
 
         <!-- ================= SUBMIT BUTTON ================= -->
         <div class="col-md-3 mb-3 search-btn-wrapper">
-          <button type="submit" class="btn btn-primary">Search Student</button>
+          <button type="submit" class="btn btn-primary w-100" [disabled]="isLoading || !studentSearchForm.get('grade')?.value || !studentSearchForm.get('gradeSection')?.value">
+            <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>{{ isLoading ? 'Loading...' : 'Search students' }}
+          </button>
         </div>
 
 
@@ -101,25 +100,25 @@
 
 <!-- ================= RECEIPT INFO ================= -->
 <form [formGroup]="receiptForm" (ngSubmit)="submitReceipt()">
-  <div class="card mb-3">
+  <div class="card form-card mb-3">
     <div class="card-header">
-      <h5>Receipt Information</h5>
+      <div class="section-heading"><span class="step-number">2</span><div><h5>Receipt information</h5><p>Enter payment and installment details.</p></div></div>
     </div>
     <div class="card-body">
       <div class="row">
 
         <div class="col-md-4 mb-3">
-          <label>Receipt Number *</label>
-          <input class="form-control" formControlName="receiptNumber">
+          <label>Receipt Number <span class="required">*</span></label>
+          <input class="form-control" formControlName="receiptNumber" placeholder="e.g. FEE-2026-001" [class.is-invalid]="receiptForm.get('receiptNumber')?.touched && receiptForm.get('receiptNumber')?.invalid">
         </div>
 
         <div class="col-md-4 mb-3">
-          <label>Installment</label>
-          <input class="form-control" formControlName="installmentName">
+          <label>Installment <span class="required">*</span></label>
+          <input class="form-control" formControlName="installmentName" placeholder="e.g. April installment">
         </div>
 
         <div class="col-md-4 mb-3">
-          <label>Payment Mode</label>
+          <label>Payment Mode <span class="required">*</span></label>
           <select class="form-control" formControlName="paymentMode">
             <option value="">Select</option>
             <option value="CASH">Cash</option>
@@ -129,7 +128,7 @@
         </div>
 
         <div class="col-md-4 mb-3">
-          <label>Payment Date</label>
+          <label>Payment Date <span class="required">*</span></label>
           <input type="date" class="form-control" formControlName="paymentDate">
         </div>
 
@@ -138,17 +137,17 @@
   </div>
 
   <!-- ================= FEE DETAILS ================= -->
-  <div class="card mb-3">
+  <div class="card form-card mb-3">
     <div class="card-header d-flex justify-content-between">
-      <h5>Fee Details</h5>
-      <button type="button" class="btn btn-sm btn-primary" (click)="addFeeRow()">
-        + Add Fee
+      <div class="section-heading"><span class="step-number">3</span><div><h5>Fee details</h5><p>Add one or more fee heads.</p></div></div>
+      <button type="button" class="btn btn-sm btn-outline-primary add-fee-btn" (click)="addFeeRow()">
+        <i class="feather icon-plus me-1"></i> Add fee
       </button>
     </div>
 
     <div class="card-body" formArrayName="receiptDetails">
 
-      <div class="row mb-2" *ngFor="let fee of receiptDetails.controls; let i = index" [formGroupName]="i">
+      <div class="row fee-row" *ngFor="let fee of receiptDetails.controls; let i = index" [formGroupName]="i">
 
         <div class="col-md-6">
           <label>Fee Type</label>
@@ -171,7 +170,7 @@
             <option value="Late Fee">Late Fee</option>
             <option value="Re-admission Fee">Re-admission Fee</option>
             <option value="Document Fee">Document Fee</option>
-            <option value="Document Fee">Miscellaneous Fee</option>
+            <option value="Miscellaneous Fee">Miscellaneous Fee</option>
           </select>
         </div>
 
@@ -181,8 +180,8 @@
         </div>
 
         <div class="col-md-2 d-flex align-items-end">
-          <button type="button" class="btn btn-danger" (click)="removeFeeRow(i)">
-            Remove
+          <button type="button" class="btn btn-outline-danger remove-fee" (click)="removeFeeRow(i)" [disabled]="receiptDetails.length === 1" aria-label="Remove fee row">
+            <i class="feather icon-trash-2"></i><span>Remove</span>
           </button>
         </div>
 
@@ -192,29 +191,29 @@
   </div>
 
   <!-- ================= AMOUNT SUMMARY ================= -->
-  <div class="card mb-3">
+  <div class="card form-card summary-card mb-3">
     <div class="card-header">
-      <h5>Amount Summary</h5>
+      <div class="section-heading"><span class="step-number">4</span><div><h5>Amount summary</h5><p>Review the final amount before generating.</p></div></div>
     </div>
     <div class="card-body">
       <div class="row">
 
-        <div class="col-md-3">
+        <div class="col-md-3 mb-3 mb-md-0">
           <label>Total Amount</label>
           <input class="form-control" formControlName="totalAmount" readonly>
         </div>
 
-        <div class="col-md-3">
+        <div class="col-md-3 mb-3 mb-md-0">
           <label>Discount</label>
           <input type="number" class="form-control" formControlName="discountAmount" (input)="calculateTotals()">
         </div>
 
-        <div class="col-md-3">
+        <div class="col-md-3 mb-3 mb-md-0">
           <label>Fine</label>
           <input type="number" class="form-control" formControlName="fineAmount" (input)="calculateTotals()">
         </div>
 
-        <div class="col-md-3">
+        <div class="col-md-3 net-amount">
           <label>Net Amount</label>
           <input class="form-control" formControlName="netAmount" readonly>
         </div>
@@ -224,10 +223,10 @@
   </div>
 
   <!-- ================= ACTIONS ================= -->
-  <div class="text-end">
+  <div class="form-actions">
     <!-- <button type="submit" class="btn btn-success" [disabled]="receiptForm.invalid"> -->
-      <button type="submit" class="btn btn-success">
-      Generate Receipt
+      <button type="submit" class="btn btn-success generate-btn" [disabled]="isSubmitting">
+      <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm me-2"></span><i *ngIf="!isSubmitting" class="feather icon-check-circle me-2"></i>{{ isSubmitting ? 'Generating...' : 'Generate receipt' }}
     </button>
     <button type="button" class="btn btn-secondary ms-2" (click)="resetForm()">
       Cancel
@@ -235,6 +234,7 @@
   </div>
 
 </form>
+</div>
 
 
 <ng-template #dialogTemplate>
@@ -242,309 +242,92 @@
   <!-- DIALOG HEADER -->
   <div class="modalHeaderContainer">
     <h2 mat-dialog-title class="p-0">Payment Receipt</h2>
-    <button mat-icon-button mat-dialog-close aria-label="Close">✕</button>
+    <button mat-icon-button mat-dialog-close aria-label="Close">&times;</button>
   </div>
 
   <mat-dialog-content class="dialog-content">
 
-    <!-- ================= PRINT AREA ================= -->
     <div id="printArea">
+      <ng-template #receiptCopy let-copyLabel="copyLabel">
+        <div class="receipt">
+          <div class="receipt-topline">
+            <span class="copy-label">{{ copyLabel }}</span>
+          </div>
 
-      <!-- ================= STUDENT COPY ================= -->
-      <div class="print-copy">
-
-        <div class="page">
-          <div class="receipt">
-
-            <div class="copy-label">Student Copy</div>
-
-            <!-- HEADER -->
-            <div class="school-details">
-              <div class="logo">
-                <img src="cia.png" alt="School Logo">
-              </div>
-
-              <div class="school-info">
-                <div class="school-name">CHAMPARAN INTERNATIONAL ACADEMY</div>
-                <div class="school-address">
-                  Masjid Tola, Near Batakh Miya Mazar, Bajrang Chowk, Agari
-                </div>
-                <div class="school-contact">
-                  Contact: 7321978565 |
-                  Email: champaraninternationalacademy&#64;gmail.com
-                </div>
+          <div class="receipt-branding">
+            <div class="brand-block">
+              <img src="assets/img/logo.png" alt="School Logo" class="receipt-logo">
+              <div>
+                <div class="school-name">CHAMPARAN INTERNATIONAL</div>
+                <div class="school-name school-name-accent">ACADEMY</div>
+                <div class="school-tagline">Learning today, leading tomorrow</div>
               </div>
             </div>
-
-            <div class="fee-title">FEE RECEIPT</div>
-
-            <!-- STUDENT DETAILS -->
-            <table class="no-border">
-              <tr>
-                <td><b>BILL NO:</b> {{ receiptForm.value.receiptNumber }}</td>
-                <td><b>MONTH:</b> {{ receiptForm.value.installmentName }}</td>
-                <td><b>DATE:</b> {{ receiptForm.value.paymentDate | date:'dd-MM-yyyy' }}</td>
-              </tr>
-              <tr>
-                <td><b>NAME:</b> {{ receiptForm.value.studentName }}</td>
-                <td><b>CLASS:</b> {{ receiptForm.value.grade }} ({{ receiptForm.value.gradeSection }})</td>
-                <td><b>ADM/ROLL NO:</b>{{ receiptForm.value.admissionNo }}
-                  /
-                  {{ receiptForm.value.rollNumber }}</td>
-              </tr>
-              <tr>
-                <td><b>FATHER:</b> NIRAJ KUMAR</td>
-                <td><b>MOTHER:</b> GEETA DEVI</td>
-                <td><b>CONTACT NO:</b> 6202014654</td>
-              </tr>
-            </table>
-
-            <!-- FEE TABLE -->
-            <table class="fee-table">
-
-              <thead>
-
-                <tr>
-
-                  <th>Fee Head</th>
-
-                  <th class="text-right">
-                    Amount
-                  </th>
-
-                  <th class="text-right">
-                    Concession
-                  </th>
-
-                  <th class="text-right">
-                    Total
-                  </th>
-
-                </tr>
-
-              </thead>
-
-              <tbody>
-
-                <tr
-                  *ngFor="
-                    let item of receiptDetails.controls;
-                    let i = index
-                  "
-                  [formGroup]="asFormGroup(item)">
-
-                  <td>
-                    {{ item.value.feeType }}
-                  </td>
-
-                  <td class="text-right">
-                    {{ item.value.amount }}
-                  </td>
-
-                  <td class="text-right">
-                    {{ receiptForm.value.discountAmount || 0 }}
-                  </td>
-
-                  <td class="text-right">
-                    {{ item.value.amount }}
-                  </td>
-
-                </tr>
-
-               
-                <tr class="bold">
-
-                  <td>Total</td>
-
-                  <td class="text-right">
-                    {{ receiptForm.value.totalAmount }}
-                  </td>
-
-                  <td class="text-right">
-                    {{ receiptForm.value.discountAmount }}
-                  </td>
-
-                  <td class="text-right">
-                    {{ receiptForm.value.netAmount }}
-                  </td>
-
-                </tr>
-
-              </tbody>
-
-            </table>
-
-
-            <!-- FOOTER -->
-            <div class="footer">
-              <b>Paid:</b> {{ receiptForm.value.netAmount }} &nbsp;&nbsp;
-              <b>Discount:</b> {{ receiptForm.value.discountAmount }} &nbsp;&nbsp;
-              <b>Dues:</b> 0 &nbsp;&nbsp;
-              <b>Mode:</b> {{ receiptForm.value.paymentMode }}
+            <div class="receipt-meta">
+              <div class="receipt-title">PAYMENT RECEIPT</div>
+              <div><span>Receipt No.</span><b>{{ receiptForm.value.receiptNumber }}</b></div>
+              <div><span>Date</span><b>{{ receiptForm.value.paymentDate | date:'dd MMMM yyyy' }}</b></div>
+              <div><span>Academic Year</span><b>{{ receiptForm.value.academicSession }}</b></div>
             </div>
+          </div>
 
-            <!-- SIGNATURE -->
-            <div class="signature"><br>
-              _______________________<br>
-              (Authorized Signature) <br><br>
+          <div class="orange-rule"></div>
+
+          <div class="detail-panel">
+            <div class="detail-column">
+              <div><span>Student Name</span><b>{{ receiptForm.value.studentName || '-' }}</b></div>
+              <div><span>Admission No.</span><b>{{ receiptForm.value.admissionNo || '-' }}</b></div>
+              <div><span>Class &amp; Section</span><b>{{ receiptForm.value.grade || '-' }} - {{ receiptForm.value.gradeSection || '-' }}</b></div>
+              <div><span>Roll No.</span><b>{{ receiptForm.value.rollNumber || '-' }}</b></div>
+              <div><span>Father's Name</span><b>{{ receiptForm.value.fatherName || '-' }}</b></div>
             </div>
+            <div class="detail-column">
+              <div><span>Payment Mode</span><b>{{ receiptForm.value.paymentMode || '-' }}</b></div>
+              <div><span>Installment</span><b>{{ receiptForm.value.installmentName || '-' }}</b></div>
+              <div><span>Payment Date</span><b>{{ receiptForm.value.paymentDate | date:'dd MMMM yyyy' }}</b></div>
+              <div><span>Contact No.</span><b>{{ receiptForm.value.contactNo || '-' }}</b></div>
+              <div><span>Status</span><b>{{ receiptForm.value.status || 'PAID' }}</b></div>
+            </div>
+          </div>
 
+          <table class="premium-fee-table">
+            <thead><tr><th>PARTICULARS</th><th>AMOUNT (₹)</th></tr></thead>
+            <tbody>
+              <tr *ngFor="let item of receiptDetails.controls" [formGroup]="asFormGroup(item)">
+                <td>{{ item.value.feeType }}</td>
+                <td>{{ item.value.amount | number:'1.2-2' }}</td>
+              </tr>
+              <tr class="summary-row"><td>TOTAL AMOUNT</td><td>{{ receiptForm.value.totalAmount | number:'1.2-2' }}</td></tr>
+              <tr class="discount-row"><td>Discount (if any)</td><td>(-) {{ receiptForm.value.discountAmount | number:'1.2-2' }}</td></tr>
+              <tr *ngIf="receiptForm.value.fineAmount" class="discount-row"><td>Fine</td><td>(+) {{ receiptForm.value.fineAmount | number:'1.2-2' }}</td></tr>
+              <tr class="paid-row"><td>AMOUNT PAID (₹)</td><td>{{ receiptForm.value.netAmount | number:'1.2-2' }}</td></tr>
+            </tbody>
+          </table>
+
+          <div class="receipt-lower">
+            <div class="thank-you"><strong>Thank You!</strong><span>We appreciate your timely payment.</span></div>
+            <div class="signature"><div class="signature-line"></div><b>Authorized Signatory</b></div>
+          </div>
+
+          <div class="contact-strip">
+            <span><i class="feather icon-map-pin"></i> Masjid Tola, Bajrang Chowk, Agari</span>
+            <span><i class="feather icon-phone"></i> 7321978565</span>
+            <span><i class="feather icon-mail"></i> champaraninternationalacademy&#64;gmail.com</span>
           </div>
         </div>
-      </div>
+      </ng-template>
 
-      <!-- ===== CUT LINE ===== -->
-      <div class="receipt-separator print-only">
-        ------------------------------ CUT HERE ------------------------------
-      </div>
-
-      <!-- ================= OFFICE COPY (PRINT ONLY) ================= -->
-      <div class="print-copy print-only">
-        <!-- SAME RECEIPT AGAIN -->
-        <div class="page">
-          <div class="receipt">
-            <div class="copy-label">Office Copy</div>
-            <!-- HEADER -->
-            <div class="school-details">
-              <div class="logo">
-                <img src="cia.png" alt="School Logo">
-              </div>
-
-              <div class="school-info">
-                <div class="school-name">CHAMPARAN INTERNATIONAL ACADEMY</div>
-                <div class="school-address">
-                  Masjid Tola, Near Batakh Miya Mazar, Bajrang Chowk, Agari
-                </div>
-                <div class="school-contact">
-                  Contact: 7321978565 |
-                  Email: champaraninternationalacademy&#64;gmail.com
-                </div>
-              </div>
-            </div>
-
-            <div class="fee-title">FEE RECEIPT</div>
-
-            <!-- STUDENT DETAILS -->
-            <table class="no-border">
-              <tr>
-                <td><b>BILL NO:</b> {{ receiptForm.value.receiptNumber }}</td>
-                <td><b>MONTH:</b> {{ receiptForm.value.installmentName }}</td>
-                <td><b>DATE:</b> {{ receiptForm.value.paymentDate | date:'dd-MM-yyyy' }}</td>
-              </tr>
-              <tr>
-                <td><b>NAME:</b> {{ receiptForm.value.studentName }}</td>
-                <td><b>CLASS:</b> {{ receiptForm.value.grade }} ({{ receiptForm.value.gradeSection }})</td>
-                <td><b>ADM/ROLL NO:</b>{{ receiptForm.value.admissionNo }}
-                  /
-                  {{ receiptForm.value.rollNumber }}</td>
-              </tr>
-              <tr>
-                <td><b>FATHER:</b> NIRAJ KUMAR</td>
-                <td><b>MOTHER:</b> GEETA DEVI</td>
-                <td><b>CONTACT NO:</b> 6202014654</td>
-              </tr>
-            </table>
-
-            <!-- FEE TABLE -->
-                       <table class="fee-table">
-
-              <thead>
-
-                <tr>
-
-                  <th>Fee Head</th>
-
-                  <th class="text-right">
-                    Amount
-                  </th>
-
-                  <th class="text-right">
-                    Concession
-                  </th>
-
-                  <th class="text-right">
-                    Total
-                  </th>
-
-                </tr>
-
-              </thead>
-
-              <tbody>
-
-                <tr
-                  *ngFor="
-                    let item of receiptDetails.controls;
-                    let i = index
-                  "
-                  [formGroup]="asFormGroup(item)">
-
-                  <td>
-                    {{ item.value.feeType }}
-                  </td>
-
-                  <td class="text-right">
-                    {{ item.value.amount }}
-                  </td>
-
-                  <td class="text-right">
-                    {{ receiptForm.value.discountAmount || 0 }}
-                  </td>
-
-                  <td class="text-right">
-                    {{ item.value.amount }}
-                  </td>
-
-                </tr>
-
-               
-                <tr class="bold">
-
-                  <td>Total</td>
-
-                  <td class="text-right">
-                    {{ receiptForm.value.totalAmount }}
-                  </td>
-
-                  <td class="text-right">
-                    {{ receiptForm.value.discountAmount }}
-                  </td>
-
-                  <td class="text-right">
-                    {{ receiptForm.value.netAmount }}
-                  </td>
-
-                </tr>
-
-              </tbody>
-
-            </table>
-
-
-            <!-- FOOTER -->
-            <div class="footer">
-              <b>Paid:</b> {{ receiptForm.value.netAmount }} &nbsp;&nbsp;
-              <b>Discount:</b> {{ receiptForm.value.discountAmount }} &nbsp;&nbsp;
-              <b>Dues:</b> 0 &nbsp;&nbsp;
-              <b>Mode:</b> {{ receiptForm.value.paymentMode }}
-            </div>
-
-            <!-- SIGNATURE -->
-            <div class="signature">
-              _______________________<br>
-              (Authorized Signature)
-            </div>
-
-          </div>
-        </div>
-      </div>
-
+      <div class="print-copy"><ng-container *ngTemplateOutlet="receiptCopy; context: { copyLabel: 'Student Copy' }"></ng-container></div>
+      <div class="receipt-separator print-only">CUT HERE</div>
+      <div class="print-copy print-only"><ng-container *ngTemplateOutlet="receiptCopy; context: { copyLabel: 'School Copy' }"></ng-container></div>
     </div>
   </mat-dialog-content>
 
-  <!-- PRINT BUTTON -->
-  <button mat-raised-button color="primary" (click)="printReceipt()">
-    Print
-  </button>
+  <mat-dialog-actions align="end" class="receipt-dialog-actions">
+    <button mat-button mat-dialog-close>Close</button>
+    <button mat-raised-button color="primary" (click)="printReceipt()">
+      <i class="feather icon-printer me-2"></i>Print student &amp; school copies
+    </button>
+  </mat-dialog-actions>
 
 </ng-template>

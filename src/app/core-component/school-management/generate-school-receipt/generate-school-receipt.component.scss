@@ -1,94 +1,140 @@
+.receipt-page { max-width: 1280px; margin: 0 auto; padding-bottom: 32px; }
+.page-hero { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 24px 28px; margin-bottom: 20px; color: #fff; border-radius: 16px; background: linear-gradient(135deg, #173b67 0%, #2563a8 58%, #16867a 100%); box-shadow: 0 14px 30px rgba(23, 59, 103, .18); }
+.page-hero h2 { margin: 3px 0 5px; font-size: 27px; font-weight: 700; color: #fff; }
+.page-hero p { margin: 0; color: rgba(255,255,255,.82); }
+.eyebrow { font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: #b9e5df; }
+.hero-badge { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border: 1px solid rgba(255,255,255,.22); border-radius: 12px; background: rgba(255,255,255,.1); white-space: nowrap; }
+.hero-badge i { font-size: 20px; }
+
 .search-btn-wrapper {
   margin-top: 25px;
 }
 
-.page {
-    width: 100%;
-    max-width: 100%;
-    margin: auto;
+.card-header h5 {
+    margin-bottom: 0;
+}
+
+.form-card {
+    border: 0;
+    border-radius: 14px;
+    box-shadow: 0 5px 22px rgba(15, 23, 42, 0.07);
+    overflow: hidden;
+}
+
+.card-header {
+    padding: 16px 20px;
+    background: #fff;
+    border-bottom: 1px solid #edf1f5;
+}
+.card-body { padding: 20px; }
+.section-heading { display: flex; align-items: center; gap: 12px; }
+.section-heading h5 { font-size: 16px; font-weight: 700; color: #182230; }
+.section-heading p { margin: 2px 0 0; font-size: 12px; color: #758195; }
+.step-number { display: inline-grid; place-items: center; width: 32px; height: 32px; flex: 0 0 32px; border-radius: 9px; color: #fff; background: #2563a8; font-size: 13px; font-weight: 700; }
+
+label {
+    margin-bottom: 6px;
+    font-weight: 500;
+}
+.form-control { min-height: 42px; border-color: #dce2e9; border-radius: 8px; }
+.form-control[readonly] { background: #f6f8fb; color: #536174; }
+.student-summary { display: grid; grid-template-columns: auto minmax(180px, 1.4fr) 1fr 1fr; gap: 18px; align-items: center; padding: 16px; margin: 4px 0 16px; border: 1px solid #dbe9e7; border-radius: 12px; background: #f3faf9; }
+.student-avatar { display: grid; place-items: center; width: 46px; height: 46px; border-radius: 50%; color: #fff; background: #16867a; font-size: 20px; font-weight: 700; }
+.student-primary, .guardian-detail { display: flex; flex-direction: column; }
+.student-primary span, .guardian-detail span { font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: #738196; }
+.student-primary strong, .guardian-detail strong { color: #233044; margin-top: 2px; }
+.student-primary small { color: #68778b; }
+.fee-row { align-items: end; padding: 14px 4px; border-bottom: 1px solid #edf1f5; }
+.fee-row:first-child { padding-top: 0; }
+.fee-row:last-child { border-bottom: 0; padding-bottom: 0; }
+.remove-fee { min-height: 42px; }
+.summary-card .card-body { background: #f9fbfd; }
+.net-amount .form-control { color: #0d705f; background: #eaf7f4; border-color: #b9e1da; font-size: 17px; font-weight: 700; }
+.form-actions { display: flex; justify-content: flex-end; gap: 10px; padding-top: 6px; }
+.form-actions .btn { min-height: 44px; padding: 9px 20px; border-radius: 9px; font-weight: 600; }
+.generate-btn { min-width: 180px; }
+
+.required { color: #dc3545; }
+
+.form-control:focus {
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
 }
 
 .receipt {
-    border: 2px solid #000;
-    padding: 10px;
+    position: relative;
+    overflow: hidden;
     box-sizing: border-box;
+    color: #10294b;
+    background: #fff;
+    border: 1px solid #cbd6e3;
+    border-radius: 5px;
+    font-family: Arial, sans-serif;
 }
 
-.school-details {
+.receipt-topline { height: 5px; background: #073a78; }
+.copy-label { position: absolute; top: 10px; right: 12px; z-index: 2; padding: 3px 9px; color: #fff; background: #ef8a1d; border-radius: 12px; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; }
+.receipt-branding { display: flex; justify-content: space-between; gap: 20px; padding: 12px 18px 9px; }
+.brand-block { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.receipt-logo { width: 58px; height: 58px; object-fit: contain; }
+.school-name {
+    color: #073a78;
+    font-size: 18px;
+    line-height: 1.05;
+    font-weight: 800;
+    letter-spacing: .02em;
+}
+.school-name-accent { color: #ef8a1d; }
+.school-tagline { margin-top: 4px; color: #55708f; font-size: 10px; letter-spacing: .08em; }
+.receipt-meta { width: 295px; padding-top: 7px; font-size: 10px; }
+.receipt-title { margin-bottom: 7px; padding: 7px 28px; color: #fff; background: linear-gradient(135deg, #062f65, #07509a); clip-path: polygon(7% 0, 93% 0, 100% 50%, 93% 100%, 7% 100%, 0 50%); text-align: center; font-size: 16px; font-weight: 800; letter-spacing: .09em; }
+.receipt-meta > div:not(.receipt-title) { display: grid; grid-template-columns: 92px 1fr; gap: 8px; padding: 1px 8px; color: #273b55; }
+.receipt-meta b { color: #10294b; }
+.orange-rule { height: 2px; margin: 0 18px 8px; background: #ef8a1d; }
+.detail-panel { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin: 0 18px 6px; padding: 5px 14px; border: 1px solid #cbd6e3; border-radius: 7px; }
+.detail-column > div { display: grid; grid-template-columns: 110px 1fr; align-items: center; gap: 8px; min-height: 18px; padding: 0; font-size: 10px; line-height: 1.15; }
+.detail-column span { font-weight: 700; color: #17365f; }
+.detail-column b { color: #172234; }
+.premium-fee-table { width: calc(100% - 36px); margin: 0 18px; border-collapse: separate; border-spacing: 0; overflow: hidden; border: 1px solid #cbd6e3; border-radius: 7px; font-size: 10px; }
+.premium-fee-table th { padding: 6px 14px; color: #fff; background: linear-gradient(90deg, #073a78, #07509a); font-size: 10px; letter-spacing: .04em; }
+.premium-fee-table th:last-child, .premium-fee-table td:last-child { width: 25%; text-align: right; border-left: 1px solid #cbd6e3; }
+.premium-fee-table td { padding: 3px 14px; color: #172234; }
+.premium-fee-table .summary-row td { padding-top: 6px; border-top: 1px dashed #b8c6d6; color: #10294b; font-weight: 800; }
+.premium-fee-table .discount-row td { color: #344963; }
+.premium-fee-table .paid-row td { padding-top: 6px; padding-bottom: 6px; color: #e5790d; background: #fff7ed; border-top: 1px solid #efc393; font-size: 12px; font-weight: 800; }
+.receipt-lower { display: flex; align-items: flex-end; justify-content: space-between; padding: 10px 28px 9px; }
+.thank-you { display: flex; flex-direction: column; color: #425875; font-size: 9px; }
+.thank-you strong { margin-bottom: 2px; color: #ef8a1d; font-family: cursive; font-size: 18px; font-style: italic; }
+.signature { width: 155px; margin: 0; color: #17365f; text-align: center; font-size: 9px; }
+.signature-line { height: 22px; margin-bottom: 4px; border-bottom: 1px solid #7187a0; }
+.contact-strip { display: flex; justify-content: space-around; gap: 12px; padding: 8px 16px; color: #fff; background: linear-gradient(90deg, #062f65, #07509a, #062f65); font-size: 8px; }
+.contact-strip span { display: flex; align-items: center; gap: 5px; }
+.contact-strip i { color: #f39a2d; font-size: 11px; }
+
+.modalHeaderContainer {
     display: flex;
     align-items: center;
-    border-bottom: 1px solid #000;
-    padding-bottom: 8px;
+    justify-content: space-between;
+    padding: 0 8px;
 }
 
-.logo {
-    width: 65px;
-    margin-right: 8px;
-}
+.dialog-content { padding-top: 8px; }
+.receipt-dialog-actions { padding: 12px 24px 18px; border-top: 1px solid #edf1f5; }
 
-.logo img {
-    width: 80px;
-}
-
-.school-info {
-    flex: 1;
-    text-align: center;
-}
-
-.school-name {
-    font-size: 20px;
-    font-weight: bold;
-    color: #c00000;
-}
-
-.school-address {
-    font-size: 13px;
-    color: #0000FF;
-}
-
-.school-contact {
-    font-size: 13px;
-    color: #00A36C;
-}
-
-.fee-title {
-    text-align: center;
-    border: 1px solid #000;
-    margin: 10px 0;
-    padding: 4px;
-    font-weight: bold;
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 13px;
-}
-
-.no-border td {
-    padding: 3px;
-}
-
-.fee-table th,
-.fee-table td {
-    padding: 6px;
-}
-
-.fee-table thead th {
-    background: #000;
-    color: #fff;
-}
-
-.signature {
-    margin-top: 20px;
-    text-align: right;
-    font-size: 13px;
-}
-
-.copy-label {
-    text-align: right;
-    font-size: 11px;
-    margin-bottom: 4px;
+@media (max-width: 767px) {
+  .page-hero { padding: 20px; }
+  .hero-badge { display: none; }
+  .student-summary { grid-template-columns: auto 1fr; }
+  .guardian-detail { grid-column: 2; }
+  .add-fee-btn span { display: none; }
+  .remove-fee { width: 100%; margin-top: 10px; }
+  .remove-fee span { margin-left: 6px; }
+  .form-actions { flex-direction: column-reverse; }
+  .form-actions .btn { width: 100%; margin-left: 0 !important; }
+  .receipt-branding { flex-direction: column; }
+  .receipt-meta { width: 100%; }
+  .detail-panel { grid-template-columns: 1fr; gap: 2px; }
+  .contact-strip { flex-direction: column; }
 }
 
 /* SEPARATOR */
@@ -130,15 +176,28 @@ table {
     }
 
     .print-copy {
-        height: 148.5mm;   /* HALF A4 */
+        height: 132mm;
+        break-inside: avoid;
+        page-break-inside: avoid;
     }
+
+    .receipt { border-color: #000; border-top-color: #000; border-radius: 0; }
 
     .print-only {
         display: block;
     }
 
+    .receipt-separator {
+        height: 5mm;
+        margin: 0 0 4mm;
+        border-top: 1px dashed #666;
+        color: transparent;
+    }
+
     button,
-    .modalHeaderContainer {
+    .modalHeaderContainer,
+    .receipt-dialog-actions,
+    .mat-mdc-dialog-actions {
         display: none !important;
     }
 }

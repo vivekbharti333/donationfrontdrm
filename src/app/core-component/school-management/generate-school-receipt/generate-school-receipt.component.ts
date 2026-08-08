@@ -1,20 +1,5 @@
 import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
-import { AuthenticationService } from 'src/app/auth/authentication.service';
-import { Sort } from '@angular/material/sort';
-import { MatTableDataSource } from '@angular/material/table';
-import { Router } from '@angular/router';
-import {
-  DataService,
-  pageSelection,
-  apiResultFormat,
-  SidebarService,
-} from 'src/app/core/core.index';
-import { routes } from 'src/app/core/helpers/routes';
-import { users } from 'src/app/shared/model/page.model';
-import { PaginationService, tablePageSize } from 'src/app/shared/shared.index';
-import { ToastModule } from 'primeng/toast';
 import { MatDialog } from '@angular/material/dialog';
 import { MessageService } from 'primeng/api';
 import { GenerateSchoolReceiptService } from './generate-school-receipt.service';
@@ -23,9 +8,9 @@ import { GenerateSchoolReceiptService } from './generate-school-receipt.service'
   selector: 'app-generate-school-receipt',
   templateUrl: './generate-school-receipt.component.html',
   styleUrl: './generate-school-receipt.component.scss',
-  providers: [MessageService, ToastModule],
+  providers: [MessageService],
 })
-export class GenerateSchoolReceiptComponent {
+export class GenerateSchoolReceiptComponent implements OnInit {
 
   @ViewChild('dialogTemplate')
   dialogTemplate!: TemplateRef<any>;
@@ -37,12 +22,12 @@ export class GenerateSchoolReceiptComponent {
   selectedStudent: any;
 
   studentDetails: any[] = [];
-  isLoading = true;
+  isLoading = false;
+  isSubmitting = false;
 
 
   constructor(
     private fb: FormBuilder,
-    private http: HttpClient,
     private dialog: MatDialog,
     private messageService: MessageService,
     private generateSchoolReceiptService: GenerateSchoolReceiptService,
@@ -70,26 +55,29 @@ export class GenerateSchoolReceiptComponent {
     this.receiptForm = this.fb.group({
 
       // Student Info
-      admissionNo: ['', Validators.required],
+      admissionNo: ['TEST-VIVEK-001', Validators.required],
       rollNumber: [''],
-      studentName: ['', Validators.required],
+      studentName: ['Vivek'],
+      fatherName: [''],
+      motherName: [''],
+      contactNo: [''],
       grade: [''],
       gradeSection: [''],
       academicSession: ['2026-2027'],
 
       // Receipt Info
       receiptNumber: ['', Validators.required],
-      installmentName: [''],
-      paymentMode: [''],
-      paymentDate: [''],
+      installmentName: ['', Validators.required],
+      paymentMode: ['', Validators.required],
+      paymentDate: ['', Validators.required],
 
       // Fee Details (FormArray)
       receiptDetails: this.fb.array([]),
 
       // Amount Summary
       totalAmount: [0],
-      discountAmount: [0],
-      fineAmount: [0],
+      discountAmount: [0, Validators.min(0)],
+      fineAmount: [0, Validators.min(0)],
       netAmount: [0],
 
       status: ['PAID']
@@ -113,6 +101,9 @@ export class GenerateSchoolReceiptComponent {
 
   // ================= REMOVE FEE ROW =================
   removeFeeRow(index: number): void {
+    if (this.receiptDetails.length === 1) {
+      return;
+    }
     this.receiptDetails.removeAt(index);
     this.calculateTotals();
   }
@@ -129,7 +120,7 @@ export class GenerateSchoolReceiptComponent {
     const discount = Number(this.receiptForm.get('discountAmount')?.value) || 0;
     const fine = Number(this.receiptForm.get('fineAmount')?.value) || 0;
 
-    const netAmount = total - discount + fine;
+    const netAmount = Math.max(0, total - discount + fine);
 
     this.receiptForm.patchValue({
       totalAmount: total,
@@ -139,54 +130,91 @@ export class GenerateSchoolReceiptComponent {
 
   // ================= SUBMIT RECEIPT =================
 
-  submitReceipt() {
+  submitReceipt(): void {
+    if (this.receiptForm.invalid || this.isSubmitting) {
+      this.receiptForm.markAllAsTouched();
+
+      if (!this.isSubmitting) {
+        const missingFields: string[] = [];
+        const fieldLabels: Record<string, string> = {
+          admissionNo: 'student',
+          receiptNumber: 'receipt number',
+          installmentName: 'installment',
+          paymentMode: 'payment mode',
+          paymentDate: 'payment date'
+        };
+
+        Object.keys(fieldLabels).forEach((field) => {
+          if (this.receiptForm.get(field)?.invalid) {
+            missingFields.push(fieldLabels[field]);
+          }
+        });
+
+        if (this.receiptDetails.invalid) {
+          missingFields.push('valid fee type and amount');
+        }
+
+        this.messageService.add({
+          summary: 'Complete required details',
+          detail: `Please provide ${missingFields.join(', ')} before generating the receipt.`,
+          styleClass: 'danger-background-popover',
+        });
+      }
+      return;
+    }
+
+    this.calculateTotals();
+    this.isSubmitting = true;
     this.generateSchoolReceiptService.submitReceipt(this.receiptForm.value)
       .subscribe({
         next: (response: any) => {
-          if (response['responseCode'] === 200) {
-            if (response['payload']['respCode'] === 200) {
+          const payload = response?.payload;
+          const responseCode = Number(response?.responseCode);
+          const payloadCode = Number(payload?.respCode);
+
+          if (responseCode === 200 && payloadCode === 200) {
 
               this.messageService.add({
-                summary: response['payload']['respCode'],
-                detail: response['payload']['respMesg'],
+                summary: 'Receipt generated',
+                detail: payload?.respMesg || 'The receipt was generated successfully.',
                 styleClass: 'success-background-popover',
               });
 
               // Open receipt modal
-              this.openEditModal(response['payload']);
-
-            } else {
-              this.messageService.add({
-                summary: response['payload']['respCode'],
-                detail: response['payload']['respMesg'],
-                styleClass: 'danger-background-popover',
-              });
-            }
+              this.openEditModal(payload);
           } else {
             this.messageService.add({
-              summary: response['payload']['respCode'],
-              detail: response['payload']['respMesg'],
+              summary: String(payload?.respCode || response?.responseCode || 'Error'),
+              detail: payload?.respMesg || response?.responseMessage || 'Unable to generate the receipt. Please try again.',
               styleClass: 'danger-background-popover',
             });
           }
+          this.isSubmitting = false;
         },
-        error: () =>
+        error: () => {
+          this.isSubmitting = false;
           this.messageService.add({
             summary: '500',
-            detail: 'Server Error',
-          }),
+            detail: 'Unable to generate the receipt. Please try again.',
+            styleClass: 'danger-background-popover',
+          });
+        },
       });
   }
 
   // ================= RESET FORM =================
   resetForm(): void {
-    this.receiptForm.reset();
+    this.receiptForm.reset({
+      admissionNo: 'TEST-VIVEK-001', studentName: 'Vivek', academicSession: '2026-2027', totalAmount: 0, discountAmount: 0,
+      fineAmount: 0, netAmount: 0, status: 'PAID'
+    });
     this.receiptDetails.clear();
     this.addFeeRow();
+    this.selectedStudent = null;
   }
 
-  submitSearch() {
-
+  submitSearch(): void {
+    this.getStudentDetails();
   }
 
   getStudentDetails() {
@@ -196,6 +224,7 @@ export class GenerateSchoolReceiptComponent {
 
     if (!grade || !gradeSection) {
       this.studentDetails = [];
+      this.selectedStudent = null;
       return;
     }
 
@@ -206,19 +235,17 @@ export class GenerateSchoolReceiptComponent {
           this.studentDetails = res?.listPayload || [];
           this.isLoading = false;
         },
-        error: (err) => {
-          console.error(err);
+        error: () => {
+          this.studentDetails = [];
           this.isLoading = false;
+          this.messageService.add({ summary: 'Error', detail: 'Unable to load students. Please try again.', styleClass: 'danger-background-popover' });
         }
       });
   }
 
 
-  onStudentChange(admissionNo: any) {
-
-    this.selectedStudent = this.studentDetails.find(
-      (student: any) => student.admissionNo == admissionNo
-    );
+  onStudentChange(student: any): void {
+    this.selectedStudent = student || null;
 
 
     if (this.selectedStudent) {
@@ -230,8 +257,11 @@ export class GenerateSchoolReceiptComponent {
         rollNumber: this.selectedStudent.rollNumber,
 
         studentName:
-          this.selectedStudent.firstName + ' ' +
-          this.selectedStudent.lastName,
+          `${this.selectedStudent.firstName || ''} ${this.selectedStudent.lastName || ''}`.trim(),
+
+        fatherName: this.selectedStudent.fatherName || '',
+        motherName: this.selectedStudent.motherName || '',
+        contactNo: this.selectedStudent.contactNo || this.selectedStudent.mobileNo || '',
 
         grade: this.selectedStudent.grade,
 
@@ -241,6 +271,14 @@ export class GenerateSchoolReceiptComponent {
 
       });
     }
+  }
+
+  onStudentChangeByAdmissionNo(): void {
+    const admissionNo = this.studentSearchForm.get('admissionNo')?.value;
+    const student = this.studentDetails.find(
+      (item: any) => String(item.admissionNo) === String(admissionNo)
+    );
+    this.onStudentChange(student);
   }
 
 openEditModal(rawData: any): void {
@@ -264,6 +302,9 @@ openEditModal(rawData: any): void {
     admissionNo: rawData?.admissionNo || '',
     rollNumber: rawData?.rollNumber || '',
     studentName: rawData?.studentName || '',
+    fatherName: rawData?.fatherName || this.selectedStudent?.fatherName || '',
+    motherName: rawData?.motherName || this.selectedStudent?.motherName || '',
+    contactNo: rawData?.contactNo || rawData?.mobileNo || this.selectedStudent?.contactNo || this.selectedStudent?.mobileNo || '',
     grade: rawData?.grade || '',
     gradeSection: rawData?.gradeSection || '',
     academicSession: rawData?.academicSession || '',
