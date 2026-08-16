@@ -142,6 +142,7 @@ export class DonationDashboardComponent implements AfterViewInit {
 
     const labels = this.paymentModes.map((item: any) => item.mode);
     const amounts = this.paymentModes.map((item: any) => item.amount);
+    const chartAmounts = this.getPaymentChartAmounts(amounts);
     const colors = this.paymentModes.map((item: any) => item.color);
 
     this.paymentChart = new Chart(canvas, {
@@ -149,7 +150,10 @@ export class DonationDashboardComponent implements AfterViewInit {
       data: {
         labels: labels,
         datasets: [{
-          data: amounts,
+          // Very small payment modes would otherwise render as sub-pixel arcs.
+          // These adjusted values are only used to draw the doughnut; the legend
+          // and tooltip continue to show the actual API amounts.
+          data: chartAmounts,
           backgroundColor: colors,
           borderWidth: 0,
           hoverOffset: 3
@@ -165,13 +169,46 @@ export class DonationDashboardComponent implements AfterViewInit {
             callbacks: {
               label: (context: any) => {
                 const label = context.label || '';
-                const value = context.raw || 0;
+                const value = amounts[context.dataIndex] || 0;
                 return `${label}: ${this.paymentCurrencySymbol} ${Number(value).toLocaleString('en-IN')}`;
               }
             }
           }
         }
       }
+    });
+  }
+
+  private getPaymentChartAmounts(amounts: number[]): number[] {
+    const numericAmounts = amounts.map((amount) => Math.max(0, Number(amount) || 0));
+    const total = numericAmounts.reduce((sum, amount) => sum + amount, 0);
+
+    if (total === 0) {
+      return numericAmounts;
+    }
+
+    const minimumShare = 0.01;
+    const smallIndexes = numericAmounts
+      .map((amount, index) => ({ amount, index }))
+      .filter(({ amount }) => amount > 0 && amount / total < minimumShare)
+      .map(({ index }) => index);
+
+    if (smallIndexes.length === 0) {
+      return numericAmounts;
+    }
+
+    const reservedShare = smallIndexes.length * minimumShare;
+    const regularTotal = numericAmounts.reduce(
+      (sum, amount, index) => sum + (smallIndexes.includes(index) ? 0 : amount),
+      0
+    );
+
+    return numericAmounts.map((amount, index) => {
+      if (amount === 0) return 0;
+      if (smallIndexes.includes(index)) return total * minimumShare;
+      return regularTotal > 0
+        ? (amount / regularTotal) * total * (1 - reservedShare)
+        : amount;
     });
   }
 
@@ -427,7 +464,7 @@ changePaymentTab(tab: string): void {
             amount: row[2] || 0,
             currencyCode: row[3] || 'INR',
             currencySymbol: row[4] || '₹',
-            color: colorPalette[index % colorPalette.length]
+            color: this.getPaymentModeColor(row[0], index, colorPalette)
           }));
 
           this.paymentTotalAmount = this.paymentModes.reduce(
@@ -449,6 +486,17 @@ changePaymentTab(tab: string): void {
         }
       },
     });
+  }
+
+  private getPaymentModeColor(mode: string, index: number, colorPalette: string[]): string {
+    switch ((mode || '').trim().toUpperCase()) {
+      case 'WEBSITE':
+        return '#ec4899'; // Pink
+      case 'CARD':
+        return '#b8860b'; // Dark yellow
+      default:
+        return colorPalette[index % colorPalette.length];
+    }
   }
 
   getPaymentPercentage(amount: number): number {

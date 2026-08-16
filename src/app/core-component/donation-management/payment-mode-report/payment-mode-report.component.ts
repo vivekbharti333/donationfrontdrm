@@ -16,6 +16,9 @@ export class PaymentModeReportComponent {
 
   public userList: any;
   public loginUser: any;
+  public selectedUserId: any = '';
+  public selectedFromDate: string = '';
+  public selectedToDate: string = '';
   public objectKeys1 = Object.keys;
   public PaymentModeCountAmount: any = {};
 

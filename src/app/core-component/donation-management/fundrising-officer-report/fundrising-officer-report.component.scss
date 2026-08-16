@@ -86,7 +86,7 @@
 }
 
 .filter-card {
-  padding: 24px;
+  padding: 14px 18px;
   margin-bottom: 20px;
 }
 
@@ -94,13 +94,13 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
 }
 
 .section-icon {
   display: grid;
-  width: 40px;
-  height: 40px;
+  width: 34px;
+  height: 34px;
   place-items: center;
   flex: 0 0 auto;
   color: #e66f16;
@@ -127,7 +127,7 @@
   display: grid;
   grid-template-columns: repeat(2, minmax(180px, 1fr)) minmax(180px, .75fr);
   align-items: end;
-  gap: 16px;
+  gap: 12px;
   max-width: 900px;
 }
 
@@ -137,7 +137,7 @@
 
 .filter-field label {
   display: block;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
   color: #344054;
   font-size: 13px;
   font-weight: 600;
@@ -145,7 +145,7 @@
 
 .report-input {
   width: 100%;
-  height: 44px;
+  height: 38px;
   box-sizing: border-box;
   padding: 9px 12px;
   border: 1px solid #d8dde7;
@@ -166,7 +166,7 @@
   align-items: center;
   justify-content: center;
   gap: 9px;
-  height: 44px;
+  height: 38px;
   padding: 0 20px;
   color: #fff;
   font-size: 13px;
@@ -181,6 +181,13 @@
 .search-button:hover {
   transform: translateY(-1px);
   box-shadow: 0 10px 18px rgba(255, 159, 67, .32);
+}
+
+.search-button:disabled {
+  cursor: not-allowed;
+  opacity: .55;
+  transform: none;
+  box-shadow: none;
 }
 
 .summary-grid {
@@ -262,6 +269,13 @@
   white-space: nowrap;
   border-radius: 20px;
   background: #fff3e8;
+}
+
+.result-summary {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
 }
 
 .table-responsive {
@@ -381,7 +395,7 @@
 
   .search-button {
     width: 100%;
-    min-height: 46px;
+    min-height: 40px;
   }
 
   .summary-grid {
@@ -416,13 +430,13 @@
   }
 
   .filter-card {
-    padding: 20px 16px;
+    padding: 14px;
     margin-bottom: 16px;
     border-radius: 14px;
   }
 
   .report-input {
-    height: 46px;
+    height: 40px;
     font-size: 16px;
   }
 
@@ -434,6 +448,11 @@
     align-items: flex-start;
     flex-direction: column;
     padding: 18px 16px;
+  }
+
+  .result-summary {
+    justify-content: flex-start;
+    flex-wrap: wrap;
   }
 
   .report-table {

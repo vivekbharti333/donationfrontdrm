@@ -26,8 +26,9 @@
     <div *ngIf="isSuperadmin" class="filter-grid filter-grid-admin">
       <div class="filter-field">
         <label for="reportUser">User</label>
-        <mat-select id="reportUser" #loginId class="report-select" placeholder="All users">
-          <mat-option value="">All users</mat-option>
+        <mat-select id="reportUser" class="report-select" placeholder="Select user"
+          [(ngModel)]="selectedUserId">
+          <mat-option value="">Select user</mat-option>
           <mat-option *ngFor="let data of userList" [value]="data.loginId">
             {{ data.firstName }} {{ data.lastName }}
           </mat-option>
@@ -36,16 +37,19 @@
 
       <div class="filter-field">
         <label for="adminFromDate">From date</label>
-        <input id="adminFromDate" type="date" class="form-control report-input" #firstDate>
+        <input id="adminFromDate" type="date" class="form-control report-input"
+          [(ngModel)]="selectedFromDate">
       </div>
 
       <div class="filter-field">
         <label for="adminToDate">To date</label>
-        <input id="adminToDate" type="date" class="form-control report-input" #lastDate>
+        <input id="adminToDate" type="date" class="form-control report-input"
+          [(ngModel)]="selectedToDate">
       </div>
 
       <button type="button" class="search-button"
-        (click)="getDonationPaymentModeCountAndAmountGroupByNameCustom(loginId.value, firstDate.value, lastDate.value)">
+        [disabled]="!selectedUserId || !selectedFromDate || !selectedToDate"
+        (click)="getDonationPaymentModeCountAndAmountGroupByNameCustom(selectedUserId, selectedFromDate, selectedToDate)">
         <i class="feather icon-search"></i>
         Generate report
       </button>
@@ -70,39 +74,16 @@
     </div>
   </div>
 
-  <div class="summary-grid">
-    <article class="summary-card summary-card-blue">
-      <div class="summary-icon"><i class="feather icon-credit-card"></i></div>
-      <div>
-        <span>Payment modes</span>
-        <strong>{{ objectKeys(PaymentModeCountAmount).length }}</strong>
-      </div>
-    </article>
-
-    <article class="summary-card summary-card-violet">
-      <div class="summary-icon"><i class="feather icon-file-text"></i></div>
-      <div>
-        <span>Total receipts</span>
-        <strong>{{ totalCount | number }}</strong>
-      </div>
-    </article>
-
-    <article class="summary-card summary-card-green">
-      <div class="summary-icon"><i class="feather icon-trending-up"></i></div>
-      <div>
-        <span>Total collection</span>
-        <strong><span class="currency">&#8377;</span>{{ totalAmount | number:'1.2-2' }}</strong>
-      </div>
-    </article>
-  </div>
-
   <div class="results-card">
     <div class="results-header">
       <div>
         <h2>Collection breakdown</h2>
         <p>Payment-wise receipt count and collected amount</p>
       </div>
-      <span class="result-count">{{ totalCount | number }} receipts</span>
+      <div class="result-summary">
+        <span class="result-count">{{ totalCount | number }} receipts</span>
+        <span class="result-count"><span class="currency">&#8377;</span>{{ totalAmount | number:'1.2-2' }}</span>
+      </div>
     </div>
 
     <div class="table-responsive">

@@ -24,46 +24,23 @@
     <div class="filter-grid">
       <div class="filter-field">
         <label for="officerFromDate">From date</label>
-        <input id="officerFromDate" type="date" class="form-control report-input" #firstDate>
+        <input id="officerFromDate" type="date" class="form-control report-input"
+          [(ngModel)]="selectedFromDate">
       </div>
 
       <div class="filter-field">
         <label for="officerToDate">To date</label>
-        <input id="officerToDate" type="date" class="form-control report-input" #lastDate>
+        <input id="officerToDate" type="date" class="form-control report-input"
+          [(ngModel)]="selectedToDate">
       </div>
 
       <button type="button" class="search-button"
-        (click)="getDonationCountAndAmountGroupByNameCustom(firstDate.value, lastDate.value)">
+        [disabled]="!selectedFromDate || !selectedToDate"
+        (click)="getDonationCountAndAmountGroupByNameCustom(selectedFromDate, selectedToDate)">
         <i class="feather icon-search"></i>
         Generate report
       </button>
     </div>
-  </div>
-
-  <div class="summary-grid">
-    <article class="summary-card">
-      <div class="summary-icon officer-icon"><i class="feather icon-users"></i></div>
-      <div>
-        <span>Active officers</span>
-        <strong>{{ objectKeys(FRToday).length }}</strong>
-      </div>
-    </article>
-
-    <article class="summary-card">
-      <div class="summary-icon receipt-icon"><i class="feather icon-file-text"></i></div>
-      <div>
-        <span>Total receipts</span>
-        <strong>{{ totalCount | number }}</strong>
-      </div>
-    </article>
-
-    <article class="summary-card">
-      <div class="summary-icon amount-icon"><i class="feather icon-trending-up"></i></div>
-      <div>
-        <span>Total collection</span>
-        <strong><span class="currency">&#8377;</span>{{ totalAmount | number:'1.2-2' }}</strong>
-      </div>
-    </article>
   </div>
 
   <div class="results-card">
@@ -72,7 +49,10 @@
         <h2>Officer performance</h2>
         <p>Officer-wise receipt count and collection amount</p>
       </div>
-      <span class="result-count">{{ totalCount | number }} receipts</span>
+      <div class="result-summary">
+        <span class="result-count">{{ totalCount | number }} receipts</span>
+        <span class="result-count"><span class="currency">&#8377;</span>{{ totalAmount | number:'1.2-2' }}</span>
+      </div>
     </div>
 
     <div class="table-responsive">

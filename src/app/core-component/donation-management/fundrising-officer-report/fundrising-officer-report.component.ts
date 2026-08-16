@@ -14,6 +14,8 @@ export class FundrisingOfficerReportComponent {
 
   public loginUser: any;
   public FRToday: any = {};
+  public selectedFromDate: string = '';
+  public selectedToDate: string = '';
 
   constructor(
     private sidebar: SidebarService,
