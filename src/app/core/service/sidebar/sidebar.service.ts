@@ -287,6 +287,36 @@ export class SidebarService {
         },
 
         {
+          menuValue: 'Whats App Management',
+          hasSubRoute: true,
+          showSubRoute: false,
+          icon: 'file',
+          // base1: 'usermang',
+          subMenus: [
+            {
+              menuValue: 'Whats App Setting',
+              route: routes.whatsAppIntegration,
+              permission: 'whats-app-integration',
+            }, 
+            {
+              menuValue: 'Inbox',
+              route: routes.whatsAppInbox,
+              permission: 'whats-app-inbox',
+            }, 
+            {
+              menuValue: 'Add Templates',
+              route: routes.addWhatsAppTemplates,
+              permission: 'add-whats-app-templates',
+            }, 
+            {
+              menuValue: 'Templates List',
+              route: routes.whatsAppTemplates,
+              permission: 'whats-app-templates',
+            }, 
+          ],
+        },
+
+        {
           menuValue: 'Campaign Management',
           hasSubRoute: true,
           showSubRoute: false,

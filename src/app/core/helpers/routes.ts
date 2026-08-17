@@ -1147,6 +1147,10 @@ export class routes {
   // Whats App Management
   public static get whatsAppManagement(): string {
     return this.core + '/whats-app-management';
+  } 
+  
+  public static get whatsAppIntegration(): string {
+    return this.whatsAppManagement + '/whats-app-integration';
   }
   public static get whatsAppInbox(): string {
     return this.whatsAppManagement + '/whats-app-inbox';
