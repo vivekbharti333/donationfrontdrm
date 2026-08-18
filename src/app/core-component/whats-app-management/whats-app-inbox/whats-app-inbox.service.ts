@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { HttpClient, HttpResponse } from '@angular/common/http';
+import { map, Observable, switchMap, timeout } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
 import { Constant } from 'src/app/core/constant/constants'; 
 import { AuthenticationService } from 'src/app/auth/authentication.service';
 import { CookieService } from 'ngx-cookie-service';
@@ -34,10 +34,42 @@ export class WhatsAppInboxService {
         payload: {
           "waId": payload.waId,
           "messageText": payload.messageText,
-          "msgBodyText": payload.messageText
+          "msgBodyText": payload.messageText,
+          "messageType": payload.messageType || 'text',
+          "mediaId": payload.mediaId || null,
+          "mimeType": payload.mimeType || null,
+          "fileName": payload.fileName || null,
+          "phoneNumberId": payload.phoneNumberId || null
         }
       };
       return this.http.post<any>(Constant.Site_Url + "replyMessage", request);
+    }
+
+    sendReply(payload: any, file: File | null): Observable<any> {
+      if (!file) {
+        return this.replyMessage(payload).pipe(map(response => ({ response, media: null })));
+      }
+
+      const formData = new FormData();
+      formData.append('file', file, file.name);
+      if (payload.phoneNumberId) {
+        formData.append('phoneNumberId', payload.phoneNumberId);
+      }
+
+      return this.http.post<any>(Constant.Site_Url + 'uploadWhatsAppReplyMedia', formData).pipe(
+        switchMap(uploadResponse => {
+          if (uploadResponse?.responseCode != null && Number(uploadResponse.responseCode) !== 200) {
+            throw new Error(uploadResponse.responseMessage || 'Media upload failed.');
+          }
+          const media = uploadResponse?.payload || uploadResponse?.listPayload || uploadResponse;
+          if (!media?.mediaId) {
+            throw new Error('Media upload did not return a media ID.');
+          }
+          return this.replyMessage({ ...payload, ...media }).pipe(
+            map(response => ({ response, media }))
+          );
+        })
+      );
     }
 
   sendMessage(payload: any): Observable<any> {
@@ -46,5 +78,19 @@ export class WhatsAppInboxService {
     payload
   );
 }
+
+  downloadMedia(mediaId: string, mediaType: string, phoneNumberId?: string): Observable<Blob> {
+    const normalizedMediaType = (mediaType || 'image').toLowerCase();
+    const request = {
+      mediaId,
+      phoneNumberId: phoneNumberId || null,
+      [normalizedMediaType]: { id: mediaId }
+    };
+
+    return this.http.post(Constant.Site_Url + 'whatsAppMediaDownload',
+      request,
+      { responseType: 'blob' }
+    ).pipe(timeout(30000));
+  }
 
 }

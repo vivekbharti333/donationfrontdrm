@@ -77,26 +77,78 @@
                                 <span *ngIf="msg.messageType === 'text'">{{msg.messageText}}</span>
 
                                 <ng-container *ngIf="msg.messageType === 'image'">
-                                    <div class="image-placeholder"
-                                         role="img"
-                                         aria-label="Image download will be available soon">
+                                    <button *ngIf="getMediaPreviewUrl(msg) as previewUrl"
+                                            type="button"
+                                            class="media-preview-button"
+                                            (click)="openImagePreview(msg)"
+                                            aria-label="Open image preview">
+                                        <img class="media-preview-image"
+                                             [src]="previewUrl"
+                                             [alt]="msg.messageText || 'WhatsApp image'">
+                                    </button>
+                                    <button *ngIf="!isMediaDownloaded(msg)" type="button"
+                                         class="image-placeholder"
+                                         [disabled]="!canDownloadMedia(msg) || isMediaDownloading(msg)"
+                                         (click)="downloadMedia(msg)"
+                                         aria-label="Download image">
                                         <span class="placeholder-picture" aria-hidden="true">&#127748;</span>
                                         <span class="media-download-sign" aria-hidden="true">&#8681;</span>
-                                        <span class="placeholder-label">Download image</span>
-                                    </div>
+                                        <span class="placeholder-label">{{isMediaDownloading(msg) ? 'Downloading…' : 'Download image'}}</span>
+                                    </button>
+                                    <span class="media-caption" *ngIf="getMediaDownloadError(msg) as downloadError">{{downloadError}}</span>
                                     <span class="media-caption" *ngIf="msg.messageText">{{msg.messageText}}</span>
                                 </ng-container>
 
                                 <ng-container *ngIf="msg.messageType === 'document'">
-                                    <div class="document-card media-placeholder"
-                                         aria-label="Document download will be available soon">
-                                        <span class="document-icon">&#128196;</span>
+                                    <button *ngIf="!isMediaDownloaded(msg)" type="button"
+                                         class="document-card media-placeholder"
+                                         [disabled]="!canDownloadMedia(msg) || isMediaDownloading(msg)"
+                                         (click)="downloadMedia(msg)"
+                                         aria-label="Download document">
+                                        <span class="document-icon file-type-icon"
+                                              [ngClass]="'file-type-' + getDocumentKind(msg)">
+                                            {{getDocumentIconLabel(msg)}}
+                                        </span>
                                         <span class="document-details">
                                             <strong>{{getDocumentName(msg)}}</strong>
                                             <small>{{msg.mimeType || 'Document'}}</small>
                                         </span>
                                         <span class="download-icon" aria-hidden="true">&#8681;</span>
-                                    </div>
+                                    </button>
+                                    <button *ngIf="isMediaDownloaded(msg)"
+                                            type="button"
+                                            class="document-preview-card downloaded-media"
+                                            (click)="openDownloadedDocument(msg)"
+                                            [attr.aria-label]="'Open ' + getDocumentName(msg)">
+                                        <span *ngIf="getDocumentKind(msg) === 'pdf'"
+                                              class="document-content-preview pdf-content-preview">
+                                            <iframe *ngIf="getPdfPreviewUrl(msg) as pdfUrl"
+                                                    [src]="pdfUrl"
+                                                    title="PDF first page preview"
+                                                    tabindex="-1"></iframe>
+                                        </span>
+                                        <span *ngIf="getDocumentKind(msg) === 'excel'"
+                                              class="document-content-preview excel-content-preview">
+                                            <table>
+                                                <tr *ngFor="let row of getExcelPreviewRows(msg); let rowIndex = index"
+                                                    [class.preview-header-row]="rowIndex === 0">
+                                                    <td *ngFor="let cell of row">{{cell}}</td>
+                                                </tr>
+                                            </table>
+                                        </span>
+                                        <span class="document-preview-footer">
+                                            <span class="document-icon file-type-icon"
+                                                  [ngClass]="'file-type-' + getDocumentKind(msg)">
+                                                {{getDocumentIconLabel(msg)}}
+                                            </span>
+                                            <span class="document-details">
+                                                <strong>{{getDocumentName(msg)}}</strong>
+                                                <small>{{getDocumentKind(msg) === 'pdf' ? 'PDF document' : getDocumentKind(msg) === 'excel' ? 'Excel spreadsheet' : 'Document'}} · Click to open</small>
+                                            </span>
+                                            <span class="download-complete" aria-label="Downloaded">&#10003;</span>
+                                        </span>
+                                    </button>
+                                    <span class="media-caption" *ngIf="getMediaDownloadError(msg) as downloadError">{{downloadError}}</span>
                                     <span class="media-caption" *ngIf="msg.messageText">{{msg.messageText}}</span>
                                 </ng-container>
 
@@ -122,7 +174,28 @@
 
             <div class="send-error" *ngIf="sendError">{{sendError}}</div>
 
+            <div class="selected-media" *ngIf="selectedMediaFile">
+                <span class="file-type-icon"
+                      [ngClass]="selectedMediaFile.type.startsWith('image/') ? 'file-type-document' : 'file-type-pdf'">
+                    {{selectedMediaFile.type.startsWith('image/') ? 'IMG' : 'PDF'}}
+                </span>
+                <span class="selected-media-name" [title]="selectedMediaFile.name">{{selectedMediaFile.name}}</span>
+                <button type="button" (click)="removeSelectedMedia()" aria-label="Remove attachment">&times;</button>
+            </div>
+
             <footer class="composer">
+                <input #mediaInput
+                       type="file"
+                       class="media-file-input"
+                       accept="image/*,.pdf,application/pdf"
+                       (change)="onMediaSelected($event)">
+                <button type="button"
+                        class="attach-btn"
+                        [disabled]="isSending"
+                        (click)="mediaInput.click()"
+                        aria-label="Attach image or PDF">
+                    <i class="fa-solid fa-paperclip" aria-hidden="true"></i>
+                </button>
                 <input type="text"
                        [(ngModel)]="newMessage"
                        (keyup.enter)="sendMessage()"
@@ -131,7 +204,7 @@
                        aria-label="Message">
                 <button type="button"
                         class="send-btn"
-                        [disabled]="isSending || !newMessage.trim()"
+                        [disabled]="isSending || (!newMessage.trim() && !selectedMediaFile)"
                         (click)="sendMessage()"
                         aria-label="Send message">
                     <span *ngIf="!isSending">&#10148;</span>
@@ -148,4 +221,20 @@
             </div>
         </ng-template>
     </main>
+</div>
+
+<div *ngIf="zoomedMediaUrl"
+     class="media-lightbox"
+     role="dialog"
+     aria-modal="true"
+     aria-label="Image preview"
+     (click)="closeImagePreview()">
+    <button type="button"
+            class="lightbox-close"
+            aria-label="Close image preview"
+            (click)="closeImagePreview()">&times;</button>
+    <img class="lightbox-image"
+         [src]="zoomedMediaUrl"
+         [alt]="zoomedMediaAlt"
+         (click)="$event.stopPropagation()">
 </div>

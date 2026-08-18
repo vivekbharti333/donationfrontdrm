@@ -39,6 +39,7 @@ export class AddWhatsAppTemplatesComponent {
   createForms() {
     this.addTemplateForm = this.fb.group({
       templateName: ['', [Validators.required, Validators.pattern(/^[a-z0-9_]+$/)]],
+      category: ['MARKETING', Validators.required],
       parameterFormat: ['POSITIONAL'],
 
       headerFormat: ['TEXT'],
@@ -376,7 +377,7 @@ export class AddWhatsAppTemplatesComponent {
       payload: {
         templateName: form.templateName,
         language: form.language,
-        category: 'MARKETING',
+        category: form.category,
         parameterFormat: form.parameterFormat,
 
         headerAvailable: !!form.headerText || form.headerFormat !== 'TEXT',
@@ -387,7 +388,17 @@ export class AddWhatsAppTemplatesComponent {
           ? form.headerVariable.map((variable: any) => variable.value)
           : [],
 
+        headerVariable: form.headerVariable.map((variable: any) => ({
+          headerVariable: String(variable.key).replace(/[{}]/g, ''),
+          example: variable.value
+        })),
+
         msgBodyText: form.msgBodyText,
+
+        msgBodyVariable: form.msgBodyVariable.map((variable: any) => ({
+          bodyVariable: String(variable.key).replace(/[{}]/g, ''),
+          example: variable.value
+        })),
 
         bodyExample: [
           this.variablesArray.value.map((v: any) => v.value)
@@ -406,19 +417,23 @@ export class AddWhatsAppTemplatesComponent {
       .subscribe({
       next: (res: any) => {
         this.isSaving = false;
-        if (res?.responseCode != null && Number(res.responseCode) !== 200) {
-          this.formError = res.responseMessage || 'Template could not be created.';
+        const metaResult = res?.payload;
+        if ((res?.responseCode != null && Number(res.responseCode) !== 200) ||
+            (metaResult?.respCode != null && Number(metaResult.respCode) !== 200)) {
+          this.formError = res?.responseMessage || metaResult?.respMesg || 'Template could not be created.';
           return;
         }
-        Swal.fire(
-          'Template created',
-          res?.responseMessage || 'The WhatsApp template was submitted successfully.',
-          'success'
-        ).then(() => this.router.navigate([routes.whatsAppTemplates]));
+        Swal.fire({
+          title: 'Template created',
+          text: res?.responseMessage || 'The WhatsApp template was submitted successfully.',
+          icon: 'success',
+          timer: 1200,
+          showConfirmButton: false
+        }).then(() => this.router.navigateByUrl(routes.whatsAppTemplates));
       },
       error: (err: any) => {
         this.isSaving = false;
-        this.formError = err?.error?.responseMessage || err?.message ||
+        this.formError = err?.error?.responseMessage || err?.responseMessage || err?.message ||
           'Template could not be created.';
       }
     });

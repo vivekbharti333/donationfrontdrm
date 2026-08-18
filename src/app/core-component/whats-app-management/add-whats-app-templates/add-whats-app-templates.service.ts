@@ -24,6 +24,9 @@ export class AddWhatsAppTemplatesService {
         const mediaHandle =
           response?.mediaHandle ||
           response?.mediaId ||
+          response?.payload?.mediaHandle ||
+          response?.payload?.mediaId ||
+          response?.mapPayload?.mediaHandle ||
           response?.listPayload?.mediaHandle ||
           response?.listPayload?.mediaId;
 
