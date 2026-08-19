@@ -2,3 +2,36 @@
   width: 100%;
 }
 
+// Keep every configured menu icon visually consistent with the original sidebar icons.
+#sidebar .sidebar-menu .sub-active > i.feather {
+  display: inline-flex;
+  width: 18px;
+  height: 18px;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 18px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent !important;
+  color: inherit !important;
+  font-size: 18px;
+  line-height: 1;
+  -webkit-text-fill-color: currentColor;
+}
+
+#sidebar .sidebar-menu .sub-active > i.feather::before {
+  color: inherit;
+}
+
+#sidebar .sidebar-menu .sub-active > i.feather.icon-whatsapp {
+  background-color: currentColor !important;
+  mask: url('/assets/icons/svg/whatsapp-monochrome.svg') center / contain no-repeat;
+  -webkit-mask: url('/assets/icons/svg/whatsapp-monochrome.svg') center / contain no-repeat;
+  transform: scale(1.5);
+}
+
+#sidebar .sidebar-menu .sub-active > i.feather.icon-whatsapp::before {
+  content: none;
+}
+

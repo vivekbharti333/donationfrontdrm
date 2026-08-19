@@ -290,7 +290,7 @@ export class SidebarService {
           menuValue: 'Whats App Management',
           hasSubRoute: true,
           showSubRoute: false,
-          icon: 'file',
+          icon: 'whatsapp',
           // base1: 'usermang',
           subMenus: [
             {
