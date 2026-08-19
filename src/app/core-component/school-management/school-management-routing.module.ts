@@ -5,6 +5,9 @@ import { AddStudentComponent } from './add-student/add-student.component';
 import { StudentListComponent } from './student-list/student-list.component';
 import { GenerateSchoolReceiptComponent } from './generate-school-receipt/generate-school-receipt.component';
 import { SchoolReceiptListComponent } from './school-receipt-list/school-receipt-list.component';
+import { FeeTypeComponent } from './fee-type/fee-type.component';
+import { FeeStructureComponent } from './fee-structure/fee-structure.component';
+import { StudentAcademicComponent } from './student-academic/student-academic.component';
  
 
 const routes: Routes = [
@@ -27,6 +30,18 @@ const routes: Routes = [
       {
         path: 'school-receipt-list',
         component: SchoolReceiptListComponent,
+      },
+      {
+        path: 'fee-type',
+        component: FeeTypeComponent,
+      },
+      {
+        path: 'fee-structure',
+        component: FeeStructureComponent,
+      },
+      {
+        path: 'student-academic',
+        component: StudentAcademicComponent,
       },
     ],
   },

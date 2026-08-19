@@ -157,4 +157,17 @@ export class SchoolManagementService {
     };
     return this.http.post<any>(Constant.Site_Url + "getStudentDetails", request);
   }
+
+  getStudentAcademicDetails(): Observable<any> {
+    let request: any = {
+      payload: {
+        requestFor: 'ALL',
+        createdBy: this.cookieService.get('userId'),
+        token: this.cookieService.get('token'),
+        // superadminId: 'SA001'
+        superadminId: this.cookieService.get('superadminId'),
+      }
+    };
+    return this.http.post<any>(Constant.Site_Url + "getStudentAcademicDetails", request);
+  }
 }
