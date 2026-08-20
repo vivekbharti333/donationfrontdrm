@@ -1,1 +1,244 @@
-<p>student-academic works!</p>
+<div class="page-header">
+  <p-toast></p-toast>
+  <div class="add-item d-flex">
+    <div class="page-title">
+      <h4>Student Academic Details</h4>
+      <h6>View students by session, grade and section</h6>
+    </div>
+  </div>
+  <ul class="table-top-head">
+    <li>
+      <a href="javascript:void(0)" matTooltip="Refresh" matTooltipPosition="above"
+         (click)="getStudentAcademicDetails()">
+        <i class="feather icon-rotate-ccw feather-rotate-ccw"></i>
+      </a>
+    </li>
+  </ul>
+</div>
+
+<div class="card table-list-card">
+  <div class="card-body">
+    <div class="table-top academic-toolbar">
+      <div class="search-set">
+        <div class="search-input">
+          <a href="javascript:void(0)" class="btn btn-searchset"><i class="feather icon-search"></i></a>
+          <div class="dataTables_filter">
+            <input [(ngModel)]="searchDataValue" (ngModelChange)="searchData($event)"
+                   type="search" class="form-control" placeholder="Search students...">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="academic-filters">
+      <div>
+        <label class="form-label">Session</label>
+        <input class="form-control" [(ngModel)]="sessionName" placeholder="e.g. 2025-26">
+      </div>
+      <div>
+        <label class="form-label">Grade</label>
+        <input class="form-control" [(ngModel)]="grade" placeholder="Grade">
+      </div>
+      <div>
+        <label class="form-label">Section</label>
+        <input class="form-control" [(ngModel)]="gradeSection" placeholder="Section">
+      </div>
+      <div>
+        <label class="form-label">Status</label>
+        <select class="form-select" [(ngModel)]="status">
+          <option value="">All</option>
+          <option value="PROMOTED">Promoted</option>
+          <option value="ACTIVE">Active</option>
+          <option value="INACTIVE">Inactive</option>
+        </select>
+      </div>
+      <div class="filter-actions">
+        <button type="button" class="btn btn-primary" (click)="applyFilters()">
+          <i class="feather icon-search me-1"></i>Apply
+        </button>
+        <button type="button" class="btn btn-light" (click)="clearFilters()">Clear</button>
+      </div>
+    </div>
+
+    <div *ngIf="errorMessage" class="alert alert-danger mt-3">{{ errorMessage }}</div>
+
+    <div *ngIf="isLoading" class="academic-state">
+      <span class="spinner-border spinner-border-sm"></span> Loading academic details...
+    </div>
+
+    <div *ngIf="!isLoading" class="table-responsive mt-3">
+      <table matSort (matSortChange)="sortData($event)" class="table datanew">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Image</th>
+            <th mat-sort-header="admissionNo">Admission No</th>
+            <th mat-sort-header="rollNumber">Roll No</th>
+            <th mat-sort-header="firstName">Student Name</th>
+            <th mat-sort-header="sessionName">Session</th>
+            <th mat-sort-header="grade">Grade / Section</th>
+            <th mat-sort-header="gender">Gender</th>
+            <th mat-sort-header="fatherName">Father</th>
+            <th mat-sort-header="status">Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let data of tableData; let i = index">
+            <td>{{ serialNumberArray[i] }}</td>
+            <td>
+              <div class="userimgname">
+                <span class="userslist-img bg-img">
+                  <img [src]="studentImageBaseUrl + data.studentPicture"
+                       [alt]="studentName(data) || 'Student'"
+                       class="academic-student-image"
+                       onerror="this.onerror=null; this.src='https://www.shareicon.net/data/128x128/2016/05/24/770117_people_512x512.png';">
+                </span>
+              </div>
+            </td>
+            <td>{{ data.admissionNo || '—' }}</td>
+            <td>{{ data.rollNumber || '—' }}</td>
+            <td>
+              <strong>{{ studentName(data) || '—' }}</strong>
+              <small class="d-block text-muted">{{ data.fatherMobileNo || '' }}</small>
+            </td>
+            <td>{{ data.sessionName || '—' }}</td>
+            <td>{{ data.grade || '—' }}<span *ngIf="data.gradeSection"> - {{ data.gradeSection }}</span></td>
+            <td>{{ data.gender || '—' }}</td>
+            <td>{{ data.fatherName || '—' }}</td>
+            <td>
+              <span class="badge"
+                    [ngClass]="(data.status === 'ACTIVE' || data.status === 'PROMOTED') ? 'badge-linesuccess' : 'badge-linedanger'">
+                {{ data.status || '—' }}
+              </span>
+            </td>
+            <td class="action-table-data">
+              <div class="edit-delete-action">
+                <a href="javascript:void(0)" class="me-2 p-2 mb-0"
+                   title="Edit academic details"
+                   (click)="openEditAcademic(editAcademicDialog, data)">
+                  <i class="feather icon-edit feather-edit"></i>
+                </a>
+                <a href="javascript:void(0)" class="me-2 p-2 mb-0 promote-action"
+                   title="Promote student"
+                   (click)="openPromoteAcademic(promoteAcademicDialog, data)">
+                  <i class="feather icon-arrow-up-circle feather-edit promote-icon"></i>
+                </a>
+              </div>
+            </td>
+          </tr>
+          <tr *ngIf="tableData.length === 0">
+            <td colspan="11" class="academic-state">No student academic details found.</td>
+          </tr>
+        </tbody>
+      </table>
+      <app-custom-pagination *ngIf="totalData > 0"></app-custom-pagination>
+    </div>
+  </div>
+</div>
+
+<ng-template #editAcademicDialog>
+  <div class="modalHeaderContainer">
+    <h2 mat-dialog-title class="p-0">Update Academic Details</h2>
+    <button type="button" class="close academic-close" mat-dialog-close aria-label="Close">&times;</button>
+  </div>
+
+  <mat-dialog-content class="dialog-content">
+    <div class="student-summary">
+      <img [src]="studentImageBaseUrl + selectedStudentPicture"
+           [alt]="selectedStudentName || 'Student'"
+           class="academic-popup-image"
+           onerror="this.onerror=null; this.src='https://www.shareicon.net/data/128x128/2016/05/24/770117_people_512x512.png';">
+      <div><small>Student</small><strong>{{ selectedStudentName }}</strong></div>
+    </div>
+
+    <form [formGroup]="editAcademicForm" class="academic-edit-grid">
+      <div>
+        <label class="form-label">Student ID</label>
+        <input class="form-control" formControlName="studentId">
+      </div>
+      <div>
+        <label class="form-label">Session</label>
+        <input class="form-control" formControlName="sessionName">
+      </div>
+      <div>
+        <label class="form-label">Grade *</label>
+        <input class="form-control" formControlName="grade">
+      </div>
+      <div>
+        <label class="form-label">Section</label>
+        <input class="form-control" formControlName="gradeSection">
+      </div>
+      <div>
+        <label class="form-label">Roll number *</label>
+        <input class="form-control" formControlName="rollNumber">
+      </div>
+      <div>
+        <label class="form-label">Academic status *</label>
+        <select class="form-select" formControlName="status">
+          <option value="PROMOTED">Promoted</option>
+          <option value="ACTIVE">Active</option>
+          <option value="INACTIVE">Inactive</option>
+        </select>
+      </div>
+    </form>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end" class="academic-dialog-actions">
+    <button type="button" class="btn btn-light" mat-dialog-close [disabled]="isUpdating">Cancel</button>
+    <button type="button" class="btn btn-primary" (click)="updateStudentAcademic()"
+            [disabled]="editAcademicForm.invalid || isUpdating">
+      <span *ngIf="isUpdating" class="spinner-border spinner-border-sm me-1"></span>
+      {{ isUpdating ? 'Updating...' : 'Update' }}
+    </button>
+  </mat-dialog-actions>
+</ng-template>
+
+<ng-template #promoteAcademicDialog>
+  <div class="modalHeaderContainer">
+    <h2 mat-dialog-title class="p-0">Promote Student</h2>
+    <button type="button" class="close academic-close" mat-dialog-close aria-label="Close">&times;</button>
+  </div>
+
+  <mat-dialog-content class="dialog-content">
+    <div class="student-summary">
+      <img [src]="studentImageBaseUrl + selectedStudentPicture"
+           [alt]="selectedStudentName || 'Student'"
+           class="academic-popup-image"
+           onerror="this.onerror=null; this.src='https://www.shareicon.net/data/128x128/2016/05/24/770117_people_512x512.png';">
+      <div><small>Student</small><strong>{{ selectedStudentName }}</strong></div>
+    </div>
+
+    <form [formGroup]="promoteAcademicForm" class="academic-edit-grid">
+      <div>
+        <label class="form-label">Student ID</label>
+        <input class="form-control" formControlName="studentId">
+      </div>
+      <div>
+        <label class="form-label">New Session *</label>
+        <input class="form-control" formControlName="sessionName" placeholder="e.g. 2027-28">
+      </div>
+      <div>
+        <label class="form-label">New Grade *</label>
+        <input class="form-control" formControlName="grade">
+      </div>
+      <div>
+        <label class="form-label">Section</label>
+        <input class="form-control" formControlName="gradeSection">
+      </div>
+      <div>
+        <label class="form-label">Roll number *</label>
+        <input class="form-control" formControlName="rollNumber">
+      </div>
+    </form>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end" class="academic-dialog-actions">
+    <button type="button" class="btn btn-light" mat-dialog-close [disabled]="isPromoting">Cancel</button>
+    <button type="button" class="btn btn-primary" (click)="promoteStudent()"
+            [disabled]="promoteAcademicForm.invalid || isPromoting">
+      <span *ngIf="isPromoting" class="spinner-border spinner-border-sm me-1"></span>
+      {{ isPromoting ? 'Promoting...' : 'Promote' }}
+    </button>
+  </mat-dialog-actions>
+</ng-template>

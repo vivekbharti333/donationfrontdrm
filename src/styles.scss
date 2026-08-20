@@ -43,6 +43,46 @@ $template-angular-theme: mat.define-light-theme((color: (primary: $template-angu
 @import url("https://cdn.jsdelivr.net/npm/lightgallery@2.0.0-beta.4/css/lg-zoom.css");
 @import url("https://cdn.jsdelivr.net/npm/lightgallery@2.0.0-beta.4/css/lg-video.css");
 
+/* Keep Material dialogs consistent with the CRM typography. Material overlays
+   are rendered outside component roots, so this rule must remain global. */
+.custom-modal .mat-mdc-dialog-container,
+.custom-modal .mat-mdc-dialog-container button,
+.custom-modal .mat-mdc-dialog-container input,
+.custom-modal .mat-mdc-dialog-container select,
+.custom-modal .mat-mdc-dialog-container textarea {
+  font-family: "Nunito", sans-serif !important;
+}
+
+.custom-modal .mat-mdc-dialog-title {
+  font-family: "Nunito", sans-serif !important;
+  font-size: 22px !important;
+  font-weight: 600 !important;
+  line-height: 1.35 !important;
+  letter-spacing: 0 !important;
+}
+
+.custom-modal .form-label {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.custom-modal .form-control,
+.custom-modal .form-select,
+.custom-modal .btn {
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.custom-modal .student-summary small {
+  font-size: 13px;
+  font-weight: 400;
+}
+
+.custom-modal .student-summary strong {
+  font-size: 15px;
+  font-weight: 600;
+}
+
 // .show-sub-menu {
 //   display: block;
 //   animation: fadeIn 1s;

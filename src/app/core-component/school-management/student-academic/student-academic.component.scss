@@ -1,0 +1,129 @@
+.academic-filters {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(150px, 1fr)) auto;
+  gap: 12px;
+  align-items: end;
+  padding: 16px;
+  border: 1px solid #e8ebed;
+  border-radius: 8px;
+  background: #fafbfc;
+}
+
+.filter-actions {
+  display: flex;
+  gap: 8px;
+  padding-bottom: 1px;
+}
+
+.academic-state {
+  padding: 32px;
+  text-align: center;
+  color: #646b72;
+}
+
+// Matches Student List: its 35px avatar plus the standard vertical cell padding.
+.table.datanew tbody tr {
+  height: 51px;
+}
+
+.table.datanew td,
+.table.datanew th {
+  vertical-align: middle;
+}
+
+.academic-student-image {
+  width: 35px;
+  height: 35px;
+  border: 1px solid #e8ebed;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+@media (max-width: 991px) {
+  .academic-filters {
+    grid-template-columns: repeat(2, minmax(140px, 1fr));
+  }
+}
+
+@media (max-width: 575px) {
+  .academic-filters {
+    grid-template-columns: 1fr;
+  }
+}
+
+.modalHeaderContainer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px 12px;
+}
+
+.academic-close {
+  border: 0;
+  background: transparent;
+  font-size: 28px;
+  line-height: 1;
+}
+
+.student-summary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  margin-bottom: 18px;
+  border-radius: 8px;
+  background: #f3f6f9;
+}
+
+.student-summary div,
+.student-summary strong {
+  display: block;
+}
+
+.academic-popup-image {
+  width: 52px;
+  height: 52px;
+  flex: 0 0 52px;
+  border: 1px solid #e8ebed;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.academic-edit-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.academic-dialog-actions {
+  padding: 12px 24px 20px;
+}
+
+.academic-dialog-actions .btn + .btn {
+  margin-left: 10px;
+}
+
+.promote-icon {
+  display: block;
+  font-size: 18px;
+  height: 20px !important;
+  line-height: 20px;
+  margin: 0;
+  text-align: center;
+  width: 20px !important;
+}
+
+.promote-action {
+  align-items: center;
+  display: inline-flex !important;
+  height: 32px;
+  justify-content: center;
+  padding: 0 !important;
+  width: 32px;
+}
+
+@media (max-width: 575px) {
+  .academic-edit-grid {
+    grid-template-columns: 1fr;
+  }
+}

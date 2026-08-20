@@ -1,0 +1,62 @@
+.fee-type-state {
+  padding: 28px 16px;
+  color: #6b7280;
+  text-align: center;
+}
+
+.table td,
+.table th {
+  vertical-align: middle;
+}
+
+// Matches Student List: its 35px avatar plus the standard vertical cell padding.
+.table.datanew tbody tr {
+  height: 51px;
+}
+
+.fee-type-toolbar {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.modalHeaderContainer {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.modalHeaderContainer h2 {
+  margin: 0;
+}
+
+.fee-type-close {
+  background: transparent;
+  border: 0;
+  color: #6b7280;
+  font-size: 28px;
+  line-height: 1;
+}
+
+.fee-type-dialog-content {
+  padding: 24px !important;
+}
+
+.fee-type-dialog-actions {
+  gap: 8px;
+  padding: 0 24px 24px;
+}
+
+@media (max-width: 575px) {
+  .fee-type-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .fee-type-toolbar .btn-primary {
+    align-self: flex-start;
+  }
+}

@@ -1126,6 +1126,15 @@ export class routes {
   public static get schoolReceiptList(): string {
     return this.schoolManagement + '/school-receipt-list';
   }
+  public static get studentAcademic(): string {
+    return this.schoolManagement + '/student-academic';
+  }
+  public static get feeType(): string {
+    return this.schoolManagement + '/fee-type';
+  }
+  public static get feeStructure(): string {
+    return this.schoolManagement + '/fee-structure';
+  }
 
   // Invoice Management
   public static get invoiceManagement(): string {

@@ -377,10 +377,25 @@ export class SidebarService {
               route: routes.generateSchoolReceipt,
               permission: 'generate-school-receipt',
             }, 
-             {
+            {
               menuValue: 'Receipt List',
               route: routes.schoolReceiptList,
               permission: 'school-receipt-list',
+            }, 
+            {
+              menuValue: 'Student Academic',
+              route: routes.studentAcademic,
+              permission: 'student-academic',
+            }, 
+            {
+              menuValue: 'Fee Type',
+              route: routes.feeType,
+              permission: 'fee-type',
+            }, 
+            {
+              menuValue: 'Fee Structure',
+              route: routes.feeStructure,
+              permission: 'fee-structure',
             }, 
            
           ],

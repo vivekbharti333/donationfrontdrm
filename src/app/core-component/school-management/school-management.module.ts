@@ -15,6 +15,9 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatTabsModule} from '@angular/material/tabs';
 import { MatIconModule } from '@angular/material/icon';
 import { CalendarModule } from 'primeng/calendar';
+import { FeeTypeComponent } from './fee-type/fee-type.component';
+import { FeeStructureComponent } from './fee-structure/fee-structure.component';
+import { StudentAcademicComponent } from './student-academic/student-academic.component';
 
 import { MessageService } from 'primeng/api';
 
@@ -24,7 +27,10 @@ import { MessageService } from 'primeng/api';
     AddStudentComponent,
     StudentListComponent,
     GenerateSchoolReceiptComponent,
-    SchoolReceiptListComponent
+    SchoolReceiptListComponent,
+    FeeTypeComponent,
+    FeeStructureComponent,
+    StudentAcademicComponent
   ],
   imports: [
     SchoolManagementRoutingModule,

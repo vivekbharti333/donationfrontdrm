@@ -1,1 +1,149 @@
-<p>fee-type works!</p>
+<div class="page-header">
+  <p-toast></p-toast>
+  <div class="add-item d-flex">
+    <div class="page-title">
+      <h4>Fee Types</h4>
+      <h6>View and manage school fee types</h6>
+    </div>
+  </div>
+  <ul class="table-top-head">
+    <li>
+      <a href="javascript:void(0)" matTooltip="Refresh" matTooltipPosition="above"
+         (click)="getFeeTypeDetails()">
+        <i class="feather icon-rotate-ccw feather-rotate-ccw"></i>
+      </a>
+    </li>
+  </ul>
+</div>
+
+<div class="card table-list-card">
+  <div class="card-body">
+    <div class="table-top fee-type-toolbar">
+      <div class="search-set">
+        <div class="search-input">
+          <a href="javascript:void(0)" class="btn btn-searchset"><i class="feather icon-search"></i></a>
+          <div class="dataTables_filter">
+            <input [(ngModel)]="searchDataValue" (ngModelChange)="searchData($event)"
+                   type="search" class="form-control" placeholder="Search fee types...">
+          </div>
+        </div>
+      </div>
+      <button type="button" class="btn btn-primary" (click)="openAddFeeType(addFeeTypeDialog)">
+        <i class="feather icon-plus-circle me-1"></i>Add Fee Type
+      </button>
+    </div>
+
+    <div *ngIf="errorMessage" class="alert alert-danger mt-3">{{ errorMessage }}</div>
+    <div *ngIf="isLoading" class="fee-type-state">
+      <span class="spinner-border spinner-border-sm me-2"></span>Loading fee types...
+    </div>
+
+    <div *ngIf="!isLoading" class="table-responsive mt-3">
+      <table matSort (matSortChange)="sortData($event)" class="table datanew">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th mat-sort-header="feeTypeName">Fee Type</th>
+            <th mat-sort-header="feeTypeDescription">Description</th>
+            <th mat-sort-header="status">Status</th>
+            <th mat-sort-header="createdAt">Created On</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let data of tableData; let i = index">
+            <td>{{ serialNumberArray[i] }}</td>
+            <td><strong>{{ data.feeTypeName || '—' }}</strong></td>
+            <td>{{ data.feeTypeDescription || '—' }}</td>
+            <td>
+              <span class="badge" [ngClass]="data.status === 'ACTIVE' ? 'badge-linesuccess' : 'badge-linedanger'">
+                {{ data.status || '—' }}
+              </span>
+            </td>
+            <td>{{ data.createdAt ? (data.createdAt | date:'dd MMM yyyy') : '—' }}</td>
+            <td class="action-table-data">
+              <div class="edit-delete-action">
+                <a href="javascript:void(0)" class="me-2 p-2 mb-0" title="Edit fee type"
+                   (click)="openEditFeeType(editFeeTypeDialog, data)">
+                  <i class="feather icon-edit feather-edit"></i>
+                </a>
+              </div>
+            </td>
+          </tr>
+          <tr *ngIf="tableData.length === 0">
+            <td colspan="6" class="fee-type-state">No fee types found.</td>
+          </tr>
+        </tbody>
+      </table>
+      <app-custom-pagination *ngIf="totalData > 0"></app-custom-pagination>
+    </div>
+  </div>
+</div>
+
+<ng-template #addFeeTypeDialog>
+  <div class="modalHeaderContainer">
+    <h2 mat-dialog-title class="p-0">Add Fee Type</h2>
+    <button type="button" class="close fee-type-close" mat-dialog-close aria-label="Close">&times;</button>
+  </div>
+
+  <mat-dialog-content class="fee-type-dialog-content">
+    <form [formGroup]="addFeeTypeForm">
+      <div class="mb-3">
+        <label class="form-label">Fee Type Name <span class="text-danger">*</span></label>
+        <input type="text" class="form-control" formControlName="feeTypeName"
+               placeholder="e.g. Tuition Fee" maxlength="100">
+        <small class="text-danger"
+               *ngIf="addFeeTypeForm.get('feeTypeName')?.touched && addFeeTypeForm.get('feeTypeName')?.hasError('required')">
+          Fee type name is required.
+        </small>
+      </div>
+      <div>
+        <label class="form-label">Description</label>
+        <textarea class="form-control" formControlName="feeTypeDescription" rows="4"
+                  placeholder="Enter fee type description" maxlength="500"></textarea>
+      </div>
+    </form>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end" class="fee-type-dialog-actions">
+    <button type="button" class="btn btn-light" mat-dialog-close [disabled]="isSaving">Cancel</button>
+    <button type="button" class="btn btn-primary" (click)="addFeeType()"
+            [disabled]="addFeeTypeForm.invalid || isSaving">
+      <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-1"></span>
+      {{ isSaving ? 'Saving...' : 'Add Fee Type' }}
+    </button>
+  </mat-dialog-actions>
+</ng-template>
+
+<ng-template #editFeeTypeDialog>
+  <div class="modalHeaderContainer">
+    <h2 mat-dialog-title class="p-0">Update Fee Type</h2>
+    <button type="button" class="close fee-type-close" mat-dialog-close aria-label="Close">&times;</button>
+  </div>
+
+  <mat-dialog-content class="fee-type-dialog-content">
+    <form [formGroup]="editFeeTypeForm">
+      <div class="mb-3">
+        <label class="form-label">Fee Type Name <span class="text-danger">*</span></label>
+        <input type="text" class="form-control" formControlName="feeTypeName" maxlength="100">
+        <small class="text-danger"
+               *ngIf="editFeeTypeForm.get('feeTypeName')?.touched && editFeeTypeForm.get('feeTypeName')?.hasError('required')">
+          Fee type name is required.
+        </small>
+      </div>
+      <div>
+        <label class="form-label">Description</label>
+        <textarea class="form-control" formControlName="feeTypeDescription" rows="4" maxlength="500"></textarea>
+      </div>
+    </form>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end" class="fee-type-dialog-actions">
+    <button type="button" class="btn btn-light" mat-dialog-close [disabled]="isUpdating">Cancel</button>
+    <button type="button" class="btn btn-primary" (click)="updateFeeType()"
+            [disabled]="editFeeTypeForm.invalid || isUpdating">
+      <span *ngIf="isUpdating" class="spinner-border spinner-border-sm me-1"></span>
+      {{ isUpdating ? 'Updating...' : 'Update' }}
+    </button>
+  </mat-dialog-actions>
+</ng-template>

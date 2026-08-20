@@ -158,16 +158,125 @@ export class SchoolManagementService {
     return this.http.post<any>(Constant.Site_Url + "getStudentDetails", request);
   }
 
-  getStudentAcademicDetails(): Observable<any> {
+  getStudentAcademicDetails(filters: {
+    sessionName?: string;
+    grade?: string;
+    gradeSection?: string;
+    status?: string;
+  } = {}): Observable<any> {
+    const token = this.cookieService.get('token');
+    const currentUser = this.authenticationService.getLoginUser();
+    const superadminId = currentUser?.superadminId
+      || this.cookieService.get('superadminId');
+    const payload: any = {
+      superadminId,
+      sessionName: filters.sessionName || undefined
+    };
+    if (filters.grade) payload.grade = filters.grade;
+    if (filters.gradeSection) payload.gradeSection = filters.gradeSection;
+    if (filters.status) payload.status = filters.status;
+
     let request: any = {
+      payload
+    };
+    const options = token
+      ? { headers: new HttpHeaders({ Authorization: `Bearer ${token}` }) }
+      : {};
+    return this.http.post<any>(Constant.Site_Url + "getStudentAcademicDetails", request, options);
+  }
+
+  updateStudentAcademic(academicDetails: any): Observable<any> {
+    const token = this.cookieService.get('token');
+    const currentUser = this.authenticationService.getLoginUser();
+    const request = {
       payload: {
-        requestFor: 'ALL',
-        createdBy: this.cookieService.get('userId'),
-        token: this.cookieService.get('token'),
-        // superadminId: 'SA001'
-        superadminId: this.cookieService.get('superadminId'),
+        studentId: academicDetails.studentId,
+        sessionName: academicDetails.sessionName,
+        grade: academicDetails.grade,
+        gradeSection: academicDetails.gradeSection,
+        rollNumber: academicDetails.rollNumber,
+        status: academicDetails.status,
+        createdBy: currentUser?.loginId || this.cookieService.get('loginId'),
+        superadminId: currentUser?.superadminId || this.cookieService.get('superadminId')
       }
     };
-    return this.http.post<any>(Constant.Site_Url + "getStudentAcademicDetails", request);
+    const options = token
+      ? { headers: new HttpHeaders({ Authorization: `Bearer ${token}` }) }
+      : {};
+    return this.http.post<any>(Constant.Site_Url + 'updateStudentAcademic', request, options);
+  }
+
+  addStudentAcademic(academicDetails: any): Observable<any> {
+    const token = this.cookieService.get('token');
+    const currentUser = this.authenticationService.getLoginUser();
+    const request = {
+      payload: {
+        studentId: academicDetails.studentId,
+        sessionName: academicDetails.sessionName?.trim(),
+        grade: academicDetails.grade?.trim(),
+        gradeSection: academicDetails.gradeSection?.trim(),
+        rollNumber: academicDetails.rollNumber?.trim(),
+        createdBy: currentUser?.loginId
+          || this.cookieService.get('loginId')
+          || this.cookieService.get('superadminId'),
+        createdByName: currentUser?.name || this.cookieService.get('superadminName'),
+        superadminId: currentUser?.superadminId || this.cookieService.get('superadminId')
+      }
+    };
+    const options = token
+      ? { headers: new HttpHeaders({ Authorization: `Bearer ${token}` }) }
+      : {};
+    return this.http.post<any>(Constant.Site_Url + 'addStudentAcademic', request, options);
+  }
+
+  getFeeTypeDetails(): Observable<any> {
+    const token = this.cookieService.get('token');
+    const currentUser = this.authenticationService.getLoginUser();
+    const request = {
+      payload: {
+        superadminId: currentUser?.superadminId || this.cookieService.get('superadminId')
+      }
+    };
+    const options = token
+      ? { headers: new HttpHeaders({ Authorization: `Bearer ${token}` }) }
+      : {};
+    return this.http.post<any>(Constant.Site_Url + 'getFeeTypeDetails', request, options);
+  }
+
+  addFeeType(feeType: any): Observable<any> {
+    const token = this.cookieService.get('token');
+    const currentUser = this.authenticationService.getLoginUser();
+    const request = {
+      payload: {
+        feeTypeName: feeType.feeTypeName?.trim(),
+        feeTypeDescription: feeType.feeTypeDescription?.trim(),
+        createdBy: currentUser?.loginId
+          || this.cookieService.get('loginId')
+          || this.cookieService.get('superadminId'),
+        createdByName: currentUser?.name || this.cookieService.get('superadminName'),
+        superadminId: currentUser?.superadminId || this.cookieService.get('superadminId')
+      }
+    };
+    const options = token
+      ? { headers: new HttpHeaders({ Authorization: `Bearer ${token}` }) }
+      : {};
+    return this.http.post<any>(Constant.Site_Url + 'addFeeType', request, options);
+  }
+
+  updateFeeType(feeType: any): Observable<any> {
+    const token = this.cookieService.get('token');
+    const currentUser = this.authenticationService.getLoginUser();
+    const request = {
+      payload: {
+        id: feeType.id,
+        feeTypeName: feeType.feeTypeName?.trim(),
+        feeTypeDescription: feeType.feeTypeDescription?.trim(),
+        superadminId: currentUser?.superadminId || this.cookieService.get('superadminId')
+      }
+    };
+    const options = token
+      ? { headers: new HttpHeaders({ Authorization: `Bearer ${token}` }) }
+      : {};
+    return this.http.post<any>(Constant.Site_Url + 'updateFeeType', request, options);
   }
 }

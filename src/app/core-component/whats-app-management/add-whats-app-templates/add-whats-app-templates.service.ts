@@ -1,21 +1,30 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, switchMap } from 'rxjs';
+import { CookieService } from 'ngx-cookie-service';
 import { Constant } from 'src/app/core/constant/constants';
+import { AuthenticationService } from 'src/app/auth/authentication.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AddWhatsAppTemplatesService {
 
-   constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private cookieService: CookieService,
+    private authenticationService: AuthenticationService
+  ) {}
 
   createTemplate(payload: any, file: File | null, mediaType: string): Observable<any> {
+    const superadminId = this.getSuperadminId();
+    payload.payload = { ...(payload.payload || {}), superadminId };
+
     if (!file || mediaType === 'None') {
       return this.submitTemplate(payload);
     }
 
-    return this.uploadTemplateMedia(file, mediaType).pipe(
+    return this.uploadTemplateMedia(file, mediaType, superadminId).pipe(
       switchMap((response: any) => {
         if (response?.responseCode != null && Number(response.responseCode) !== 200) {
           throw response;
@@ -40,18 +49,33 @@ export class AddWhatsAppTemplatesService {
     );
   }
 
-  private uploadTemplateMedia(file: File, mediaType: string): Observable<any> {
+  private uploadTemplateMedia(file: File, mediaType: string, superadminId: string): Observable<any> {
     const formData = new FormData();
     formData.append('file', file, file.name);
     formData.append('mediaType', mediaType.toUpperCase());
     return this.http.post<any>(
       Constant.Site_Url + 'uploadWhatsAppTemplateMedia',
-      formData
+      formData,
+      this.authOptions()
     );
   }
 
   private submitTemplate(payload: any): Observable<any> {
-    return this.http.post<any>(Constant.Site_Url + 'addTemplates', payload);
+    return this.http.post<any>(Constant.Site_Url + 'addTemplates', payload, this.authOptions());
+  }
+
+  private getSuperadminId(): string {
+    const currentUser = this.authenticationService.getLoginUser();
+    return currentUser?.superadminId || this.cookieService.get('superadminId');
+  }
+
+  private authOptions(): { headers: HttpHeaders } {
+    const token = this.cookieService.get('token');
+    return {
+      headers: token
+        ? new HttpHeaders({ Authorization: `Bearer ${token}` })
+        : new HttpHeaders()
+    };
   }
 }
 
