@@ -18,6 +18,7 @@ import { CalendarModule } from 'primeng/calendar';
 import { FeeTypeComponent } from './fee-type/fee-type.component';
 import { FeeStructureComponent } from './fee-structure/fee-structure.component';
 import { StudentAcademicComponent } from './student-academic/student-academic.component';
+import { GradeComponent } from './grade/grade.component';
 
 import { MessageService } from 'primeng/api';
 
@@ -30,7 +31,8 @@ import { MessageService } from 'primeng/api';
     SchoolReceiptListComponent,
     FeeTypeComponent,
     FeeStructureComponent,
-    StudentAcademicComponent
+    StudentAcademicComponent,
+    GradeComponent
   ],
   imports: [
     SchoolManagementRoutingModule,

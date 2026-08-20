@@ -1,1 +1,133 @@
-<p>grade works!</p>
+<div class="page-header">
+  <p-toast></p-toast>
+  <div class="add-item d-flex">
+    <div class="page-title">
+      <h4>Grades</h4>
+      <h6>View school grade details</h6>
+    </div>
+  </div>
+  <ul class="table-top-head">
+    <li>
+      <a href="javascript:void(0)" matTooltip="Refresh" matTooltipPosition="above"
+         (click)="getGradeDetails()">
+        <i class="feather icon-rotate-ccw feather-rotate-ccw"></i>
+      </a>
+    </li>
+  </ul>
+</div>
+
+<div class="card table-list-card">
+  <div class="card-body">
+    <div class="table-top grade-toolbar">
+      <div class="search-set">
+        <div class="search-input">
+          <a href="javascript:void(0)" class="btn btn-searchset"><i class="feather icon-search"></i></a>
+          <div class="dataTables_filter">
+            <input [(ngModel)]="searchDataValue" (ngModelChange)="searchData($event)"
+                   type="search" class="form-control" placeholder="Search grades...">
+          </div>
+        </div>
+      </div>
+      <button type="button" class="btn btn-primary" (click)="openAddGrade(addGradeDialog)">
+        <i class="feather icon-plus-circle me-1"></i>Add Grade
+      </button>
+    </div>
+
+    <div *ngIf="errorMessage" class="alert alert-danger mt-3">{{ errorMessage }}</div>
+    <div *ngIf="isLoading" class="grade-state">
+      <span class="spinner-border spinner-border-sm me-2"></span>Loading grades...
+    </div>
+
+    <div *ngIf="!isLoading" class="table-responsive mt-3">
+      <table matSort (matSortChange)="sortData($event)" class="table datanew">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th mat-sort-header="gradeName">Grade Name</th>
+            <th mat-sort-header="gradeCode">Grade Code</th>
+            <th mat-sort-header="status">Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let data of tableData; let i = index">
+            <td>{{ serialNumberArray[i] }}</td>
+            <td><strong>{{ data.gradeName || '—' }}</strong></td>
+            <td>{{ data.gradeCode || '—' }}</td>
+            <td>
+              <span class="badge" [ngClass]="data.status === 'ACTIVE' ? 'badge-linesuccess' : 'badge-linedanger'">
+                {{ data.status || '—' }}
+              </span>
+            </td>
+            <td class="action-table-data">
+              <div class="edit-delete-action">
+                <a href="javascript:void(0)" class="me-2 p-2 mb-0" title="Edit grade"
+                   (click)="openEditGrade(editGradeDialog, data)">
+                  <i class="feather icon-edit feather-edit"></i>
+                </a>
+              </div>
+            </td>
+          </tr>
+          <tr *ngIf="tableData.length === 0">
+            <td colspan="5" class="grade-state">No grades found.</td>
+          </tr>
+        </tbody>
+      </table>
+      <app-custom-pagination *ngIf="totalData > 0"></app-custom-pagination>
+    </div>
+  </div>
+</div>
+
+<ng-template #addGradeDialog>
+  <div class="modalHeaderContainer">
+    <h2 mat-dialog-title class="p-0">Add Grade</h2>
+    <button type="button" class="close grade-close" mat-dialog-close aria-label="Close">&times;</button>
+  </div>
+  <mat-dialog-content class="grade-dialog-content">
+    <form [formGroup]="addGradeForm" class="grade-form-grid">
+      <div>
+        <label class="form-label">Grade Name <span class="text-danger">*</span></label>
+        <input class="form-control" formControlName="gradeName" placeholder="e.g. Grade 5" maxlength="100">
+      </div>
+      <div>
+        <label class="form-label">Grade Code <span class="text-danger">*</span></label>
+        <input class="form-control" formControlName="gradeCode" placeholder="e.g. G5" maxlength="50">
+      </div>
+    </form>
+  </mat-dialog-content>
+  <mat-dialog-actions align="end" class="grade-dialog-actions">
+    <button type="button" class="btn btn-light" mat-dialog-close [disabled]="isSaving">Cancel</button>
+    <button type="button" class="btn btn-primary" (click)="addGrade()"
+            [disabled]="addGradeForm.invalid || isSaving">
+      <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-1"></span>
+      {{ isSaving ? 'Saving...' : 'Add Grade' }}
+    </button>
+  </mat-dialog-actions>
+</ng-template>
+
+<ng-template #editGradeDialog>
+  <div class="modalHeaderContainer">
+    <h2 mat-dialog-title class="p-0">Update Grade</h2>
+    <button type="button" class="close grade-close" mat-dialog-close aria-label="Close">&times;</button>
+  </div>
+  <mat-dialog-content class="grade-dialog-content">
+    <form [formGroup]="editGradeForm" class="grade-form-grid">
+      <div>
+        <label class="form-label">Grade Name <span class="text-danger">*</span></label>
+        <input class="form-control" formControlName="gradeName" maxlength="100">
+      </div>
+      <div>
+        <label class="form-label">Grade Code <span class="text-danger">*</span></label>
+        <input class="form-control" formControlName="gradeCode" maxlength="50">
+      </div>
+    </form>
+  </mat-dialog-content>
+  <mat-dialog-actions align="end" class="grade-dialog-actions">
+    <button type="button" class="btn btn-light" mat-dialog-close [disabled]="isUpdating">Cancel</button>
+    <button type="button" class="btn btn-primary" (click)="updateGrade()"
+            [disabled]="editGradeForm.invalid || isUpdating">
+      <span *ngIf="isUpdating" class="spinner-border spinner-border-sm me-1"></span>
+      {{ isUpdating ? 'Updating...' : 'Update' }}
+    </button>
+  </mat-dialog-actions>
+</ng-template>

@@ -397,6 +397,16 @@ export class SidebarService {
               route: routes.feeStructure,
               permission: 'fee-structure',
             }, 
+            {
+              menuValue: 'Fee-Assignment',
+              route: routes.feeAssignment,
+              permission: 'fee-assignment',
+            }, 
+            {
+              menuValue: 'Grade',
+              route: routes.grade,
+              permission: 'grade',
+            }, 
            
           ],
         },

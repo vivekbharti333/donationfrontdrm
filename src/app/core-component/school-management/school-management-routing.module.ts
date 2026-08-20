@@ -8,6 +8,8 @@ import { SchoolReceiptListComponent } from './school-receipt-list/school-receipt
 import { FeeTypeComponent } from './fee-type/fee-type.component';
 import { FeeStructureComponent } from './fee-structure/fee-structure.component';
 import { StudentAcademicComponent } from './student-academic/student-academic.component';
+// Standalone fee assignment screen.
+import { FeeAssignmentComponent } from './fee-assignment/fee-assignment.component';
 import { GradeComponent } from './grade/grade.component';
  
 
@@ -43,6 +45,10 @@ const routes: Routes = [
       {
         path: 'student-academic',
         component: StudentAcademicComponent,
+      },
+      {
+        path: 'fee-assignment',
+        component: FeeAssignmentComponent,
       },
       {
         path: 'grade',

@@ -1,1 +1,55 @@
-<p>fee-structure works!</p>
+<p-toast></p-toast>
+<section class="fee-dashboard">
+  <nav class="breadcrumbs"><i class="feather icon-home"></i><span>Academics</span><i class="feather icon-chevron-right"></i><span>Fee Management</span><i class="feather icon-chevron-right"></i><span>Fee Structure</span></nav>
+  <header class="dashboard-header">
+    <div><h1>Fee Structure</h1><p>Create and manage fee structures for different classes and academic years.</p></div>
+    <div class="header-actions"><button class="secondary-btn"><i class="feather icon-download"></i>Export</button><button class="primary-btn" (click)="openAddFeeStructure(addFeeStructureDialog)"><i class="feather icon-plus"></i>Create Fee Structure</button></div>
+  </header>
+
+  <div class="filter-card">
+    <label><span>Academic Year</span><select [(ngModel)]="selectedAcademicYear"><option>All Years</option><option *ngFor="let year of academicYears">{{ year }}</option></select></label>
+    <label><span>Class</span><select [(ngModel)]="selectedGrade"><option>All Classes</option><option *ngFor="let grade of grades">{{ grade }}</option></select></label>
+    <label class="search-field"><span>Fee Structure Name</span><div><input [(ngModel)]="searchDataValue" (keyup.enter)="applyFilters()" placeholder="Search by structure name..."><i class="feather icon-search"></i></div></label>
+    <label><span>Status</span><select [(ngModel)]="selectedStatus"><option>All Statuses</option><option>Active</option><option>Inactive</option></select></label>
+    <button class="secondary-btn compact" (click)="applyFilters()"><i class="feather icon-filter"></i>Filter</button>
+    <button class="secondary-btn compact" (click)="resetFilters()"><i class="feather icon-rotate-ccw"></i>Reset</button>
+  </div>
+
+  <div class="summary-grid">
+    <article class="summary-card"><div class="summary-icon purple"><i class="feather icon-file-text"></i></div><div><span>Total Fee Structures</span><strong>{{ fullData.length }}</strong><small>Across all classes</small></div></article>
+    <article class="summary-card"><div class="summary-icon green">₹</div><div><span>Total Annual Amount</span><strong>₹ {{ totalAmount | number:'1.0-0' }}</strong><small>Average: ₹ {{ (fullData.length ? totalAmount / fullData.length : 0) | number:'1.0-0' }}</small></div></article>
+    <article class="summary-card"><div class="summary-icon blue"><i class="feather icon-layers"></i></div><div><span>Active Structures</span><strong>{{ activeCount }}</strong><small>Active fee structures</small></div></article>
+    <article class="summary-card"><div class="summary-icon orange"><i class="feather icon-calendar"></i></div><div><span>Inactive Structures</span><strong>{{ inactiveCount }}</strong><small>Inactive fee structures</small></div></article>
+  </div>
+
+  <div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
+  <div class="dashboard-grid">
+    <article class="dashboard-panel list-panel">
+      <h2>Fee Structures ({{ totalData }})</h2>
+      <div *ngIf="isLoading" class="fee-structure-state"><span class="spinner-border spinner-border-sm me-2"></span>Loading fee structures from API...</div>
+      <div *ngIf="!isLoading" class="table-scroll"><table matSort (matSortChange)="sortData($event)"><thead><tr><th>Sr. No.</th><th mat-sort-header="feeTypeId">Fee Structure Name</th><th mat-sort-header="gradeId">Class</th><th mat-sort-header="academicYearId">Academic Year</th><th mat-sort-header="amount">Total Amount (₹)</th><th mat-sort-header="status">Status</th><th>Action</th></tr></thead>
+        <tbody><tr *ngFor="let data of tableData; let i = index" (click)="selectFeeStructure(data)" [class.selected-row]="selectedFeeStructure?.id === data.id"><td>{{ serialNumberArray[i] }}</td><td>{{ getStructureName(data) }}</td><td>{{ getGradeName(data) }}</td><td>{{ data.academicYearId || '—' }}</td><td>{{ data.amount | number:'1.2-2' }}</td><td><span class="status-pill" [class.inactive]="!isActive(data)">{{ isActive(data) ? 'Active' : 'Inactive' }}</span></td><td><div class="row-actions"><button title="View" (click)="$event.stopPropagation(); selectFeeStructure(data)"><i class="feather icon-eye"></i></button><button class="edit-btn" title="Edit" (click)="$event.stopPropagation(); openEditFeeStructure(editFeeStructureDialog, data)"><i class="feather icon-edit-2"></i></button><button class="delete-btn" title="Delete" [disabled]="isDeleting" (click)="$event.stopPropagation(); deleteFeeStructure(data)"><i class="feather icon-trash-2"></i></button></div></td></tr>
+        <tr *ngIf="tableData.length === 0"><td colspan="7" class="fee-structure-state">No fee structures found.</td></tr></tbody></table></div>
+      <app-custom-pagination *ngIf="totalData > 0"></app-custom-pagination>
+      <aside class="info-note"><i class="feather icon-info"></i><p><strong>Note:</strong> You can create different fee structures for different classes and academic years. Students will be assigned fee structures while promoting or during admission.</p></aside>
+    </article>
+
+    <article class="dashboard-panel details-panel">
+      <h2>Fee Structure Details</h2>
+      <ng-container *ngIf="selectedFeeStructure as item; else emptyDetails">
+        <div class="structure-name"><span>Structure Name</span><div><strong>{{ getStructureName(item) }}</strong><span class="status-pill" [class.inactive]="!isActive(item)">{{ isActive(item) ? 'Active' : 'Inactive' }}</span></div></div>
+        <div class="detail-grid"><div><span>Class</span><strong>{{ getGradeName(item) }}</strong></div><div><span>Academic Year</span><strong>{{ item.academicYearId || '—' }}</strong></div><div><span>Total Amount</span><strong>₹ {{ item.amount | number:'1.2-2' }}</strong></div></div>
+        <h3>Fee Components</h3>
+        <div class="table-scroll component-table"><table><thead><tr><th>Component Name</th><th>Frequency</th><th>Amount (₹)</th><th>Status</th></tr></thead><tbody><tr><td>{{ getFeeTypeName(item.feeTypeId) }}</td><td>{{ item.frequency || '—' }}</td><td>{{ item.amount | number:'1.2-2' }}</td><td>{{ isActive(item) ? 'Active' : 'Inactive' }}</td></tr></tbody></table></div>
+        <button class="outline-btn"><i class="feather icon-eye"></i>View Full Details</button>
+      </ng-container>
+      <ng-template #emptyDetails><div class="empty-details"><i class="feather icon-file-text"></i><p>Select a fee structure from the API list.</p></div></ng-template>
+    </article>
+  </div>
+</section>
+
+<ng-template #addFeeStructureDialog><div class="modalHeaderContainer"><h2 mat-dialog-title class="p-0">Add Fee Structure</h2><button type="button" class="close fee-structure-close" mat-dialog-close aria-label="Close">&times;</button></div><mat-dialog-content class="fee-structure-dialog-content"><form [formGroup]="addFeeStructureForm"><ng-container *ngTemplateOutlet="feeStructureFields; context: { form: addFeeStructureForm }"></ng-container></form></mat-dialog-content><mat-dialog-actions align="end" class="fee-structure-dialog-actions"><button type="button" class="btn btn-light" mat-dialog-close [disabled]="isSaving">Cancel</button><button type="button" class="btn btn-primary" (click)="addFeeStructure()" [disabled]="isSaving"><span *ngIf="isSaving" class="spinner-border spinner-border-sm me-1"></span>{{ isSaving ? 'Saving...' : 'Add Fee Structure' }}</button></mat-dialog-actions></ng-template>
+
+<ng-template #editFeeStructureDialog><div class="modalHeaderContainer"><h2 mat-dialog-title class="p-0">Update Fee Structure</h2><button type="button" class="close fee-structure-close" mat-dialog-close aria-label="Close">&times;</button></div><mat-dialog-content class="fee-structure-dialog-content"><form [formGroup]="editFeeStructureForm"><ng-container *ngTemplateOutlet="feeStructureFields; context: { form: editFeeStructureForm }"></ng-container></form></mat-dialog-content><mat-dialog-actions align="end" class="fee-structure-dialog-actions"><button type="button" class="btn btn-light" mat-dialog-close [disabled]="isUpdating">Cancel</button><button type="button" class="btn btn-primary" (click)="updateFeeStructure()" [disabled]="isUpdating"><span *ngIf="isUpdating" class="spinner-border spinner-border-sm me-1"></span>{{ isUpdating ? 'Updating...' : 'Update' }}</button></mat-dialog-actions></ng-template>
+
+<ng-template #feeStructureFields let-form="form"><div class="row g-3" [formGroup]="form"><div class="col-md-4"><label class="form-label">Academic Year <span class="text-danger">*</span></label><input type="text" class="form-control" formControlName="academicYearId" placeholder="e.g. 2026-27"><small class="text-danger" *ngIf="form.get('academicYearId')?.touched && form.get('academicYearId')?.invalid">Academic year is required.</small></div><div class="col-md-4"><label class="form-label">Grade <span class="text-danger">*</span></label><select class="form-select" formControlName="gradeId"><option [ngValue]="null">{{ isGradesLoading ? 'Loading grades...' : 'Select grade' }}</option><option *ngFor="let grade of gradeOptions" [ngValue]="grade.id">{{ grade.gradeName || grade.name || ('Grade ' + grade.id) }}</option></select><small class="text-danger" *ngIf="form.get('gradeId')?.touched && form.get('gradeId')?.invalid">Grade is required.</small><small class="text-muted" *ngIf="!isGradesLoading && gradeOptions.length === 0">No grades available.</small></div><div class="col-md-4"><label class="form-label">Fee Type <span class="text-danger">*</span></label><select class="form-select" formControlName="feeTypeId"><option [ngValue]="null">{{ isFeeTypesLoading ? 'Loading fee types...' : 'Select fee type' }}</option><option *ngFor="let feeType of feeTypes" [ngValue]="feeType.id">{{ feeType.feeTypeName }} (ID: {{ feeType.id }})</option></select><small class="text-danger" *ngIf="form.get('feeTypeId')?.touched && form.get('feeTypeId')?.invalid">Fee type is required.</small><small class="text-muted" *ngIf="!isFeeTypesLoading && feeTypes.length === 0">No fee types available.</small></div><div class="col-md-6"><label class="form-label">Amount <span class="text-danger">*</span></label><input type="number" min="0" step="0.01" class="form-control" formControlName="amount"><small class="text-danger" *ngIf="form.get('amount')?.touched && form.get('amount')?.invalid">Enter a valid amount.</small></div><div class="col-md-6"><label class="form-label">Frequency</label><select class="form-select" formControlName="frequency"><option value="">Select frequency</option><option *ngFor="let frequency of feeFrequencyOptions" [value]="frequency.value">{{ frequency.name }}</option></select></div></div></ng-template>

@@ -230,7 +230,7 @@ export class SchoolManagementService {
   }
 
   getFeeTypeDetails(): Observable<any> {
-    const token = this.cookieService.get('token');
+    const token = this.getAuthenticationToken();
     const currentUser = this.authenticationService.getLoginUser();
     const request = {
       payload: {
@@ -244,7 +244,7 @@ export class SchoolManagementService {
   }
 
   addFeeType(feeType: any): Observable<any> {
-    const token = this.cookieService.get('token');
+    const token = this.getAuthenticationToken();
     const currentUser = this.authenticationService.getLoginUser();
     const request = {
       payload: {
@@ -264,7 +264,7 @@ export class SchoolManagementService {
   }
 
   updateFeeType(feeType: any): Observable<any> {
-    const token = this.cookieService.get('token');
+    const token = this.getAuthenticationToken();
     const currentUser = this.authenticationService.getLoginUser();
     const request = {
       payload: {
@@ -278,5 +278,121 @@ export class SchoolManagementService {
       ? { headers: new HttpHeaders({ Authorization: `Bearer ${token}` }) }
       : {};
     return this.http.post<any>(Constant.Site_Url + 'updateFeeType', request, options);
+  }
+
+  getFeeStructure(): Observable<any> {
+    const token = this.getAuthenticationToken();
+    const currentUser = this.authenticationService.getLoginUser();
+    const request = {
+      payload: {
+        superadminId: currentUser?.superadminId || this.cookieService.get('superadminId')
+      }
+    };
+    const options = token
+      ? { headers: new HttpHeaders({ Authorization: `Bearer ${token}` }) }
+      : {};
+    return this.http.post<any>(Constant.Site_Url + 'getFeeStructure', request, options);
+  }
+
+  addFeeStructure(feeStructure: any): Observable<any> {
+    const token = this.getAuthenticationToken();
+    const currentUser = this.authenticationService.getLoginUser();
+    const request = {
+      payload: {
+        academicYearId: feeStructure.academicYearId?.trim(),
+        gradeId: Number(feeStructure.gradeId),
+        feeTypeId: Number(feeStructure.feeTypeId),
+        amount: Number(feeStructure.amount),
+        frequency: feeStructure.frequency?.trim(),
+        createdBy: currentUser?.loginId
+          || this.cookieService.get('loginId')
+          || this.cookieService.get('superadminId'),
+        createdByName: currentUser?.name || this.cookieService.get('superadminName'),
+        superadminId: currentUser?.superadminId || this.cookieService.get('superadminId')
+      }
+    };
+    const options = token
+      ? { headers: new HttpHeaders({ Authorization: `Bearer ${token}` }) }
+      : {};
+    return this.http.post<any>(Constant.Site_Url + 'addFeeStructure', request, options);
+  }
+
+  updateFeeStructure(feeStructure: any): Observable<any> {
+    const token = this.getAuthenticationToken();
+    const currentUser = this.authenticationService.getLoginUser();
+    const request = {
+      payload: {
+        id: feeStructure.id,
+        academicYearId: feeStructure.academicYearId?.trim(),
+        gradeId: Number(feeStructure.gradeId),
+        feeTypeId: Number(feeStructure.feeTypeId),
+        amount: Number(feeStructure.amount),
+        frequency: feeStructure.frequency?.trim(),
+        superadminId: currentUser?.superadminId || this.cookieService.get('superadminId')
+      }
+    };
+    const options = token
+      ? { headers: new HttpHeaders({ Authorization: `Bearer ${token}` }) }
+      : {};
+    return this.http.post<any>(Constant.Site_Url + 'updateFeeStructure', request, options);
+  }
+
+  deleteFeeStructure(id: number): Observable<any> {
+    const token = this.getAuthenticationToken();
+    const currentUser = this.authenticationService.getLoginUser();
+    const request = {
+      payload: {
+        id: Number(id),
+        updatedBy: currentUser?.loginId || this.cookieService.get('loginId'),
+        superadminId: currentUser?.superadminId || this.cookieService.get('superadminId')
+      }
+    };
+    const options = token
+      ? { headers: new HttpHeaders({ Authorization: `Bearer ${token}` }) }
+      : {};
+    return this.http.post<any>(Constant.Site_Url + 'deleteFeeStructure', request, options);
+  }
+
+  getGradeDetails(): Observable<any> {
+    const token = this.cookieService.get('token');
+    const request = { payload: {} };
+    const options = token
+      ? { headers: new HttpHeaders({ Authorization: `Bearer ${token}` }) }
+      : {};
+    return this.http.post<any>(Constant.Site_Url + 'getGradeDetails', request, options);
+  }
+
+  addGrade(grade: any): Observable<any> {
+    const token = this.cookieService.get('token');
+    const request = {
+      payload: {
+        gradeName: grade.gradeName?.trim(),
+        gradeCode: grade.gradeCode?.trim()
+      }
+    };
+    const options = token
+      ? { headers: new HttpHeaders({ Authorization: `Bearer ${token}` }) }
+      : {};
+    return this.http.post<any>(Constant.Site_Url + 'addGrade', request, options);
+  }
+
+  updateGrade(grade: any): Observable<any> {
+    const token = this.cookieService.get('token');
+    const request = {
+      payload: {
+        id: grade.id,
+        gradeName: grade.gradeName?.trim(),
+        gradeCode: grade.gradeCode?.trim()
+      }
+    };
+    const options = token
+      ? { headers: new HttpHeaders({ Authorization: `Bearer ${token}` }) }
+      : {};
+    return this.http.post<any>(Constant.Site_Url + 'updateGrade', request, options);
+  }
+
+  private getAuthenticationToken(): string {
+    return this.authenticationService.getLoginUser()?.token
+      || this.cookieService.get('token');
   }
 }

@@ -54,6 +54,15 @@ export class Constant {
     public static LEAD_ORIGINE_LIST = [{ value: 'CALL', name: 'Call'}, {value: 'WHATSAPP', name: 'Whats App'}, {value: 'EMAIL', name: 'Email'},{value: 'OTHER', name: 'Other'}];
     public static LEAD_TYPE_LIST = [{ value: 'NEW', name: 'New'}, {value: 'REPEAT', name: 'Repeat'}, {value: 'REFERRED', name: 'Referred'},{value: 'AGENT', name: 'Agent'}, {value: 'AGENT-REPEAT', name: 'Agent Repeat'}];
 
+    // School fee frequency options. Reuse this list in any school fee form.
+    public static FEE_FREQUENCY_OPTIONS = [
+      { value: 'ONE_TIME', name: 'One Time' },
+      { value: 'MONTHLY', name: 'Monthly' },
+      { value: 'QUARTERLY', name: 'Quarterly' },
+      { value: 'HALF_YEARLY', name: 'Half Yearly' },
+      { value: 'YEARLY', name: 'Yearly' }
+    ];
+
 
       serviceType: any = ['DONATION'];
       public static roleTypeForMainAdmin: any = [{value: Constant.superAdmin, name: 'Superadmin'}, {value: Constant.admin, name: 'Admin'}, {value:Constant.teamLeader, name: 'Team Leader'}, { value: Constant.fundraisingOfficer, name: 'Fundrising Officer'}];

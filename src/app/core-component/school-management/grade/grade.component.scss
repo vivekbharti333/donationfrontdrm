@@ -1,0 +1,66 @@
+.grade-state {
+  padding: 28px 16px;
+  color: #6b7280;
+  text-align: center;
+}
+
+.table.datanew tbody tr {
+  height: 51px;
+}
+
+.table.datanew td,
+.table.datanew th {
+  vertical-align: middle;
+}
+
+.grade-toolbar {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.modalHeaderContainer {
+  align-items: center;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: space-between;
+  padding: 20px 24px;
+}
+
+.modalHeaderContainer h2 {
+  margin: 0;
+}
+
+.grade-close {
+  background: transparent;
+  border: 0;
+  color: #6b7280;
+  font-size: 28px;
+  line-height: 1;
+}
+
+.grade-dialog-content {
+  padding: 24px !important;
+}
+
+.grade-form-grid {
+  display: grid;
+  gap: 16px;
+}
+
+.grade-dialog-actions {
+  gap: 10px;
+  padding: 0 24px 24px;
+}
+
+@media (max-width: 575px) {
+  .grade-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .grade-toolbar .btn-primary {
+    align-self: flex-start;
+  }
+}

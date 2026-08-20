@@ -1,1 +1,40 @@
-<p>fee-assignment works!</p>
+<section class="assignment-page">
+  <nav class="breadcrumbs"><i class="feather icon-home"></i><span>Academics</span><i class="feather icon-chevron-right"></i><span>Fee Assignment / Exceptions</span></nav>
+  <h1>Fee Assignment / Exceptions</h1>
+
+  <div class="top-filters">
+    <label><span>Academic Year <b>*</b></span><select [(ngModel)]="sessionName"><option value="2026-27">2026-27</option><option value="2025-26">2025-26</option></select></label>
+    <label><span>Class <b>*</b></span><select [(ngModel)]="classFilter"><option value="">All Classes</option><option *ngFor="let item of availableClasses" [value]="item.value">{{ item.label }}</option></select></label>
+    <label><span>Fee Structure <b>*</b></span><select [(ngModel)]="feeStructure"><option>Annual Fee Structure 25-26</option></select></label>
+    <button class="outline-orange" (click)="applyFilters()"><i class="feather icon-check-square"></i>View Fee Structure <i class="feather icon-chevron-down"></i></button>
+  </div>
+
+  <div class="assignment-grid" [class.resizing]="isResizing" [style.grid-template-columns]="splitPercent + '% 10px minmax(0, 1fr)'">
+    <article class="panel students-panel">
+      <h2>Students ({{ filteredStudents.length }})</h2>
+      <div class="student-toolbar"><div class="search-box"><input [(ngModel)]="searchTerm" (ngModelChange)="searchStudents()" placeholder="Search by Name or Roll No."><i class="feather icon-search"></i></div><button><i class="feather icon-download"></i>Export</button></div>
+      <div *ngIf="errorMessage" class="api-error">{{ errorMessage }}</div>
+      <div *ngIf="isLoading" class="loading"><span class="spinner-border spinner-border-sm"></span> Loading students from API...</div>
+      <div *ngIf="!isLoading" class="student-table"><table><thead><tr><th><input type="checkbox"></th><th>Roll No.</th><th>Student Name</th><th>Admission No.</th><th>Current Fee Plan</th><th>Action</th></tr></thead>
+        <tbody><tr *ngFor="let student of visibleStudents; trackBy: trackByStudent" [class.selected]="selectedStudent === student" (click)="selectStudent(student)"><td><input type="checkbox" [checked]="selectedStudent === student"></td><td>{{ student.rollNumber || '—' }}</td><td>{{ studentName(student) }}</td><td>{{ admissionNumber(student) }}</td><td>{{ student.feeStructureName || feeStructure }}</td><td><button class="assign-btn" (click)="$event.stopPropagation(); selectStudent(student)">Assign</button></td></tr><tr *ngIf="visibleStudents.length === 0"><td colspan="6" class="empty">No students match this filter.</td></tr></tbody></table></div>
+      <div class="list-footer"><span>Showing {{ filteredStudents.length ? (page - 1) * pageSize + 1 : 0 }} to {{ page * pageSize < filteredStudents.length ? page * pageSize : filteredStudents.length }} of {{ filteredStudents.length }} entries</span><div><button (click)="setPage(page - 1)" [disabled]="page === 1"><i class="feather icon-chevron-left"></i></button><button *ngFor="let number of [1,2,3,4,5]" [hidden]="number > totalPages" [class.current]="number === page" (click)="setPage(number)">{{ number }}</button><button (click)="setPage(page + 1)" [disabled]="page === totalPages"><i class="feather icon-chevron-right"></i></button></div></div>
+    </article>
+
+    <div class="panel-resizer" role="separator" aria-label="Resize student and selected student panels" (pointerdown)="startResize($event)"><span></span></div>
+
+    <article class="panel details-panel">
+      <header><h2>Selected Student</h2><button class="clear-btn" (click)="clearSelection()">Clear Selection <i class="feather icon-x"></i></button></header>
+      <ng-container *ngIf="selectedStudent as student; else selectPrompt">
+        <div class="student-card"><img [src]="studentImage(student)" alt="Student"><div><h3>{{ studentName(student) }}</h3><p>Roll No.: <strong>{{ student.rollNumber || '—' }}</strong><i></i>Admission No.: {{ admissionNumber(student) }}</p><p>Class: {{ className(student) }}</p></div></div>
+        <div class="tabs"><button class="active">Fee Details</button><button>Payment Plan</button></div>
+        <h3 class="section-title">Assigned Fee Structure</h3>
+        <div class="structure-box"><span>{{ student.feeStructureName || feeStructure }}</span><button>View Structure <i class="feather icon-external-link"></i></button></div>
+        <h3 class="section-title">Fee Components</h3>
+        <div class="fee-area"><div class="fee-table"><table><thead><tr><th>Component</th><th>Amount (₹)</th><th>Discount (₹)</th><th>Payable (₹)</th><th>Action</th></tr></thead><tbody><tr *ngFor="let fee of feeComponents; let i = index"><td><input *ngIf="fee.name === 'Additional Fee'" [(ngModel)]="fee.name"><ng-container *ngIf="fee.name !== 'Additional Fee'">{{ fee.name }}</ng-container></td><td><input *ngIf="fee.name === 'Additional Fee'" type="number" min="0" [(ngModel)]="fee.amount"><ng-container *ngIf="fee.name !== 'Additional Fee'">{{ fee.amount | number:'1.2-2' }}</ng-container></td><td><input type="number" min="0" [max]="fee.amount" [(ngModel)]="fee.discount"></td><td><strong>{{ fee.amount - fee.discount | number:'1.2-2' }}</strong></td><td><button *ngIf="fee.removable" class="trash" (click)="removeFee(i)"><i class="feather icon-trash-2"></i></button><span *ngIf="!fee.removable">—</span></td></tr></tbody></table><button class="outline-orange add-fee" (click)="addOtherFee()"><i class="feather icon-plus"></i>Add Other Fee / Discount</button></div>
+          <aside><div class="summary"><h4>Summary</h4><p><span>Total Fee</span><strong>₹ {{ totalFee | number:'1.2-2' }}</strong></p><p class="discount"><span>Total Discount</span><strong>₹ {{ totalDiscount | number:'1.2-2' }}</strong></p><hr><p class="payable"><span>Total Payable</span><strong>₹ {{ totalPayable | number:'1.2-2' }}</strong></p></div><label><span>Reason (Optional)</span><textarea [(ngModel)]="reason" placeholder="Enter reason for fee exception"></textarea></label></aside></div>
+      </ng-container>
+      <ng-template #selectPrompt><div class="select-prompt"><i class="feather icon-user"></i><p>Select a student from the API list to assign fees.</p></div></ng-template>
+    </article>
+  </div>
+  <footer class="page-actions"><button>Cancel</button><button (click)="resetAssignment()">Reset</button><button class="save-btn" [disabled]="!selectedStudent">Save Assignment</button></footer>
+</section>
