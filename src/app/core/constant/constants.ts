@@ -62,4 +62,32 @@ export class Constant {
       public static roleTypeFoManager: any = [{value: Constant.fundraisingOfficer, name: 'Fundrising Officer'}];
     
 
+// Dashboard
+
+// Students
+//  ├── Student List
+//  ├── Admission
+//  └── Student Academic
+
+// Academic
+//  ├── Academic Year
+//  ├── Grade / Class
+//  ├── Section
+//  ├── Promotion
+//  └── Academic History
+
+// Fees
+//  ├── Fee Heads
+//  ├── Fee Structure
+//  ├── Student Fee Assignment
+//  ├── Fee Collection
+//  └── Receipts
+
+// Examination
+//  ├── Exams
+//  ├── Marks Entry
+//  └── Results
+
+// Attendance
+
 }

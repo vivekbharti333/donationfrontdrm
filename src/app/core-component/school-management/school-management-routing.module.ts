@@ -8,6 +8,7 @@ import { SchoolReceiptListComponent } from './school-receipt-list/school-receipt
 import { FeeTypeComponent } from './fee-type/fee-type.component';
 import { FeeStructureComponent } from './fee-structure/fee-structure.component';
 import { StudentAcademicComponent } from './student-academic/student-academic.component';
+import { GradeComponent } from './grade/grade.component';
  
 
 const routes: Routes = [
@@ -42,6 +43,10 @@ const routes: Routes = [
       {
         path: 'student-academic',
         component: StudentAcademicComponent,
+      },
+      {
+        path: 'grade',
+        component: GradeComponent,
       },
     ],
   },
