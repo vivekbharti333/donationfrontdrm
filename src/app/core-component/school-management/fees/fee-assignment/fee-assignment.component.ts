@@ -1,8 +1,6 @@
-import { CommonModule } from '@angular/common';
 import { Component, HostListener, OnInit } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { Constant } from 'src/app/core/constant/constants';
-import { SchoolManagementService } from '../school-management.service';
+import { SchoolManagementService } from '../../school-management.service';
 
 interface AssignmentFeeComponent {
   name: string;
@@ -14,8 +12,6 @@ interface AssignmentFeeComponent {
 // Student fee assignment and exception editor.
 @Component({
   selector: 'app-fee-assignment',
-  standalone: true,
-  imports: [CommonModule, FormsModule],
   templateUrl: './fee-assignment.component.html',
   styleUrl: './fee-assignment.component.scss'
 })

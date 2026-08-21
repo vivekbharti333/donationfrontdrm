@@ -7,18 +7,19 @@ import { MultiSelectModule } from 'primeng/multiselect';
 import { sharedModule } from 'src/app/shared/shared.module';
 import { SchoolManagementComponent } from './school-management.component'; 
 import { SchoolManagementRoutingModule } from './school-management-routing.module';
-import { AddStudentComponent } from './add-student/add-student.component';
-import { StudentListComponent } from './student-list/student-list.component';
-import { GenerateSchoolReceiptComponent } from './generate-school-receipt/generate-school-receipt.component';
-import { SchoolReceiptListComponent } from './school-receipt-list/school-receipt-list.component';
+import { AddStudentComponent } from './students/add-student/add-student.component';
+import { StudentListComponent } from './students/student-list/student-list.component';
+import { GenerateSchoolReceiptComponent } from './receipt/generate-school-receipt/generate-school-receipt.component';
+import { SchoolReceiptListComponent } from './receipt/school-receipt-list/school-receipt-list.component';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatTabsModule} from '@angular/material/tabs';
 import { MatIconModule } from '@angular/material/icon';
 import { CalendarModule } from 'primeng/calendar';
-import { FeeTypeComponent } from './fee-type/fee-type.component';
-import { FeeStructureComponent } from './fee-structure/fee-structure.component';
-import { StudentAcademicComponent } from './student-academic/student-academic.component';
-import { GradeComponent } from './grade/grade.component';
+import { FeeTypeComponent } from './fees/fee-type/fee-type.component';
+import { FeeStructureComponent } from './fees/fee-structure/fee-structure.component';
+import { StudentAcademicComponent } from './academic/student-academic/student-academic.component';
+import { GradeComponent } from './academic/grade/grade.component';
+import { FeeAssignmentComponent } from './fees/fee-assignment/fee-assignment.component';
 
 import { MessageService } from 'primeng/api';
 
@@ -32,7 +33,8 @@ import { MessageService } from 'primeng/api';
     FeeTypeComponent,
     FeeStructureComponent,
     StudentAcademicComponent,
-    GradeComponent
+    GradeComponent,
+    FeeAssignmentComponent
   ],
   imports: [
     SchoolManagementRoutingModule,

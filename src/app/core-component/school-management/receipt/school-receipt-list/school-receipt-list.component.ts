@@ -11,7 +11,7 @@ import { Router } from '@angular/router';
 import { pageSelection, SidebarService } from 'src/app/core/core.index';
 import { routes } from 'src/app/core/helpers/routes';
 import { PaginationService, tablePageSize } from 'src/app/shared/shared.index';
-import { UserDetails } from '../../interface/user-management';
+import { UserDetails } from '../../../interface/user-management';
 import { MatDialog } from '@angular/material/dialog';
 import { GenerateSchoolReceiptService } from '../generate-school-receipt/generate-school-receipt.service'; 
 

@@ -1,6 +1,6 @@
 import { Component, TemplateRef } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { SchoolManagementService } from '../school-management.service';
+import { SchoolManagementService } from '../../school-management.service';
 import { MessageService } from 'primeng/api';
 import { AuthenticationService } from 'src/app/auth/authentication.service';
 import { CookieService } from 'ngx-cookie-service';
@@ -11,7 +11,7 @@ import { Router } from '@angular/router';
 import { pageSelection, SidebarService } from 'src/app/core/core.index';
 import { routes } from 'src/app/core/helpers/routes';
 import { PaginationService, tablePageSize } from 'src/app/shared/shared.index';
-import { UserDetails } from '../../interface/user-management';
+import { UserDetails } from '../../../interface/user-management';
 import { MatDialog } from '@angular/material/dialog';
 
 import { Constant } from 'src/app/core/constant/constants';

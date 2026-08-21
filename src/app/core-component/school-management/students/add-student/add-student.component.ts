@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { FormGroup, FormArray, FormBuilder, Validators} from '@angular/forms';
 import { SidebarService } from 'src/app/core/core.index'; // Ensure correct import path
-import { SchoolManagementService } from '../school-management.service';
+import { SchoolManagementService } from '../../school-management.service';
 import { MessageService } from 'primeng/api';
 import { AuthenticationService } from 'src/app/auth/authentication.service';
 import { CookieService } from 'ngx-cookie-service';

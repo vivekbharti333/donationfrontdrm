@@ -8,7 +8,7 @@ import { Subject, takeUntil } from 'rxjs';
 import { pageSelection } from 'src/app/core/core.index';
 import { routes } from 'src/app/core/helpers/routes';
 import { PaginationService, tablePageSize } from 'src/app/shared/shared.index';
-import { SchoolManagementService } from '../school-management.service';
+import { SchoolManagementService } from '../../school-management.service';
 import { MessageService } from 'primeng/api';
 import { Constant } from 'src/app/core/constant/constants';
 

@@ -371,7 +371,7 @@ export class SidebarService {
           showSubRoute: false,
           icon: 'credit-card',
           // base1: 'usermang',
-          subMenus: [
+          subMenus: [    
             {
               menuValue: 'Generate Receipt',
               route: routes.generateSchoolReceipt,

@@ -7,7 +7,7 @@ import { MessageService } from 'primeng/api';
 import { Subject, takeUntil } from 'rxjs';
 import { PaginationService, tablePageSize } from 'src/app/shared/shared.index';
 import { Constant } from 'src/app/core/constant/constants';
-import { SchoolManagementService } from '../school-management.service';
+import { SchoolManagementService } from '../../school-management.service';
 
 @Component({
   selector: 'app-fee-structure',

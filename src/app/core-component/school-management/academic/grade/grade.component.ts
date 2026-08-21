@@ -5,15 +5,15 @@ import { Sort } from '@angular/material/sort';
 import { Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { PaginationService, tablePageSize } from 'src/app/shared/shared.index';
-import { SchoolManagementService } from '../school-management.service';
+import { SchoolManagementService } from '../../school-management.service';
 import { MessageService } from 'primeng/api';
 
 @Component({
-  selector: 'app-fee-type',
-  templateUrl: './fee-type.component.html',
-  styleUrl: './fee-type.component.scss'
+  selector: 'app-grade',
+  templateUrl: './grade.component.html',
+  styleUrl: './grade.component.scss'
 })
-export class FeeTypeComponent implements OnInit, OnDestroy {
+export class GradeComponent implements OnInit, OnDestroy {
   public fullData: any[] = [];
   public tableData: any[] = [];
   public serialNumberArray: number[] = [];
@@ -22,8 +22,8 @@ export class FeeTypeComponent implements OnInit, OnDestroy {
   public searchDataValue = '';
   public isLoading = false;
   public errorMessage = '';
-  public addFeeTypeForm!: FormGroup;
-  public editFeeTypeForm!: FormGroup;
+  public addGradeForm!: FormGroup;
+  public editGradeForm!: FormGroup;
   public isSaving = false;
   public isUpdating = false;
 
@@ -42,25 +42,17 @@ export class FeeTypeComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.addFeeTypeForm = this.fb.group({
-      feeTypeName: ['', [Validators.required, Validators.maxLength(100)]],
-      feeTypeDescription: ['', Validators.maxLength(500)]
-    });
-    this.editFeeTypeForm = this.fb.group({
-      id: [null, Validators.required],
-      feeTypeName: ['', [Validators.required, Validators.maxLength(100)]],
-      feeTypeDescription: ['', Validators.maxLength(500)]
-    });
+    this.createForms();
     this.pagination.tablePageSize
       .pipe(takeUntil(this.destroy$))
       .subscribe((page: tablePageSize) => {
-        if (this.router.url.includes('fee-type')) {
+        if (this.router.url.includes('/grade')) {
           this.pageSize = page.pageSize;
           this.currentSkip = page.skip;
           this.applySearchAndPagination();
         }
       });
-    this.getFeeTypeDetails();
+    this.getGradeDetails();
   }
 
   ngOnDestroy(): void {
@@ -68,15 +60,15 @@ export class FeeTypeComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  public getFeeTypeDetails(): void {
+  public getGradeDetails(): void {
     this.isLoading = true;
     this.errorMessage = '';
-    this.schoolManagementService.getFeeTypeDetails().subscribe({
+    this.schoolManagementService.getGradeDetails().subscribe({
       next: (response: any) => {
         const rows = response?.listPayload ?? response?.payload ?? response?.data;
         this.fullData = Array.isArray(rows) ? rows : [];
         if (!Array.isArray(rows) && Number(response?.responseCode) !== 200) {
-          this.errorMessage = response?.responseMessage || 'Unable to load fee types.';
+          this.errorMessage = response?.responseMessage || 'Unable to load grades.';
         }
         this.currentSkip = 0;
         this.applySearchAndPagination();
@@ -85,7 +77,7 @@ export class FeeTypeComponent implements OnInit, OnDestroy {
       error: (error: any) => {
         this.fullData = [];
         this.applySearchAndPagination();
-        this.errorMessage = error?.error?.responseMessage || 'Unable to load fee types.';
+        this.errorMessage = error?.error?.responseMessage || 'Unable to load grades.';
         this.isLoading = false;
       }
     });
@@ -97,104 +89,76 @@ export class FeeTypeComponent implements OnInit, OnDestroy {
     this.applySearchAndPagination();
   }
 
-  public openAddFeeType(template: TemplateRef<any>): void {
-    this.addFeeTypeForm.reset({ feeTypeName: '', feeTypeDescription: '' });
+  public openAddGrade(template: TemplateRef<any>): void {
+    this.addGradeForm.reset({ gradeName: '', gradeCode: '' });
     this.addDialog = this.dialog.open(template, {
-      width: '540px',
+      width: '520px',
       maxWidth: '95vw',
       disableClose: true,
       panelClass: 'custom-modal'
     });
   }
 
-  public addFeeType(): void {
-    if (this.addFeeTypeForm.invalid || this.isSaving) {
-      this.addFeeTypeForm.markAllAsTouched();
+  public addGrade(): void {
+    if (this.addGradeForm.invalid || this.isSaving) {
+      this.addGradeForm.markAllAsTouched();
       return;
     }
-
     this.isSaving = true;
-    this.schoolManagementService.addFeeType(this.addFeeTypeForm.value).subscribe({
+    this.schoolManagementService.addGrade(this.addGradeForm.value).subscribe({
       next: (response: any) => {
         this.isSaving = false;
         const payload = response?.payload;
         if (Number(response?.responseCode) !== 200 || Number(payload?.respCode) !== 200) {
-          this.messageService.add({
-            summary: 'Unable to add fee type',
-            detail: payload?.respMesg || response?.responseMessage || 'Fee type could not be added.',
-            severity: 'error'
-          });
+          this.showMessage('Unable to add grade', payload?.respMesg || response?.responseMessage, 'error');
           return;
         }
-
         this.addDialog?.close();
-        this.messageService.add({
-          summary: 'Added',
-          detail: payload?.respMesg || 'Fee type added successfully.',
-          severity: 'success'
-        });
-        this.getFeeTypeDetails();
+        this.showMessage('Added', payload?.respMesg || 'Grade added successfully.', 'success');
+        this.getGradeDetails();
       },
       error: (error: any) => {
         this.isSaving = false;
-        this.messageService.add({
-          summary: 'Unable to add fee type',
-          detail: error?.error?.responseMessage || 'Fee type could not be added.',
-          severity: 'error'
-        });
+        this.showMessage('Unable to add grade', error?.error?.responseMessage, 'error');
       }
     });
   }
 
-  public openEditFeeType(template: TemplateRef<any>, feeType: any): void {
-    this.editFeeTypeForm.reset({
-      id: feeType.id,
-      feeTypeName: feeType.feeTypeName,
-      feeTypeDescription: feeType.feeTypeDescription || ''
+  public openEditGrade(template: TemplateRef<any>, grade: any): void {
+    this.editGradeForm.reset({
+      id: grade.id,
+      gradeName: grade.gradeName,
+      gradeCode: grade.gradeCode
     });
     this.editDialog = this.dialog.open(template, {
-      width: '540px',
+      width: '520px',
       maxWidth: '95vw',
       disableClose: true,
       panelClass: 'custom-modal'
     });
   }
 
-  public updateFeeType(): void {
-    if (this.editFeeTypeForm.invalid || this.isUpdating) {
-      this.editFeeTypeForm.markAllAsTouched();
+  public updateGrade(): void {
+    if (this.editGradeForm.invalid || this.isUpdating) {
+      this.editGradeForm.markAllAsTouched();
       return;
     }
-
     this.isUpdating = true;
-    this.schoolManagementService.updateFeeType(this.editFeeTypeForm.value).subscribe({
+    this.schoolManagementService.updateGrade(this.editGradeForm.value).subscribe({
       next: (response: any) => {
         this.isUpdating = false;
         const payload = response?.payload;
         if (Number(response?.responseCode) !== 200 || Number(payload?.respCode) !== 200) {
-          this.messageService.add({
-            summary: 'Unable to update fee type',
-            detail: payload?.respMesg || response?.responseMessage || 'Fee type could not be updated.',
-            severity: 'error'
-          });
+          this.showMessage('Unable to update grade', payload?.respMesg || response?.responseMessage, 'error');
           return;
         }
-
         this.editDialog?.close();
-        this.messageService.add({
-          summary: 'Updated',
-          detail: payload?.respMesg || 'Fee type updated successfully.',
-          severity: 'success'
-        });
-        this.getFeeTypeDetails();
+        this.showMessage('Updated', payload?.respMesg || 'Grade updated successfully.', 'success');
+        this.getGradeDetails();
       },
       error: (error: any) => {
         this.isUpdating = false;
-        this.messageService.add({
-          summary: 'Unable to update fee type',
-          detail: error?.error?.responseMessage || 'Fee type could not be updated.',
-          severity: 'error'
-        });
+        this.showMessage('Unable to update grade', error?.error?.responseMessage, 'error');
       }
     });
   }
@@ -214,7 +178,7 @@ export class FeeTypeComponent implements OnInit, OnDestroy {
     const term = this.searchDataValue.trim().toLowerCase();
     const filtered = term
       ? this.fullData.filter(item =>
-          [item?.feeTypeName, item?.feeTypeDescription, item?.status, item?.createdBy]
+          [item?.gradeName, item?.gradeCode, item?.status]
             .some(value => String(value ?? '').toLowerCase().includes(term)))
       : [...this.fullData];
 
@@ -227,6 +191,27 @@ export class FeeTypeComponent implements OnInit, OnDestroy {
       pageSize: this.pageSize,
       tableData: this.tableData,
       serialNumberArray: this.serialNumberArray
+    });
+  }
+
+  private createForms(): void {
+    const controls = {
+      gradeName: ['', [Validators.required, Validators.maxLength(100)]],
+      gradeCode: ['', [Validators.required, Validators.maxLength(50)]]
+    };
+    this.addGradeForm = this.fb.group(controls);
+    this.editGradeForm = this.fb.group({
+      id: [null, Validators.required],
+      gradeName: ['', [Validators.required, Validators.maxLength(100)]],
+      gradeCode: ['', [Validators.required, Validators.maxLength(50)]]
+    });
+  }
+
+  private showMessage(summary: string, detail: string, severity: 'success' | 'error'): void {
+    this.messageService.add({
+      summary,
+      detail: detail || (severity === 'success' ? 'Operation completed successfully.' : 'Operation could not be completed.'),
+      severity
     });
   }
 
