@@ -1,10 +1,10 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { DonationManagementComponent } from './donation-management.component';
-import { AddDonationComponent } from './add-donation/add-donation.component'; 
-import { AllDonationListComponent } from './all-donation-list/all-donation-list.component'; 
-import { FundrisingOfficerReportComponent } from './fundrising-officer-report/fundrising-officer-report.component';
-import { PaymentModeReportComponent } from './payment-mode-report/payment-mode-report.component';
+import { AddDonationComponent } from './donation/add-donation/add-donation.component';
+import { AllDonationListComponent } from './donation/all-donation-list/all-donation-list.component';
+import { FundrisingOfficerReportComponent } from './report/fundrising-officer-report/fundrising-officer-report.component';
+import { PaymentModeReportComponent } from './report/payment-mode-report/payment-mode-report.component';
 
 
 const routes: Routes = [

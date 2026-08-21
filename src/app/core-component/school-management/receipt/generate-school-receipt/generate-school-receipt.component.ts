@@ -1,4 +1,4 @@
-import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { Component, HostListener, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { MessageService } from 'primeng/api';
@@ -24,6 +24,9 @@ export class GenerateSchoolReceiptComponent implements OnInit {
   studentDetails: any[] = [];
   isLoading = false;
   isSubmitting = false;
+  isReceiptPreviewVisible = false;
+  private isResizingPreview = false;
+  private resizeStartX = 0;
 
 
   constructor(
@@ -38,6 +41,28 @@ export class GenerateSchoolReceiptComponent implements OnInit {
     this.createSearchForm();
     this.addFeeRow(); // at least one fee row by default
 
+  }
+
+  toggleReceiptPreview(): void {
+    this.isReceiptPreviewVisible = !this.isReceiptPreviewVisible;
+  }
+
+  startPreviewResize(event: MouseEvent): void {
+    event.preventDefault();
+    this.isResizingPreview = true;
+    this.resizeStartX = event.clientX;
+  }
+
+  @HostListener('document:mousemove', ['$event'])
+  resizeReceiptPreview(event: MouseEvent): void {
+    if (this.isResizingPreview && this.resizeStartX - event.clientX > 8) {
+      this.isReceiptPreviewVisible = true;
+    }
+  }
+
+  @HostListener('document:mouseup')
+  stopPreviewResize(): void {
+    this.isResizingPreview = false;
   }
 
   createSearchForm(): void {

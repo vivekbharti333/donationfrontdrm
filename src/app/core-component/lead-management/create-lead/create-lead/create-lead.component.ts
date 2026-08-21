@@ -6,7 +6,7 @@ import { LeadManagementService } from '../../lead-management.service';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { ReceiptHeaderListService } from 'src/app/core-component/receipt-management/receipt-header-list/receipt-header-list.service';
-import { ProgramManagementService } from 'src/app/core-component/program-management/program-management.service';
+import { ProgramService } from 'src/app/core-component/donation-management/program/program/program.service';
 import { CurrencyService } from 'src/app/core-component/currency-management/currency/currency.service';
 import { PaymentModeService } from 'src/app/core-component/payment-mode-management/payment-mode/payment-mode.service';
 import { DonationManagementService } from 'src/app/core-component/donation-management/donation-management.service';
@@ -76,7 +76,7 @@ export class CreateLeadComponent {
     private userManagementService: UserManagementService,
     private cookiesService: CookieService,
     private receiptHeaderListService: ReceiptHeaderListService,
-    private programManagementService: ProgramManagementService,
+    private programManagementService: ProgramService,
     private currencyService: CurrencyService,
     private paymentModeService: PaymentModeService,
     private donationManagementService: DonationManagementService,

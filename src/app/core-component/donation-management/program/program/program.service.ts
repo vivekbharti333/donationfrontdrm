@@ -8,7 +8,7 @@ import { CookieService } from 'ngx-cookie-service';
 @Injectable({
   providedIn: 'root'
 })
-export class ProgramManagementService {
+export class ProgramService {
 
   public loginUser: any;
   public details = false;

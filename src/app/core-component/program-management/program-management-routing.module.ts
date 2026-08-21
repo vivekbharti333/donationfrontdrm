@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { ProgramManagementComponent } from './program-management.component'; 
-import { ProgramComponent } from './program/program.component'; 
+import { ProgramComponent } from '../donation-management/program/program/program.component';
 
 
 const routes: Routes = [

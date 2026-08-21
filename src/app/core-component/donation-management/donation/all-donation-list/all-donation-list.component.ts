@@ -3,11 +3,11 @@ import { FormGroup, FormBuilder, Validators, AbstractControl, FormControl } from
 import { Sort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { Router } from '@angular/router';
-import { ReceiptHeaderListService } from '../../receipt-management/receipt-header-list/receipt-header-list.service';
-import { ProgramManagementService } from '../../program-management/program-management.service';
-import { CurrencyService } from '../../currency-management/currency/currency.service';
-import { PaymentModeService } from '../../payment-mode-management/payment-mode/payment-mode.service';
-import { UserManagementService } from '../../user-management/user-management.service';
+import { ReceiptHeaderListService } from '../../../receipt-management/receipt-header-list/receipt-header-list.service';
+import { ProgramService } from '../../program/program/program.service';
+import { CurrencyService } from '../../../currency-management/currency/currency.service';
+import { PaymentModeService } from '../../../payment-mode-management/payment-mode/payment-mode.service';
+import { UserManagementService } from '../../../user-management/user-management.service';
 import {
   DataService,
   pageSelection,
@@ -18,12 +18,12 @@ import { routes } from 'src/app/core/helpers/routes';
 import { users } from 'src/app/shared/model/page.model';
 import { PaginationService, tablePageSize } from 'src/app/shared/shared.index';
 import Swal from 'sweetalert2';
-import { DonationManagementService } from '../donation-management.service';
+import { DonationManagementService } from '../../donation-management.service';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { MatDialog } from '@angular/material/dialog';
 import { Constant } from 'src/app/core/constant/constants';
-import { DonationDetails, DonationListForExcel } from '../../interface/donation-management';
+import { DonationDetails, DonationListForExcel } from '../../../interface/donation-management';
 import { AuthenticationService } from 'src/app/auth/authentication.service';
 import { CustomPaginationComponent } from 'src/app/shared/custom-pagination/custom-pagination.component';
 
@@ -134,7 +134,7 @@ export class AllDonationListComponent implements OnDestroy {
     private sidebar: SidebarService,
     private messageService: MessageService,
     private receiptHeaderListService: ReceiptHeaderListService,
-    private programManagementService: ProgramManagementService,
+    private programManagementService: ProgramService,
     private currencyService: CurrencyService,
     private paymentModeService: PaymentModeService,
     private donationManagementService: DonationManagementService,

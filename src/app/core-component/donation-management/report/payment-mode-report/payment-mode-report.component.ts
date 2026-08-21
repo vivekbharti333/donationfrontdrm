@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
 import { CommonService, SidebarService, routes } from 'src/app/core/core.index';
-import { DashboardService } from '../../main/dashboard/dashboard.service';
+import { DashboardService } from '../../../main/dashboard/dashboard.service';
 import { AuthenticationService } from 'src/app/auth/authentication.service';
-import { UserManagementService } from '../../user-management/user-management.service';
+import { UserManagementService } from '../../../user-management/user-management.service';
 import { CookieService } from 'ngx-cookie-service';
 import { Constant } from 'src/app/core/constant/constants';
 

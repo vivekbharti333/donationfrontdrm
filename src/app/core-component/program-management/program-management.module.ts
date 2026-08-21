@@ -7,7 +7,7 @@ import { MultiSelectModule } from 'primeng/multiselect';
 import { sharedModule } from 'src/app/shared/shared.module';
 import { ProgramManagementComponent } from './program-management.component'; 
 import { ProgramManagementRoutingModule } from './program-management-routing.module';
-import { ProgramComponent } from './program/program.component';  
+import { ProgramComponent } from '../donation-management/program/program/program.component';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatTabsModule} from '@angular/material/tabs';
 import { MatIconModule } from '@angular/material/icon';

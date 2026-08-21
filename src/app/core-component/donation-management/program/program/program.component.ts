@@ -4,11 +4,11 @@ import { AuthenticationService } from 'src/app/auth/authentication.service';
 import { Sort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { Router } from '@angular/router';
-import { ReceiptHeaderListService } from '../../receipt-management/receipt-header-list/receipt-header-list.service';
-import { ProgramManagementService } from '../../program-management/program-management.service';
-import { CurrencyService } from '../../currency-management/currency/currency.service';
-import { PaymentModeService } from '../../payment-mode-management/payment-mode/payment-mode.service';
-import { ProgramDetails, ProgramDetailsRequest } from '../../interface/program-management';
+import { ReceiptHeaderListService } from '../../../receipt-management/receipt-header-list/receipt-header-list.service';
+import { ProgramService } from './program.service';
+import { CurrencyService } from '../../../currency-management/currency/currency.service';
+import { PaymentModeService } from '../../../payment-mode-management/payment-mode/payment-mode.service';
+import { ProgramDetails, ProgramDetailsRequest } from '../../../interface/program-management';
 import {
   DataService,
   pageSelection,
@@ -64,7 +64,7 @@ export class ProgramComponent {
 
   constructor(
     private fb: FormBuilder,
-    private programManagementService: ProgramManagementService,
+    private programManagementService: ProgramService,
     private pagination: PaginationService,
     private router: Router,
     private sidebar: SidebarService,

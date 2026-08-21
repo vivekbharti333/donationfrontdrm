@@ -1,10 +1,10 @@
 import { Component } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { ReceiptHeaderListService } from '../../receipt-management/receipt-header-list/receipt-header-list.service';
-import { ProgramManagementService } from '../../program-management/program-management.service';
-import { CurrencyService } from '../../currency-management/currency/currency.service';
-import { PaymentModeService } from '../../payment-mode-management/payment-mode/payment-mode.service';
-import { DonationManagementService } from '../donation-management.service';
+import { ReceiptHeaderListService } from '../../../receipt-management/receipt-header-list/receipt-header-list.service';
+import { ProgramService } from '../../program/program/program.service';
+import { CurrencyService } from '../../../currency-management/currency/currency.service';
+import { PaymentModeService } from '../../../payment-mode-management/payment-mode/payment-mode.service';
+import { DonationManagementService } from '../../donation-management.service';
 // import { ToastrService } from 'ngx-toastr';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
@@ -73,7 +73,7 @@ export class AddDonationComponent {
     // private http: HttpClient,
     private router: Router,
     private receiptHeaderListService: ReceiptHeaderListService,
-    private programManagementService: ProgramManagementService,
+    private programManagementService: ProgramService,
     private currencyService: CurrencyService,
     private paymentModeService: PaymentModeService,
     private donationManagementService: DonationManagementService,
