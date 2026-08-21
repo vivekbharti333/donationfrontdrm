@@ -42,9 +42,7 @@ export class SigninComponent {
         next: (response: any) => {
           if (response['responseCode'] == '200') {
             if (response['payload']['respCode'] == '200') {
-
-              this.getApplicaionHeaderDetails(response['payload']['superadminId']);
-
+              localStorage.clear();
               localStorage.setItem('authorized', 'true');
               const permission = this.parsePermissions(response['payload']['permissions']);
               localStorage.setItem('menuPermission', JSON.stringify(permission));
@@ -62,6 +60,8 @@ export class SigninComponent {
               this.cookieService.set('teamLeaderId', response['payload']['teamLeaderId'], expiredDate);
               this.cookieService.set('superadminId', response['payload']['superadminId'], expiredDate);
               this.cookieService.set('token', response['payload']['token'], expiredDate);
+
+              this.getApplicaionHeaderDetails(response['payload']['superadminId']);
 
               this.messageService.add({
                 summary: response['payload']['respCode'],
@@ -122,7 +122,6 @@ export class SigninComponent {
   }
 
   public getApplicaionHeaderDetails(superadminId: any) {
-    localStorage.clear();
     this.commonComponentService.getApplicaionHeaderDetails(superadminId)
       .subscribe({
         next: (response: any) => {
