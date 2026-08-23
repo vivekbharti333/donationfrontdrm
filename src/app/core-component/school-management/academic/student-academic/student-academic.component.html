@@ -18,35 +18,28 @@
 
 <div class="card table-list-card">
   <div class="card-body">
-    <div class="table-top academic-toolbar">
-      <div class="search-set">
-        <div class="search-input">
-          <a href="javascript:void(0)" class="btn btn-searchset"><i class="feather icon-search"></i></a>
-          <div class="dataTables_filter">
-            <input [(ngModel)]="searchDataValue" (ngModelChange)="searchData($event)"
-                   type="search" class="form-control" placeholder="Search students...">
-          </div>
-        </div>
+    <section class="academic-filter-card">
+      <div class="filter-card-heading">
+        <div><h5>Search Student Academics</h5><p>Use one or more filters to find academic records.</p></div>
+        <div class="academic-quick-search"><i class="feather icon-search"></i><input [(ngModel)]="searchDataValue" (ngModelChange)="searchData($event)" type="search" class="form-control" placeholder="Search loaded students..."></div>
       </div>
-    </div>
-
     <div class="academic-filters">
       <div>
-        <label class="form-label">Session</label>
-        <input class="form-control" [(ngModel)]="sessionName" placeholder="e.g. 2025-26">
+        <label class="form-label">Academic Year</label>
+        <select class="form-select" [(ngModel)]="sessionName"><option value="">All academic years</option><option *ngFor="let year of academicYearOptions" [value]="year.value">{{ year.name }}</option></select>
       </div>
       <div>
         <label class="form-label">Grade</label>
-        <input class="form-control" [(ngModel)]="grade" placeholder="Grade">
+        <select class="form-select" [(ngModel)]="grade" [disabled]="isGradesLoading"><option value="">{{ isGradesLoading ? 'Loading grades...' : 'All grades' }}</option><option *ngFor="let gradeOption of gradeOptions" [value]="gradeValue(gradeOption)">{{ gradeLabel(gradeOption) }}</option></select>
       </div>
       <div>
         <label class="form-label">Section</label>
-        <input class="form-control" [(ngModel)]="gradeSection" placeholder="Section">
+        <select class="form-select" [(ngModel)]="gradeSection"><option value="">All sections</option><option *ngFor="let section of sectionOptions" [value]="section.value">Section {{ section.name }}</option></select>
       </div>
       <div>
         <label class="form-label">Status</label>
         <select class="form-select" [(ngModel)]="status">
-          <option value="">All</option>
+          <option value="">All statuses</option>
           <option value="PROMOTED">Promoted</option>
           <option value="ACTIVE">Active</option>
           <option value="INACTIVE">Inactive</option>
@@ -54,11 +47,11 @@
       </div>
       <div class="filter-actions">
         <button type="button" class="btn btn-primary" (click)="applyFilters()">
-          <i class="feather icon-search me-1"></i>Apply
+          <i class="feather icon-search me-1"></i>{{ isLoading ? 'Searching...' : 'Search' }}
         </button>
         <button type="button" class="btn btn-light" (click)="clearFilters()">Clear</button>
       </div>
-    </div>
+    </div></section>
 
     <div *ngIf="errorMessage" class="alert alert-danger mt-3">{{ errorMessage }}</div>
 
@@ -159,15 +152,15 @@
       </div>
       <div>
         <label class="form-label">Session</label>
-        <input class="form-control" formControlName="sessionName">
+        <select class="form-select" formControlName="sessionName"><option *ngFor="let year of academicYearOptions" [value]="year.value">{{ year.name }}</option></select>
       </div>
       <div>
         <label class="form-label">Grade *</label>
-        <input class="form-control" formControlName="grade">
+        <select class="form-select" formControlName="grade"><option value="">Select grade</option><option *ngFor="let gradeOption of gradeOptions" [value]="gradeValue(gradeOption)">{{ gradeLabel(gradeOption) }}</option></select>
       </div>
       <div>
         <label class="form-label">Section</label>
-        <input class="form-control" formControlName="gradeSection">
+        <select class="form-select" formControlName="gradeSection"><option value="">Select section</option><option *ngFor="let section of sectionOptions" [value]="section.value">Section {{ section.name }}</option></select>
       </div>
       <div>
         <label class="form-label">Roll number *</label>
@@ -216,15 +209,15 @@
       </div>
       <div>
         <label class="form-label">New Session *</label>
-        <input class="form-control" formControlName="sessionName" placeholder="e.g. 2027-28">
+        <select class="form-select" formControlName="sessionName"><option value="">Select academic year</option><option *ngFor="let year of academicYearOptions" [value]="year.value">{{ year.name }}</option></select>
       </div>
       <div>
         <label class="form-label">New Grade *</label>
-        <input class="form-control" formControlName="grade">
+        <select class="form-select" formControlName="grade"><option value="">Select grade</option><option *ngFor="let gradeOption of gradeOptions" [value]="gradeValue(gradeOption)">{{ gradeLabel(gradeOption) }}</option></select>
       </div>
       <div>
         <label class="form-label">Section</label>
-        <input class="form-control" formControlName="gradeSection">
+        <select class="form-select" formControlName="gradeSection"><option value="">Select section</option><option *ngFor="let section of sectionOptions" [value]="section.value">Section {{ section.name }}</option></select>
       </div>
       <div>
         <label class="form-label">Roll number *</label>

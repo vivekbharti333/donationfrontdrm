@@ -23,9 +23,17 @@ import { Constant } from 'src/app/core/constant/constants';
 })
 export class StudentListComponent {
 
+  public readonly academicYearOptions = Constant.ACADEMIC_YEAR_OPTIONS;
+
   public loginUser: any;
   public editStudentForm!: FormGroup;
+  public assignClassForm!: FormGroup;
   public studentUpdateDialog: any;
+  public assignClassDialog: any;
+  public selectedStudent: any = null;
+  public gradeOptions: any[] = [];
+  public isGradesLoading = false;
+  public isAssigningClass = false;
   public fullData: any[] = [];
   public routes = routes;
 
@@ -61,6 +69,7 @@ export class StudentListComponent {
   ngOnInit() {
     this.getStudentDetails();
     this.createForms();
+    this.getGradeDetails();
     this.baseUrl = Constant.Site_Url+'studentImage/';
   }
 
@@ -119,6 +128,99 @@ export class StudentListComponent {
       superadminId: ['']
 
     });
+
+    this.assignClassForm = this.fb.group({
+      studentId: [null, Validators.required],
+      sessionName: [this.getCurrentAcademicYear(), Validators.required],
+      gradeId: [null, Validators.required],
+      gradeSection: ['', Validators.required],
+      rollNumber: ['', Validators.required]
+    });
+  }
+
+  getGradeDetails(): void {
+    this.isGradesLoading = true;
+    this.schoolManagementService.getGradeDetails().subscribe({
+      next: (response: any) => {
+        const rows = response?.listPayload ?? response?.payload ?? response?.data;
+        this.gradeOptions = Array.isArray(rows) ? rows : [];
+        this.isGradesLoading = false;
+      },
+      error: () => {
+        this.gradeOptions = [];
+        this.isGradesLoading = false;
+      }
+    });
+  }
+
+  openAssignClassModal(templateRef: TemplateRef<any>, student: any): void {
+    this.selectedStudent = student;
+    this.assignClassForm.reset({
+      studentId: student?.id,
+      sessionName: this.getCurrentAcademicYear(),
+      gradeId: null,
+      gradeSection: '',
+      rollNumber: student?.rollNumber || ''
+    });
+    this.assignClassDialog = this.dialog.open(templateRef, {
+      width: '620px',
+      maxWidth: '95vw',
+      disableClose: true,
+      panelClass: 'custom-modal'
+    });
+  }
+
+  assignClass(): void {
+    if (this.isAssigningClass) return;
+    if (this.assignClassForm.invalid) {
+      this.assignClassForm.markAllAsTouched();
+      return;
+    }
+
+    const formValue = this.assignClassForm.getRawValue();
+    const selectedGrade = this.gradeOptions.find(
+      grade => String(grade?.id) === String(formValue.gradeId));
+    if (!selectedGrade) {
+      this.assignClassForm.get('gradeId')?.setErrors({ required: true });
+      return;
+    }
+    const request = {
+      ...formValue,
+      grade: selectedGrade.gradeName || selectedGrade.name || String(selectedGrade.id)
+    };
+
+    this.isAssigningClass = true;
+    this.schoolManagementService.addStudentAcademic(request).subscribe({
+      next: (response: any) => {
+        const success = Number(response?.responseCode) === 200
+          && Number(response?.payload?.respCode) === 200;
+        this.messageService.add({
+          summary: success ? 'Success' : 'Unable to assign class',
+          detail: response?.payload?.respMesg || response?.responseMessage || 'Class assignment could not be completed.',
+          styleClass: success ? 'success-background-popover' : 'danger-background-popover'
+        });
+        if (success) {
+          this.assignClassDialog?.close();
+          this.selectedStudent = null;
+          this.getStudentDetails();
+        }
+        this.isAssigningClass = false;
+      },
+      error: (error: any) => {
+        this.messageService.add({
+          summary: 'Error',
+          detail: error?.error?.responseMessage || 'Unable to assign class.',
+          styleClass: 'danger-background-popover'
+        });
+        this.isAssigningClass = false;
+      }
+    });
+  }
+
+  private getCurrentAcademicYear(): string {
+    const today = new Date();
+    const startYear = today.getMonth() >= 3 ? today.getFullYear() : today.getFullYear() - 1;
+    return `${startYear}-${String(startYear + 1).slice(-2)}`;
   }
 
   public getStudentDetails(): void {

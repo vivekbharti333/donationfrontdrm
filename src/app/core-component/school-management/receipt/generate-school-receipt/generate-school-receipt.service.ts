@@ -4,6 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { Constant } from 'src/app/core/constant/constants'; 
 import { AuthenticationService } from 'src/app/auth/authentication.service';
 import { CookieService } from 'ngx-cookie-service';
+import { SchoolManagementService } from '../../school-management.service';
 
 
 @Injectable({
@@ -17,7 +18,8 @@ export class GenerateSchoolReceiptService {
    constructor(
     private http: HttpClient,
     private authenticationService: AuthenticationService,
-    private cookieService: CookieService
+    private cookieService: CookieService,
+    private schoolManagementService: SchoolManagementService
   ) {
     this.loginUser = this.authenticationService.getLoginUser();
 
@@ -42,8 +44,12 @@ export class GenerateSchoolReceiptService {
 
       // ===== Student Info =====
       admissionNo: receiptDetasils.admissionNo,
+      studentId: receiptDetasils.studentId,
+      studentAcademicId: receiptDetasils.studentAcademicId,
       rollNumber: receiptDetasils.rollNumber,
       studentName: receiptDetasils.studentName,
+      fatherName: receiptDetasils.fatherName,
+      fatherMobileNo: receiptDetasils.contactNo,
       grade: receiptDetasils.grade,
       gradeSection: receiptDetasils.gradeSection,
       academicSession: receiptDetasils.academicSession,
@@ -88,6 +94,35 @@ getStudentDetailsForFee( grade: string, gradeSection: string): Observable<any> {
       }
     };
     return this.http.post<any>(Constant.Site_Url + "getStudentDetails", request);
+  }
+
+  getGradeDetails(): Observable<any> {
+    return this.schoolManagementService.getGradeDetails();
+  }
+
+  getInvoiceHeaderList(): Observable<any> {
+    const currentUser = this.authenticationService.getLoginUser();
+    const request = {
+      payload: {
+        requestFor: 'BYSUPERADMINID',
+        token: currentUser?.token || this.cookieService.get('token'),
+        createdBy: currentUser?.loginId || this.cookieService.get('loginId'),
+        superadminId: currentUser?.superadminId || this.cookieService.get('superadminId')
+      }
+    };
+    return this.http.post<any>(Constant.Site_Url + 'getInvoiceHeaderList', request);
+  }
+
+  getStudentAcademicDetails(filters: {
+    sessionName: string;
+    grade: string;
+    gradeSection: string;
+  }): Observable<any> {
+    return this.schoolManagementService.getStudentAcademicDetails(filters);
+  }
+
+  getAssignedFeeToStudentDetails(studentId: number, sessionName: string): Observable<any> {
+    return this.schoolManagementService.getAssignedFeeToStudentDetails(studentId, sessionName);
   }
 
 }

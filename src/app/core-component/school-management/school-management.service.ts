@@ -170,11 +170,11 @@ export class SchoolManagementService {
       || this.cookieService.get('superadminId');
     const payload: any = {
       superadminId,
-      sessionName: filters.sessionName || undefined
+      sessionName: filters.sessionName?.trim() || undefined
     };
-    if (filters.grade) payload.grade = filters.grade;
-    if (filters.gradeSection) payload.gradeSection = filters.gradeSection;
-    if (filters.status) payload.status = filters.status;
+    if (filters.grade?.trim()) payload.grade = filters.grade.trim();
+    if (filters.gradeSection?.trim()) payload.gradeSection = filters.gradeSection.trim();
+    if (filters.status?.trim()) payload.status = filters.status.trim();
 
     let request: any = {
       payload
@@ -212,10 +212,11 @@ export class SchoolManagementService {
     const request = {
       payload: {
         studentId: academicDetails.studentId,
-        sessionName: academicDetails.sessionName?.trim(),
-        grade: academicDetails.grade?.trim(),
-        gradeSection: academicDetails.gradeSection?.trim(),
-        rollNumber: academicDetails.rollNumber?.trim(),
+        gradeId: Number(academicDetails.gradeId),
+        sessionName: String(academicDetails.sessionName ?? '').trim(),
+        grade: String(academicDetails.grade ?? '').trim(),
+        gradeSection: String(academicDetails.gradeSection ?? '').trim(),
+        rollNumber: String(academicDetails.rollNumber ?? '').trim(),
         createdBy: currentUser?.loginId
           || this.cookieService.get('loginId')
           || this.cookieService.get('superadminId'),
@@ -280,12 +281,15 @@ export class SchoolManagementService {
     return this.http.post<any>(Constant.Site_Url + 'updateFeeType', request, options);
   }
 
-  getFeeStructure(): Observable<any> {
+  getFeeStructure(filters?: { academicYearId?: string; gradeId?: number | null; feeTypeName?: string }): Observable<any> {
     const token = this.getAuthenticationToken();
     const currentUser = this.authenticationService.getLoginUser();
     const request = {
       payload: {
-        superadminId: currentUser?.superadminId || this.cookieService.get('superadminId')
+        superadminId: currentUser?.superadminId || this.cookieService.get('superadminId'),
+        ...(filters?.academicYearId ? { academicYearId: filters.academicYearId } : {}),
+        ...(filters?.gradeId ? { gradeId: Number(filters.gradeId) } : {}),
+        ...(filters?.feeTypeName?.trim() ? { feeTypeName: filters.feeTypeName.trim() } : {})
       }
     };
     const options = token
@@ -301,9 +305,11 @@ export class SchoolManagementService {
       payload: {
         academicYearId: feeStructure.academicYearId?.trim(),
         gradeId: Number(feeStructure.gradeId),
-        feeTypeId: Number(feeStructure.feeTypeId),
-        amount: Number(feeStructure.amount),
-        frequency: feeStructure.frequency?.trim(),
+        feeStructures: (feeStructure.feeStructures || []).map((item: any) => ({
+          feeTypeId: Number(item.feeTypeId),
+          amount: Number(item.amount),
+          frequency: item.frequency?.trim()
+        })),
         createdBy: currentUser?.loginId
           || this.cookieService.get('loginId')
           || this.cookieService.get('superadminId'),
@@ -335,6 +341,42 @@ export class SchoolManagementService {
       ? { headers: new HttpHeaders({ Authorization: `Bearer ${token}` }) }
       : {};
     return this.http.post<any>(Constant.Site_Url + 'updateFeeStructure', request, options);
+  }
+
+  getAssignedFeeToStudentDetails(studentId: number, sessionName: string): Observable<any> {
+    const token = this.getAuthenticationToken();
+    const currentUser = this.authenticationService.getLoginUser();
+    const request = {
+      payload: {
+        studentId: Number(studentId),
+        sessionName: String(sessionName ?? '').trim(),
+        superadminId: currentUser?.superadminId || this.cookieService.get('superadminId')
+      }
+    };
+    const options = token
+      ? { headers: new HttpHeaders({ Authorization: `Bearer ${token}` }) }
+      : {};
+    return this.http.post<any>(Constant.Site_Url + 'getAssignedFeeToStudentDetails', request, options);
+  }
+
+  updateAssignedFeeToStudent(fee: any): Observable<any> {
+    const token = this.getAuthenticationToken();
+    const currentUser = this.authenticationService.getLoginUser();
+    const request = {
+      payload: {
+        id: Number(fee.id),
+        studentAcademicId: Number(fee.studentAcademicId),
+        feeStructureId: Number(fee.feeStructureId),
+        assignedAmount: Number(fee.amount || 0),
+        discountAmount: Number(fee.discount || 0),
+        fineAmount: Number(fee.fine || 0),
+        superadminId: currentUser?.superadminId || this.cookieService.get('superadminId')
+      }
+    };
+    const options = token
+      ? { headers: new HttpHeaders({ Authorization: `Bearer ${token}` }) }
+      : {};
+    return this.http.post<any>(Constant.Site_Url + 'updateAssignedFeeToStudent', request, options);
   }
 
   deleteFeeStructure(id: number): Observable<any> {

@@ -15,7 +15,7 @@ import { Constant } from 'src/app/core/constant/constants';
 @Component({
   selector: 'app-student-academic',
   templateUrl: './student-academic.component.html',
-  styleUrl: './student-academic.component.scss'
+  styleUrls: ['./student-academic.component.scss']
 })
 export class StudentAcademicComponent implements OnInit, OnDestroy {
   public readonly routes = routes;
@@ -35,6 +35,10 @@ export class StudentAcademicComponent implements OnInit, OnDestroy {
   public selectedStudentName = '';
   public selectedStudentPicture = '';
   public readonly studentImageBaseUrl = Constant.Site_Url + 'studentImage/';
+  public readonly academicYearOptions = Constant.ACADEMIC_YEAR_OPTIONS;
+  public readonly sectionOptions = Constant.SECTION_OPTIONS;
+  public gradeOptions: any[] = [];
+  public isGradesLoading = false;
 
   public sessionName = this.getCurrentAcademicSession();
   public grade = '';
@@ -58,6 +62,7 @@ export class StudentAcademicComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.createEditForm();
     this.createPromoteForm();
+    this.getGradeDetails();
     this.pagination.tablePageSize
       .pipe(takeUntil(this.destroy$))
       .subscribe((page: tablePageSize) => {
@@ -97,13 +102,36 @@ export class StudentAcademicComponent implements OnInit, OnDestroy {
         this.applySearchAndPagination();
         this.isLoading = false;
       },
-      error: () => {
+      error: (error: any) => {
         this.fullData = [];
         this.applySearchAndPagination();
-        this.errorMessage = 'Unable to load student academic details.';
+        this.errorMessage = error?.error?.responseMessage || 'Unable to load student academic details.';
         this.isLoading = false;
       }
     });
+  }
+
+  public getGradeDetails(): void {
+    this.isGradesLoading = true;
+    this.schoolManagementService.getGradeDetails().subscribe({
+      next: (response: any) => {
+        const rows = response?.listPayload ?? response?.payload ?? response?.data;
+        this.gradeOptions = Array.isArray(rows) ? rows : [];
+        this.isGradesLoading = false;
+      },
+      error: () => {
+        this.gradeOptions = [];
+        this.isGradesLoading = false;
+      }
+    });
+  }
+
+  public gradeValue(grade: any): string {
+    return String(grade?.gradeName ?? grade?.name ?? grade?.gradeCode ?? '').trim();
+  }
+
+  public gradeLabel(grade: any): string {
+    return String(grade?.gradeName ?? grade?.name ?? grade?.gradeCode ?? ('Grade ' + grade?.id));
   }
 
   public applyFilters(): void {

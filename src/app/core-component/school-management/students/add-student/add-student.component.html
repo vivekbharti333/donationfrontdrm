@@ -102,21 +102,11 @@
 
         <div class="col-md-2 mb-3">
           <label>Grade *</label>
-          <!-- <input class="form-control" formControlName="grade"> -->
            <select class="form-control" formControlName="grade">
-            <option value="">Select Grade</option>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
-            <option value="6">6</option>
-            <option value="7">7</option>
-            <option value="8">8</option>
-            <option value="9">9</option>
-            <option value="10">10</option>
-            <option value="11">11</option>
-            <option value="12">12</option>
+            <option value="">{{ isGradesLoading ? 'Loading grades...' : 'Select Grade' }}</option>
+            <option *ngFor="let grade of gradeOptions" [value]="grade.gradeName || grade.name || grade.id">
+              {{ grade.gradeName || grade.name || ('Grade ' + grade.id) }}
+            </option>
           </select>
         </div>
 
@@ -209,7 +199,7 @@
 
         <div class="col-md-4 mb-3">
           <label>Session</label>
-          <input class="form-control" formControlName="sessionName">
+          <select class="form-select" formControlName="sessionName"><option value="">Select academic year</option><option *ngFor="let year of academicYearOptions" [value]="year.value">{{ year.name }}</option></select>
         </div>
 
         <div class="col-md-4 mb-3">

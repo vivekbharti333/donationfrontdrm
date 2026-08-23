@@ -1,312 +1,273 @@
-import { Component, TemplateRef } from '@angular/core';
-import { FormGroup, FormBuilder, Validators, FormArray } from '@angular/forms';
-import { SchoolReceiptListService } from './school-receipt-list.service';
-import { MessageService } from 'primeng/api';
-import { AuthenticationService } from 'src/app/auth/authentication.service';
-import { CookieService } from 'ngx-cookie-service';
-
+import { Component, OnDestroy, OnInit, TemplateRef } from '@angular/core';
+import { FormArray, FormBuilder, FormGroup } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
 import { Sort } from '@angular/material/sort';
-import { MatTableDataSource } from '@angular/material/table';
 import { Router } from '@angular/router';
-import { pageSelection, SidebarService } from 'src/app/core/core.index';
+import { Subject, takeUntil } from 'rxjs';
+import { Constant } from 'src/app/core/constant/constants';
+import { pageSelection } from 'src/app/core/core.index';
 import { routes } from 'src/app/core/helpers/routes';
 import { PaginationService, tablePageSize } from 'src/app/shared/shared.index';
-import { UserDetails } from '../../../interface/user-management';
-import { MatDialog } from '@angular/material/dialog';
-import { GenerateSchoolReceiptService } from '../generate-school-receipt/generate-school-receipt.service'; 
+import { GenerateSchoolReceiptService } from '../generate-school-receipt/generate-school-receipt.service';
+import { SchoolReceiptListService } from './school-receipt-list.service';
 
 @Component({
   selector: 'app-school-receipt-list',
   templateUrl: './school-receipt-list.component.html',
-  styleUrl: './school-receipt-list.component.scss'
+  styleUrls: ['./school-receipt-list.component.scss']
 })
-export class SchoolReceiptListComponent {
-
+export class SchoolReceiptListComponent implements OnInit, OnDestroy {
+  readonly routes = routes;
+  readonly academicYearOptions = Constant.ACADEMIC_YEAR_OPTIONS;
+  readonly sectionOptions = Constant.SECTION_OPTIONS;
   studentSearchForm!: FormGroup;
   receiptForm!: FormGroup;
-  // receiptDetails!: FormGroup;
-  selectedStudent: any;
+  gradeOptions: any[] = [];
   studentDetails: any[] = [];
-  isLoading = true;
-
-  public loginUser: any;
-  // public editStudentForm!: FormGroup;
-  public receiptDialog: any;
-  public fullData: any[] = [];
-  public routes = routes;
-
-  // pagination variables
-  public tableData: Array<any> = [];
-  public pageSize = 2;
-  public serialNumberArray: Array<number> = [];
-  public totalData = 0;
-  showFilter = false;
-  dataSource!: MatTableDataSource<any>;
-  public searchDataValue = '';
-  // pagination variables
-
+  fullData: any[] = [];
+  filteredData: any[] = [];
+  tableData: any[] = [];
+  serialNumberArray: number[] = [];
+  totalData = 0;
+  pageSize = 10;
+  currentSkip = 0;
+  searchDataValue = '';
+  isLoading = false;
+  isStudentsLoading = false;
+  isGradesLoading = false;
+  errorMessage = '';
+  receiptDialog: any;
+  invoiceHeader: any = null;
+  selectedReceipt: any = null;
+  private readonly destroy$ = new Subject<void>();
 
   constructor(
     private fb: FormBuilder,
-    private sidebar: SidebarService,
     private schoolReceiptListService: SchoolReceiptListService,
     private generateSchoolReceiptService: GenerateSchoolReceiptService,
-    private authenticationService: AuthenticationService,
-    private messageService: MessageService,
-    private cookieService: CookieService,
-
     private pagination: PaginationService,
     private router: Router,
-    private dialog: MatDialog,
+    private dialog: MatDialog
+  ) {}
 
-  ) {
-    this.loginUser = this.authenticationService.getLoginUser();
+  ngOnInit(): void {
+    this.createForms();
+    this.getGradeDetails();
+    this.getInvoiceHeaderDetails();
+    this.pagination.tablePageSize.pipe(takeUntil(this.destroy$)).subscribe((page: tablePageSize) => {
+      if (this.router.url.includes('school-receipt-list')) {
+        this.pageSize = page.pageSize;
+        this.currentSkip = page.skip;
+        this.prepareTableData();
+      }
+    });
+    this.getReceiptDetails();
   }
 
-  ngOnInit() {
-    // this.getReceiptDetails();
-    this.createSearchForm();
-    this.createReceiptForm();
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
-     createSearchForm(): void {
+  private createForms(): void {
     this.studentSearchForm = this.fb.group({
-      // Search Info
-      admissionNo: [''],
-      grade: [''],
-      gradeSection: [''],
-      academicSession: ['2026-2027'],
+      academicSession: [''], grade: [''], gradeSection: [''], admissionNo: [''],
+      studentName: [''], rollNumber: [''], receiptNumber: ['']
     });
-
-  }
-
-  createReceiptForm(): void {
     this.receiptForm = this.fb.group({
-    receiptNumber: [''],
-    admissionNo: [''],
-    rollNumber: [''],
-    studentName: [''],
-    grade: [''],
-    gradeSection: [''],
-    academicSession: [''],
-    installmentName: [''],
-    paymentMode: [''],
-    paymentDate: [''],
-    totalAmount: [''],
-    discountAmount: [''],
-    fineAmount: [''],
-    netAmount: [''],
-    status: [''],
-    createdBy:  [''],
-    createdByName: [''],
-    superadminId: [''],
-
-     // FormArray
-    receiptDetails: this.fb.array([])
-
+      receiptNumber: [''], admissionNo: [''], rollNumber: [''], studentName: [''],
+      fatherName: [''], contactNo: [''], dob: [''], address: [''], createdByName: [''],
+      grade: [''], gradeSection: [''], academicSession: [''], installmentName: [''],
+      paymentMode: [''], paymentDate: [''], totalAmount: [0], discountAmount: [0],
+      fineAmount: [0], netAmount: [0], status: [''], receiptDetails: this.fb.array([])
     });
   }
 
-  get receiptDetails(): FormArray {
+  get receiptDetails(): FormArray { return this.receiptForm.get('receiptDetails') as FormArray; }
 
-  return this.receiptForm.get(
-    'receiptDetails'
-  ) as FormArray;
-}
-
-createReceiptDetailGroup(data?: any): FormGroup {
-
-  return this.fb.group({
-
-    feeType: [data?.feeType || ''],
-
-    amount: [data?.amount || 0]
-
-  });
-}
-
-    public getReceiptDetails(studentDetails:any): void {
-
-    this.studentSearchForm.patchValue({
-    admissionNo: studentDetails.admissionNo,
-   });
-      this.serialNumberArray = []; // Clear serial number array before fetching new data
-  
-      this.schoolReceiptListService.getReceiptDetails(this.studentSearchForm.value).subscribe((apiRes: any) => {
-        this.totalData = apiRes.totalNumber; // Set total data count
-        this.fullData = apiRes.listPayload;  // Store the full dataset
-  
-        this.pagination.tablePageSize.subscribe((res: tablePageSize) => {
-          if (this.router.url === this.routes.schoolReceiptList) {
-            this.pageSize = res.pageSize;
-            // Use the full dataset for pagination
-            this.prepareTableData(this.fullData, { skip: res.skip, limit: res.skip + res.pageSize });
-            this.pageSize = res.pageSize;
-          }
-        });
-      });
-    }
-  
-    prepareTableData(apiRes: any[], pageOption: pageSelection): void {
-      this.tableData = []; // Reset table data
-      this.serialNumberArray = []; // Reset serial numbers
-  
-      // Slice data based on pagination limits (skip, limit)
-      const dataToDisplay = apiRes.slice(pageOption.skip, pageOption.limit);
-  
-      // Add serial numbers and prepare table data
-      dataToDisplay.forEach((res: any, index: number) => {
-        const serialNumber = index + 1;
-        this.tableData.push(res);
-        this.serialNumberArray.push(serialNumber);
-      });
-  
-      // Update MatTableDataSource
-      this.dataSource = new MatTableDataSource<any>(this.tableData);
-  
-      // Emit updated pagination data
-      this.pagination.calculatePageSize.next({
-        totalData: this.totalData,
-        pageSize: this.pageSize,
-        tableData: this.tableData,
-        serialNumberArray: this.serialNumberArray,
-      });
-    }
-  
-  
-    public sortData(sort: Sort) {
-      const data = this.tableData.slice();
-      if (!sort.active || sort.direction === '') {
-        this.tableData = data;
-      } else {
-        this.tableData = data.sort((a, b) => {
-          const aValue = (a as never)[sort.active];
-          const bValue = (b as never)[sort.active];
-          return (aValue < bValue ? -1 : 1) * (sort.direction === 'asc' ? 1 : -1);
-        });
-      }
-    }
-  
-    public searchData(value: string): void {
-      const searchTerm = value.trim().toLowerCase();
-  
-      if (searchTerm) {
-        // Filter the full dataset based on the search term
-        const filteredData = this.fullData.filter((donation: UserDetails) =>
-          Object.values(donation).some((field) =>
-            String(field).toLowerCase().includes(searchTerm)
-          )
-        );
-  
-        this.prepareTableData(filteredData, { skip: 0, limit: this.pageSize });
-        this.totalData = filteredData.length; // Update total data count for pagination
-      } else {
-        // Reset to the full dataset when the search term is cleared
-        this.prepareTableData(this.fullData, { skip: 0, limit: this.pageSize });
-        this.totalData = this.fullData.length; // Reset the total data count
-      }
-  
-      // Reset to the first page after a search or clearing search
-      this.pagination.calculatePageSize.next({
-        totalData: this.totalData,
-        pageSize: this.pageSize,
-        tableData: this.tableData,
-        serialNumberArray: this.serialNumberArray,
-      });
-    }
-
-    confirmColor(userId: string) {
-
+  get receiptCompanyName(): string {
+    return [this.invoiceHeader?.companyFirstName, this.invoiceHeader?.companyLastName]
+      .filter(Boolean).join(' ') || 'School Name';
   }
 
-  openEditModal(templateRef: TemplateRef<any>, rawData: any): void {
+  get receiptCompanyLogo(): string { return this.imageData(this.invoiceHeader?.companyLogo); }
+  get receiptCompanyStamp(): string { return this.imageData(this.invoiceHeader?.companyStamp); }
 
-    // Patch normal form values
-    this.receiptForm.patchValue({
+  private imageData(value: any): string {
+    const image = String(value || '').trim();
+    return !image ? '' : image.startsWith('data:') ? image : `data:image/png;base64,${image}`;
+  }
 
-      receiptNumber: rawData.receiptNumber,
-      admissionNo: rawData.admissionNo,
-      rollNumber: rawData.rollNumber,
-      studentName: rawData.studentName,
-      grade: rawData.grade,
-      gradeSection: rawData.gradeSection,
-      academicSession: rawData.academicSession,
-      installmentName: rawData.installmentName,
-      paymentMode: rawData.paymentMode,
-      paymentDate: rawData.paymentDate,
-      totalAmount: rawData.totalAmount,
-      discountAmount: rawData.discountAmount,
-      fineAmount: rawData.fineAmount,
-      netAmount: rawData.netAmount,
-      status: rawData.status,
-      createdBy: rawData.createdBy,
-      createdByName: rawData.createdByName,
-      superadminId: rawData.superadminId
-    });
-
-    // Clear old FormArray
-    this.receiptDetails.clear();
-
-    // Add new receipt details
-    rawData.receiptDetails.forEach((item: any) => {
-
-      this.receiptDetails.push(this.createReceiptDetailGroup(item)
-      );
-    });
-
-    // Open modal
-    this.receiptDialog = this.dialog.open(templateRef, {
-
-      width: '100%',
-      maxWidth: '900px',
-      height: '90vh',
-      disableClose: true,
-      panelClass: 'custom-modal'
-
+  getInvoiceHeaderDetails(): void {
+    this.generateSchoolReceiptService.getInvoiceHeaderList().subscribe({
+      next: (response: any) => {
+        const rows = response?.listPayload ?? response?.payload ?? response?.data;
+        this.invoiceHeader = Array.isArray(rows) && rows.length ? rows[0] : null;
+      },
+      error: () => { this.invoiceHeader = null; }
     });
   }
 
-  printReceipt() {
-    window.print();
+  getGradeDetails(): void {
+    this.isGradesLoading = true;
+    this.generateSchoolReceiptService.getGradeDetails().subscribe({
+      next: (response: any) => {
+        const rows = response?.listPayload ?? response?.payload ?? response?.data;
+        this.gradeOptions = Array.isArray(rows) ? rows : [];
+        this.isGradesLoading = false;
+      },
+      error: () => { this.gradeOptions = []; this.isGradesLoading = false; }
+    });
   }
 
-
-asFormGroup(control: any): FormGroup {
-
-  return control as FormGroup;
-}
-
-
-
-getStudentDetails() {
-
-  const grade = this.studentSearchForm.get('grade')?.value;
-  const gradeSection = this.studentSearchForm.get('gradeSection')?.value;
-
-  if (!grade || !gradeSection) {
+  onAcademicFilterChange(): void {
+    this.studentSearchForm.patchValue({ admissionNo: '' }, { emitEvent: false });
     this.studentDetails = [];
-    return;
+    const value = this.studentSearchForm.getRawValue();
+    if (!value.academicSession || !value.grade || !value.gradeSection) return;
+    this.isStudentsLoading = true;
+    this.generateSchoolReceiptService.getStudentAcademicDetails({
+      sessionName: value.academicSession, grade: value.grade, gradeSection: value.gradeSection
+    }).subscribe({
+      next: (response: any) => {
+        const rows = response?.listPayload ?? response?.payload ?? response?.data;
+        this.studentDetails = Array.isArray(rows) ? rows : [];
+        this.isStudentsLoading = false;
+      },
+      error: () => { this.studentDetails = []; this.isStudentsLoading = false; }
+    });
   }
 
-  this.isLoading = true;
-  this.generateSchoolReceiptService.getStudentDetailsForFee(grade, gradeSection)
-    .subscribe({
-      next: (res) => {
-         this.studentDetails = res?.listPayload || [];
+  getReceiptDetails(): void {
+    this.isLoading = true;
+    this.errorMessage = '';
+    this.schoolReceiptListService.getReceiptDetails(this.studentSearchForm.getRawValue()).subscribe({
+      next: (response: any) => {
+        const rows = response?.listPayload ?? response?.payload ?? response?.data;
+        this.fullData = Array.isArray(rows) ? rows : [];
+        this.currentSkip = 0;
+        this.applyLocalSearch();
         this.isLoading = false;
       },
-      error: (err) => {
-        console.error(err);
+      error: (error: any) => {
+        this.fullData = [];
+        this.filteredData = [];
+        this.prepareTableData();
+        this.errorMessage = error?.error?.responseMessage || 'Unable to load receipts.';
         this.isLoading = false;
       }
     });
-}
+  }
 
-submitSearch(){
+  submitSearch(): void { this.getReceiptDetails(); }
 
-}
-  
+  clearFilters(): void {
+    this.studentSearchForm.reset({ academicSession: '', grade: '', gradeSection: '', admissionNo: '', studentName: '', rollNumber: '', receiptNumber: '' });
+    this.studentDetails = [];
+    this.searchDataValue = '';
+    this.getReceiptDetails();
+  }
 
+  searchData(value: string): void {
+    this.searchDataValue = value;
+    this.currentSkip = 0;
+    this.applyLocalSearch();
+  }
 
+  private applyLocalSearch(): void {
+    const term = this.searchDataValue.trim().toLowerCase();
+    this.filteredData = term ? this.fullData.filter(receipt => [receipt.receiptNumber, receipt.studentName,
+      receipt.admissionNo, receipt.rollNumber, receipt.grade, receipt.gradeSection, receipt.paymentMode,
+      receipt.status, receipt.installmentName].some(value => String(value ?? '').toLowerCase().includes(term))) : [...this.fullData];
+    this.totalData = this.filteredData.length;
+    this.prepareTableData();
+  }
 
+  private prepareTableData(): void {
+    this.tableData = this.filteredData.slice(this.currentSkip, this.currentSkip + this.pageSize);
+    this.serialNumberArray = this.tableData.map((_, index) => this.currentSkip + index + 1);
+    this.pagination.calculatePageSize.next({ totalData: this.totalData, pageSize: this.pageSize,
+      tableData: this.tableData, serialNumberArray: this.serialNumberArray });
+  }
+
+  sortData(sort: Sort): void {
+    if (!sort.active || !sort.direction) return;
+    const direction = sort.direction === 'asc' ? 1 : -1;
+    this.filteredData = [...this.filteredData].sort((a, b) => String(a?.[sort.active] ?? '')
+      .localeCompare(String(b?.[sort.active] ?? ''), undefined, { numeric: true }) * direction);
+    this.currentSkip = 0;
+    this.prepareTableData();
+  }
+
+  openReceipt(template: TemplateRef<any>, receipt: any): void {
+    this.selectedReceipt = receipt;
+    this.receiptForm.patchValue({
+      ...receipt,
+      fatherName: receipt?.fatherName || '',
+      contactNo: receipt?.fatherMobileNo || receipt?.contactNo || ''
+    });
+    this.receiptDetails.clear();
+    (receipt?.receiptDetails || []).forEach((item: any) => this.receiptDetails.push(this.fb.group({
+      feeType: [item?.feeType || ''], amount: [Number(item?.amount || 0)]
+    })));
+    this.receiptDialog = this.dialog.open(template, { width: '920px', maxWidth: '96vw', maxHeight: '94vh', panelClass: 'receipt-view-dialog' });
+  }
+
+  studentLabel(student: any): string {
+    return [student?.firstName, student?.middleName, student?.lastName].filter(Boolean).join(' ');
+  }
+
+  amountInWords(value: number): string {
+    const amount = Math.max(0, Math.floor(Number(value) || 0));
+    if (!amount) return 'Zero Rupees Only';
+    const ones = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten',
+      'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
+    const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+    const wordsFor = (number: number): string => {
+      const words: string[] = [];
+      if (number >= 100) { words.push(ones[Math.floor(number / 100)], 'Hundred'); number %= 100; }
+      if (number >= 20) { words.push(tens[Math.floor(number / 10)]); number %= 10; }
+      if (number) words.push(ones[number]);
+      return words.join(' ');
+    };
+    let remaining = amount;
+    const parts: string[] = [];
+    [{ value: 10000000, label: 'Crore' }, { value: 100000, label: 'Lakh' }, { value: 1000, label: 'Thousand' }]
+      .forEach(unit => { if (remaining >= unit.value) { parts.push(wordsFor(Math.floor(remaining / unit.value)), unit.label); remaining %= unit.value; } });
+    if (remaining) parts.push(wordsFor(remaining));
+    return `${parts.join(' ')} Rupees Only`;
+  }
+
+  printReceipt(): void {
+    const receipt = document.getElementById('receiptListPrintArea');
+    if (!receipt) return;
+    const styles = Array.from(document.querySelectorAll('link[rel="stylesheet"], style')).map(node => node.outerHTML).join('');
+    const printFrame = document.createElement('iframe');
+    printFrame.setAttribute('title', 'Fee receipt print frame');
+    printFrame.style.position = 'fixed';
+    printFrame.style.right = '0';
+    printFrame.style.bottom = '0';
+    printFrame.style.width = '0';
+    printFrame.style.height = '0';
+    printFrame.style.border = '0';
+    printFrame.style.opacity = '0';
+    printFrame.style.pointerEvents = 'none';
+    document.body.appendChild(printFrame);
+
+    const frameWindow = printFrame.contentWindow;
+    const frameDocument = printFrame.contentDocument;
+    if (!frameWindow || !frameDocument) {
+      printFrame.remove();
+      return;
+    }
+
+    printFrame.onload = () => {
+      frameWindow.focus();
+      frameWindow.print();
+      window.setTimeout(() => printFrame.remove(), 1000);
+    };
+    frameDocument.open();
+    frameDocument.write(`<!doctype html><html><head><title>${this.receiptForm.value.receiptNumber || 'Fee Receipt'}</title>${styles}<style>@page{size:A4 portrait;margin:8mm}body{margin:0;background:#fff}.list-print-receipt{margin:0 auto!important;max-width:none!important}</style></head><body>${receipt.outerHTML}</body></html>`);
+    frameDocument.close();
+  }
 }

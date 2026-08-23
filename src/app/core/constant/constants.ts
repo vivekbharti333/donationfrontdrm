@@ -64,6 +64,26 @@ export class Constant {
       { value: 'YEARLY', name: 'Yearly' }
     ];
 
+    // Shared school academic sessions in YYYY-YY format.
+    public static ACADEMIC_YEAR_OPTIONS = [
+      { value: '2024-25', name: '2024-25' },
+      { value: '2025-26', name: '2025-26' },
+      { value: '2026-27', name: '2026-27' },
+      { value: '2027-28', name: '2027-28' },
+      { value: '2028-29', name: '2028-29' },
+      { value: '2029-30', name: '2029-30' },
+      { value: '2030-31', name: '2030-31' }
+    ];
+
+    // Shared school section options. Reuse this list in academic filters/forms.
+    public static SECTION_OPTIONS = [
+      { value: 'A', name: 'A' },
+      { value: 'B', name: 'B' },
+      { value: 'C', name: 'C' },
+      { value: 'D', name: 'D' },
+      { value: 'E', name: 'E' }
+    ];
+
 
       serviceType: any = ['DONATION'];
       public static roleTypeForMainAdmin: any = [{value: Constant.superAdmin, name: 'Superadmin'}, {value: Constant.admin, name: 'Admin'}, {value:Constant.teamLeader, name: 'Team Leader'}, { value: Constant.fundraisingOfficer, name: 'Fundrising Officer'}];

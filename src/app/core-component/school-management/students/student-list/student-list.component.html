@@ -167,6 +167,10 @@
                   (click)="openEditModal(dialogTemplate, data)">
                   <i class="feather icon-edit feather-edit"></i></a>
 
+                <a class="me-2 p-2 mb-0" href="javascript:void(0);" title="Assign class"
+                  (click)="openAssignClassModal(assignClassTemplate, data)">
+                  <i class="feather icon-book-open"></i></a>
+
                   <div class="userimgname">
                   <a class="me-2 p-2 mb-0"
                        (click)="downloadReceipt(data.id)">
@@ -185,6 +189,66 @@
       <app-custom-pagination></app-custom-pagination>
     </div>
   </div>
+
+  <ng-template #assignClassTemplate>
+    <div class="modalHeaderContainer">
+      <h2 mat-dialog-title class="p-0">Assign Grade / Class</h2>
+      <div mat-dialog-close class="closeBtn">
+        <button type="button" class="close" aria-label="Close" [disabled]="isAssigningClass">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+    </div>
+    <mat-dialog-content class="dialog-content">
+      <div class="assign-student-summary" *ngIf="selectedStudent as student">
+        <img [src]="baseUrl + student.studentPicture" alt="Student"
+          onerror="this.onerror=null; this.src='https://www.shareicon.net/data/128x128/2016/05/24/770117_people_512x512.png';">
+        <div>
+          <span>Student</span>
+          <strong>{{ student.firstName }} {{ student.middleName }} {{ student.lastName }}</strong>
+          <small>Admission No: {{ student.admissionNo }} &nbsp; | &nbsp; Roll No: {{ student.rollNumber || '—' }}</small>
+        </div>
+      </div>
+
+      <form [formGroup]="assignClassForm" class="row g-3 mt-1">
+        <div class="col-md-6">
+          <label class="form-label">Academic Session *</label>
+          <select class="form-control" formControlName="sessionName">
+            <option value="">Select session</option>
+            <option *ngFor="let year of academicYearOptions" [value]="year.value">{{ year.name }}</option>
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Grade / Class *</label>
+          <select class="form-control" formControlName="gradeId">
+            <option [ngValue]="null">{{ isGradesLoading ? 'Loading grades...' : 'Select grade' }}</option>
+            <option *ngFor="let grade of gradeOptions" [ngValue]="grade.id">
+              {{ grade.gradeName || grade.name || ('Grade ' + grade.id) }}
+            </option>
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Section *</label>
+          <select class="form-control" formControlName="gradeSection">
+            <option value="">Select section</option>
+            <option value="A">A</option><option value="B">B</option><option value="C">C</option>
+            <option value="D">D</option><option value="E">E</option>
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Roll Number *</label>
+          <input class="form-control" formControlName="rollNumber">
+        </div>
+      </form>
+    </mat-dialog-content>
+    <mat-dialog-actions align="end" class="px-4 pb-4 gap-2">
+      <button type="button" class="btn btn-light" mat-dialog-close [disabled]="isAssigningClass">Cancel</button>
+      <button type="button" class="btn btn-primary" (click)="assignClass()" [disabled]="isAssigningClass">
+        <span *ngIf="isAssigningClass" class="spinner-border spinner-border-sm me-1"></span>
+        {{ isAssigningClass ? 'Assigning...' : 'Assign Class' }}
+      </button>
+    </mat-dialog-actions>
+  </ng-template>
 
   <ng-template #dialogTemplate let-dialog>
     <div class="modalHeaderContainer">
@@ -306,7 +370,7 @@
 
               <div class="col-md-4 mb-3">
                 <label class="form-label requiredField">Session</label>
-                <input class="form-control" formControlName="sessionName">
+                <select class="form-select" formControlName="sessionName"><option value="">Select academic year</option><option *ngFor="let year of academicYearOptions" [value]="year.value">{{ year.name }}</option></select>
               </div>
 
               <div class="col-md-4 mb-3">

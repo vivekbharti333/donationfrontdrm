@@ -15,6 +15,9 @@ import { ToastModule } from 'primeng/toast';
    providers: [MessageService, ToastModule],
 })
 export class AddStudentComponent {
+ public readonly academicYearOptions = Constant.ACADEMIC_YEAR_OPTIONS;
+ public gradeOptions: any[] = [];
+ public isGradesLoading = false;
 public loginUser: any;
  public addStudentForm!: FormGroup;
 
@@ -34,7 +37,23 @@ public loginUser: any;
       ngOnInit() {
 
     this.createForms();
+    this.getGradeDetails();
    
+  }
+
+  getGradeDetails(): void {
+    this.isGradesLoading = true;
+    this.schoolManagementService.getGradeDetails().subscribe({
+      next: (response: any) => {
+        const rows = response?.listPayload ?? response?.payload ?? response?.data;
+        this.gradeOptions = Array.isArray(rows) ? rows : [];
+        this.isGradesLoading = false;
+      },
+      error: () => {
+        this.gradeOptions = [];
+        this.isGradesLoading = false;
+      }
+    });
   }
 
   createForms() {

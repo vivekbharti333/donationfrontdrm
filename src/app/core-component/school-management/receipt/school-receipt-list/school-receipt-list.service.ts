@@ -24,20 +24,27 @@ export class SchoolReceiptListService {
   }
 
   getReceiptDetails(studentSearchForm:any) {
+	const currentUser = this.authenticationService.getLoginUser();
+	const token = currentUser?.token || this.cookieService.get('token');
+	const tenantId = currentUser?.superadminId
+	  || currentUser?.superAdminId
+	  || currentUser?.loginId
+	  || this.cookieService.get('superadminId')
+	  || this.cookieService.get('loginId');
   const request: any = {
     payload: {
-      admissionNo: studentSearchForm.admissionNo,
-      academicSession: studentSearchForm.academicSession,
-      superadminId: this.loginUser['superadminId'],
-      // grade: "10",
-      // gradeSection: "A",
-      // studentName: "Rahul",
-      // rollNumber: "15",
-
+	  admissionNo: studentSearchForm.admissionNo || undefined,
+	  academicSession: studentSearchForm.academicSession || undefined,
+	  grade: studentSearchForm.grade || undefined,
+	  gradeSection: studentSearchForm.gradeSection || undefined,
+	  studentName: studentSearchForm.studentName || undefined,
+	  rollNumber: studentSearchForm.rollNumber || undefined,
+	  receiptNumber: studentSearchForm.receiptNumber || undefined,
+	  superadminId: tenantId
     }
   };
-
-  return this.http.post<any>(Constant.Site_Url + "getReceiptDetails", request);
+	const options = token ? { headers: new HttpHeaders({ Authorization: `Bearer ${token}` }) } : {};
+	return this.http.post<any>(Constant.Site_Url + "getReceiptDetails", request, options);
 }
 
 

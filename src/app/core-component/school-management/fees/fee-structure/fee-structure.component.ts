@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit, TemplateRef } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Sort } from '@angular/material/sort';
 import { Router } from '@angular/router';
@@ -22,7 +22,7 @@ export class FeeStructureComponent implements OnInit, OnDestroy {
   public pageSize = 10;
   public searchDataValue = '';
   public selectedAcademicYear = 'All Years';
-  public selectedGrade = 'All Classes';
+  public selectedGrade: number | null = null;
   public selectedStatus = 'All Statuses';
   public selectedFeeStructure: any = null;
   public isLoading = false;
@@ -32,6 +32,7 @@ export class FeeStructureComponent implements OnInit, OnDestroy {
   public isFeeTypesLoading = false;
   public isGradesLoading = false;
   public readonly feeFrequencyOptions = Constant.FEE_FREQUENCY_OPTIONS;
+  public readonly academicYearOptions = Constant.ACADEMIC_YEAR_OPTIONS;
   public addFeeStructureForm!: FormGroup;
   public editFeeStructureForm!: FormGroup;
   public isSaving = false;
@@ -73,10 +74,15 @@ export class FeeStructureComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  public getFeeStructure(): void {
+  public getFeeStructure(useFilters = false): void {
     this.isLoading = true;
     this.errorMessage = '';
-    this.schoolManagementService.getFeeStructure().subscribe({
+    const filters = useFilters ? {
+      academicYearId: this.selectedAcademicYear === 'All Years' ? undefined : this.selectedAcademicYear,
+      gradeId: this.selectedGrade,
+      feeTypeName: this.searchDataValue.replace(/\s+fee structure$/i, '').trim()
+    } : undefined;
+    this.schoolManagementService.getFeeStructure(filters).subscribe({
       next: (response: any) => {
         const rows = response?.listPayload ?? response?.payload ?? response?.data;
         this.fullData = Array.isArray(rows) ? rows : [];
@@ -135,16 +141,15 @@ export class FeeStructureComponent implements OnInit, OnDestroy {
 
   public applyFilters(): void {
     this.currentSkip = 0;
-    this.applySearchAndPagination();
-    this.selectedFeeStructure = this.tableData[0] || null;
+    this.getFeeStructure(true);
   }
 
   public resetFilters(): void {
     this.selectedAcademicYear = 'All Years';
-    this.selectedGrade = 'All Classes';
+    this.selectedGrade = null;
     this.selectedStatus = 'All Statuses';
     this.searchDataValue = '';
-    this.applyFilters();
+    this.getFeeStructure();
   }
 
   public selectFeeStructure(item: any): void {
@@ -188,16 +193,29 @@ export class FeeStructureComponent implements OnInit, OnDestroy {
 
   public openAddFeeStructure(template: TemplateRef<any>): void {
     this.addFeeStructureForm.reset({
-      academicYearId: null, gradeId: null, feeTypeId: null, amount: null, frequency: ''
+      academicYearId: '2026-27', gradeId: null
     });
+    this.addFeeStructureForm.setControl('feeStructures', this.fb.array([this.createFeeRow()]));
     this.addDialog = this.openDialog(template);
+  }
+
+  public get feeStructureRows(): FormArray {
+    return this.addFeeStructureForm.get('feeStructures') as FormArray;
+  }
+
+  public addFeeRow(): void {
+    this.feeStructureRows.push(this.createFeeRow());
+  }
+
+  public removeFeeRow(index: number): void {
+    if (this.feeStructureRows.length > 1) this.feeStructureRows.removeAt(index);
   }
 
   public addFeeStructure(): void {
     if (this.isSaving) return;
-    if (!this.hasValidFeeStructureValues(this.addFeeStructureForm)) {
+    if (this.addFeeStructureForm.invalid || this.feeStructureRows.length === 0) {
       this.addFeeStructureForm.markAllAsTouched();
-      this.showMessage('Required fields', 'Please complete all required fee structure fields.', 'error');
+      this.showMessage('Required fields', 'Complete academic year, grade, and every fee row.', 'error');
       return;
     }
     this.isSaving = true;
@@ -294,14 +312,11 @@ export class FeeStructureComponent implements OnInit, OnDestroy {
   }
 
   private createForms(): void {
-    const addFields = {
+    this.addFeeStructureForm = this.fb.group({
       academicYearId: ['', Validators.required],
       gradeId: [null, [Validators.required, Validators.min(1)]],
-      feeTypeId: [null, [Validators.required, Validators.min(1)]],
-      amount: [null, [Validators.required, Validators.min(0)]],
-      frequency: ['', Validators.maxLength(50)]
-    };
-    this.addFeeStructureForm = this.fb.group(addFields);
+      feeStructures: this.fb.array([this.createFeeRow()])
+    });
     this.editFeeStructureForm = this.fb.group({
       id: [null, Validators.required],
       academicYearId: ['', Validators.required],
@@ -312,22 +327,30 @@ export class FeeStructureComponent implements OnInit, OnDestroy {
     });
   }
 
+  private createFeeRow(): FormGroup {
+    return this.fb.group({
+      feeTypeId: [null, [Validators.required, Validators.min(1)]],
+      amount: [null, [Validators.required, Validators.min(0)]],
+      frequency: ['', Validators.required]
+    });
+  }
+
   private openDialog(template: TemplateRef<any>): MatDialogRef<any> {
     return this.dialog.open(template, {
-      width: '700px', maxWidth: '95vw', disableClose: true, panelClass: 'custom-modal'
+      width: '900px', maxWidth: '95vw', disableClose: true, panelClass: 'custom-modal'
     });
   }
 
   private applySearchAndPagination(): void {
     const term = this.searchDataValue.trim().toLowerCase();
     const filtered = this.fullData.filter(item => {
-      const matchesTerm = !term || [this.getStructureName(item), item?.academicYearId, this.getGradeName(item),
-        this.getFeeTypeName(item?.feeTypeId), item?.amount, item?.frequency, item?.status]
-        .some(value => String(value ?? '').toLowerCase().includes(term));
+      const matchesTerm = !term
+        || this.getStructureName(item).toLowerCase().includes(term)
+        || this.getFeeTypeName(item?.feeTypeId).toLowerCase().includes(term);
       const matchesYear = this.selectedAcademicYear === 'All Years'
-        || String(item?.academicYearId) === this.selectedAcademicYear;
-      const matchesGrade = this.selectedGrade === 'All Classes'
-        || this.getGradeName(item) === this.selectedGrade;
+        || String(item?.academicYearId ?? '') === this.selectedAcademicYear;
+      const matchesGrade = this.selectedGrade == null
+        || String(item?.gradeId ?? '') === String(this.selectedGrade);
       const matchesStatus = this.selectedStatus === 'All Statuses'
         || (this.selectedStatus === 'Active' ? this.isActive(item) : !this.isActive(item));
       return matchesTerm && matchesYear && matchesGrade && matchesStatus;

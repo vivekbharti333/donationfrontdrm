@@ -1,6 +1,9 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatSortModule } from '@angular/material/sort';
+import { ToastModule } from 'primeng/toast';
+import { CustomPaginationModule } from 'src/app/shared/custom-pagination/custom-pagination.module';
 import { MatSelectModule } from '@angular/material/select';
 import { MatOptionModule } from '@angular/material/core'; 
 import { MultiSelectModule } from 'primeng/multiselect';
@@ -41,6 +44,10 @@ import { MessageService } from 'primeng/api';
     CommonModule,
     sharedModule,
     FormsModule,
+    ReactiveFormsModule,
+    MatSortModule,
+    ToastModule,
+    CustomPaginationModule,
     MatSelectModule,
     MatOptionModule,
     MultiSelectModule,
