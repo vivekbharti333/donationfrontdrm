@@ -110,8 +110,10 @@ export class AttendanceMarkComponent implements OnInit {
     }).pipe(map(response => Number(response?.responseCode) === 200), catchError(() => of(false)))))
       .subscribe(results => {
         this.isSaving = false; const saved = results.filter(Boolean).length;
-        if (saved === markedStudents.length) this.successMessage = `Attendance saved for ${saved} student${saved === 1 ? '' : 's'}.`;
-        else this.errorMessage = `Attendance saved for ${saved} of ${markedStudents.length} marked students. Please retry the remaining records.`;
+        if (saved === markedStudents.length) 
+          this.successMessage = `Attendance saved for ${saved} student${saved === 1 ? '' : 's'}.`;
+        else 
+          this.errorMessage = `Attendance saved for ${saved} of ${markedStudents.length} marked students. Please retry the remaining records.`;
       });
   }
   reset(): void { this.filterForm.reset({ sessionName: this.currentAcademicSession(), attendanceDate: this.today(), grade: this.grades.length ? this.gradeValue(this.grades[0]) : '', gradeSection: 'A' }); this.students = []; this.selectedStudentIds.clear(); this.searchTerm = ''; this.successMessage = ''; this.errorMessage = ''; }
