@@ -1,0 +1,29 @@
+<section class="attendance-page">
+  <header><h1>Monthly Attendance Sheet</h1></header>
+  <form class="filters" [formGroup]="filterForm" (ngSubmit)="viewAttendance()">
+    <label><span>Class / Grade</span><select formControlName="grade"><option value="">{{isGradesLoading?'Loading classes...':'All grades'}}</option><option *ngFor="let grade of grades" [value]="gradeValue(grade)">{{gradeLabel(grade)}}</option></select></label>
+    <label><span>Section</span><select formControlName="gradeSection"><option value="">All sections</option><option *ngFor="let section of sections" [value]="section.value">{{section.name}}</option></select></label>
+    <label><span>Month</span><select formControlName="month"><option *ngFor="let month of months" [ngValue]="month.value">{{month.name}}</option></select></label>
+    <label><span>Year</span><select formControlName="year"><option *ngFor="let year of years" [ngValue]="year">{{year}}</option></select></label>
+    <div class="actions"><button class="view" type="submit" [disabled]="isLoading"><i class="feather icon-search"></i>{{isLoading?'Loading...':'View'}}</button><button class="export" type="button" (click)="exportAttendance()" [disabled]="!students.length"><i class="feather icon-download"></i>Export</button></div>
+  </form>
+  <div class="message" *ngIf="errorMessage&&!isLoading">{{errorMessage}}</div>
+  <section class="summary">
+    <article><i class="bubble blue feather icon-users"></i><div><small>Total Students</small><b>{{totalStudents}}</b></div></article>
+    <article><i class="bubble green feather icon-check-circle"></i><div><small>Present Days</small><b>{{totalPresent}} <em>({{totalMarked?(totalPresent/totalMarked*100|number:'1.2-2'):'0.00'}}%)</em></b></div></article>
+    <article><i class="bubble red feather icon-x-circle"></i><div><small>Absent Days</small><b>{{totalAbsent}} <em>({{totalMarked?(totalAbsent/totalMarked*100|number:'1.2-2'):'0.00'}}%)</em></b></div></article>
+  </section>
+  <article class="sheet">
+    <div class="sheet-head"><h2>Attendance Sheet - {{monthName}} {{selectedYear}}</h2><div class="legend"><span><i class="present"></i>P - Present</span><span><i class="absent"></i>A - Absent</span><span><i class="holiday"></i>H - Holiday</span></div></div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>#</th><th>Roll No.</th><th class="student-col">Student Name</th><th class="day" *ngFor="let day of days"><b>{{day.day}}</b><small>{{day.weekday}}</small></th><th>Present</th><th>Absent</th><th>Attendance<br>%</th></tr></thead>
+      <tbody>
+        <tr *ngIf="isLoading"><td class="state" [attr.colspan]="days.length+6">Loading attendance...</td></tr>
+        <tr *ngIf="!isLoading&&!students.length"><td class="state" [attr.colspan]="days.length+6">No attendance records found for the selected filters.</td></tr>
+        <tr *ngFor="let student of students;let i=index"><td>{{i+1}}</td><td>{{student.rollNumber}}</td><td class="student-col"><div class="student"><img [src]="image(student.studentPicture)" (error)="$any($event.target).src='assets/img/profiles/avatar-02.jpg'" alt=""><span>{{student.studentName}}</span></div></td><td *ngFor="let day of days" class="status" [ngClass]="cell(student,day).toLowerCase()">{{label(cell(student,day))}}</td><td class="green-t">{{student.present}}</td><td class="red-t">{{student.absent}}</td><td [ngClass]="percentageClass(student.percentage)">{{student.percentage|number:'1.2-2'}}%</td></tr>
+      </tbody>
+      <tfoot *ngIf="students.length&&!isLoading"><tr><td colspan="3" class="total-label">Total Days</td><td *ngFor="let day of days">{{day.holiday?0:dayPresent(day)}}</td><td class="green-t">{{totalPresent}}</td><td class="red-t">{{totalAbsent}}</td><td class="good">{{overallPercentage|number:'1.2-2'}}%</td></tr></tfoot>
+    </table></div>
+    <footer><span>Note: H - Holiday</span><div><span>Total Working Days: {{workingDays}}</span><i></i><span>Holidays: {{holidays}}</span><i></i><span>Attendance Calculated on Marked Working Days</span></div></footer>
+  </article>
+</section>

@@ -20,7 +20,11 @@
                 <a class="sub-active" href="javascript:void(0)" (click)="expandSubMenus(menu)"
                   [ngClass]="{ 'subdrop': menu.showSubRoute === true}"
                   [class.active]="base === menu.base1 || base === menu.base || page === menu.page">
+                  @if (menu.menuValue === 'Fee Management') {
+                  <i class="fas fa-indian-rupee-sign"></i>
+                  } @else {
                   <i class="feather" [class]="'icon-' + menu.icon"></i>
+                  }
                   <span>{{ menu.menuValue }}</span>
                   <span class="menu-arrow"></span>
                 </a>

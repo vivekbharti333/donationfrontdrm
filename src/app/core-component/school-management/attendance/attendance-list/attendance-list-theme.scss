@@ -1,0 +1,21 @@
+.view {
+  background: #ff6818;
+  border-color: #ff6818;
+  box-shadow: 0 2px 5px rgba(255, 104, 24, .22);
+}
+
+.summary {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+@media (max-width: 767px) {
+  .summary {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .summary {
+    grid-template-columns: 1fr;
+  }
+}

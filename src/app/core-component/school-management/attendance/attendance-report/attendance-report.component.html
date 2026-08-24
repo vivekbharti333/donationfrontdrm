@@ -1,0 +1,38 @@
+<section class="report-page">
+  <header><h1>Attendance List</h1></header>
+  <form class="filters" [formGroup]="filterForm" (ngSubmit)="viewAttendance()">
+    <label><span>Class / Grade</span><select formControlName="grade"><option value="">{{isGradesLoading?'Loading classes...':'All grades'}}</option><option *ngFor="let grade of grades" [value]="gradeValue(grade)">{{gradeLabel(grade)}}</option></select></label>
+    <label><span>Section</span><select formControlName="gradeSection"><option value="">All sections</option><option *ngFor="let section of sections" [value]="section.value">{{section.name}}</option></select></label>
+    <label><span>From Date</span><input type="date" formControlName="fromDate"></label>
+    <label><span>To Date</span><input type="date" formControlName="toDate"></label>
+    <div class="filter-actions"><button class="view" type="submit" [disabled]="isLoading"><i class="feather icon-search"></i>{{isLoading?'Loading...':'View Attendance'}}</button><button class="export" type="button" (click)="exportReport()" [disabled]="!reports.length"><i class="feather icon-download"></i>Export</button></div>
+  </form>
+  <div class="message" *ngIf="errorMessage&&!isLoading">{{errorMessage}}</div>
+
+  <section class="summary">
+    <article><i class="bubble students feather icon-users"></i><div><small>Total Students</small><b>{{totalStudents}}</b></div></article>
+    <article><i class="bubble present feather icon-check-circle"></i><div><small>Present</small><b>{{percent(totalPresent)|number:'1.2-2'}}%</b><em>({{totalPresent}})</em></div></article>
+    <article><i class="bubble absent feather icon-x-circle"></i><div><small>Absent</small><b>{{percent(totalAbsent)|number:'1.2-2'}}%</b><em>({{totalAbsent}})</em></div></article>
+  </section>
+
+  <article class="report-card">
+    <div class="card-head"><h2>Attendance Summary ({{filterForm.controls.fromDate.value|date:'dd/MM/yyyy'}} - {{filterForm.controls.toDate.value|date:'dd/MM/yyyy'}})</h2><div class="legend"><span><i class="present"></i>P - Present</span><span><i class="absent"></i>A - Absent</span></div></div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>#</th><th>Roll No.</th><th class="student-col">Student Name</th><th>Present<br><small>(%)</small></th><th>Absent<br><small>(%)</small></th><th>Attendance %</th><th>Action</th></tr></thead>
+      <tbody>
+        <tr *ngIf="isLoading"><td colspan="7" class="state">Loading attendance report...</td></tr>
+        <tr *ngIf="!isLoading&&!reports.length"><td colspan="7" class="state">No attendance records found for the selected filters.</td></tr>
+        <tr *ngFor="let row of pagedReports;let i=index"><td>{{(page-1)*pageSize+i+1}}</td><td>{{row.rollNumber}}</td><td class="student-col"><div class="student"><img [src]="studentImage(row.studentPicture)" (error)="$any($event.target).src='assets/img/profiles/avatar-02.jpg'" alt=""><span>{{row.studentName}}</span></div></td><td>{{row.present}}<small class="green">({{rowPercent(row.present,row)|number:'1.2-2'}}%)</small></td><td class="red">{{row.absent}}<small>({{rowPercent(row.absent,row)|number:'1.2-2'}}%)</small></td><td [ngClass]="percentageClass(row.attendancePercentage)">{{row.attendancePercentage|number:'1.2-2'}}%</td><td><button class="eye" type="button" (click)="openDetails(row)" title="View details"><i class="feather icon-eye"></i></button></td></tr>
+      </tbody>
+    </table></div>
+    <footer><span>Showing {{shownFrom}} to {{shownTo}} of {{reports.length}} entries</span><div><button (click)="changePage(page-1)" [disabled]="page===1">‹</button><b>{{page}}</b><button (click)="changePage(page+1)" [disabled]="page===totalPages">›</button></div></footer>
+  </article>
+
+  <div class="modal-backdrop" *ngIf="selectedReport" (click)="closeDetails()">
+    <section class="details-modal" (click)="$event.stopPropagation()">
+      <header><div><h2>{{selectedReport.studentName}}</h2><p>Roll No. {{selectedReport.rollNumber}} · Admission No. {{selectedReport.admissionNo}}</p></div><button type="button" (click)="closeDetails()">×</button></header>
+      <div class="detail-summary"><span>Present <b class="green">{{selectedReport.present}}</b></span><span>Absent <b class="red">{{selectedReport.absent}}</b></span></div>
+      <div class="detail-list"><div *ngFor="let record of selectedReport.records"><span>{{record.attendanceDate|date:'dd MMM yyyy'}}</span><b [ngClass]="statusClass(record.status)">{{record.status|titlecase}}</b></div></div>
+    </section>
+  </div>
+</section>

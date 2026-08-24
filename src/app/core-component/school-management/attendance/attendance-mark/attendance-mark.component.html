@@ -1,0 +1,60 @@
+<section class="mark-page">
+  <header class="page-heading">
+    <h1>Mark Attendance</h1>
+  </header>
+
+  <form class="filter-card" [formGroup]="filterForm" (ngSubmit)="loadStudents()">
+    <label><span>Academic Session</span><select formControlName="sessionName"><option value="">Select session</option><option *ngFor="let session of academicSessions" [value]="session.value">{{session.name}}</option></select></label>
+    <label><span>Date</span><input type="date" formControlName="attendanceDate"></label>
+    <label><span>Class / Grade</span><select formControlName="grade"><option value="">Select grade</option><option *ngFor="let grade of grades" [value]="gradeValue(grade)">{{gradeLabel(grade)}}</option></select></label>
+    <label><span>Section</span><select formControlName="gradeSection"><option value="">Select section</option><option *ngFor="let section of sections" [value]="section.value">{{section.name}}</option></select></label>
+    <div class="filter-actions">
+      <button class="load" type="submit" [disabled]="isLoading"><i class="feather icon-search"></i>{{isLoading?'Loading...':'Load Students'}}</button>
+      <button class="reset" type="button" (click)="reset()"><i class="feather icon-rotate-ccw"></i>Reset</button>
+    </div>
+  </form>
+
+  <div class="message success" *ngIf="successMessage">{{successMessage}}</div>
+  <div class="message error" *ngIf="errorMessage">{{errorMessage}}</div>
+
+  <section class="summary-card">
+    <article><small>Total Students</small><b>{{totalStudents}}</b></article>
+    <article class="present"><small>Present</small><b>{{presentCount}}</b></article>
+    <article class="absent"><small>Absent</small><b>{{absentCount}}</b></article>
+    <article class="ring-wrap"><div class="progress-ring" [style.--progress]="presentPercentage+'%'"><div><b>{{presentPercentage}}%</b><small>Present</small></div></div></article>
+  </section>
+
+  <section class="attendance-card">
+    <div class="toolbar">
+      <div class="bulk">
+        <button class="present" type="button" (click)="markAll('PRESENT')"><i class="feather icon-check"></i>Mark All Present</button>
+        <button class="absent" type="button" (click)="markAll('ABSENT')"><i class="feather icon-x"></i>Mark All Absent</button>
+      </div>
+      <div class="toolbar-right">
+        <label class="search"><input [(ngModel)]="searchTerm" [ngModelOptions]="{standalone:true}" placeholder="Search Student..."><i class="feather icon-search"></i></label>
+        <button class="save" type="button" (click)="saveAttendance()" [disabled]="isSaving||!students.length"><i class="feather icon-save"></i>{{isSaving?'Saving...':'Save Attendance'}}</button>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th class="check"><input type="checkbox" [checked]="isAllSelected()" (change)="toggleAll($any($event.target).checked)"></th><th class="roll">Roll No.</th><th>Student Name</th><th class="status-heading">Attendance Status <i class="feather icon-info"></i></th></tr></thead>
+        <tbody>
+          <tr *ngIf="isLoading"><td colspan="4" class="state">Loading students...</td></tr>
+          <tr *ngIf="!isLoading&&!students.length"><td colspan="4" class="state">Select the filters and click Load Students.</td></tr>
+          <tr *ngFor="let student of filteredStudents">
+            <td class="check"><input type="checkbox" [checked]="selectedStudentIds.has(student.studentAcademicId)" (change)="toggleStudent(student.studentAcademicId,$any($event.target).checked)"></td>
+            <td class="roll">{{student.rollNumber||'—'}}</td>
+            <td><div class="student"><img [src]="studentImage(student.studentPicture)" alt="" (error)="$any($event.target).src='assets/img/profiles/avatar-02.jpg'"><span>{{studentName(student)}}</span></div></td>
+            <td><div class="status-options">
+              <button *ngFor="let status of statuses" type="button" [ngClass]="[status.toLowerCase(),student.status===status?'active':'']" (click)="setStatus(student,status)">
+                <i class="feather" [ngClass]="status==='PRESENT'?'icon-check-circle':'icon-x-circle'"></i>{{status|titlecase}}
+              </button>
+            </div></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note">Note: Click on any status to change the attendance.</p>
+  </section>
+</section>

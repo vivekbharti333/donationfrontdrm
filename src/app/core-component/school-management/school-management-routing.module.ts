@@ -11,6 +11,9 @@ import { StudentAcademicComponent } from './academic/student-academic/student-ac
 // Standalone fee assignment screen.
 import { FeeAssignmentComponent } from './fees/fee-assignment/fee-assignment.component';
 import { GradeComponent } from './academic/grade/grade.component';
+import { AttendanceListComponent } from './attendance/attendance-list/attendance-list.component';
+import { AttendanceMarkComponent } from './attendance/attendance-mark/attendance-mark.component';
+import { AttendanceReportComponent } from './attendance/attendance-report/attendance-report.component';
  
 
 const routes: Routes = [
@@ -54,6 +57,18 @@ const routes: Routes = [
         path: 'grade',
         component: GradeComponent,
       },
+      {
+        path: 'attendance-mark',
+        component: AttendanceMarkComponent,
+      },
+      {
+        path: 'attendance-list',
+        component: AttendanceListComponent,
+      },
+      {
+        path: 'attendance-report',
+        component: AttendanceReportComponent,
+      }
     ],
   },
 ];

@@ -1141,6 +1141,15 @@ export class routes {
   public static get grade(): string {
     return this.schoolManagement + '/grade';
   }
+  public static get attendanceList(): string {
+    return this.schoolManagement + '/attendance-list';
+  }
+  public static get attendanceMark(): string {
+    return this.schoolManagement + '/attendance-mark';
+  }
+  public static get attendanceReport(): string {
+    return this.schoolManagement + '/attendance-report';
+  }
 
   // Invoice Management
   public static get invoiceManagement(): string {

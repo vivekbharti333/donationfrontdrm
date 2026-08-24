@@ -365,11 +365,32 @@ export class SidebarService {
             }, 
           ],
         },
+
+        {
+          menuValue: 'Academic Management',
+          hasSubRoute: true,
+          showSubRoute: false,
+          icon: 'book-open',
+          // base1: 'usermang',
+          subMenus: [  
+            {
+              menuValue: 'Grade',
+              route: routes.grade,
+              permission: 'grade',
+            },   
+            {
+              menuValue: 'Student Academic',
+              route: routes.studentAcademic,
+              permission: 'student-academic',
+            }, 
+          ],
+        },
+
         {
           menuValue: 'Fee Management',
           hasSubRoute: true,
           showSubRoute: false,
-          icon: 'credit-card',
+          icon: 'indian-rupee-sign',
           // base1: 'usermang',
           subMenus: [    
             {
@@ -381,11 +402,6 @@ export class SidebarService {
               menuValue: 'Receipt List',
               route: routes.schoolReceiptList,
               permission: 'school-receipt-list',
-            }, 
-            {
-              menuValue: 'Student Academic',
-              route: routes.studentAcademic,
-              permission: 'student-academic',
             }, 
             {
               menuValue: 'Fee Type',
@@ -402,12 +418,33 @@ export class SidebarService {
               route: routes.feeAssignment,
               permission: 'fee-assignment',
             }, 
+          ],
+        },
+
+        {
+          menuValue: 'Attendance Management',
+          hasSubRoute: true,
+          showSubRoute: false,
+          icon: 'check-square',
+          subMenus: [
             {
-              menuValue: 'Grade',
-              route: routes.grade,
-              permission: 'grade',
-            }, 
-           
+              menuValue: 'Mark Attendance',
+              route: routes.attendanceMark,
+              // permission: 'attendance-mark',
+              permission: 'fee-assignment',
+            },
+            {
+              menuValue: 'Attendance List',
+              route: routes.attendanceList,
+              // permission: 'attendance-list',
+              permission: 'fee-assignment',
+            },
+            {
+              menuValue: 'Attendance Report',
+              route: routes.attendanceReport,
+              // permission: 'attendance-report',
+              permission: 'fee-assignment',
+            },
           ],
         },
 

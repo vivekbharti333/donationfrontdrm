@@ -23,6 +23,9 @@ import { FeeStructureComponent } from './fees/fee-structure/fee-structure.compon
 import { StudentAcademicComponent } from './academic/student-academic/student-academic.component';
 import { GradeComponent } from './academic/grade/grade.component';
 import { FeeAssignmentComponent } from './fees/fee-assignment/fee-assignment.component';
+import { AttendanceListComponent } from './attendance/attendance-list/attendance-list.component';
+import { AttendanceMarkComponent } from './attendance/attendance-mark/attendance-mark.component';
+import { AttendanceReportComponent } from './attendance/attendance-report/attendance-report.component';
 
 import { MessageService } from 'primeng/api';
 
@@ -37,7 +40,10 @@ import { MessageService } from 'primeng/api';
     FeeStructureComponent,
     StudentAcademicComponent,
     GradeComponent,
-    FeeAssignmentComponent
+    FeeAssignmentComponent,
+    AttendanceListComponent,
+    AttendanceMarkComponent,
+    AttendanceReportComponent
   ],
   imports: [
     SchoolManagementRoutingModule,
