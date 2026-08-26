@@ -4,6 +4,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MessageService } from 'primeng/api';
 import { GenerateSchoolReceiptService } from './generate-school-receipt.service';
 import { Constant } from 'src/app/core/constant/constants';
+import { AuthenticationService } from 'src/app/auth/authentication.service';
 
 @Component({
   selector: 'app-generate-school-receipt',
@@ -34,6 +35,7 @@ export class GenerateSchoolReceiptComponent implements OnInit {
   isLoading = false;
   isSubmitting = false;
   isReceiptPreviewVisible = false;
+  loginUser: any;
 
 
   constructor(
@@ -41,7 +43,10 @@ export class GenerateSchoolReceiptComponent implements OnInit {
     private dialog: MatDialog,
     private messageService: MessageService,
     private generateSchoolReceiptService: GenerateSchoolReceiptService,
-  ) { }
+    private authenticationService: AuthenticationService,
+  ) {
+    this.loginUser = this.authenticationService.getLoginUser();
+  }
 
   ngOnInit(): void {
     this.createReceiptForm();
@@ -108,7 +113,13 @@ export class GenerateSchoolReceiptComponent implements OnInit {
   }
 
   get selectedFeeDetails(): any[] {
-    return this.receiptDetails.controls.filter(control => control.get('selected')?.value);
+    return this.receiptDetails.controls.filter(control =>
+      control.get('selected')?.value && !this.isZeroBalanceFee(control)
+    );
+  }
+
+  isZeroBalanceFee(control: any): boolean {
+    return Number(control?.get('balance')?.value) <= 0;
   }
 
   // ================= ADD FEE ROW =================
@@ -139,7 +150,7 @@ export class GenerateSchoolReceiptComponent implements OnInit {
     let total = 0;
 
     this.receiptDetails.controls.forEach(control => {
-      if (control.get('selected')?.value) {
+      if (control.get('selected')?.value && !this.isZeroBalanceFee(control)) {
         const amount = Number(control.get('amount')?.value) || 0;
         total += amount;
       }
@@ -193,7 +204,7 @@ export class GenerateSchoolReceiptComponent implements OnInit {
 
     this.calculateTotals();
     const selectedReceiptDetails = this.receiptDetails.controls
-      .filter(control => control.get('selected')?.value)
+      .filter(control => control.get('selected')?.value && !this.isZeroBalanceFee(control))
       .map(control => ({
         studentFeeId: control.get('studentFeeId')?.value,
         feeType: control.get('feeType')?.value,
@@ -325,15 +336,23 @@ export class GenerateSchoolReceiptComponent implements OnInit {
   }
 
   get receiptCompanyLogo(): string {
-    const logo = String(this.invoiceHeader?.companyLogo || '').trim();
-    if (!logo) return '';
-    return logo.startsWith('data:') ? logo : `data:image/png;base64,${logo}`;
+    return this.receiptHeaderImage(this.invoiceHeader?.companyLogo);
   }
 
   get receiptCompanyStamp(): string {
-    const stamp = String(this.invoiceHeader?.companyStamp || '').trim();
-    if (!stamp) return '';
-    return stamp.startsWith('data:') ? stamp : `data:image/png;base64,${stamp}`;
+    return this.receiptHeaderImage(this.invoiceHeader?.companyStamp);
+  }
+
+  private receiptHeaderImage(value: any): string {
+    const image = String(value || '').trim();
+    if (!image) return '';
+    if (/^(data:image\/|blob:|https?:)/i.test(image)) return image;
+    if (image.length > 100 && /^[A-Za-z0-9+/=\r\n]+$/.test(image)) {
+      return `data:image/png;base64,${image}`;
+    }
+    const superadminId = String(this.invoiceHeader?.superadminId || '').trim();
+    return !superadminId ? '' : Constant.Site_Url + 'invoiceHeaderImage/'
+      + encodeURIComponent(superadminId) + '/' + encodeURIComponent(image);
   }
 
   public amountInWords(value: number): string {
@@ -467,13 +486,15 @@ export class GenerateSchoolReceiptComponent implements OnInit {
 
         uniqueFees.forEach((fee: any) => {
           const amount = Number(fee?.balanceAmount ?? fee?.payableAmount ?? fee?.assignedAmount ?? 0);
+          const balance = Number(fee?.balanceAmount ?? amount);
           this.receiptDetails.push(this.fb.group({
             selected: [false],
             studentFeeId: [fee?.id],
             studentAcademicId: [fee?.studentAcademicId],
             feeType: [fee?.feeTypeName || `Fee Structure ${fee?.feeStructureId ?? ''}`, Validators.required],
-            amount: [amount, [Validators.required, Validators.min(1)]],
-            balance: [Number(fee?.balanceAmount ?? amount)]
+            amount: [balance > 0 ? Math.min(amount, balance) : 0,
+              balance > 0 ? [Validators.required, Validators.min(1)] : []],
+            balance: [balance]
           }));
         });
         this.receiptForm.patchValue({
@@ -587,8 +608,25 @@ createReceiptDetailGroup(data?: any): FormGroup {
 }
 
 studentImage(student: any): string {
-  const picture = student?.studentPicture || student?.profilePicture;
-  return picture ? this.studentImageBaseUrl + picture : 'assets/img/profiles/avatar-01.jpg';
+  const picture = String(student?.studentPicture || student?.profilePicture || '').trim();
+  if (!picture) return 'assets/img/profiles/avatar-02.jpg';
+  if (/^(data:image\/|blob:|https?:)/i.test(picture)) return picture;
+  if (picture.length > 100 && /^[A-Za-z0-9+/=\r\n]+$/.test(picture)) {
+    return 'data:image/png;base64,' + picture;
+  }
+  const superadminId = String(
+    student?.superadminId || this.loginUser?.superadminId || this.loginUser?.loginId || ''
+  ).trim();
+  const imageUrl = this.studentImageBaseUrl + encodeURIComponent(picture);
+  return superadminId
+    ? imageUrl + '?superadminId=' + encodeURIComponent(superadminId)
+    : imageUrl;
+}
+
+useDefaultStudentImage(event: Event): void {
+  const image = event.target as HTMLImageElement;
+  image.onerror = null;
+  image.src = 'assets/img/profiles/avatar-02.jpg';
 }
 
 private currentDateTimeLocal(): string {

@@ -11,6 +11,7 @@ import { PaginationService, tablePageSize } from 'src/app/shared/shared.index';
 import { SchoolManagementService } from '../../school-management.service';
 import { MessageService } from 'primeng/api';
 import { Constant } from 'src/app/core/constant/constants';
+import { AuthenticationService } from 'src/app/auth/authentication.service';
 
 @Component({
   selector: 'app-student-academic',
@@ -34,6 +35,8 @@ export class StudentAcademicComponent implements OnInit, OnDestroy {
   public isPromoting = false;
   public selectedStudentName = '';
   public selectedStudentPicture = '';
+  public selectedStudentSuperadminId = '';
+  public loginUser: any;
   public readonly studentImageBaseUrl = Constant.Site_Url + 'studentImage/';
   public readonly academicYearOptions = Constant.ACADEMIC_YEAR_OPTIONS;
   public readonly sectionOptions = Constant.SECTION_OPTIONS;
@@ -56,8 +59,11 @@ export class StudentAcademicComponent implements OnInit, OnDestroy {
     private router: Router,
     private fb: FormBuilder,
     private dialog: MatDialog,
-    private messageService: MessageService
-  ) {}
+    private messageService: MessageService,
+    private authenticationService: AuthenticationService
+  ) {
+    this.loginUser = this.authenticationService.getLoginUser();
+  }
 
   ngOnInit(): void {
     this.createEditForm();
@@ -169,9 +175,33 @@ export class StudentAcademicComponent implements OnInit, OnDestroy {
       .filter(Boolean).join(' ');
   }
 
+  public studentImageUrl(student: any): string {
+    const picture = String(student?.studentPicture || student?.profilePicture || '').trim();
+    if (!picture) return 'assets/img/profiles/avatar-02.jpg';
+    if (/^(data:image\/|blob:|https?:)/i.test(picture)) return picture;
+    if (picture.length > 100 && /^[A-Za-z0-9+/=\r\n]+$/.test(picture)) {
+      return 'data:image/png;base64,' + picture;
+    }
+    const superadminId = String(
+      student?.superadminId || this.selectedStudentSuperadminId ||
+      this.loginUser?.superadminId || this.loginUser?.loginId || ''
+    ).trim();
+    const imageUrl = this.studentImageBaseUrl + encodeURIComponent(picture);
+    return superadminId
+      ? imageUrl + '?superadminId=' + encodeURIComponent(superadminId)
+      : imageUrl;
+  }
+
+  public useDefaultStudentImage(event: Event): void {
+    const image = event.target as HTMLImageElement;
+    image.onerror = null;
+    image.src = 'assets/img/profiles/avatar-02.jpg';
+  }
+
   public openEditAcademic(template: TemplateRef<any>, student: any): void {
     this.selectedStudentName = this.studentName(student);
     this.selectedStudentPicture = student?.studentPicture || '';
+    this.selectedStudentSuperadminId = String(student?.superadminId || '');
     this.editAcademicForm.reset({
       studentId: student.studentId,
       sessionName: student.sessionName,
@@ -229,6 +259,7 @@ export class StudentAcademicComponent implements OnInit, OnDestroy {
   public openPromoteAcademic(template: TemplateRef<any>, student: any): void {
     this.selectedStudentName = this.studentName(student);
     this.selectedStudentPicture = student?.studentPicture || '';
+    this.selectedStudentSuperadminId = String(student?.superadminId || '');
     this.promoteAcademicForm.reset({
       studentId: student.studentId,
       sessionName: this.getNextAcademicSession(student.sessionName),

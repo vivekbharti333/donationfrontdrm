@@ -58,11 +58,11 @@
         <div class="profile-pic-upload">
           <div class="profile-pic">
             <!-- Check if the userPicture field in the form is empty -->
-            <ng-container *ngIf="!addUserForm.get('userPicture')?.value; else showImage">
+            <ng-container *ngIf="!userPicturePreview; else showImage">
               <span><i class="feather icon-plus-circle plus-down-add"></i> Profile Photo</span>
             </ng-container>
             <ng-template #showImage>
-              <img [src]="'data:image/png;base64,' + addUserForm.get('userPicture')?.value" alt="Profile Picture"
+              <img [src]="userPicturePreview" alt="Profile Picture"
                 class="uploaded-profile-pic" />
             </ng-template>
           </div>
@@ -311,6 +311,9 @@
 
   <div class="text-end mb-3">
     <!-- <button type="submit" class="btn btn-submit" [disabled]="!userForm.form.valid">Save User</button> -->
-    <button type="submit" class="btn btn-submit">Save User</button>
+    <button type="submit" class="btn btn-submit" [disabled]="isSubmitting || addUserForm.invalid">
+      <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm me-2"></span>
+      {{ isSubmitting ? 'Saving...' : 'Save User' }}
+    </button>
   </div>
 </form>

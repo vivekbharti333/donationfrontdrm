@@ -1,5 +1,15 @@
 <p-toast></p-toast>
 
+<style>
+  .identity-image-uploaders { display:grid; gap:18px; grid-template-columns:repeat(2,minmax(0,1fr)); margin-bottom:28px; }
+  .identity-image-uploaders .logo-uploader { align-items:center; margin-bottom:0; }
+  .identity-image-uploaders .profile-pic,
+  .identity-image-uploaders .uploaded-profile-pic { height:150px; width:150px; }
+  .identity-image-uploaders .uploaded-profile-pic { border-radius:10px; object-fit:contain; }
+  .identity-image-uploaders .stamp-uploader { background:#fffdf8; }
+  @media (max-width:767px) { .identity-image-uploaders { grid-template-columns:1fr; } }
+</style>
+
 <div class="receipt-header-page">
 <!-- <div class="page-intro">
     <div class="intro-icon"><i class="feather icon-file-text"></i></div>
@@ -40,13 +50,14 @@
                 </div>
 
 
+                <div class="identity-image-uploaders">
                 <div class="profile-pic-upload logo-uploader">
                     <div class="profile-pic">
-                      <ng-container *ngIf="!addInvoiceHeaderForm.get('companyLogo')?.value; else showImage">
-                        <span><i class="feather icon-plus-circle plus-down-add"></i> Ngo Logo</span>
+                      <ng-container *ngIf="!companyLogoPreview; else showImage">
+                        <span><i class="feather icon-plus-circle plus-down-add"></i> Company Logo</span>
                       </ng-container>
                       <ng-template #showImage>
-                        <img [src]="'data:image/png;base64,' + addInvoiceHeaderForm.get('companyLogo')?.value" alt="Logo"
+                        <img [src]="companyLogoPreview" alt="Logo"
                           class="uploaded-profile-pic" />
                       </ng-template>
                     </div>
@@ -63,6 +74,28 @@
                       </small>
                     </div>
                   </div>
+
+                  <div class="profile-pic-upload logo-uploader stamp-uploader">
+                    <div class="profile-pic">
+                      <ng-container *ngIf="!companyStampPreview; else showStampImage">
+                        <span><i class="feather icon-plus-circle plus-down-add"></i> Company Stamp</span>
+                      </ng-container>
+                      <ng-template #showStampImage>
+                        <img [src]="companyStampPreview" alt="Company stamp" class="uploaded-profile-pic" />
+                      </ng-template>
+                    </div>
+                    <div class="input-blocks mb-0">
+                      <div class="image-upload mb-0">
+                        <input type="file" class="form-control" id="companyStamp" accept="image/*" (change)="onStampSelected($event)" />
+                        <div class="image-uploads"><h4>{{ companyStampPreview ? 'Change Stamp' : 'Upload Stamp' }}</h4></div>
+                      </div>
+                      <small class="logo-upload-hint">
+                        <i class="feather icon-info"></i>
+                        Upload the authorized company stamp as a clear square image.
+                      </small>
+                    </div>
+                  </div>
+                </div>
 
 
                 <!-- <div class="row">

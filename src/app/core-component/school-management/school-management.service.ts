@@ -89,9 +89,10 @@ export class SchoolManagementService {
       payload: {
         // Auth / audit
         token: this.cookieService.get('token'),
-        // createdBy: this.cookieService.get('superadminId'),
-        // createdByName: this.cookieService.get('superadminName'),
-        // superadminId: this.cookieService.get('superadminId'),
+        id: studentDetails.id ?? studentDetails.studentId,
+        createdBy: studentDetails.createdBy || this.cookieService.get('loginId'),
+        createdByName: studentDetails.createdByName || this.cookieService.get('userName'),
+        superadminId: studentDetails.superadminId || this.cookieService.get('superadminId'),
 
         // Student Basic Details
         admissionNo: studentDetails.admissionNo,

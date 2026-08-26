@@ -3,11 +3,12 @@ import { FormBuilder } from '@angular/forms';
 import { Constant } from 'src/app/core/constant/constants';
 import { SchoolManagementService } from '../../school-management.service';
 import { AttendanceService } from '../attendance.service';
+import { AuthenticationService } from 'src/app/auth/authentication.service';
 
 type Code = 'PRESENT'|'ABSENT'|'LATE'|'LEAVE'|'HOLIDAY'|'';
 interface Day { day:number; weekday:string; holiday:boolean; }
 interface StudentRow {
-  key:string; rollNumber:string; studentPicture:string; studentName:string;
+  key:string; rollNumber:string; studentPicture:string; studentName:string; superadminId?:string;
   attendance:Record<number,Code>; present:number; absent:number; late:number; leave:number; percentage:number;
 }
 
@@ -27,10 +28,13 @@ export class AttendanceListComponent implements OnInit {
   });
   grades:any[] = []; years:number[] = []; days:Day[] = []; students:StudentRow[] = [];
   isLoading = false; isGradesLoading = false; errorMessage = '';
+  loginUser:any;
 
-  constructor(private fb:FormBuilder, private schoolService:SchoolManagementService, private attendanceService:AttendanceService) {
+  constructor(private fb:FormBuilder, private schoolService:SchoolManagementService, private attendanceService:AttendanceService,
+    private authenticationService:AuthenticationService) {
     const year = new Date().getFullYear();
     this.years = Array.from({length:7}, (_, i) => year - 3 + i);
+    this.loginUser = this.authenticationService.getLoginUser();
   }
   ngOnInit():void { this.buildDays(); this.getGrades(); }
   get monthName():string { return this.months.find(m => m.value === Number(this.filterForm.controls.month.value))?.name || ''; }
@@ -87,7 +91,16 @@ export class AttendanceListComponent implements OnInit {
   label(code:Code):string { return ({PRESENT:'P',ABSENT:'A',LATE:'L',LEAVE:'LV',HOLIDAY:'H','':'—'} as Record<Code,string>)[code]; }
   dayPresent(day:Day):number { return this.students.filter(s => this.cell(s,day)==='PRESENT').length; }
   percentageClass(n:number):string { return n >= 80 ? 'good' : n >= 70 ? 'warning' : 'low'; }
-  image(path:string):string { return !path ? 'assets/img/profiles/avatar-02.jpg' : /^(https?:|data:|blob:)/i.test(path) ? path : this.imageBaseUrl + path; }
+  image(student:StudentRow):string {
+    const picture=String(student?.studentPicture||'').trim();
+    if(!picture)return 'assets/img/profiles/avatar-02.jpg';
+    if(/^(data:image\/|blob:|https?:)/i.test(picture))return picture;
+    if(picture.length>100&&/^[A-Za-z0-9+/=\r\n]+$/.test(picture))return 'data:image/png;base64,'+picture;
+    const superadminId=String(student?.superadminId||this.loginUser?.superadminId||this.loginUser?.loginId||'').trim();
+    const url=this.imageBaseUrl+encodeURIComponent(picture);
+    return superadminId?url+'?superadminId='+encodeURIComponent(superadminId):url;
+  }
+  useDefaultStudentImage(event:Event):void { const image=event.target as HTMLImageElement; image.onerror=null; image.src='assets/img/profiles/avatar-02.jpg'; }
 
   private buildDays():void {
     const m=Number(this.filterForm.controls.month.value), y=Number(this.filterForm.controls.year.value), count=new Date(y,m,0).getDate();
@@ -97,7 +110,7 @@ export class AttendanceListComponent implements OnInit {
     const map=new Map<string,StudentRow>();
     records.forEach(r=>{
       const key=String(r.studentAcademicId ?? r.studentId ?? r.admissionNo ?? ''); if(!key)return;
-      if(!map.has(key)) map.set(key,{key,rollNumber:String(r.rollNumber??'—'),studentPicture:String(r.studentPicture??''),studentName:[r.firstName,r.middleName,r.lastName].filter(Boolean).join(' ')||'Unnamed student',attendance:{},present:0,absent:0,late:0,leave:0,percentage:0});
+      if(!map.has(key)) map.set(key,{key,rollNumber:String(r.rollNumber??'—'),studentPicture:String(r.studentPicture??''),studentName:[r.firstName,r.middleName,r.lastName].filter(Boolean).join(' ')||'Unnamed student',superadminId:String(r.superadminId??''),attendance:{},present:0,absent:0,late:0,leave:0,percentage:0});
       const day=Number(String(r.attendanceDate??'').slice(8,10)); if(day) map.get(key)!.attendance[day]=this.normalize(r.status);
     });
     map.forEach(s=>{Object.values(s.attendance).forEach(v=>{if(v==='PRESENT')s.present++;if(v==='ABSENT')s.absent++;});const t=s.present+s.absent;s.percentage=t?s.present/t*100:0;});

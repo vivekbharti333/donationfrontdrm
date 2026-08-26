@@ -31,6 +31,7 @@ export class StudentListComponent {
   public studentUpdateDialog: any;
   public assignClassDialog: any;
   public selectedStudent: any = null;
+  public editingStudent: any = null;
   public gradeOptions: any[] = [];
   public isGradesLoading = false;
   public isAssigningClass = false;
@@ -71,6 +72,65 @@ export class StudentListComponent {
     this.createForms();
     this.getGradeDetails();
     this.baseUrl = Constant.Site_Url+'studentImage/';
+  }
+
+  studentImageUrl(student: any): string {
+    const picture = String(student?.studentPicture || '').trim();
+    if (!picture) {
+      return 'assets/img/profiles/avatar-02.jpg';
+    }
+    if (/^(data:image\/|blob:|https?:)/i.test(picture)) {
+      return picture;
+    }
+    if (picture.length > 100 && /^[A-Za-z0-9+/=\r\n]+$/.test(picture)) {
+      return 'data:image/png;base64,' + picture;
+    }
+    const superadminId = String(
+      student?.superadminId || this.loginUser?.superadminId || this.loginUser?.loginId || ''
+    ).trim();
+    const url = this.baseUrl + encodeURIComponent(picture);
+    return superadminId
+      ? url + '?superadminId=' + encodeURIComponent(superadminId)
+      : url;
+  }
+
+  useDefaultStudentImage(event: Event): void {
+    const image = event.target as HTMLImageElement;
+    image.onerror = null;
+    image.src = 'assets/img/profiles/avatar-02.jpg';
+  }
+
+  get editStudentImageUrl(): string {
+    return this.studentImageUrl({
+      studentPicture: this.editStudentForm?.get('studentPicture')?.value,
+      superadminId: this.editingStudent?.superadminId
+    });
+  }
+
+  onEditStudentImageSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) {
+      return;
+    }
+    if (!file.type?.startsWith('image/')) {
+      input.value = '';
+      this.messageService.add({
+        summary: 'Invalid image',
+        detail: 'Please select a valid image file.',
+        styleClass: 'danger-background-popover'
+      });
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.editStudentForm.patchValue({
+        studentPicture: String(reader.result || '')
+      });
+      this.editStudentForm.get('studentPicture')?.markAsDirty();
+    };
+    reader.readAsDataURL(file);
   }
 
   createForms() {
@@ -322,10 +382,12 @@ export class StudentListComponent {
 
   openEditModal(templateRef: TemplateRef<any>, rawData: any): void {
 
+    this.editingStudent = rawData;
+
     this.editStudentForm.patchValue({
 
       // Basic Identifiers
-      id: rawData['id'],
+      id: rawData['id'] ?? rawData['studentId'],
       admissionNo: rawData['admissionNo'],
       rollNumber: rawData['rollNumber'],
 
@@ -400,6 +462,8 @@ export class StudentListComponent {
                 detail: response['payload']['respMesg'],
                 styleClass: 'success-background-popover',
               });
+              this.studentUpdateDialog?.close();
+              this.getStudentDetails();
               this.editStudentForm.reset();
               this.createForms();
 

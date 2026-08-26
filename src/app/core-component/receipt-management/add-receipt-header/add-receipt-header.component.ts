@@ -30,7 +30,11 @@ export class AddReceiptHeaderComponent implements OnInit, OnDestroy {
   public superadminId: any;
     public loginUser : any;
 
-  public logo: any;
+  public logo: string | null = null;
+  public logoVersion = Date.now();
+  public logoLoadError = false;
+  public stamp: string | null = null;
+  public stampLoadError = false;
 
   constructor(
     private fb: FormBuilder,
@@ -76,6 +80,8 @@ export class AddReceiptHeaderComponent implements OnInit, OnDestroy {
     
   
     ngOnDestroy(): void {
+      this.releaseLogoObjectUrl();
+      this.releaseStampObjectUrl();
       this.editor.destroy();
     }
     // showBox = false;
@@ -93,6 +99,7 @@ export class AddReceiptHeaderComponent implements OnInit, OnDestroy {
       id: [''],
       invoiceInitial: ['', Validators.required],
       companyLogo: [''],
+      companyStamp: [''],
       companyFirstName: ['', Validators.required],
       companyFirstNameColor: [''],
       companyLastName: [''],
@@ -188,20 +195,67 @@ export class AddReceiptHeaderComponent implements OnInit, OnDestroy {
 
 
   onFileSelected(event: any) {
-    const selectedFile = event.target.files[0];
+    const selectedFile = event.target.files?.[0];
 
     if (selectedFile) {
+      if (!selectedFile.type?.startsWith('image/')) {
+        this.showError('Please select a valid image file.');
+        event.target.value = '';
+        return;
+      }
       const reader = new FileReader();
       reader.onload = (event: any) => {
-        const base64String = event.target.result.split(',')[1]; // Get the base64 part
-
-        // Set the base64 string to the userPicture field
+        const imageDataUrl = String(event.target.result || '');
+        this.releaseLogoObjectUrl();
         this.addInvoiceHeaderForm.patchValue({
-          companyLogo: base64String
+          companyLogo: imageDataUrl
         });
+        this.logo = imageDataUrl;
+        this.logoLoadError = false;
       };
       reader.readAsDataURL(selectedFile);
     }
+  }
+
+  onStampSelected(event: any): void {
+    const selectedFile = event.target.files?.[0];
+    if (!selectedFile) return;
+    if (!selectedFile.type?.startsWith('image/')) {
+      this.showError('Please select a valid stamp image file.');
+      event.target.value = '';
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (loadEvent: any) => {
+      const imageDataUrl = String(loadEvent.target.result || '');
+      this.releaseStampObjectUrl();
+      this.addInvoiceHeaderForm.patchValue({ companyStamp: imageDataUrl });
+      this.stamp = imageDataUrl;
+      this.stampLoadError = false;
+    };
+    reader.readAsDataURL(selectedFile);
+  }
+
+  get companyLogoPreview(): string | null {
+    const value = String(this.addInvoiceHeaderForm?.get('companyLogo')?.value || '').trim();
+    if (!value) {
+      return null;
+    }
+    if (/^(data:image\/|blob:|https?:)/i.test(value)) {
+      return value;
+    }
+    if (this.looksLikeBase64(value)) {
+      return 'data:image/png;base64,' + value;
+    }
+    return this.logo;
+  }
+
+  get companyStampPreview(): string | null {
+    const value = String(this.addInvoiceHeaderForm?.get('companyStamp')?.value || '').trim();
+    if (!value) return null;
+    if (/^(data:image\/|blob:|https?:)/i.test(value)) return value;
+    if (this.looksLikeBase64(value)) return 'data:image/png;base64,' + value;
+    return this.stamp;
   }
 
   getAndSetInvoiceHeaderDetails() {
@@ -215,7 +269,95 @@ export class AddReceiptHeaderComponent implements OnInit, OnDestroy {
       this.isInvoiceHeaderExists = true;
     }
     this.addInvoiceHeaderForm.patchValue(header);
-    this.logo = header['companyLogo'] ? 'data:image/png;base64,' + header['companyLogo'] : null;
+    this.logoVersion = Date.now();
+    this.loadCompanyLogo(header);
+    this.loadCompanyStamp(header);
+  }
+
+  private loadCompanyLogo(header: any): void {
+    const imageName = String(header?.companyLogo || '').trim();
+    const headerSuperadminId = String(
+      header?.superadminId || this.superadminId || ''
+    ).trim();
+
+    this.releaseLogoObjectUrl();
+    this.logoLoadError = false;
+    if (!imageName || !headerSuperadminId) {
+      this.logo = null;
+      return;
+    }
+    if (/^(data:image\/|blob:|https?:)/i.test(imageName)) {
+      this.logo = imageName;
+      return;
+    }
+    if (this.looksLikeBase64(imageName)) {
+      this.logo = 'data:image/png;base64,' + imageName;
+      return;
+    }
+
+    this.receiptManagementService
+      .getInvoiceHeaderImage(headerSuperadminId, imageName)
+      .subscribe({
+        next: (imageBlob: Blob) => {
+          if (!imageBlob?.size) {
+            this.logo = null;
+            this.logoLoadError = true;
+            return;
+          }
+          this.releaseLogoObjectUrl();
+          this.logo = URL.createObjectURL(imageBlob);
+        },
+        error: () => {
+          this.logo = null;
+          this.logoLoadError = true;
+          this.showError('The saved company logo could not be loaded.');
+        },
+      });
+  }
+
+  private releaseLogoObjectUrl(): void {
+    if (this.logo?.startsWith('blob:')) {
+      URL.revokeObjectURL(this.logo);
+    }
+  }
+
+  private loadCompanyStamp(header: any): void {
+    const imageName = String(header?.companyStamp || '').trim();
+    const headerSuperadminId = String(header?.superadminId || this.superadminId || '').trim();
+    this.releaseStampObjectUrl();
+    this.stampLoadError = false;
+    if (!imageName || !headerSuperadminId) {
+      this.stamp = null;
+      return;
+    }
+    if (/^(data:image\/|blob:|https?:)/i.test(imageName)) {
+      this.stamp = imageName;
+      return;
+    }
+    if (this.looksLikeBase64(imageName)) {
+      this.stamp = 'data:image/png;base64,' + imageName;
+      return;
+    }
+    this.receiptManagementService.getInvoiceHeaderImage(headerSuperadminId, imageName).subscribe({
+      next: (imageBlob: Blob) => {
+        if (!imageBlob?.size) {
+          this.stamp = null;
+          this.stampLoadError = true;
+          return;
+        }
+        this.releaseStampObjectUrl();
+        this.stamp = URL.createObjectURL(imageBlob);
+      },
+      error: () => {
+        this.stamp = null;
+        this.stampLoadError = true;
+        this.showError('The saved company stamp could not be loaded.');
+      }
+    });
+  }
+
+  private releaseStampObjectUrl(): void {
+    if (this.stamp?.startsWith('blob:')) URL.revokeObjectURL(this.stamp);
   }
 
 
@@ -259,6 +401,10 @@ export class AddReceiptHeaderComponent implements OnInit, OnDestroy {
 
   private showError(detail: string): void {
     this.messageService.add({ severity: 'error', summary: 'Unable to continue', detail });
+  }
+
+  private looksLikeBase64(value: string): boolean {
+    return value.length > 100 && /^[A-Za-z0-9+/=\r\n]+$/.test(value);
   }
 
 }

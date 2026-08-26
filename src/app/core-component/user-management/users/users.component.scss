@@ -169,6 +169,28 @@
 
 }
 
+.userslist-img,
+.user-info {
+  position: relative;
+  overflow: visible;
+}
+
+.userslist-img img,
+.user-img-mobile {
+  position: relative;
+  z-index: 1;
+  cursor: zoom-in;
+  transition: transform 180ms ease, box-shadow 180ms ease;
+  transform-origin: center;
+}
+
+.userslist-img img:hover,
+.user-img-mobile:hover {
+  z-index: 100;
+  transform: scale(2.35);
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.28);
+}
+
 
 /* -----------------------------------------
    SEPARATOR

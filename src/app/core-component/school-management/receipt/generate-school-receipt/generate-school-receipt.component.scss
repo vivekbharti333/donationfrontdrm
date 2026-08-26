@@ -198,14 +198,40 @@ label em {
 .profile-avatar {
   display: grid;
   place-items: center;
-  width: 53px;
-  height: 53px;
+  width: 82px;
+  height: 82px;
   border-radius: 50%;
   background: linear-gradient(135deg, #394b69, #fc7b2a);
   color: #fff;
   font-size: 20px;
   font-weight: 700;
   object-fit: cover;
+}
+
+.zero-balance-row {
+  background: #f8fafc;
+  color: #98a2b3;
+  opacity: .72;
+}
+
+.zero-balance-row .fee-type-text {
+  color: #667085;
+}
+
+.zero-balance-row .fee-checkbox,
+.zero-balance-row .amount-control {
+  cursor: not-allowed;
+}
+
+.fully-paid-label {
+  background: #ecfdf3;
+  border-radius: 999px;
+  color: #067647;
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  margin-left: 7px;
+  padding: 3px 7px;
 }
 .student-profile strong {
   font-size: 15px;

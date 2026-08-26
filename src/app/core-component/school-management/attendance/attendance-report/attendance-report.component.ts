@@ -3,10 +3,11 @@ import { FormBuilder } from '@angular/forms';
 import { Constant } from 'src/app/core/constant/constants';
 import { SchoolManagementService } from '../../school-management.service';
 import { AttendanceService } from '../attendance.service';
+import { AuthenticationService } from 'src/app/auth/authentication.service';
 
 type Status = 'PRESENT'|'ABSENT'|'LATE'|'LEAVE';
 interface StudentReport {
-  key:string; rollNumber:string; admissionNo:string; studentName:string; studentPicture:string;
+  key:string; rollNumber:string; admissionNo:string; studentName:string; studentPicture:string; superadminId?:string;
   present:number; absent:number; late:number; leave:number; total:number; attendancePercentage:number; records:any[];
 }
 
@@ -21,8 +22,10 @@ export class AttendanceReportComponent implements OnInit {
   readonly filterForm=this.fb.group({grade:[''],gradeSection:['A'],fromDate:[this.firstDay()],toDate:[this.today()]});
   grades:any[]=[]; reports:StudentReport[]=[]; isLoading=false; isGradesLoading=false; errorMessage='';
   page=1; pageSize=10; selectedReport:StudentReport|null=null;
+  loginUser:any;
 
-  constructor(private fb:FormBuilder,private schoolService:SchoolManagementService,private attendanceService:AttendanceService){}
+  constructor(private fb:FormBuilder,private schoolService:SchoolManagementService,private attendanceService:AttendanceService,
+    private authenticationService:AuthenticationService){this.loginUser=this.authenticationService.getLoginUser();}
   ngOnInit():void{this.getGrades();}
   get pagedReports():StudentReport[]{const start=(this.page-1)*this.pageSize;return this.reports.slice(start,start+this.pageSize);}
   get totalPages():number{return Math.max(1,Math.ceil(this.reports.length/this.pageSize));}
@@ -66,7 +69,16 @@ export class AttendanceReportComponent implements OnInit {
   changePage(page:number):void{if(page>=1&&page<=this.totalPages)this.page=page;}
   gradeValue(g:any):string{return String(g?.gradeName??g?.name??g?.gradeCode??g?.grade??'').trim();}
   gradeLabel(g:any):string{const v=this.gradeValue(g);return v.toLowerCase().startsWith('grade')?v:'Grade '+(v||g?.id||'');}
-  studentImage(path:string):string{return !path?'assets/img/profiles/avatar-02.jpg':/^(https?:|data:|blob:)/i.test(path)?path:this.imageBaseUrl+path;}
+  studentImage(student:StudentReport):string{
+    const picture=String(student?.studentPicture||'').trim();
+    if(!picture)return'assets/img/profiles/avatar-02.jpg';
+    if(/^(data:image\/|blob:|https?:)/i.test(picture))return picture;
+    if(picture.length>100&&/^[A-Za-z0-9+/=\r\n]+$/.test(picture))return'data:image/png;base64,'+picture;
+    const superadminId=String(student?.superadminId||this.loginUser?.superadminId||this.loginUser?.loginId||'').trim();
+    const url=this.imageBaseUrl+encodeURIComponent(picture);
+    return superadminId?url+'?superadminId='+encodeURIComponent(superadminId):url;
+  }
+  useDefaultStudentImage(event:Event):void{const image=event.target as HTMLImageElement;image.onerror=null;image.src='assets/img/profiles/avatar-02.jpg';}
   rowPercent(value:number,row:StudentReport):number{return row.total?value/row.total*100:0;}
   percentageClass(value:number):string{return value>=75?'good':value>=60?'warning':'low';}
   statusClass(value:any):string{return this.normalize(value).toLowerCase();}
@@ -75,7 +87,7 @@ export class AttendanceReportComponent implements OnInit {
     const map=new Map<string,StudentReport>();
     records.forEach(record=>{
       const key=String(record.studentAcademicId??record.studentId??record.admissionNo??'');if(!key)return;
-      if(!map.has(key))map.set(key,{key,rollNumber:String(record.rollNumber??'—'),admissionNo:String(record.admissionNo??'—'),studentName:[record.firstName,record.middleName,record.lastName].filter(Boolean).join(' ')||'Unnamed student',studentPicture:String(record.studentPicture??''),present:0,absent:0,late:0,leave:0,total:0,attendancePercentage:0,records:[]});
+      if(!map.has(key))map.set(key,{key,rollNumber:String(record.rollNumber??'—'),admissionNo:String(record.admissionNo??'—'),studentName:[record.firstName,record.middleName,record.lastName].filter(Boolean).join(' ')||'Unnamed student',studentPicture:String(record.studentPicture??''),superadminId:String(record.superadminId??''),present:0,absent:0,late:0,leave:0,total:0,attendancePercentage:0,records:[]});
       const row=map.get(key)!,status=this.normalize(record.status);
       if(status==='PRESENT'||status==='ABSENT')row.records.push(record);
       if(status==='PRESENT')row.present++;if(status==='ABSENT')row.absent++;if(status==='LATE')row.late++;if(status==='LEAVE')row.leave++;

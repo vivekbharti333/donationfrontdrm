@@ -155,7 +155,8 @@
         <span class="user-info">
           <span class="user-letter">
             <!-- <img src="data:image/png;base64,{{userPicture}}" alt="" class="img-fluid"> -->
-            <img src="https://png.pngtree.com/png-clipart/20200224/original/pngtree-cartoon-color-simple-male-avatar-png-image_5230557.jpg" alt="" class="img-fluid">
+            <img [src]="userPicture" [alt]="userName || 'User profile'" class="img-fluid"
+              (error)="useDefaultUserImage($event)">
             <!-- <img src="https://www.shareicon.net/data/128x128/2016/05/24/770117_people_512x512.png" alt="" class="img-fluid"> -->
 
           </span>
@@ -191,8 +192,10 @@
 
   <!-- Mobile Menu -->
   <div class="dropdown mobile-user-menu">
-    <a href="javascript:void(0);" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"><i
-        class="fa fa-ellipsis-v"></i></a>
+    <a href="javascript:void(0);" class="nav-link dropdown-toggle mobile-profile-toggle" data-bs-toggle="dropdown"
+      aria-expanded="false">
+      <img [src]="userPicture" [alt]="userName || 'User profile'" (error)="useDefaultUserImage($event)">
+    </a>
     <div class="dropdown-menu dropdown-menu-right">
       <a class="dropdown-item" [routerLink] = "routes.profile">My Profile</a>
       <!-- <a class="dropdown-item" [routerLink] = "routes.generalSettings">Settings</a> -->

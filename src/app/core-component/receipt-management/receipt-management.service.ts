@@ -45,11 +45,19 @@ export class ReceiptManagementService {
     return this.http.post<any>(Constant.Site_Url + "getInvoiceHeaderList", request);
   }
 
+  getInvoiceHeaderImage(superadminId: string, imageName: string): Observable<Blob> {
+    const url = Constant.Site_Url + 'invoiceHeaderImage/'
+      + encodeURIComponent(superadminId) + '/'
+      + encodeURIComponent(imageName);
+    return this.http.get(url, { responseType: 'blob' });
+  }
+
   saveInvoiceHeader(superadninId: any,invoiceHeader: any){
     let request: any = {
       payload: {
         invoiceInitial: invoiceHeader.invoiceInitial,
         companyLogo: invoiceHeader.companyLogo,
+        companyStamp: invoiceHeader.companyStamp,
         companyFirstName: invoiceHeader.companyFirstName,
         companyFirstNameColor: invoiceHeader.companyFirstNameColor,
         companyLastName: invoiceHeader.companyLastName,

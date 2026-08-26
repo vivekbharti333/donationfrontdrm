@@ -51,6 +51,7 @@ export class UsersComponent {
 
   public userRoleList!: any;
   public userPhoto: any;
+  public editUserSuperadminId = '';
   public userAddressList: any;
   public loginId :any;
 
@@ -217,6 +218,9 @@ export class UsersComponent {
   }
 
   openEditModal(templateRef: TemplateRef<any>, user: any): void {
+    this.editUserSuperadminId = String(
+      user?.superadminId || this.loginUser?.superadminId || this.loginUser?.loginId || ''
+    );
     this.getAddressDetailsByUserId(user, () => {
       const addressListCopy = Array.isArray(this.userAddressList) ? [...this.userAddressList] : [];
   
@@ -257,9 +261,7 @@ export class UsersComponent {
         permissions: user['permissions'] || ''
       });
   
-      this.userPhoto = user['userPicture']
-        ? 'data:image/png;base64,' + user['userPicture']
-        : '';
+      this.userPhoto = this.userImageUrl(user);
   
       this.userUpdateDialog = this.dialog.open(templateRef, {
         width: '1400px',
@@ -580,20 +582,68 @@ export class UsersComponent {
   }
 
   onFileSelected(event: any) {
-    const selectedFile = event.target.files[0];
+    const selectedFile = event.target.files?.[0];
 
     if (selectedFile) {
+      if (!selectedFile.type?.startsWith('image/')) {
+        event.target.value = '';
+        this.messageService.add({
+          summary: 'Invalid image',
+          detail: 'Please select a valid image file.',
+          styleClass: 'danger-background-popover',
+        });
+        return;
+      }
       const reader = new FileReader();
       reader.onload = (event: any) => {
-        const base64String = event.target.result.split(',')[1]; // Get the base64 part
-
-        // Set the base64 string to the userPicture field
+        const imageDataUrl = String(event.target.result || '');
         this.editUserForm.patchValue({
-          userPicture: base64String
+          userPicture: imageDataUrl
         });
+        this.userPhoto = imageDataUrl;
       };
       reader.readAsDataURL(selectedFile);
     }
+  }
+
+  userImageUrl(user: any): string {
+    return this.resolveUserImage(
+      user?.userPicture,
+      user?.superadminId || this.loginUser?.superadminId || this.loginUser?.loginId
+    );
+  }
+
+  get editUserPicturePreview(): string {
+    return this.resolveUserImage(
+      this.editUserForm?.get('userPicture')?.value,
+      this.editUserSuperadminId
+    );
+  }
+
+  useDefaultUserImage(event: Event): void {
+    const image = event.target as HTMLImageElement;
+    image.onerror = null;
+    image.src = 'assets/img/profiles/avatar-02.jpg';
+  }
+
+  private resolveUserImage(value: any, superadminId: any): string {
+    const imageValue = String(value || '').trim();
+    if (!imageValue) {
+      return 'assets/img/profiles/avatar-02.jpg';
+    }
+    if (/^(data:image\/|blob:|https?:)/i.test(imageValue)) {
+      return imageValue;
+    }
+    if (imageValue.length > 100 && /^[A-Za-z0-9+/=\r\n]+$/.test(imageValue)) {
+      return 'data:image/png;base64,' + imageValue;
+    }
+    const tenantId = String(superadminId || '').trim();
+    if (!tenantId) {
+      return 'assets/img/profiles/avatar-02.jpg';
+    }
+    return Constant.Site_Url + 'userImage/'
+      + encodeURIComponent(tenantId) + '/'
+      + encodeURIComponent(imageValue);
   }
 
   updateUserDetails() {
@@ -609,6 +659,7 @@ export class UsersComponent {
             });
 
             this.userUpdateDialog.close();
+            this.getUserDetails();
 
           } else {
             this.messageService.add({

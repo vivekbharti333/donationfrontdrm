@@ -1,82 +1,89 @@
-<div class="page-header">
-    <div class="page-title">
-        <h4>Profile</h4>
-        <h6>User Profile</h6>
-    </div>
-</div>
-<!-- /product list -->
-<div class="card">
-    <div class="card-body">
-        <div class="profile-set">
-            <div class="profile-head">
+<div class="profile-page">
+  <div *ngIf="isLoading" class="state-card"><span class="spinner-border spinner-border-sm"></span> Loading profile...</div>
+  <div *ngIf="!isLoading && loadError" class="state-card error-state">
+    <i class="feather icon-alert-circle"></i><span>{{ loadError }}</span>
+    <button class="btn theme-button" type="button" (click)="getUserByLoginId()">Try Again</button>
+  </div>
 
-            </div>
-            <div class="profile-top">
-                <div class="profile-content">
-                    <div class="profile-contentimg">
-                        <!-- <img *ngIf="userDetails.userPicture; else defaultImage" [src]="'data:image/png;base64,' + userDetails.userPicture"
-                            height="300" width="350" alt="User Profile Picture" id="blah"> -->
-                            
-                            <img src="data:image/jpeg;base64,{{ userDetails.userPicture }}" alt="user image" style="border-radius: 100%;"
-                                onerror="this.onerror=null; this.src='https://www.shareicon.net/data/128x128/2016/05/24/770117_people_512x512.png';" />
-                    </div>
-                    
-                    <div class="profile-contentname">
-                        <h2>{{userDetails['firstName']}} {{userDetails['lastName']}}</h2>
-                        <h4>This is Your Photo and Personal Details.</h4>
-                    </div>
-                </div>
-            </div>
+  <ng-container *ngIf="!isLoading && !loadError">
+    <div class="profile-layout">
+      <aside class="identity-card">
+        <div class="identity-pattern"></div>
+        <div class="photo-shell">
+          <img [src]="profileImageUrl" [alt]="fullName" (error)="useDefaultImage($event)">
+          <label class="camera-button" for="profilePicture" title="Change profile picture">
+            <i class="feather icon-camera"></i>
+          </label>
+          <input id="profilePicture" type="file" accept="image/*" hidden (change)="onPictureSelected($event)">
         </div>
-        <div class="row">
-            <div class="col-lg-6 col-sm-12">
-                <div class="input-blocks">
-                    <label class="form-label">First Name</label>
-                    <input type="text" class="form-control" value="{{userDetails['firstName']}}" readonly>
-                </div>
-            </div>
-            <div class="col-lg-6 col-sm-12">
-                <div class="input-blocks">
-                    <label class="form-label">Last Name</label>
-                    <input type="text" class="form-control" value="{{userDetails['lastName']}}" readonly>
-                </div>
-            </div>
-            <div class="col-lg-6 col-sm-12">
-                <div class="input-blocks">
-                    <label>Email</label>
-                    <input type="email" class="form-control" value="{{userDetails['emailId']}}" readonly>
-                </div>
-            </div>
-            <div class="col-lg-6 col-sm-12">
-                <div class="input-blocks">
-                    <label class="form-label">Phone</label>
-                    <input type="text"  class="form-control" value="{{userDetails['mobileNo']}}" readonly>
-                </div>
-            </div>
-            <div class="col-lg-6 col-sm-12">
-                <div class="input-blocks">
-                    <label class="form-label">Role</label>
-                    <input type="text" class="form-control" value="{{userDetails['roleType']}}" readonly>
-                </div>
-            </div>
-            <div class="col-lg-6 col-sm-12">
-                <div class="input-blocks">
-                    
-                    <label class="form-label">Team Leader</label>
-                    <input type="text" class="form-control" value="{{userDetails['teamLeaderId']}}" readonly>
-                    
-                    <!-- <div class="pass-group">
-                        <input [type]="password[1] ? 'text' : 'password' " class="pass-input form-control">
-                        <span class="fas toggle-password" [ngClass]=" password[1] ? 'fa-eye' : 'fa-eye-slash'"
-                            (click)="togglePassword(1)"></span>
-                    </div> -->
-                </div>
-            </div>
-            <!-- <div class="col-12">
-                <a href="javascript:void(0);" class="btn btn-submit me-2">Submit</a>
-                <a href="javascript:void(0);" class="btn btn-cancel">Cancel</a>
-            </div> -->
+        <h2>{{ fullName }}</h2>
+        <span class="role-pill">{{ roleLabel }}</span>
+        <p class="member-since"><i class="feather icon-calendar"></i> Member since {{ memberSince }}</p>
+
+        <div class="strength-block">
+          <div class="strength-heading"><span>Profile Strength</span><strong>{{ profileStrength }}%</strong></div>
+          <div class="strength-track"><span [style.width.%]="profileStrength"></span></div>
+          <p>{{ profileStrength === 100 ? 'Great! Your profile is complete.' : 'Complete the missing details to improve your profile.' }}</p>
         </div>
+
+        <div class="security-note">
+          <span class="security-icon"><i class="feather icon-shield"></i></span>
+          <div><strong>Your information is secure</strong><p>We use secure access to protect your account data.</p></div>
+        </div>
+      </aside>
+
+      <section class="information-card">
+        <div class="card-heading">
+          <span class="heading-icon"><i class="feather icon-user"></i></span>
+          <div><h5>Profile Information</h5><p>Update your personal and professional details</p></div>
+        </div>
+
+        <div *ngIf="message" class="form-message" [class.success]="messageType === 'success'" [class.error]="messageType === 'error'">
+          <i class="feather" [ngClass]="messageType === 'success' ? 'icon-check-circle' : 'icon-alert-circle'"></i>{{ message }}
+        </div>
+
+        <form #profileForm="ngForm" (ngSubmit)="updateProfile()">
+          <div class="form-grid">
+            <div class="field-group">
+              <label><i class="feather icon-user"></i> First Name <span>*</span></label>
+              <div class="input-shell"><i class="feather icon-user"></i><input name="firstName" [(ngModel)]="userDetails.firstName" required></div>
+            </div>
+            <div class="field-group">
+              <label><i class="feather icon-user"></i> Last Name <span>*</span></label>
+              <div class="input-shell"><i class="feather icon-user"></i><input name="lastName" [(ngModel)]="userDetails.lastName" required></div>
+            </div>
+            <div class="field-group full-width">
+              <label><i class="feather icon-mail"></i> Email Address</label>
+              <div class="input-shell"><i class="feather icon-mail"></i><input type="email" name="emailId" [(ngModel)]="userDetails.emailId"></div>
+            </div>
+            <div class="field-group">
+              <label><i class="feather icon-phone"></i> Mobile Number <span>*</span></label>
+              <div class="input-shell"><i class="feather icon-phone"></i><input name="mobileNo" [(ngModel)]="userDetails.mobileNo" required></div>
+            </div>
+            <div class="field-group">
+              <label><i class="feather icon-users"></i> Team Leader</label>
+              <div class="input-shell readonly"><i class="feather icon-users"></i><input [value]="displayValue(userDetails.teamLeaderId)" readonly></div>
+            </div>
+            <div class="field-group full-width">
+              <label><i class="feather icon-briefcase"></i> Role</label>
+              <div class="input-shell readonly"><i class="feather icon-briefcase"></i><input [value]="roleLabel" readonly></div>
+            </div>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn cancel-button" (click)="cancelChanges()" [disabled]="isSaving">Cancel</button>
+            <button type="submit" class="btn theme-button" [disabled]="isSaving || profileForm.invalid">
+              <span *ngIf="isSaving" class="spinner-border spinner-border-sm"></span>
+              <i *ngIf="!isSaving" class="feather icon-save"></i>{{ isSaving ? 'Updating...' : 'Update Profile' }}
+            </button>
+          </div>
+        </form>
+      </section>
     </div>
+
+    <section class="information-banner">
+      <span class="banner-illustration"><i class="feather icon-lock"></i></span>
+      <div><h5>Keep your profile information up to date</h5><p>This information is used for account management, team collaboration and communication purposes.</p></div>
+      <span class="banner-decoration"><i class="feather icon-credit-card"></i></span>
+    </section>
+  </ng-container>
 </div>
-<!-- /product list -->

@@ -6,6 +6,8 @@ import { routes } from 'src/app/core/helpers/routes';
 import { CommonComponentService } from '../common-component.service';
 import { AuthenticationService } from 'src/app/auth/authentication.service';
 import { CookieService } from 'ngx-cookie-service';
+import { Constant } from 'src/app/core/constant/constants';
+import { UserManagementService } from 'src/app/core-component/user-management/user-management.service';
 
 
 
@@ -45,6 +47,7 @@ export class HeaderComponent  {
     private commonComponentService: CommonComponentService,
     private authenticationService: AuthenticationService,
     private cookieService: CookieService,
+    private userManagementService: UserManagementService,
   ) {
 
     this.activePath = this.router.url.split('/')[2];
@@ -78,6 +81,7 @@ export class HeaderComponent  {
 
   ngOnInit(){
     this.getApplicaionHeaderDetails();
+    this.loadCurrentUserPicture();
   }
 
 
@@ -123,8 +127,69 @@ export class HeaderComponent  {
      this.displayLogo = 'data:image/png;base64,'+this.displayLogo;
 
 
-    //  this.userPicture = 'data:image/jpeg;base64,'+localStorage.getItem('userPicture');
-    this.userPicture = localStorage.getItem('userPicture') || '';
+    this.userPicture = this.resolveUserPicture(
+      this.loginUser?.userPicture || localStorage.getItem('userPicture') || ''
+    );
+  }
+
+  private loadCurrentUserPicture(): void {
+    this.userManagementService.getUserDetailsByLoginId().subscribe({
+      next: (response: any) => {
+        if (Number(response?.responseCode) !== Constant.SUCCESS_CODE || !response?.payload) {
+          return;
+        }
+
+        const user = response.payload;
+        this.userPicture = this.resolveUserPicture(user.userPicture);
+        this.userName = [user.firstName, user.lastName]
+          .filter((value: any) => String(value || '').trim())
+          .join(' ') || this.userName;
+        this.userRole = user.roleType || this.userRole;
+
+        if (user.userPicture) {
+          localStorage.setItem('userPicture', user.userPicture);
+        } else {
+          localStorage.removeItem('userPicture');
+        }
+      },
+      error: () => {
+        this.userPicture = this.resolveUserPicture(
+          this.loginUser?.userPicture || localStorage.getItem('userPicture') || ''
+        );
+      }
+    });
+  }
+
+  private resolveUserPicture(value: any): string {
+    const picture = String(value || '').trim();
+    if (!picture || picture === 'undefined' || picture === 'null') {
+      return 'assets/img/profiles/avatar-02.jpg';
+    }
+    if (/^(data:image\/|blob:|https?:)/i.test(picture)) {
+      return picture;
+    }
+    if (picture.length > 100 && /^[A-Za-z0-9+/=\r\n]+$/.test(picture)) {
+      return 'data:image/png;base64,' + picture;
+    }
+    const superadminId = String(
+      this.loginUser?.superadminId
+        || this.cookieService.get('superadminId')
+        || this.loginUser?.loginId
+        || this.cookieService.get('loginId')
+        || ''
+    ).trim();
+    if (!superadminId) {
+      return 'assets/img/profiles/avatar-02.jpg';
+    }
+    return Constant.Site_Url + 'userImage/'
+      + encodeURIComponent(superadminId) + '/'
+      + encodeURIComponent(picture);
+  }
+
+  public useDefaultUserImage(event: Event): void {
+    const image = event.target as HTMLImageElement;
+    image.onerror = null;
+    image.src = 'assets/img/profiles/avatar-02.jpg';
   }
 
 

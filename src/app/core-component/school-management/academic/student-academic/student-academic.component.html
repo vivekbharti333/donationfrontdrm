@@ -82,10 +82,10 @@
             <td>
               <div class="userimgname">
                 <span class="userslist-img bg-img">
-                  <img [src]="studentImageBaseUrl + data.studentPicture"
+                  <img [src]="studentImageUrl(data)"
                        [alt]="studentName(data) || 'Student'"
                        class="academic-student-image"
-                       onerror="this.onerror=null; this.src='https://www.shareicon.net/data/128x128/2016/05/24/770117_people_512x512.png';">
+                       (error)="useDefaultStudentImage($event)">
                 </span>
               </div>
             </td>
@@ -138,10 +138,10 @@
 
   <mat-dialog-content class="dialog-content">
     <div class="student-summary">
-      <img [src]="studentImageBaseUrl + selectedStudentPicture"
+      <img [src]="studentImageUrl({ studentPicture: selectedStudentPicture, superadminId: selectedStudentSuperadminId })"
            [alt]="selectedStudentName || 'Student'"
            class="academic-popup-image"
-           onerror="this.onerror=null; this.src='https://www.shareicon.net/data/128x128/2016/05/24/770117_people_512x512.png';">
+           (error)="useDefaultStudentImage($event)">
       <div><small>Student</small><strong>{{ selectedStudentName }}</strong></div>
     </div>
 
@@ -195,10 +195,10 @@
 
   <mat-dialog-content class="dialog-content">
     <div class="student-summary">
-      <img [src]="studentImageBaseUrl + selectedStudentPicture"
+      <img [src]="studentImageUrl({ studentPicture: selectedStudentPicture, superadminId: selectedStudentSuperadminId })"
            [alt]="selectedStudentName || 'Student'"
            class="academic-popup-image"
-           onerror="this.onerror=null; this.src='https://www.shareicon.net/data/128x128/2016/05/24/770117_people_512x512.png';">
+           (error)="useDefaultStudentImage($event)">
       <div><small>Student</small><strong>{{ selectedStudentName }}</strong></div>
     </div>
 

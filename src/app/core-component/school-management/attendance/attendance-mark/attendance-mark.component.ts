@@ -4,6 +4,7 @@ import { catchError, forkJoin, map, of } from 'rxjs';
 import { Constant } from 'src/app/core/constant/constants';
 import { SchoolManagementService } from '../../school-management.service';
 import { AttendanceService } from '../attendance.service';
+import { AuthenticationService } from 'src/app/auth/authentication.service';
 
 type AttendanceStatus = 'PRESENT' | 'ABSENT' | '';
 interface AttendanceStudent {
@@ -11,6 +12,7 @@ interface AttendanceStudent {
   rollNumber?: string;
   admissionNo?: string;
   studentPicture?: string;
+  superadminId?: string;
   firstName?: string;
   middleName?: string;
   lastName?: string;
@@ -39,9 +41,13 @@ export class AttendanceMarkComponent implements OnInit {
   isSaving = false;
   successMessage = '';
   errorMessage = '';
+  loginUser: any;
 
   constructor(private formBuilder: FormBuilder, private schoolManagementService: SchoolManagementService,
-    private attendanceService: AttendanceService) { }
+    private attendanceService: AttendanceService,
+    private authenticationService: AuthenticationService) {
+      this.loginUser = this.authenticationService.getLoginUser();
+    }
 
   ngOnInit(): void { this.getGradeDetails(); }
   get filteredStudents(): AttendanceStudent[] {
@@ -81,6 +87,7 @@ export class AttendanceMarkComponent implements OnInit {
         this.students = (Array.isArray(rows) ? rows : []).map((student: any) => ({
           studentAcademicId: Number(student.studentAcademicId || student.academicId || student.id),
           rollNumber: student.rollNumber, admissionNo: student.admissionNo, studentPicture: student.studentPicture,
+          superadminId: student.superadminId,
           firstName: student.firstName, middleName: student.middleName, lastName: student.lastName,
           status: '' as AttendanceStatus
         })).filter((student: AttendanceStudent) => student.studentAcademicId > 0);
@@ -118,7 +125,26 @@ export class AttendanceMarkComponent implements OnInit {
   }
   reset(): void { this.filterForm.reset({ sessionName: this.currentAcademicSession(), attendanceDate: this.today(), grade: this.grades.length ? this.gradeValue(this.grades[0]) : '', gradeSection: 'A' }); this.students = []; this.selectedStudentIds.clear(); this.searchTerm = ''; this.successMessage = ''; this.errorMessage = ''; }
   studentName(student: AttendanceStudent): string { return [student.firstName, student.middleName, student.lastName].filter(Boolean).join(' ') || 'Unnamed student'; }
-  studentImage(path?: string): string { return !path ? 'assets/img/profiles/avatar-02.jpg' : /^(https?:|data:|blob:)/i.test(path) ? path : this.studentImageBaseUrl + path; }
+  studentImage(student: AttendanceStudent): string {
+    const picture = String(student?.studentPicture || '').trim();
+    if (!picture) return 'assets/img/profiles/avatar-02.jpg';
+    if (/^(data:image\/|blob:|https?:)/i.test(picture)) return picture;
+    if (picture.length > 100 && /^[A-Za-z0-9+/=\r\n]+$/.test(picture)) {
+      return 'data:image/png;base64,' + picture;
+    }
+    const superadminId = String(
+      student?.superadminId || this.loginUser?.superadminId || this.loginUser?.loginId || ''
+    ).trim();
+    const imageUrl = this.studentImageBaseUrl + encodeURIComponent(picture);
+    return superadminId
+      ? imageUrl + '?superadminId=' + encodeURIComponent(superadminId)
+      : imageUrl;
+  }
+  useDefaultStudentImage(event: Event): void {
+    const image = event.target as HTMLImageElement;
+    image.onerror = null;
+    image.src = 'assets/img/profiles/avatar-02.jpg';
+  }
   gradeValue(grade: any): string { return String(grade?.gradeName ?? grade?.name ?? grade?.gradeCode ?? grade?.grade ?? '').trim(); }
   gradeLabel(grade: any): string { const value = this.gradeValue(grade); return value.toLowerCase().startsWith('grade') ? value : 'Grade ' + (value || grade?.id || ''); }
   isAllSelected(): boolean { return !!this.students.length && this.selectedStudentIds.size === this.students.length; }

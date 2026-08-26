@@ -45,7 +45,7 @@
           <tr *ngFor="let student of filteredStudents">
             <td class="check"><input type="checkbox" [checked]="selectedStudentIds.has(student.studentAcademicId)" (change)="toggleStudent(student.studentAcademicId,$any($event.target).checked)"></td>
             <td class="roll">{{student.rollNumber||'—'}}</td>
-            <td><div class="student"><img [src]="studentImage(student.studentPicture)" alt="" (error)="$any($event.target).src='assets/img/profiles/avatar-02.jpg'"><span>{{studentName(student)}}</span></div></td>
+            <td><div class="student"><img [src]="studentImage(student)" [alt]="studentName(student)" (error)="useDefaultStudentImage($event)"><span>{{studentName(student)}}</span></div></td>
             <td><div class="status-options">
               <button *ngFor="let status of statuses" type="button" [ngClass]="[status.toLowerCase(),student.status===status?'active':'']" (click)="setStatus(student,status)">
                 <i class="feather" [ngClass]="status==='PRESENT'?'icon-check-circle':'icon-x-circle'"></i>{{status|titlecase}}

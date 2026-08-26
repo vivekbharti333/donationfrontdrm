@@ -134,10 +134,10 @@
               <div class="userimgname">
                 <a href="javascript:void(0);" class="userslist-img bg-img">
                   <img 
-                    src="data:image/jpeg;base64,{{ data.userPicture }}" 
+                    [src]="userImageUrl(data)" 
                     alt="user image" 
                     style="border-radius: 100%;" 
-                    onerror="this.onerror=null; this.src='https://www.shareicon.net/data/128x128/2016/05/24/770117_people_512x512.png';" />
+                    (error)="useDefaultUserImage($event)" />
                 </a>
               </div>
             </td>
@@ -198,9 +198,9 @@
       <div class="user-info">
         <img 
           class="user-img-mobile"
-          src="data:image/jpeg;base64,{{ u.userPicture }}"
+          [src]="userImageUrl(u)"
           alt="user image"
-          onerror="this.onerror=null; this.src='https://www.shareicon.net/data/128x128/2016/05/24/770117_people_512x512.png';"
+          (error)="useDefaultUserImage($event)"
         />
 
         <h3 class="username">{{ u.firstName }} {{ u.lastName }}</h3>
@@ -288,8 +288,8 @@
               <span><i class="feather icon-plus-circle plus-down-add"></i> Profile Photo</span>
             </ng-container>
             <ng-template #showImage>
-              <img [src]="'data:image/png;base64,' + editUserForm.get('userPicture')?.value" alt="Profile Picture"
-                class="uploaded-profile-pic" />
+              <img [src]="editUserPicturePreview" alt="Profile Picture"
+                class="uploaded-profile-pic" (error)="useDefaultUserImage($event)" />
             </ng-template>
           </div>
           <div class="input-blocks mb-0">

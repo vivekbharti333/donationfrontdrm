@@ -49,9 +49,9 @@
   color: #646b72;
 }
 
-// Matches Student List: its 35px avatar plus the standard vertical cell padding.
+// Keep enough row height for the larger student avatar.
 .table.datanew tbody tr {
-  height: 51px;
+  height: 74px;
 }
 
 .table.datanew td,
@@ -60,11 +60,40 @@
 }
 
 .academic-student-image {
-  width: 35px;
-  height: 35px;
+  aspect-ratio: 1 / 1;
+  width: 56px;
+  height: 56px;
   border: 1px solid #e8ebed;
-  border-radius: 50%;
+  border-radius: 50% !important;
+  cursor: zoom-in;
+  display: block;
+  max-height: none !important;
+  max-width: none !important;
+  min-height: 56px;
+  min-width: 56px;
   object-fit: cover;
+  position: relative;
+  transform-origin: center;
+  transition: transform 180ms ease, box-shadow 180ms ease;
+  z-index: 1;
+}
+
+.userimgname,
+.userslist-img {
+  align-items: center;
+  display: inline-flex;
+  height: auto !important;
+  justify-content: center;
+  overflow: visible;
+  position: relative;
+  width: auto !important;
+}
+
+.academic-student-image:hover {
+  border-radius: 50% !important;
+  box-shadow: 0 7px 20px rgba(15, 23, 42, 0.28);
+  transform: scale(2.65);
+  z-index: 50;
 }
 
 @media (max-width: 991px) {
@@ -104,6 +133,8 @@
   margin-bottom: 18px;
   border-radius: 8px;
   background: #f3f6f9;
+  overflow: visible;
+  transition: min-height 180ms ease;
 }
 
 .student-summary div,
@@ -112,12 +143,23 @@
 }
 
 .academic-popup-image {
-  width: 52px;
-  height: 52px;
-  flex: 0 0 52px;
+  aspect-ratio: 1 / 1;
+  width: 88px;
+  height: 88px;
+  flex: 0 0 auto;
   border: 1px solid #e8ebed;
   border-radius: 50%;
+  cursor: zoom-in;
   object-fit: cover;
+  transition: width 180ms ease, height 180ms ease, box-shadow 180ms ease;
+  z-index: 1;
+}
+
+.academic-popup-image:hover {
+  box-shadow: 0 7px 20px rgba(15, 23, 42, 0.25);
+  height: 166px;
+  width: 166px;
+  z-index: 2;
 }
 
 .academic-edit-grid {

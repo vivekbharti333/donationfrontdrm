@@ -32,6 +32,7 @@ export class CreateUserComponent {
   public teamLeaderFielShow: boolean = false;
 
   public addUserForm!: FormGroup;
+  public isSubmitting = false;
 
   public currentAddressType: string = 'CURRENT';
   public parmanentAddressType: string = 'PERMANENT';
@@ -278,28 +279,70 @@ onPermissionChange(event: any) {
   }
 
   onFileSelected(event: any) {
-    const selectedFile = event.target.files[0];
+    const selectedFile = event.target.files?.[0];
 
     if (selectedFile) {
+      if (!selectedFile.type?.startsWith('image/')) {
+        this.messageService.add({
+          summary: 'Invalid image',
+          detail: 'Please select a valid image file.',
+          styleClass: 'danger-background-popover',
+        });
+        event.target.value = '';
+        return;
+      }
       const reader = new FileReader();
       reader.onload = (event: any) => {
-        const base64String = event.target.result.split(',')[1]; // Get the base64 part
-
-        // Set the base64 string to the userPicture field
+        const imageDataUrl = String(event.target.result || '');
         this.addUserForm.patchValue({
-          userPicture: base64String
+          userPicture: imageDataUrl
         });
       };
       reader.readAsDataURL(selectedFile);
-      
     }
   }
 
+  get userPicturePreview(): string | null {
+    const value = String(this.addUserForm?.get('userPicture')?.value || '').trim();
+    if (!value) {
+      return null;
+    }
+    if (/^(data:image\/|blob:|https?:)/i.test(value)) {
+      return value;
+    }
+    if (value.length > 100 && /^[A-Za-z0-9+/=\r\n]+$/.test(value)) {
+      return 'data:image/png;base64,' + value;
+    }
+
+    const superadminId = String(
+      this.loginUser?.superadminId || this.loginUser?.loginId || ''
+    ).trim();
+    if (!superadminId) {
+      return null;
+    }
+    return Constant.Site_Url + 'userImage/'
+      + encodeURIComponent(superadminId) + '/'
+      + encodeURIComponent(value);
+  }
+
   saveUserDetails() {
-    // alert('Enter here')
+    if (this.isSubmitting) {
+      return;
+    }
+    if (this.addUserForm.invalid) {
+      this.addUserForm.markAllAsTouched();
+      this.messageService.add({
+        summary: 'Complete required details',
+        detail: 'Please enter all required user details correctly.',
+        styleClass: 'danger-background-popover',
+      });
+      return;
+    }
+    this.isSubmitting = true;
     this.userManagementService.saveUserDetails(this.addUserForm.value)
       .subscribe({
         next: (response: any) => {
+          this.isSubmitting = false;
           if (response['responseCode'] == '200') {
             if (response['payload']['respCode'] == '200') {
              
@@ -339,9 +382,12 @@ onPermissionChange(event: any) {
             });
           }
         },
-        error: (error: any) => this.messageService.add({
-          summary: '500', detail: 'Server Error', styleClass: 'danger-background-popover',
-        })
+        error: (error: any) => {
+          this.isSubmitting = false;
+          this.messageService.add({
+            summary: '500', detail: 'Server Error', styleClass: 'danger-background-popover',
+          });
+        }
       });
   }
 

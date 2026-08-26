@@ -95,7 +95,14 @@ export class SchoolReceiptListComponent implements OnInit, OnDestroy {
 
   private imageData(value: any): string {
     const image = String(value || '').trim();
-    return !image ? '' : image.startsWith('data:') ? image : `data:image/png;base64,${image}`;
+    if (!image) return '';
+    if (/^(data:image\/|blob:|https?:)/i.test(image)) return image;
+    if (image.length > 100 && /^[A-Za-z0-9+/=\r\n]+$/.test(image)) {
+      return `data:image/png;base64,${image}`;
+    }
+    const superadminId = String(this.invoiceHeader?.superadminId || '').trim();
+    return !superadminId ? '' : Constant.Site_Url + 'invoiceHeaderImage/'
+      + encodeURIComponent(superadminId) + '/' + encodeURIComponent(image);
   }
 
   getInvoiceHeaderDetails(): void {
