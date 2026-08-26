@@ -274,8 +274,13 @@
     <div class="card-body">
       <!-- <h6>Permanent Address</h6> -->
       <div class="new-employee-field">
-        <div class="card-title-head">
+        <div class="card-title-head permanent-address-heading">
           <h6><span><i class="feather icon-info feather-edit"></i></span>Permanent Address</h6>
+          <label class="same-address-check">
+            <input type="checkbox" [checked]="sameAsCurrentAddress"
+              (change)="onSameAddressChange($any($event.target).checked)">
+            <span>Same as Current Address</span>
+          </label>
         </div>
       </div>
 

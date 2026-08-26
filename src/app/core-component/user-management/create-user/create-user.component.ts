@@ -35,6 +35,7 @@ export class CreateUserComponent {
 
   public currentAddressType: string = 'CURRENT';
   public parmanentAddressType: string = 'PERMANENT';
+  public sameAsCurrentAddress: boolean = false;
 
   public userList: any;
   public userRoleList: any;
@@ -91,6 +92,12 @@ export class CreateUserComponent {
         this.addressForm(),
         this.addressForm()]),
     });
+
+    this.addressList.at(0).valueChanges.subscribe(() => {
+      if (this.sameAsCurrentAddress) {
+        this.copyCurrentAddressToPermanent();
+      }
+    });
   }
 
   get addressList(): FormArray {
@@ -115,6 +122,44 @@ export class CreateUserComponent {
   }
   removeItem(i: number) {
     this.addressList.removeAt(i);
+  }
+
+  copyCurrentAddressToPermanent(): void {
+    const currentAddress = this.addressList.at(0);
+    const permanentAddress = this.addressList.at(1);
+    if (!currentAddress || !permanentAddress) {
+      return;
+    }
+
+    const {
+      addressLine,
+      landmark,
+      district,
+      city,
+      state,
+      country,
+      pincode
+    } = currentAddress.getRawValue();
+
+    permanentAddress.patchValue({
+      addressType: this.parmanentAddressType,
+      addressLine,
+      landmark,
+      district,
+      city,
+      state,
+      country,
+      pincode
+    });
+    permanentAddress.markAsDirty();
+    permanentAddress.markAsTouched();
+  }
+
+  onSameAddressChange(checked: boolean): void {
+    this.sameAsCurrentAddress = checked;
+    if (checked) {
+      this.copyCurrentAddressToPermanent();
+    }
   }
 
 onPermissionChange(event: any) {

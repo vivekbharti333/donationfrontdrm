@@ -20,6 +20,7 @@ export class AddStudentComponent {
  public isGradesLoading = false;
 public loginUser: any;
  public addStudentForm!: FormGroup;
+ public sameAsCurrentAddress = false;
 
 
     constructor(
@@ -57,6 +58,7 @@ public loginUser: any;
   }
 
   createForms() {
+  this.sameAsCurrentAddress = false;
   this.addStudentForm = this.fb.group({
 
     // Student Basic Details
@@ -110,6 +112,35 @@ public loginUser: any;
     createdByName: [''],
     superadminId: ['']
 
+  });
+
+  ['currentAddress', 'currentCity', 'currentState', 'currentPin'].forEach(controlName => {
+    this.addStudentForm.get(controlName)?.valueChanges.subscribe(() => {
+      if (this.sameAsCurrentAddress) {
+        this.copyCurrentAddressToPermanent();
+      }
+    });
+  });
+}
+
+onSameAddressChange(checked: boolean): void {
+  this.sameAsCurrentAddress = checked;
+  if (checked) {
+    this.copyCurrentAddressToPermanent();
+  }
+}
+
+copyCurrentAddressToPermanent(): void {
+  this.addStudentForm.patchValue({
+    permanentAddress: this.addStudentForm.get('currentAddress')?.value || '',
+    permanentCity: this.addStudentForm.get('currentCity')?.value || '',
+    permanentState: this.addStudentForm.get('currentState')?.value || '',
+    permanentPin: this.addStudentForm.get('currentPin')?.value || ''
+  }, { emitEvent: false });
+
+  ['permanentAddress', 'permanentCity', 'permanentState', 'permanentPin'].forEach(controlName => {
+    this.addStudentForm.get(controlName)?.markAsDirty();
+    this.addStudentForm.get(controlName)?.markAsTouched();
   });
 }
 

@@ -8,3 +8,44 @@
 .image-upload {
     margin-top: 10px;
 }
+
+.permanent-address-heading {
+    align-items: center;
+    display: flex;
+    gap: 12px;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.permanent-address-heading h6 {
+    margin: 0;
+}
+
+.same-address-check {
+    align-items: center;
+    display: inline-flex;
+    font-size: 13px;
+    font-weight: 600;
+    gap: 8px;
+    margin: 0;
+    user-select: none;
+}
+
+.same-address-check input {
+    accent-color: #ff6818;
+    cursor: pointer;
+    height: 17px;
+    width: 17px;
+}
+
+.same-address-check span {
+    color: #344054;
+    cursor: pointer;
+}
+
+@media (max-width: 575px) {
+    .permanent-address-heading {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}

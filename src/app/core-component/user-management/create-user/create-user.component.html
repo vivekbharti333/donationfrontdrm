@@ -174,7 +174,14 @@
                     <h6><span><i class="feather icon-info feather-edit"></i></span>Current Address </h6>
                   </div>
                   <div class="inner-header" *ngIf="i === 1">
-                    <h6><span><i class="feather icon-info feather-edit"></i></span>Parmanent Address </h6>
+                    <div class="permanent-address-heading">
+                      <h6><span><i class="feather icon-info feather-edit"></i></span>Permanent Address</h6>
+                      <label class="same-address-check">
+                        <input type="checkbox" [checked]="sameAsCurrentAddress"
+                          (change)="onSameAddressChange($any($event.target).checked)">
+                        <span>Same as Current Address</span>
+                      </label>
+                    </div>
                   </div>
 
                   <div class="row">
