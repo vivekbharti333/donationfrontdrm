@@ -1,0 +1,185 @@
+<div class="page-header">
+  <p-toast></p-toast>
+  <div class="add-item d-flex">
+    <div class="page-title">
+      <h4>Exam Subjects</h4>
+      <h6>View and search examination subjects</h6>
+    </div>
+  </div>
+  <ul class="table-top-head">
+    <li>
+      <a href="javascript:void(0)" matTooltip="Refresh" matTooltipPosition="above"
+         (click)="getExamSubject()">
+        <i class="feather icon-rotate-ccw feather-rotate-ccw"></i>
+      </a>
+    </li>
+  </ul>
+</div>
+
+<div class="card table-list-card">
+  <div class="card-body">
+    <div class="table-top subject-toolbar">
+      <div class="search-set subject-filters">
+        <div class="search-input">
+          <a href="javascript:void(0)" class="btn btn-searchset" (click)="searchSubjects()">
+            <i class="feather icon-search"></i>
+          </a>
+          <div class="dataTables_filter">
+            <input [(ngModel)]="searchDataValue" (keyup.enter)="searchSubjects()"
+                   type="search" class="form-control" placeholder="Search subject name or code...">
+          </div>
+        </div>
+        <select [(ngModel)]="selectedStatus" class="form-select status-filter" aria-label="Subject status">
+          <option value="">All statuses</option>
+          <option value="ACTIVE">Active</option>
+          <option value="INACTIVE">Inactive</option>
+        </select>
+        <button type="button" class="btn btn-primary" (click)="searchSubjects()" [disabled]="isLoading">
+          <i class="feather icon-search me-1"></i>Search
+        </button>
+        <button type="button" class="btn btn-light" (click)="clearFilters()" [disabled]="isLoading">
+          Clear
+        </button>
+      </div>
+      <button type="button" class="btn btn-primary add-subject-button"
+              (click)="openAddSubject(addSubjectDialog)">
+        <i class="feather icon-plus-circle me-1"></i>Add Subject
+      </button>
+    </div>
+
+    <div *ngIf="errorMessage" class="alert alert-danger mt-3">{{ errorMessage }}</div>
+    <div *ngIf="isLoading" class="subject-state">
+      <span class="spinner-border spinner-border-sm me-2"></span>Loading subjects...
+    </div>
+
+    <div *ngIf="!isLoading" class="table-responsive mt-3">
+      <table matSort (matSortChange)="sortData($event)" class="table datanew">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th mat-sort-header="subjectCode">Subject Code</th>
+            <th mat-sort-header="subjectName">Subject Name</th>
+            <th mat-sort-header="description">Description</th>
+            <th mat-sort-header="status">Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let subject of tableData; let i = index">
+            <td>{{ serialNumberArray[i] }}</td>
+            <td><strong>{{ subject.subjectCode || '—' }}</strong></td>
+            <td>{{ subject.subjectName || '—' }}</td>
+            <td class="subject-description" [title]="subject.description || ''">
+              {{ subject.description || '—' }}
+            </td>
+            <td>
+              <span class="badge"
+                    [ngClass]="subject.status === 'ACTIVE' ? 'badge-linesuccess' : 'badge-linedanger'">
+                {{ subject.status || '—' }}
+              </span>
+            </td>
+            <td class="action-table-data">
+              <div class="edit-delete-action">
+                <a href="javascript:void(0)" class="p-2 mb-0" title="Update subject"
+                   (click)="openEditSubject(editSubjectDialog, subject)">
+                  <i class="feather icon-edit feather-edit"></i>
+                </a>
+              </div>
+            </td>
+          </tr>
+          <tr *ngIf="tableData.length === 0">
+            <td colspan="6" class="subject-state">No exam subjects found.</td>
+          </tr>
+        </tbody>
+      </table>
+      <app-custom-pagination *ngIf="totalData > 0"></app-custom-pagination>
+    </div>
+  </div>
+</div>
+
+<ng-template #addSubjectDialog>
+  <div class="modalHeaderContainer">
+    <div class="subject-dialog-heading"><span class="subject-dialog-icon"><i class="feather icon-book-open"></i></span><div><h2 mat-dialog-title class="p-0">Add Exam Subject</h2><p>Create a subject for examination planning.</p></div></div>
+    <button type="button" class="close subject-close" mat-dialog-close
+            [disabled]="isSaving" aria-label="Close">&times;</button>
+  </div>
+  <mat-dialog-content class="subject-dialog-content">
+    <form [formGroup]="addSubjectForm" class="subject-form-grid">
+      <div>
+        <label class="form-label">Subject Code <span class="text-danger">*</span></label>
+        <input type="text" class="form-control" formControlName="subjectCode"
+               maxlength="30" placeholder="e.g. MATH">
+        <small class="text-danger" *ngIf="addSubjectForm.get('subjectCode')?.touched && addSubjectForm.get('subjectCode')?.invalid">Subject code is required.</small>
+      </div>
+      <div>
+        <label class="form-label">Subject Name <span class="text-danger">*</span></label>
+        <input type="text" class="form-control" formControlName="subjectName"
+               maxlength="100" placeholder="e.g. Mathematics">
+        <small class="text-danger" *ngIf="addSubjectForm.get('subjectName')?.touched && addSubjectForm.get('subjectName')?.invalid">Subject name is required.</small>
+      </div>
+      <div class="full-width">
+        <label class="form-label">Description</label>
+        <textarea class="form-control" formControlName="description" rows="3"
+                  maxlength="500" placeholder="Enter subject description"></textarea>
+      </div>
+      <div class="status-field">
+        <label class="form-label">Status <span class="text-danger">*</span></label>
+        <select class="form-select" formControlName="status">
+          <option value="ACTIVE">Active</option>
+          <option value="INACTIVE">Inactive</option>
+        </select>
+      </div>
+    </form>
+  </mat-dialog-content>
+  <mat-dialog-actions align="end" class="subject-dialog-actions">
+    <button type="button" class="btn btn-light" mat-dialog-close [disabled]="isSaving">Cancel</button>
+    <button type="button" class="btn btn-primary" (click)="addExamSubject()"
+            [disabled]="addSubjectForm.invalid || isSaving">
+      <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-1"></span>
+      <i *ngIf="!isSaving" class="feather icon-plus-circle me-1"></i>
+      {{ isSaving ? 'Saving...' : 'Add Subject' }}
+    </button>
+  </mat-dialog-actions>
+</ng-template>
+
+<ng-template #editSubjectDialog>
+  <div class="modalHeaderContainer">
+    <div class="subject-dialog-heading"><span class="subject-dialog-icon"><i class="feather icon-edit-2"></i></span><div><h2 mat-dialog-title class="p-0">Update Exam Subject</h2><p>Edit the selected subject details.</p></div></div>
+    <button type="button" class="close subject-close" mat-dialog-close
+            [disabled]="isUpdating" aria-label="Close">&times;</button>
+  </div>
+  <mat-dialog-content class="subject-dialog-content">
+    <form [formGroup]="editSubjectForm" class="subject-form-grid">
+      <div>
+        <label class="form-label">Subject Code <span class="text-danger">*</span></label>
+        <input type="text" class="form-control" formControlName="subjectCode" maxlength="30">
+        <small class="text-danger" *ngIf="editSubjectForm.get('subjectCode')?.touched && editSubjectForm.get('subjectCode')?.invalid">Subject code is required.</small>
+      </div>
+      <div>
+        <label class="form-label">Subject Name <span class="text-danger">*</span></label>
+        <input type="text" class="form-control" formControlName="subjectName" maxlength="100">
+        <small class="text-danger" *ngIf="editSubjectForm.get('subjectName')?.touched && editSubjectForm.get('subjectName')?.invalid">Subject name is required.</small>
+      </div>
+      <div class="full-width">
+        <label class="form-label">Description</label>
+        <textarea class="form-control" formControlName="description" rows="3" maxlength="500"></textarea>
+      </div>
+      <div class="status-field">
+        <label class="form-label">Status <span class="text-danger">*</span></label>
+        <select class="form-select" formControlName="status">
+          <option value="ACTIVE">Active</option>
+          <option value="INACTIVE">Inactive</option>
+        </select>
+      </div>
+    </form>
+  </mat-dialog-content>
+  <mat-dialog-actions align="end" class="subject-dialog-actions">
+    <button type="button" class="btn btn-light" mat-dialog-close [disabled]="isUpdating">Cancel</button>
+    <button type="button" class="btn btn-primary" (click)="updateExamSubject()"
+            [disabled]="editSubjectForm.invalid || isUpdating">
+      <span *ngIf="isUpdating" class="spinner-border spinner-border-sm me-1"></span>
+      <i *ngIf="!isUpdating" class="feather icon-save me-1"></i>
+      {{ isUpdating ? 'Updating...' : 'Update Subject' }}
+    </button>
+  </mat-dialog-actions>
+</ng-template>

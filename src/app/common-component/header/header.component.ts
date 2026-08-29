@@ -8,6 +8,7 @@ import { AuthenticationService } from 'src/app/auth/authentication.service';
 import { CookieService } from 'ngx-cookie-service';
 import { Constant } from 'src/app/core/constant/constants';
 import { UserManagementService } from 'src/app/core-component/user-management/user-management.service';
+import { TenantMediaUrlService } from 'src/app/core/service/tenant-media-url.service';
 
 
 
@@ -48,6 +49,7 @@ export class HeaderComponent  {
     private authenticationService: AuthenticationService,
     private cookieService: CookieService,
     private userManagementService: UserManagementService,
+    private mediaUrl: TenantMediaUrlService,
   ) {
 
     this.activePath = this.router.url.split('/')[2];
@@ -181,9 +183,7 @@ export class HeaderComponent  {
     if (!superadminId) {
       return 'assets/img/profiles/avatar-02.jpg';
     }
-    return Constant.Site_Url + 'userImage/'
-      + encodeURIComponent(superadminId) + '/'
-      + encodeURIComponent(picture);
+    return this.mediaUrl.userPicture(superadminId, picture);
   }
 
   public useDefaultUserImage(event: Event): void {

@@ -422,6 +422,51 @@ export class SidebarService {
         },
 
         {
+          menuValue: 'Examination Management',
+          hasSubRoute: true,
+          showSubRoute: false,
+          icon: 'file-text',
+          subMenus: [
+            {
+              menuValue: 'Subjects',
+              route: routes.subject,
+              // permission: 'grade',
+              permission:'fee-assignment',
+            },
+            {
+              menuValue: 'Grade Subjects',
+              route: routes.gradeSubject,
+              permission: 'fee-assignment',
+            },
+            {
+              menuValue: 'Exams',
+              route: routes.exam,
+              permission: 'fee-assignment',
+            },
+            {
+              menuValue: 'Exam Schedule',
+              route: routes.examSchedule,
+              permission: 'fee-assignment',
+            },
+            {
+              menuValue: 'Student Exam Marks',
+              route: routes.studentExamMarks,
+              permission: 'fee-assignment',
+            },
+            {
+              menuValue: 'Grading Scale',
+              route: routes.gradingScale,
+              permission: 'fee-assignment',
+            },
+            {
+              menuValue: 'Student Exam Results',
+              route: routes.studentExamResult,
+              permission: 'fee-assignment',
+            },
+          ],
+        },
+
+        {
           menuValue: 'Attendance Management',
           hasSubRoute: true,
           showSubRoute: false,

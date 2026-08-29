@@ -1,0 +1,131 @@
+<p-toast></p-toast>
+
+<div class="grading-page">
+  <div class="page-heading">
+    <div>
+      <h3>Grading Scale</h3>
+      <p>Create and manage academic grading ranges</p>
+    </div>
+    <button type="button" class="btn add-btn" (click)="openAdd(addScaleDialog)">
+      <i class="feather icon-plus"></i> Add Grading Scale
+    </button>
+  </div>
+
+  <div class="filter-card">
+    <div class="filter-grid">
+      <div class="field">
+        <label for="gradeSearch">Grade</label>
+        <input id="gradeSearch" class="form-control" type="text" [(ngModel)]="searchGradeName"
+          placeholder="Search grade" (keyup.enter)="getGradingScale()">
+      </div>
+      <div class="field">
+        <label for="academicYearFilter">Academic Year</label>
+        <select id="academicYearFilter" class="form-select" [(ngModel)]="selectedAcademicYear">
+          <option value="">All academic years</option>
+          <option *ngFor="let year of academicYearOptions" [value]="year.value">{{ year.name }}</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="resultFilter">Result</label>
+        <select id="resultFilter" class="form-select" [(ngModel)]="selectedResultStatus">
+          <option value="">All results</option>
+          <option value="PASS">Pass</option>
+          <option value="FAIL">Fail</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="statusFilter">Status</label>
+        <select id="statusFilter" class="form-select" [(ngModel)]="selectedStatus">
+          <option value="">All statuses</option>
+          <option value="ACTIVE">Active</option>
+          <option value="INACTIVE">Inactive</option>
+        </select>
+      </div>
+      <div class="filter-actions">
+        <button type="button" class="btn search-btn" [disabled]="isLoading" (click)="getGradingScale()">
+          <i class="feather icon-search"></i> Search
+        </button>
+        <button type="button" class="btn clear-btn" [disabled]="isLoading" (click)="clearFilters()">Clear</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-card">
+    <div class="table-responsive">
+      <table class="table" matSort (matSortChange)="sortData($event)">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th mat-sort-header="academicYear">Academic Year</th>
+            <th mat-sort-header="gradeName">Grade</th>
+            <th>Percentage Range</th>
+            <th mat-sort-header="gradePoint">Grade Point</th>
+            <th mat-sort-header="resultStatus">Result</th>
+            <th>Description</th>
+            <th mat-sort-header="status">Status</th>
+            <th class="text-center">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let scale of tableData; let i = index">
+            <td>{{ serialNumberArray[i] }}</td>
+            <td>{{ scale.academicYear || '—' }}</td>
+            <td><span class="grade-label">{{ scale.gradeName || '—' }}</span></td>
+            <td>{{ scale.minimumPercentage | number:'1.0-2' }}% - {{ scale.maximumPercentage | number:'1.0-2' }}%</td>
+            <td>{{ scale.gradePoint ?? '—' }}</td>
+            <td><span class="result-badge" [class.fail]="scale.resultStatus === 'FAIL'">{{ scale.resultStatus || '—' }}</span></td>
+            <td class="description-cell" [title]="scale.description || ''">{{ scale.description || '—' }}</td>
+            <td><span class="status-badge" [class.inactive]="scale.status === 'INACTIVE'">{{ scale.status || '—' }}</span></td>
+            <td class="text-center">
+              <button type="button" class="icon-btn" title="Edit grading scale" (click)="openEdit(editScaleDialog, scale)">
+                <i class="feather icon-edit"></i>
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="!isLoading && !tableData.length">
+            <td colspan="9" class="empty-state">{{ errorMessage || 'No grading scale details found.' }}</td>
+          </tr>
+          <tr *ngIf="isLoading"><td colspan="9" class="empty-state"><span class="spinner-border spinner-border-sm"></span> Loading grading scales...</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <app-custom-pagination *ngIf="totalData > 0"></app-custom-pagination>
+  </div>
+</div>
+
+<ng-template #addScaleDialog>
+  <div class="scale-dialog">
+    <div class="dialog-header"><div><h4>Add Grading Scale</h4><p>Define a percentage range and its grade</p></div><button mat-dialog-close class="close-btn"><i class="feather icon-x"></i></button></div>
+    <form [formGroup]="addForm" (ngSubmit)="addGradingScale()">
+      <ng-container *ngTemplateOutlet="scaleFields; context: {$implicit: addForm}"></ng-container>
+      <div class="dialog-actions"><button type="button" mat-dialog-close class="btn cancel-btn">Cancel</button><button type="submit" class="btn save-btn" [disabled]="isSaving"><span *ngIf="isSaving" class="spinner-border spinner-border-sm"></span>{{ isSaving ? ' Saving...' : 'Add Grading Scale' }}</button></div>
+    </form>
+  </div>
+</ng-template>
+
+<ng-template #editScaleDialog>
+  <div class="scale-dialog">
+    <div class="dialog-header"><div><h4>Update Grading Scale</h4><p>Modify the selected grading range</p></div><button mat-dialog-close class="close-btn"><i class="feather icon-x"></i></button></div>
+    <form [formGroup]="editForm" (ngSubmit)="updateGradingScale()">
+      <ng-container *ngTemplateOutlet="scaleFields; context: {$implicit: editForm}"></ng-container>
+      <div class="dialog-actions"><button type="button" mat-dialog-close class="btn cancel-btn">Cancel</button><button type="submit" class="btn save-btn" [disabled]="isUpdating"><span *ngIf="isUpdating" class="spinner-border spinner-border-sm"></span>{{ isUpdating ? ' Updating...' : 'Update' }}</button></div>
+    </form>
+  </div>
+</ng-template>
+
+<ng-template #scaleFields let-form>
+  <div class="dialog-body" [formGroup]="form">
+    <div class="form-grid">
+      <div class="field"><label>Academic Year <span>*</span></label><select class="form-select" formControlName="academicYear"><option value="" disabled>Select academic year</option><option *ngFor="let year of academicYearOptions" [value]="year.value">{{ year.name }}</option></select></div>
+      <div class="field"><label>Grade <span>*</span></label><input class="form-control" formControlName="gradeName" placeholder="Example: A+"></div>
+      <div class="field"><label>Minimum Percentage <span>*</span></label><input class="form-control" type="number" min="0" max="100" step="0.01" formControlName="minimumPercentage" placeholder="0"></div>
+      <div class="field"><label>Maximum Percentage <span>*</span></label><input class="form-control" type="number" min="0" max="100" step="0.01" formControlName="maximumPercentage" placeholder="100"></div>
+      <div class="field"><label>Grade Point</label><input class="form-control" type="number" min="0" step="0.01" formControlName="gradePoint" placeholder="Example: 10"></div>
+      <div class="field"><label>Result <span>*</span></label><select class="form-select" formControlName="resultStatus"><option value="PASS">Pass</option><option value="FAIL">Fail</option></select></div>
+      <div class="field"><label>Status <span>*</span></label><select class="form-select" formControlName="status"><option value="ACTIVE">Active</option><option value="INACTIVE">Inactive</option></select></div>
+      <div class="field full-width"><label>Description</label><textarea class="form-control" rows="3" formControlName="description" placeholder="Optional description"></textarea></div>
+    </div>
+    <div class="validation-message" *ngIf="form.hasError('invalidRange') && (form.get('minimumPercentage')?.touched || form.get('maximumPercentage')?.touched)">Minimum percentage cannot be greater than maximum percentage.</div>
+    <div class="validation-message" *ngIf="form.invalid && form.touched && !form.hasError('invalidRange')">Please complete all required fields with valid values.</div>
+  </div>
+</ng-template>

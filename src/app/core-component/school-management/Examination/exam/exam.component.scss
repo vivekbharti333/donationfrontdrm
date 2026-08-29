@@ -1,0 +1,27 @@
+.exam-state { color: #6b7280; padding: 28px 16px; text-align: center; }
+.exam-toolbar { align-items: center; display: flex; gap: 14px; justify-content: space-between; }
+.exam-filters { align-items: center; display: flex; flex: 1; flex-wrap: wrap; gap: 10px; }
+.exam-filters .form-select { min-width: 150px; width: auto; }
+.table.datanew tbody tr { height: 51px; }
+.table.datanew td, .table.datanew th { vertical-align: middle; white-space: nowrap; }
+.modalHeaderContainer { align-items: center; background: linear-gradient(135deg, rgba(255,159,67,.16), rgba(255,159,67,.04)); border-bottom: 1px solid rgba(255,159,67,.22); display: flex; justify-content: space-between; padding: 22px 26px; }
+.exam-dialog-heading { align-items: center; display: flex; gap: 14px; }
+.exam-dialog-icon { align-items: center; background: var(--bs-primary, #ff9f43); border-radius: 12px; box-shadow: 0 7px 16px rgba(255,159,67,.22); color: #fff; display: inline-flex; flex: 0 0 44px; font-size: 20px; height: 44px; justify-content: center; }
+.modalHeaderContainer h2, .modalHeaderContainer p { margin: 0; }
+.modalHeaderContainer p { color: #6b7280; font-size: 13px; margin-top: 4px; }
+.exam-close { background: transparent; border: 0; color: #6b7280; font-size: 28px; line-height: 1; padding: 6px; transition: .2s; }
+.exam-close:hover { color: #ef4444; transform: rotate(90deg); }
+.exam-dialog-content { background: #fff; padding: 26px !important; }
+.exam-form-grid { display: grid; gap: 20px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.exam-form-grid > div { min-width: 0; }
+.exam-form-grid label { color: #374151; display: block; font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+.exam-form-grid label span, .exam-form-grid small { color: #dc2626; }
+.exam-form-grid small { display: block; font-size: 12px; margin-top: 5px; }
+.exam-form-grid .form-control, .exam-form-grid .form-select { border-color: #dbe2ea; border-radius: 8px; min-height: 46px; }
+.exam-form-grid .form-control:focus, .exam-form-grid .form-select:focus { border-color: var(--bs-primary, #ff9f43); box-shadow: 0 0 0 3px rgba(255,159,67,.12); }
+.exam-form-grid textarea.form-control { min-height: 92px; resize: vertical; }
+.exam-form-grid .full-width { grid-column: 1 / -1; }
+.exam-dialog-actions { border-top: 1px solid #eef1f5; gap: 10px; margin: 0; padding: 18px 26px 24px; }
+.exam-dialog-actions .btn { border-radius: 8px; min-height: 44px; min-width: 116px; }
+@media (max-width: 991px) { .exam-toolbar, .exam-filters { align-items: stretch; flex-direction: column; } .exam-filters .search-input, .exam-filters .form-select, .exam-filters .btn, .add-exam-button { width: 100%; } }
+@media (max-width: 767px) { .exam-form-grid { grid-template-columns: 1fr; } .exam-form-grid .full-width { grid-column: auto; } .modalHeaderContainer, .exam-dialog-content, .exam-dialog-actions { padding-left: 18px !important; padding-right: 18px !important; } .exam-dialog-actions .btn { flex: 1; min-width: 0; } }

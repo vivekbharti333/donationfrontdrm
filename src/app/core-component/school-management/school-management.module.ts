@@ -26,6 +26,13 @@ import { FeeAssignmentComponent } from './fees/fee-assignment/fee-assignment.com
 import { AttendanceListComponent } from './attendance/attendance-list/attendance-list.component';
 import { AttendanceMarkComponent } from './attendance/attendance-mark/attendance-mark.component';
 import { AttendanceReportComponent } from './attendance/attendance-report/attendance-report.component';
+import { SubjectComponent } from './Examination/subject/subject.component';
+import { GradeSubjectComponent } from './Examination/grade-subject/grade-subject.component';
+import { ExamComponent } from './Examination/exam/exam.component';
+import { ExamScheduleComponent } from './Examination/exam-schedule/exam-schedule.component';
+import { GradingScaleComponent } from './Examination/grading-scale/grading-scale.component';
+import { StudentExamMarksComponent } from './Examination/student-exam-marks/student-exam-marks.component';
+import { StudentExamResultComponent } from './Examination/student-exam-result/student-exam-result.component';
 
 import { MessageService } from 'primeng/api';
 
@@ -43,7 +50,14 @@ import { MessageService } from 'primeng/api';
     FeeAssignmentComponent,
     AttendanceListComponent,
     AttendanceMarkComponent,
-    AttendanceReportComponent
+    AttendanceReportComponent,
+    SubjectComponent,
+    GradeSubjectComponent,
+    ExamComponent,
+    ExamScheduleComponent,
+    GradingScaleComponent,
+    StudentExamMarksComponent,
+    StudentExamResultComponent
   ],
   imports: [
     SchoolManagementRoutingModule,

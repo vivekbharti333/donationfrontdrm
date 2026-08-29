@@ -1,0 +1,52 @@
+<p-toast></p-toast>
+<div class="page-header">
+  <div class="add-item d-flex"><div class="page-title"><h4>Exam Details</h4><h6>Create and manage school examinations</h6></div></div>
+  <ul class="table-top-head"><li><a href="javascript:void(0)" matTooltip="Refresh" (click)="getExamDetails()"><i class="feather icon-rotate-ccw"></i></a></li></ul>
+</div>
+<div class="card table-list-card"><div class="card-body">
+  <div class="table-top exam-toolbar">
+    <div class="exam-filters">
+      <div class="search-input"><a href="javascript:void(0)" class="btn btn-searchset" (click)="searchExams()"><i class="feather icon-search"></i></a><div class="dataTables_filter"><input [(ngModel)]="searchDataValue" (keyup.enter)="searchExams()" type="search" class="form-control" placeholder="Search exam name, code or type..."></div></div>
+      <select [(ngModel)]="selectedAcademicYear" class="form-select"><option value="">All academic years</option><option *ngFor="let year of academicYearOptions" [value]="year.value">{{ year.name }}</option></select>
+      <select [(ngModel)]="selectedExamType" class="form-select"><option value="">All exam types</option><option *ngFor="let type of examTypeOptions" [value]="type.value">{{ type.name }}</option></select>
+      <select [(ngModel)]="selectedStatus" class="form-select"><option value="">All statuses</option><option value="ACTIVE">Active</option><option value="INACTIVE">Inactive</option></select>
+      <button class="btn btn-primary" type="button" (click)="searchExams()" [disabled]="isLoading"><i class="feather icon-search me-1"></i>Search</button>
+      <button class="btn btn-light" type="button" (click)="clearFilters()" [disabled]="isLoading">Clear</button>
+    </div>
+    <button class="btn btn-primary add-exam-button" type="button" (click)="openAddExam(addExamDialog)"><i class="feather icon-plus-circle me-1"></i>Add Exam</button>
+  </div>
+  <div *ngIf="errorMessage" class="alert alert-danger mt-3">{{ errorMessage }}</div>
+  <div *ngIf="isLoading" class="exam-state"><span class="spinner-border spinner-border-sm me-2"></span>Loading exams...</div>
+  <div *ngIf="!isLoading" class="table-responsive mt-3">
+    <table matSort (matSortChange)="sortData($event)" class="table datanew">
+      <thead><tr><th>#</th><th mat-sort-header="examCode">Exam Code</th><th mat-sort-header="examName">Exam Name</th><th mat-sort-header="examType">Type</th><th mat-sort-header="academicYear">Academic Year</th><th mat-sort-header="startDate">Start Date</th><th mat-sort-header="endDate">End Date</th><th mat-sort-header="status">Status</th><th>Action</th></tr></thead>
+      <tbody>
+        <tr *ngFor="let exam of tableData; let i = index"><td>{{ serialNumberArray[i] }}</td><td><strong>{{ exam.examCode || '—' }}</strong></td><td>{{ exam.examName || '—' }}</td><td>{{ examTypeLabel(exam.examType) }}</td><td>{{ exam.academicYear || '—' }}</td><td>{{ exam.startDate ? (exam.startDate | date:'dd-MM-yyyy') : '—' }}</td><td>{{ exam.endDate ? (exam.endDate | date:'dd-MM-yyyy') : '—' }}</td><td><span class="badge" [ngClass]="exam.status === 'ACTIVE' ? 'badge-linesuccess' : 'badge-linedanger'">{{ exam.status || '—' }}</span></td><td class="action-table-data"><div class="edit-delete-action"><a href="javascript:void(0)" class="p-2 mb-0" title="Update exam" (click)="openEditExam(editExamDialog, exam)"><i class="feather icon-edit feather-edit"></i></a></div></td></tr>
+        <tr *ngIf="tableData.length === 0"><td colspan="9" class="exam-state">No exam details found.</td></tr>
+      </tbody>
+    </table><app-custom-pagination *ngIf="totalData > 0"></app-custom-pagination>
+  </div>
+</div></div>
+
+<ng-template #addExamDialog>
+  <div class="modalHeaderContainer"><div class="exam-dialog-heading"><span class="exam-dialog-icon"><i class="feather icon-clipboard"></i></span><div><h2 mat-dialog-title class="p-0">Add Exam</h2><p>Create examination details and date range.</p></div></div><button type="button" class="close exam-close" mat-dialog-close [disabled]="isSaving">&times;</button></div>
+  <mat-dialog-content class="exam-dialog-content"><ng-container *ngTemplateOutlet="examFields; context: { form: addExamForm }"></ng-container></mat-dialog-content>
+  <mat-dialog-actions align="end" class="exam-dialog-actions"><button type="button" class="btn btn-light" mat-dialog-close [disabled]="isSaving">Cancel</button><button type="button" class="btn btn-primary" (click)="addExamDetails()" [disabled]="addExamForm.invalid || isSaving"><span *ngIf="isSaving" class="spinner-border spinner-border-sm me-1"></span><i *ngIf="!isSaving" class="feather icon-plus-circle me-1"></i>{{ isSaving ? 'Saving...' : 'Add Exam' }}</button></mat-dialog-actions>
+</ng-template>
+<ng-template #editExamDialog>
+  <div class="modalHeaderContainer"><div class="exam-dialog-heading"><span class="exam-dialog-icon"><i class="feather icon-edit-2"></i></span><div><h2 mat-dialog-title class="p-0">Update Exam</h2><p>Edit the selected examination details.</p></div></div><button type="button" class="close exam-close" mat-dialog-close [disabled]="isUpdating">&times;</button></div>
+  <mat-dialog-content class="exam-dialog-content"><ng-container *ngTemplateOutlet="examFields; context: { form: editExamForm }"></ng-container></mat-dialog-content>
+  <mat-dialog-actions align="end" class="exam-dialog-actions"><button type="button" class="btn btn-light" mat-dialog-close [disabled]="isUpdating">Cancel</button><button type="button" class="btn btn-primary" (click)="updateExamDetails()" [disabled]="editExamForm.invalid || isUpdating"><span *ngIf="isUpdating" class="spinner-border spinner-border-sm me-1"></span><i *ngIf="!isUpdating" class="feather icon-save me-1"></i>{{ isUpdating ? 'Updating...' : 'Update Exam' }}</button></mat-dialog-actions>
+</ng-template>
+<ng-template #examFields let-form="form">
+  <form [formGroup]="form" class="exam-form-grid">
+    <div><label>Exam Code <span>*</span></label><input class="form-control" formControlName="examCode" maxlength="30" placeholder="e.g. MID-2026"><small *ngIf="form.get('examCode')?.touched && form.get('examCode')?.invalid">Exam code is required.</small></div>
+    <div><label>Exam Name <span>*</span></label><input class="form-control" formControlName="examName" maxlength="100" placeholder="e.g. Mid Term Examination"><small *ngIf="form.get('examName')?.touched && form.get('examName')?.invalid">Exam name is required.</small></div>
+    <div><label>Exam Type <span>*</span></label><select class="form-select" formControlName="examType"><option value="">Select exam type</option><option *ngFor="let type of examTypeOptions" [value]="type.value">{{ type.name }}</option></select><small *ngIf="form.get('examType')?.touched && form.get('examType')?.invalid">Exam type is required.</small></div>
+    <div><label>Academic Year <span>*</span></label><select class="form-select" formControlName="academicYear"><option value="">Select academic year</option><option *ngFor="let year of academicYearOptions" [value]="year.value">{{ year.name }}</option></select><small *ngIf="form.get('academicYear')?.touched && form.get('academicYear')?.invalid">Academic year is required.</small></div>
+    <div><label>Start Date <span>*</span></label><input type="date" class="form-control" formControlName="startDate"><small *ngIf="form.get('startDate')?.touched && form.get('startDate')?.invalid">Start date is required.</small></div>
+    <div><label>End Date <span>*</span></label><input type="date" class="form-control" formControlName="endDate"><small *ngIf="form.get('endDate')?.touched && form.get('endDate')?.invalid">End date is required.</small><small *ngIf="form.touched && form.hasError('invalidDateRange')">End date cannot be before start date.</small></div>
+    <div class="full-width"><label>Description</label><textarea class="form-control" formControlName="description" rows="3" maxlength="500" placeholder="Enter exam description"></textarea></div>
+    <div><label>Status <span>*</span></label><select class="form-select" formControlName="status"><option value="ACTIVE">Active</option><option value="INACTIVE">Inactive</option></select></div>
+  </form>
+</ng-template>

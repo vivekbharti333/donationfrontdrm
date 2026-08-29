@@ -1,0 +1,73 @@
+<div class="page-header">
+  <p-toast></p-toast>
+  <div class="add-item d-flex"><div class="page-title"><h4>Grade Subjects</h4><h6>View subjects assigned to each grade</h6></div></div>
+  <div class="grade-subject-page-actions"><ul class="table-top-head"><li><a href="javascript:void(0)" matTooltip="Refresh" (click)="getExamGradeSubject()"><i class="feather icon-rotate-ccw"></i></a></li></ul><button type="button" class="btn btn-primary" (click)="openAddGradeSubject(addGradeSubjectDialog)"><i class="feather icon-plus-circle me-1"></i>Assign Subject</button></div>
+</div>
+
+<ng-template #addGradeSubjectDialog>
+  <div class="grade-subject-dialog-header">
+    <div class="dialog-title-wrap"><span class="dialog-icon"><i class="feather icon-link"></i></span><div><h2 mat-dialog-title>Assign Subject to Grade</h2><p>Create a subject assignment for an academic year.</p></div></div>
+    <button type="button" class="dialog-close" mat-dialog-close [disabled]="isSaving" aria-label="Close">&times;</button>
+  </div>
+  <mat-dialog-content class="grade-subject-dialog-content">
+    <form [formGroup]="addGradeSubjectForm" class="grade-subject-form">
+      <div><label>Academic Year <span>*</span></label><select class="form-select" formControlName="academicYear"><option value="">Select academic year</option><option *ngFor="let year of academicYearOptions" [value]="year.value">{{ year.name }}</option></select><small *ngIf="addGradeSubjectForm.get('academicYear')?.touched && addGradeSubjectForm.get('academicYear')?.invalid">Academic year is required.</small></div>
+      <div><label>Grade <span>*</span></label><select class="form-select" formControlName="gradeId"><option [ngValue]="null">{{ isMastersLoading ? 'Loading grades...' : 'Select grade' }}</option><option *ngFor="let grade of gradeOptions" [ngValue]="grade.id">{{ grade.gradeName || grade.name || ('Grade ' + grade.id) }}</option></select><small *ngIf="addGradeSubjectForm.get('gradeId')?.touched && addGradeSubjectForm.get('gradeId')?.invalid">Grade is required.</small></div>
+      <div class="wide-field"><label>Subject <span>*</span></label><select class="form-select" formControlName="subjectId"><option [ngValue]="null">{{ isMastersLoading ? 'Loading subjects...' : 'Select subject' }}</option><option *ngFor="let subject of subjectOptions" [ngValue]="subject.id">{{ subject.subjectName }} {{ subject.subjectCode ? '(' + subject.subjectCode + ')' : '' }}</option></select><small *ngIf="addGradeSubjectForm.get('subjectId')?.touched && addGradeSubjectForm.get('subjectId')?.invalid">Subject is required.</small></div>
+      <div><label>Subject Type <span>*</span></label><select class="form-select" formControlName="subjectType"><option value="CORE">Core</option><option value="OPTIONAL">Optional</option></select></div>
+      <div><label>Status <span>*</span></label><select class="form-select" formControlName="status"><option value="ACTIVE">Active</option><option value="INACTIVE">Inactive</option></select></div>
+    </form>
+  </mat-dialog-content>
+  <mat-dialog-actions align="end" class="grade-subject-dialog-actions">
+    <button type="button" class="btn btn-light" mat-dialog-close [disabled]="isSaving">Cancel</button>
+    <button type="button" class="btn btn-primary" (click)="addExamGradeSubject()" [disabled]="addGradeSubjectForm.invalid || isSaving"><span *ngIf="isSaving" class="spinner-border spinner-border-sm me-1"></span><i *ngIf="!isSaving" class="feather icon-plus-circle me-1"></i>{{ isSaving ? 'Assigning...' : 'Assign Subject' }}</button>
+  </mat-dialog-actions>
+</ng-template>
+
+<div class="card filter-card">
+  <div class="card-body grade-subject-filters">
+    <label><span>Academic Year</span><select class="form-select" [(ngModel)]="selectedAcademicYear"><option value="">All academic years</option><option *ngFor="let year of academicYearOptions" [value]="year.value">{{ year.name }}</option></select></label>
+    <label><span>Grade</span><select class="form-select" [(ngModel)]="selectedGradeId"><option [ngValue]="null">All grades</option><option *ngFor="let grade of gradeOptions" [ngValue]="grade.id">{{ grade.gradeName || grade.name || ('Grade ' + grade.id) }}</option></select></label>
+    <label><span>Subject</span><select class="form-select" [(ngModel)]="selectedSubjectId"><option [ngValue]="null">All subjects</option><option *ngFor="let subject of subjectOptions" [ngValue]="subject.id">{{ subject.subjectName }} {{ subject.subjectCode ? '(' + subject.subjectCode + ')' : '' }}</option></select></label>
+    <label><span>Subject Type</span><select class="form-select" [(ngModel)]="selectedSubjectType"><option value="">All types</option><option value="CORE">Core</option><option value="OPTIONAL">Optional</option></select></label>
+    <label><span>Status</span><select class="form-select" [(ngModel)]="selectedStatus"><option value="">All statuses</option><option value="ACTIVE">Active</option><option value="INACTIVE">Inactive</option></select></label>
+    <div class="filter-actions"><button class="btn btn-primary" type="button" (click)="getExamGradeSubject()" [disabled]="isLoading"><i class="feather icon-search me-1"></i>Search</button><button class="btn btn-light" type="button" (click)="clearFilters()" [disabled]="isLoading">Clear</button></div>
+  </div>
+</div>
+
+<div class="card table-list-card">
+  <div class="card-body">
+    <div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
+    <div *ngIf="isLoading" class="grade-subject-state"><span class="spinner-border spinner-border-sm me-2"></span>Loading grade subjects...</div>
+    <div *ngIf="!isLoading" class="table-responsive">
+      <table matSort (matSortChange)="sortData($event)" class="table datanew">
+        <thead><tr><th>#</th><th mat-sort-header="academicYear">Academic Year</th><th mat-sort-header="gradeId">Grade</th><th mat-sort-header="subjectId">Subject</th><th>Subject Code</th><th mat-sort-header="subjectType">Type</th><th mat-sort-header="status">Status</th><th>Action</th></tr></thead>
+        <tbody>
+          <tr *ngFor="let item of tableData; let i = index"><td>{{ serialNumberArray[i] }}</td><td>{{ item.academicYear || '—' }}</td><td><strong>{{ getGradeName(item.gradeId) }}</strong></td><td>{{ getSubjectName(item.subjectId) }}</td><td>{{ getSubjectCode(item.subjectId) }}</td><td><span class="type-pill">{{ item.subjectType || '—' }}</span></td><td><span class="badge" [ngClass]="item.status === 'ACTIVE' ? 'badge-linesuccess' : 'badge-linedanger'">{{ item.status || '—' }}</span></td><td class="action-table-data"><div class="edit-delete-action"><a href="javascript:void(0)" class="p-2 mb-0" title="Update assignment" (click)="openEditGradeSubject(editGradeSubjectDialog, item)"><i class="feather icon-edit feather-edit"></i></a></div></td></tr>
+          <tr *ngIf="tableData.length === 0"><td colspan="8" class="grade-subject-state">No grade-subject assignments found.</td></tr>
+        </tbody>
+      </table>
+      <app-custom-pagination *ngIf="totalData > 0"></app-custom-pagination>
+    </div>
+  </div>
+</div>
+
+<ng-template #editGradeSubjectDialog>
+  <div class="grade-subject-dialog-header">
+    <div class="dialog-title-wrap"><span class="dialog-icon"><i class="feather icon-edit-2"></i></span><div><h2 mat-dialog-title>Update Grade Subject</h2><p>Edit the selected grade and subject assignment.</p></div></div>
+    <button type="button" class="dialog-close" mat-dialog-close [disabled]="isUpdating" aria-label="Close">&times;</button>
+  </div>
+  <mat-dialog-content class="grade-subject-dialog-content">
+    <form [formGroup]="editGradeSubjectForm" class="grade-subject-form">
+      <div><label>Academic Year <span>*</span></label><select class="form-select" formControlName="academicYear"><option value="">Select academic year</option><option *ngFor="let year of academicYearOptions" [value]="year.value">{{ year.name }}</option></select><small *ngIf="editGradeSubjectForm.get('academicYear')?.touched && editGradeSubjectForm.get('academicYear')?.invalid">Academic year is required.</small></div>
+      <div><label>Grade <span>*</span></label><select class="form-select" formControlName="gradeId"><option [ngValue]="null">Select grade</option><option *ngFor="let grade of gradeOptions" [ngValue]="grade.id">{{ grade.gradeName || grade.name || ('Grade ' + grade.id) }}</option></select><small *ngIf="editGradeSubjectForm.get('gradeId')?.touched && editGradeSubjectForm.get('gradeId')?.invalid">Grade is required.</small></div>
+      <div class="wide-field"><label>Subject <span>*</span></label><select class="form-select" formControlName="subjectId"><option [ngValue]="null">Select subject</option><option *ngFor="let subject of subjectOptions" [ngValue]="subject.id">{{ subject.subjectName }} {{ subject.subjectCode ? '(' + subject.subjectCode + ')' : '' }}</option></select><small *ngIf="editGradeSubjectForm.get('subjectId')?.touched && editGradeSubjectForm.get('subjectId')?.invalid">Subject is required.</small></div>
+      <div><label>Subject Type <span>*</span></label><select class="form-select" formControlName="subjectType"><option value="CORE">Core</option><option value="OPTIONAL">Optional</option></select></div>
+      <div><label>Status <span>*</span></label><select class="form-select" formControlName="status"><option value="ACTIVE">Active</option><option value="INACTIVE">Inactive</option></select></div>
+    </form>
+  </mat-dialog-content>
+  <mat-dialog-actions align="end" class="grade-subject-dialog-actions">
+    <button type="button" class="btn btn-light" mat-dialog-close [disabled]="isUpdating">Cancel</button>
+    <button type="button" class="btn btn-primary" (click)="updateExamGradeSubject()" [disabled]="editGradeSubjectForm.invalid || isUpdating"><span *ngIf="isUpdating" class="spinner-border spinner-border-sm me-1"></span><i *ngIf="!isUpdating" class="feather icon-save me-1"></i>{{ isUpdating ? 'Updating...' : 'Update Assignment' }}</button>
+  </mat-dialog-actions>
+</ng-template>

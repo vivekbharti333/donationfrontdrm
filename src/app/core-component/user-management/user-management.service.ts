@@ -214,27 +214,21 @@ export class UserManagementService {
     const loginUser = this.authenticationService.getLoginUser() || {};
     const request: any = {
       payload: {
+        // Preserve the complete profile object returned by
+        // getUserDetailsByLoginId. Unedited values are sent unchanged.
+        ...userDetails,
         loginId: userDetails.loginId || loginUser['loginId'] || this.cookieService.get('loginId'),
         firstName: String(userDetails.firstName || '').trim(),
         lastName: String(userDetails.lastName || '').trim(),
         emailId: String(userDetails.emailId || '').trim(),
         mobileNo: String(userDetails.mobileNo || '').replace(/\s+/g, ''),
-        // These fields are not editable on the profile page, but must be sent
-        // unchanged for compatibility with backend versions that perform a
-        // full entity update rather than a partial patch.
-        roleType: userDetails.roleType || loginUser['roleType'] || this.cookieService.get('roleType'),
         alternateMobile: userDetails.alternateMobile || '',
-        createdBy: userDetails.createdBy || loginUser['createdBy'] || this.cookieService.get('createdBy'),
         userPicture: userDetails.userPicture || null,
-        // Keep compatibility with older deployed updateUserDetails versions
-        // that iterate this collection without checking for null.
-        addressList: [],
-        requestedFor: 'WEB',
         token: loginUser['token'] || this.cookieService.get('token'),
         superadminId: loginUser['superadminId'] || this.cookieService.get('superadminId')
       }
     };
-    return this.http.post<any>(Constant.Site_Url + "updateUserDetails", request);
+    return this.http.post<any>(Constant.Site_Url + "updateUserProfile", request);
   }
 
   // updateUserDetails(user: any): Observable<any> {

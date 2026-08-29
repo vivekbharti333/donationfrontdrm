@@ -1,0 +1,20 @@
+<p-toast></p-toast>
+<div class="result-page">
+  <div class="page-heading"><div><h3>Student Exam Results</h3><p>Calculate, review and publish results from entered marks</p></div></div>
+  <div class="control-card">
+    <div class="controls">
+      <label><span>Exam</span><select class="form-select" [(ngModel)]="selectedExamId"><option [ngValue]="null">Select exam</option><option *ngFor="let exam of exams" [ngValue]="exam.id">{{exam.examName}} ({{exam.academicYear}})</option></select></label>
+      <label><span>Student</span><select class="form-select" [(ngModel)]="selectedStudentId"><option [ngValue]="null">All students</option><option *ngFor="let student of students" [ngValue]="student.id">{{studentName(student.id)}} · {{student.rollNumber || 'No roll'}}</option></select></label>
+      <label><span>Publication</span><select class="form-select" [(ngModel)]="selectedPublished"><option value="">All results</option><option [ngValue]="true">Published</option><option [ngValue]="false">Unpublished</option></select></label>
+      <div class="search-actions"><button class="btn theme-btn" (click)="getResults()" [disabled]="isLoading"><i class="feather icon-search"></i> Search</button><button class="btn btn-light" (click)="clearFilters()">Clear</button></div>
+    </div>
+    <div class="generate-actions"><button class="btn outline-btn" (click)="generateSelected()" [disabled]="isGenerating||!selectedExamId||!selectedStudentId"><i class="feather icon-user-check"></i> Generate Selected</button><button class="btn theme-btn" (click)="generateAll()" [disabled]="isGenerating||!selectedExamId"><span *ngIf="isGenerating" class="spinner-border spinner-border-sm"></span><i *ngIf="!isGenerating" class="feather icon-users"></i> Generate All</button></div>
+  </div>
+  <div class="result-card">
+    <div class="table-responsive"><table class="table datanew"><thead><tr><th>#</th><th>Exam</th><th>Roll No.</th><th>Student</th><th>Maximum</th><th>Obtained</th><th>Percentage</th><th>Grade</th><th>Failed Subjects</th><th>Result</th><th>Rank</th><th>Publication</th><th>Action</th></tr></thead><tbody>
+      <tr *ngFor="let result of tableData;let i=index"><td>{{serialNumberArray[i]}}</td><td>{{examName(result.examId)}}</td><td>{{studentRoll(result.studentAcademicId)}}</td><td class="student-name">{{studentName(result.studentAcademicId)}}</td><td>{{result.totalMaximumMarks|number:'1.0-2'}}</td><td>{{result.totalMarksObtained|number:'1.0-2'}}</td><td><b>{{result.percentage|number:'1.2-2'}}%</b></td><td><span class="grade">{{result.grade||'—'}}</span></td><td>{{result.failedSubjectCount||0}}</td><td><span class="result-status" [class.fail]="result.resultStatus==='FAIL'">{{result.resultStatus}}</span></td><td>{{result.studentRank||'—'}}</td><td><span class="publish-status" [class.published]="result.published">{{result.published?'Published':'Unpublished'}}</span></td><td><button class="btn action-btn" [disabled]="updatingResultId===result.id" (click)="setPublished(result,!result.published)">{{result.published?'Unpublish':'Publish'}}</button></td></tr>
+      <tr *ngIf="isLoading"><td colspan="13" class="state"><span class="spinner-border spinner-border-sm"></span> Loading results...</td></tr>
+      <tr *ngIf="!isLoading&&!tableData.length"><td colspan="13" class="state">{{errorMessage||'No generated exam results found.'}}</td></tr>
+    </tbody></table></div><app-custom-pagination *ngIf="totalData>0"></app-custom-pagination>
+  </div>
+</div>

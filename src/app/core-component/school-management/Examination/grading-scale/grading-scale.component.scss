@@ -1,0 +1,56 @@
+:host { display: block; color: #1f2937; }
+.grading-page { padding: 10px 4px 28px; }
+.page-heading { display:flex; align-items:center; justify-content:space-between; gap:18px; margin-bottom:20px; }
+.page-heading h3 { margin:0 0 4px; font-size:26px; font-weight:700; color:#13244d; }
+.page-heading p { margin:0; color:#667085; font-size:15px; }
+.btn { min-height:44px; border-radius:8px; font-weight:600; display:inline-flex; align-items:center; justify-content:center; gap:8px; }
+.add-btn,.search-btn,.save-btn { background:#ff9f43; border:1px solid #ff9f43; color:#fff; }
+.add-btn:hover,.search-btn:hover,.save-btn:hover { background:#f58b25; border-color:#f58b25; }
+.filter-card,.list-card { background:#fff; border:1px solid #e7ebf1; border-radius:12px; box-shadow:0 4px 16px rgba(15,23,42,.04); }
+.filter-card { padding:18px; margin-bottom:20px; }
+.filter-grid { display:grid; grid-template-columns:1.1fr 1fr .8fr .8fr auto; gap:14px; align-items:end; }
+.field { min-width:0; }
+.field label { display:block; margin-bottom:7px; color:#344054; font-size:14px; font-weight:600; }
+.field label span { color:#ef4444; }
+.form-control,.form-select { min-height:44px; border-color:#dce3ed; border-radius:8px; font-size:15px; color:#344054; }
+.form-control:focus,.form-select:focus { border-color:#ff9f43; box-shadow:0 0 0 3px rgba(255,159,67,.13); }
+.filter-actions { display:flex; gap:9px; }
+.clear-btn,.cancel-btn { background:#fff; border:1px solid #d8dee8; color:#344054; }
+.list-card { overflow:hidden; }
+.table { margin:0; white-space:nowrap; }
+.table th { padding:15px 14px; background:#f8fafc; color:#344054; border-bottom:1px solid #e5eaf1; font-size:14px; font-weight:700; }
+.table td { padding:14px; border-color:#edf0f4; vertical-align:middle; font-size:14px; }
+.table tbody tr:hover { background:#fffaf5; }
+.grade-label { font-weight:700; color:#13244d; }
+.description-cell { max-width:220px; overflow:hidden; text-overflow:ellipsis; }
+.status-badge,.result-badge { display:inline-flex; align-items:center; justify-content:center; min-width:68px; padding:5px 10px; border-radius:20px; background:#eaf8ee; color:#218838; font-size:12px; font-weight:700; }
+.status-badge.inactive,.result-badge.fail { background:#fff0f0; color:#dc3545; }
+.icon-btn { width:38px; height:38px; border:1px solid #ffca99; border-radius:8px; background:#fff8f1; color:#ff9f43; display:inline-flex; align-items:center; justify-content:center; font-size:17px; }
+.icon-btn:hover { background:#ff9f43; color:#fff; }
+.empty-state { padding:38px !important; color:#667085; text-align:center; }
+.scale-dialog { background:#fff; border-radius:12px; overflow:hidden; }
+.dialog-header { padding:22px 26px; background:#fff3df; display:flex; align-items:flex-start; justify-content:space-between; border-bottom:1px solid #f3e2c7; }
+.dialog-header h4 { margin:0 0 4px; font-size:22px; font-weight:700; color:#202124; }
+.dialog-header p { margin:0; color:#7b6b55; font-size:14px; }
+.close-btn { width:36px; height:36px; border:0; border-radius:50%; background:transparent; color:#6b7280; font-size:20px; }
+.close-btn:hover { background:rgba(0,0,0,.06); }
+.dialog-body { padding:24px 26px 10px; }
+.form-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px; }
+.full-width { grid-column:1/-1; }
+textarea.form-control { resize:vertical; }
+.validation-message { margin-top:12px; color:#dc3545; font-size:13px; }
+.dialog-actions { display:flex; justify-content:flex-end; gap:12px; padding:18px 26px 24px; }
+button:disabled { cursor:not-allowed; opacity:.65; }
+
+@media (max-width: 1100px) { .filter-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .filter-actions { grid-column:1/-1; justify-content:flex-end; } }
+@media (max-width: 600px) {
+  .grading-page { padding-top:2px; }
+  .page-heading { align-items:stretch; flex-direction:column; }
+  .page-heading h3 { font-size:23px; }
+  .add-btn { width:100%; }
+  .filter-grid,.form-grid { grid-template-columns:1fr; }
+  .filter-actions { grid-column:auto; display:grid; grid-template-columns:1fr 1fr; }
+  .full-width { grid-column:auto; }
+  .dialog-header,.dialog-body { padding-left:18px; padding-right:18px; }
+  .dialog-actions { padding:16px 18px 20px; display:grid; grid-template-columns:1fr 1fr; }
+}

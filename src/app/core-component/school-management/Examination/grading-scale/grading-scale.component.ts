@@ -1,0 +1,33 @@
+import { Component, OnDestroy, OnInit, TemplateRef } from '@angular/core';
+import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { Sort } from '@angular/material/sort';
+import { Router } from '@angular/router';
+import { MessageService } from 'primeng/api';
+import { Subject, takeUntil } from 'rxjs';
+import { Constant } from 'src/app/core/constant/constants';
+import { PaginationService, tablePageSize } from 'src/app/shared/shared.index';
+import { GradingScaleService } from './grading-scale.service';
+
+@Component({selector:'app-grading-scale',templateUrl:'./grading-scale.component.html',styleUrl:'./grading-scale.component.scss'})
+export class GradingScaleComponent implements OnInit,OnDestroy{
+  readonly academicYearOptions=Constant.ACADEMIC_YEAR_OPTIONS;
+  fullData:any[]=[];tableData:any[]=[];serialNumberArray:number[]=[];totalData=0;pageSize=10;
+  selectedAcademicYear='';searchGradeName='';selectedResultStatus='';selectedStatus='';isLoading=false;isSaving=false;isUpdating=false;errorMessage='';
+  addForm!:FormGroup;editForm!:FormGroup;private currentSkip=0;private addDialog?:MatDialogRef<any>;private editDialog?:MatDialogRef<any>;
+  private readonly destroy$=new Subject<void>();
+  constructor(private service:GradingScaleService,private pagination:PaginationService,private router:Router,
+    private fb:FormBuilder,private dialog:MatDialog,private messages:MessageService){}
+  ngOnInit():void{this.addForm=this.createForm();this.editForm=this.createForm(true);this.pagination.tablePageSize.pipe(takeUntil(this.destroy$)).subscribe((p:tablePageSize)=>{if(this.router.url.includes('/grading-scale')){this.pageSize=p.pageSize;this.currentSkip=p.skip;this.applyPagination();}});this.getGradingScale();}
+  ngOnDestroy():void{this.destroy$.next();this.destroy$.complete();}
+  getGradingScale():void{this.isLoading=true;this.errorMessage='';this.service.getGradingScale({academicYear:this.selectedAcademicYear,gradeName:this.searchGradeName,resultStatus:this.selectedResultStatus,status:this.selectedStatus}).subscribe({next:r=>{const rows=r?.listPayload??r?.payload??r?.data;this.fullData=Array.isArray(rows)?rows:[];if(!Array.isArray(rows)&&Number(r?.responseCode)!==200)this.errorMessage=r?.responseMessage||'Unable to load grading scales.';this.currentSkip=0;this.applyPagination();this.isLoading=false;},error:e=>{this.fullData=[];this.applyPagination();this.errorMessage=e?.error?.responseMessage||'Unable to load grading scales.';this.isLoading=false;}});}
+  clearFilters():void{this.selectedAcademicYear='';this.searchGradeName='';this.selectedResultStatus='';this.selectedStatus='';this.getGradingScale();}
+  openAdd(t:TemplateRef<any>):void{this.addForm.reset({academicYear:'',gradeName:'',minimumPercentage:null,maximumPercentage:null,gradePoint:null,resultStatus:'PASS',description:'',status:'ACTIVE'});this.addDialog=this.openDialog(t);}
+  addGradingScale():void{if(this.addForm.invalid||this.isSaving){this.addForm.markAllAsTouched();return;}this.isSaving=true;this.service.addGradingScale(this.addForm.getRawValue()).subscribe({next:r=>{this.isSaving=false;if(!this.success(r)){this.toast('Unable to add grading scale',this.message(r,'Grading scale could not be added.'),'error');return;}this.addDialog?.close();this.toast('Grading scale added',this.message(r,'Grading scale added successfully.'),'success');this.getGradingScale();},error:e=>{this.isSaving=false;this.toast('Unable to add grading scale',e?.error?.responseMessage||'Grading scale could not be added.','error');}});}
+  openEdit(t:TemplateRef<any>,s:any):void{this.editForm.reset({id:s?.id,academicYear:s?.academicYear||'',gradeName:s?.gradeName||'',minimumPercentage:s?.minimumPercentage,maximumPercentage:s?.maximumPercentage,gradePoint:s?.gradePoint,resultStatus:s?.resultStatus||'PASS',description:s?.description||'',status:s?.status||'ACTIVE'});this.editDialog=this.openDialog(t);}
+  updateGradingScale():void{if(this.editForm.invalid||this.isUpdating){this.editForm.markAllAsTouched();return;}this.isUpdating=true;this.service.updateGradingScale(this.editForm.getRawValue()).subscribe({next:r=>{this.isUpdating=false;if(!this.success(r)){this.toast('Unable to update grading scale',this.message(r,'Grading scale could not be updated.'),'error');return;}this.editDialog?.close();this.toast('Grading scale updated',this.message(r,'Grading scale updated successfully.'),'success');this.getGradingScale();},error:e=>{this.isUpdating=false;this.toast('Unable to update grading scale',e?.error?.responseMessage||'Grading scale could not be updated.','error');}});}
+  sortData(sort:Sort):void{if(!sort.active||!sort.direction)return;const d=sort.direction==='asc'?1:-1;this.fullData=[...this.fullData].sort((a,b)=>String(a?.[sort.active]??'').localeCompare(String(b?.[sort.active]??''),undefined,{numeric:true})*d);this.applyPagination();}
+  private createForm(withId=false):FormGroup{return this.fb.group({...(withId?{id:[null,Validators.required]}:{}),academicYear:['',Validators.required],gradeName:['',[Validators.required,Validators.maxLength(10)]],minimumPercentage:[null,[Validators.required,Validators.min(0),Validators.max(100)]],maximumPercentage:[null,[Validators.required,Validators.min(0),Validators.max(100)]],gradePoint:[null,Validators.min(0)],resultStatus:['PASS',Validators.required],description:['',Validators.maxLength(255)],status:['ACTIVE',Validators.required]},{validators:this.rangeValidator()});}
+  private rangeValidator():ValidatorFn{return(c:AbstractControl):ValidationErrors|null=>{const min=c.get('minimumPercentage')?.value,max=c.get('maximumPercentage')?.value;return min!==null&&max!==null&&Number(min)>Number(max)?{invalidRange:true}:null;};}
+  private success(r:any):boolean{return Number(r?.responseCode)===200&&Number(r?.payload?.respCode)===200;}private message(r:any,f:string):string{return r?.payload?.respMesg||r?.responseMessage||f;}private openDialog(t:TemplateRef<any>):MatDialogRef<any>{return this.dialog.open(t,{width:'760px',maxWidth:'96vw',disableClose:true,panelClass:'custom-modal'});}private applyPagination():void{this.totalData=this.fullData.length;if(this.currentSkip>=this.totalData)this.currentSkip=0;this.tableData=this.fullData.slice(this.currentSkip,this.currentSkip+this.pageSize);this.serialNumberArray=this.tableData.map((_,i)=>this.currentSkip+i+1);this.pagination.calculatePageSize.next({totalData:this.totalData,pageSize:this.pageSize,tableData:this.tableData,serialNumberArray:this.serialNumberArray});}private toast(summary:string,detail:string,severity:'success'|'error'):void{this.messages.add({summary,detail,severity});}
+}

@@ -1141,6 +1141,27 @@ export class routes {
   public static get grade(): string {
     return this.schoolManagement + '/grade';
   }
+  public static get subject(): string {
+    return this.schoolManagement + '/subject';
+  }
+  public static get gradeSubject(): string {
+    return this.schoolManagement + '/grade-subject';
+  }
+  public static get exam(): string {
+    return this.schoolManagement + '/exam';
+  }
+  public static get examSchedule(): string {
+    return this.schoolManagement + '/exam-schedule';
+  }
+  public static get gradingScale(): string {
+    return this.schoolManagement + '/grading-scale';
+  }
+  public static get studentExamMarks(): string {
+    return this.schoolManagement + '/student-exam-marks';
+  }
+  public static get studentExamResult(): string {
+    return this.schoolManagement + '/student-exam-result';
+  }
   public static get attendanceList(): string {
     return this.schoolManagement + '/attendance-list';
   }

@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Constant } from 'src/app/core/constant/constants';
 import { UserManagementService } from '../../user-management/user-management.service';
+import { TenantMediaUrlService } from 'src/app/core/service/tenant-media-url.service';
 
 @Component({
   selector: 'app-profile',
@@ -16,7 +17,7 @@ export class ProfileComponent implements OnInit {
   message = '';
   messageType: 'success' | 'error' | '' = '';
 
-  constructor(private userManagementService: UserManagementService) {}
+  constructor(private userManagementService: UserManagementService, private mediaUrl: TenantMediaUrlService) {}
 
   ngOnInit(): void { this.getUserByLoginId(); }
 
@@ -52,6 +53,11 @@ export class ProfileComponent implements OnInit {
       next: (response: any) => {
         this.isSaving = false;
         if (Number(response?.responseCode) === Constant.SUCCESS_CODE) {
+          const savedPicture = response?.payload?.userPicture;
+          if (savedPicture) {
+            this.userDetails.userPicture = savedPicture;
+            localStorage.setItem('userPicture', savedPicture);
+          }
           this.savedDetails = { ...this.userDetails };
           this.showMessage('Profile updated successfully.', 'success');
         } else {
@@ -99,7 +105,7 @@ export class ProfileComponent implements OnInit {
     if (!picture) return 'assets/img/profiles/avatar-02.jpg';
     if (picture.startsWith('data:image/') || /^https?:\/\//i.test(picture)) return picture;
     const tenantId = this.userDetails?.superadminId || localStorage.getItem('superadminId') || '';
-    return `${Constant.Site_Url}userImage/${encodeURIComponent(tenantId)}/${encodeURIComponent(picture)}`;
+    return this.mediaUrl.userPicture(tenantId, picture);
   }
 
   useDefaultImage(event: Event): void { (event.target as HTMLImageElement).src = 'assets/img/profiles/avatar-02.jpg'; }

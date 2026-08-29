@@ -14,6 +14,13 @@ import { GradeComponent } from './academic/grade/grade.component';
 import { AttendanceListComponent } from './attendance/attendance-list/attendance-list.component';
 import { AttendanceMarkComponent } from './attendance/attendance-mark/attendance-mark.component';
 import { AttendanceReportComponent } from './attendance/attendance-report/attendance-report.component';
+import { SubjectComponent } from './Examination/subject/subject.component';
+import { GradeSubjectComponent } from './Examination/grade-subject/grade-subject.component';
+import { ExamComponent } from './Examination/exam/exam.component';
+import { ExamScheduleComponent } from './Examination/exam-schedule/exam-schedule.component';
+import { GradingScaleComponent } from './Examination/grading-scale/grading-scale.component';
+import { StudentExamMarksComponent } from './Examination/student-exam-marks/student-exam-marks.component';
+import { StudentExamResultComponent } from './Examination/student-exam-result/student-exam-result.component';
  
 
 const routes: Routes = [
@@ -68,6 +75,34 @@ const routes: Routes = [
       {
         path: 'attendance-report',
         component: AttendanceReportComponent,
+      },
+      {
+        path: 'subject',
+        component: SubjectComponent,
+      },
+      {
+        path: 'grade-subject',
+        component: GradeSubjectComponent,
+      },
+      {
+        path: 'exam',
+        component: ExamComponent,
+      },
+      {
+        path: 'exam-schedule',
+        component: ExamScheduleComponent,
+      },
+      {
+        path: 'grading-scale',
+        component: GradingScaleComponent,
+      },
+      {
+        path: 'student-exam-marks',
+        component: StudentExamMarksComponent,
+      },
+      {
+        path: 'student-exam-result',
+        component: StudentExamResultComponent,
       }
     ],
   },
