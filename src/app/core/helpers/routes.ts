@@ -698,6 +698,9 @@ export class routes {
   public static get donationDashboard(): string {
     return this.dashboard + '/donation-dashboard';
   }
+  public static get schoolDashboard(): string {
+    return this.dashboard + '/school-dashboard';
+  }
   public static get campaignDashboard(): string {
     return this.dashboard + '/campaign-dashboard';
   }

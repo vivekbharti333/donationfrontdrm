@@ -5,6 +5,7 @@ import { AdminDashboardComponent } from './admin-dashboard/admin-dashboard.compo
 import { SalesDashboardComponent } from './sales-dashboard/sales-dashboard.component';
 import { CampaignDashboardComponent } from './campaign-dashboard/campaign-dashboard.component';
 import { DonationDashboardComponent } from './donation-dashboard/donation-dashboard.component';
+import { SchoolDashboardComponent } from './school-dashboard/school-dashboard.component';
 import { AuthGuard } from 'src/app/core/core.index';
 
 const routes: Routes = [{ path: '', component: DashboardComponent,
@@ -29,6 +30,11 @@ children: [
   {
     path: 'donation-dashboard',
     component: DonationDashboardComponent
+  },
+  {
+    path: 'school-dashboard',
+    component: SchoolDashboardComponent,
+    canActivate: [AuthGuard]
   }
 ]
 }];

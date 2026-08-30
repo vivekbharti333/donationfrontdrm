@@ -1,0 +1,69 @@
+<div class="school-dashboard">
+  <div class="dashboard-heading">
+    <div>
+      <h2>School Management Dashboard</h2>
+      <p>A complete overview of academics, attendance, fees and examinations</p>
+    </div>
+    <div class="heading-actions">
+      <select class="form-select" [(ngModel)]="academicYear" aria-label="Academic session">
+        <option>2025-26</option><option>2026-27</option><option>2027-28</option>
+      </select>
+      <a class="btn btn-primary" routerLink="/school-management/add-student"><i class="feather icon-plus me-1"></i>Add Student</a>
+    </div>
+  </div>
+
+  <div class="metric-grid">
+    <div class="dashboard-card metric-card" *ngFor="let metric of metrics">
+      <span class="metric-icon" [ngClass]="metric.tone"><i class="feather" [ngClass]="metric.icon"></i></span>
+      <div class="metric-copy"><p>{{ metric.label }}</p><h3>{{ metric.value }}</h3>
+        <svg class="sparkline" viewBox="0 0 203 22" preserveAspectRatio="none"><polyline [attr.points]="metric.trend"></polyline></svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="dashboard-grid overview-grid">
+    <section class="dashboard-card attendance-card">
+      <div class="card-title"><h4><i class="feather icon-calendar"></i> Attendance Overview</h4><span>May 2026</span></div>
+      <div class="attendance-bars">
+        <div *ngFor="let month of ['Dec','Jan','Feb','Mar','Apr','May']; let i=index" class="month-bar">
+          <strong>{{ [91,90,93,91,92,92][i] }}%</strong>
+          <div class="bar-track"><span [style.height.%]="[76,73,78,72,69,66][i]"></span></div><small>{{ month }}</small>
+        </div>
+      </div>
+    </section>
+    <section class="dashboard-card fee-card">
+      <div class="card-title"><h4>Fee Collection</h4></div>
+      <div class="fee-content"><div class="fee-donut"><span>Total<strong>₹11.1L</strong></span></div>
+        <ul><li><i class="collected"></i><span>Collected</span><strong>₹8.4L</strong></li><li><i class="pending"></i><span>Pending</span><strong>₹2.1L</strong></li><li><i class="discount"></i><span>Discount</span><strong>₹0.6L</strong></li></ul>
+      </div>
+    </section>
+  </div>
+
+  <div class="dashboard-grid content-grid">
+    <section class="dashboard-card admissions-card">
+      <div class="card-title"><h4><i class="feather icon-user-plus"></i> Recent Admissions</h4><a routerLink="/school-management/student-list">View All</a></div>
+      <div class="table-responsive"><table class="table"><thead><tr><th>Student</th><th>Admission No.</th><th>Class</th><th>Father Name</th><th>Contact</th><th>Status</th></tr></thead><tbody>
+        <tr *ngFor="let student of admissions"><td><span class="student-avatar">{{ student.name.charAt(0) }}</span><strong>{{ student.name }}</strong></td><td>{{ student.admission }}</td><td>{{ student.className }}</td><td>{{ student.father }}</td><td>{{ student.contact }}</td><td><span class="status-pill">{{ student.status }}</span></td></tr>
+      </tbody></table></div>
+    </section>
+    <section class="dashboard-card academic-card">
+      <div class="card-title"><h4><i class="feather icon-book-open"></i> Academic Overview</h4></div>
+      <div class="academic-head"><span>Class</span><span>Students</span></div>
+      <div class="academic-row" *ngFor="let item of academicOverview"><span>{{ item.className }}</span><strong>{{ item.students }}</strong></div>
+      <div class="academic-row total"><strong>Total</strong><strong>1,248</strong></div>
+    </section>
+    <section class="dashboard-card quick-card">
+      <div class="card-title"><h4><i class="feather icon-zap"></i> Quick Actions</h4></div>
+      <div class="quick-grid"><a *ngFor="let action of quickActions" [routerLink]="action.route"><i class="feather" [ngClass]="action.icon"></i><span>{{ action.label }}</span></a></div>
+    </section>
+  </div>
+
+  <div class="dashboard-grid bottom-grid">
+    <section class="dashboard-card events-card"><div class="card-title"><h4><i class="feather icon-calendar"></i> Upcoming Events &amp; Exams</h4></div>
+      <div class="event-row" *ngFor="let event of events"><div class="event-date" [ngClass]="event.tone"><strong>{{event.day}}</strong><small>{{event.month}}</small></div><div><strong>{{event.title}}</strong><small>{{event.detail}}</small></div><span class="event-type" [ngClass]="event.tone">{{event.type}}</span></div>
+      <a class="view-calendar" href="javascript:void(0)">View Calendar <i class="feather icon-chevron-right"></i></a>
+    </section>
+    <section class="dashboard-card performance-card"><div class="card-title"><h4><i class="feather icon-bar-chart-2"></i> Examination Performance</h4></div><div class="performance-list"><div><span class="ring pass">82%</span><p>Pass</p><small>(1,024)</small></div><div><span class="ring fail">12%</span><p>Fail</p><small>(150)</small></div><div><span class="ring waiting">6%</span><p>Results Pending</p><small>(74)</small></div></div><div class="performance-foot"><span>Based on 1,248 students</span><strong>Term: Final Exam 2025-26</strong></div></section>
+    <section class="dashboard-card activity-card"><div class="card-title"><h4><i class="feather icon-activity"></i> Recent Activity</h4></div><div class="activity-row" *ngFor="let activity of activities"><i class="feather" [ngClass]="activity.icon"></i><div><strong>{{ activity.title }}</strong><small>{{ activity.detail }}</small></div><time>{{ activity.time }}</time></div></section>
+  </div>
+</div>

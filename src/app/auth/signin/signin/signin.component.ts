@@ -60,6 +60,7 @@ export class SigninComponent {
               this.cookieService.set('teamLeaderId', response['payload']['teamLeaderId'], expiredDate);
               this.cookieService.set('superadminId', response['payload']['superadminId'], expiredDate);
               this.cookieService.set('token', response['payload']['token'], expiredDate);
+              this.cookieService.set('service', this.serviceName(response['payload']['service']), expiredDate);
 
               this.getApplicaionHeaderDetails(response['payload']['superadminId']);
 
@@ -68,7 +69,9 @@ export class SigninComponent {
                 detail: response['payload']['respMesg'],
                 styleClass: 'success-background-popover',
               });
-              if (response['payload']['roleType'] == Constant.donorExecutive) {
+              if (this.isSchoolService(response['payload']['service'])) {
+                this.router.navigate([routes.schoolDashboard]);
+              } else if (response['payload']['roleType'] == Constant.donorExecutive) {
                 this.router.navigate([routes.adminDashboard]);
               } else if (response['payload']['roleType'] == Constant.superAdmin) {
                 this.router.navigate([routes.donationDashboard]);
@@ -119,6 +122,48 @@ export class SigninComponent {
     } catch {
       return [];
     }
+  }
+
+  private isSchoolService(service: unknown): boolean {
+    return this.serviceValues(service).includes('SCHOOL');
+  }
+
+  private serviceName(service: unknown): string {
+    return this.serviceValues(service).join(',');
+  }
+
+  private serviceValues(service: unknown): string[] {
+    if (Array.isArray(service)) {
+      return service.flatMap((value) => this.serviceValues(value));
+    }
+
+    if (service && typeof service === 'object') {
+      const value = service as Record<string, unknown>;
+      return this.serviceValues(value['name'] ?? value['value'] ?? value['service']);
+    }
+
+    if (typeof service !== 'string') {
+      return [];
+    }
+
+    const normalized = service.trim();
+    if (!normalized) {
+      return [];
+    }
+
+    try {
+      const parsed = JSON.parse(normalized.replace(/'/g, '"'));
+      if (parsed !== normalized) {
+        return this.serviceValues(parsed);
+      }
+    } catch {
+      // Plain service names such as SCHOOL and DONATION are expected here.
+    }
+
+    return normalized
+      .split(',')
+      .map((value) => value.trim().toUpperCase())
+      .filter(Boolean);
   }
 
   public getApplicaionHeaderDetails(superadminId: any) {
