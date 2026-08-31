@@ -28,6 +28,7 @@ import { MatDialog } from '@angular/material/dialog';
 export class CampaignSendComponent {
 
   public campaignDetailsList:any=[];
+  public selectedChannelFilter: 'ALL' | 'EMAIL' | 'WHATSAPP' | 'SMS' = 'ALL';
     public sendCompaignForm!: FormGroup;
 
   constructor(
@@ -53,6 +54,57 @@ export class CampaignSendComponent {
     
         });
       }
+
+    public selectChannel(channel: 'ALL' | 'EMAIL' | 'WHATSAPP' | 'SMS'): void {
+      this.selectedChannelFilter = channel;
+      this.sendCompaignForm.patchValue({
+        campaignChannel: channel === 'ALL' ? '' : channel,
+        campaignId: '',
+      });
+    }
+
+    public selectCampaign(campaignId: any): void {
+      const campaign = this.campaignDetailsList.find((item: any) => item.id === campaignId);
+      this.sendCompaignForm.patchValue({
+        campaignId,
+        campaignChannel: campaign?.campaignChannel || this.sendCompaignForm.get('campaignChannel')?.value,
+      });
+    }
+
+    public get selectedCampaign(): any {
+      const campaignId = this.sendCompaignForm?.get('campaignId')?.value;
+      return this.campaignDetailsList.find((campaign: any) => campaign.id === campaignId);
+    }
+
+    public get visibleCampaigns(): any[] {
+      if (this.selectedChannelFilter === 'ALL') return this.campaignDetailsList;
+      return this.campaignDetailsList.filter((campaign: any) =>
+        campaign?.campaignChannel?.toUpperCase() === this.selectedChannelFilter,
+      );
+    }
+
+    public get channelSelectionMessage(): string {
+      const channelName = this.selectedChannelFilter === 'ALL'
+        ? 'all channels'
+        : this.selectedChannelFilter === 'WHATSAPP'
+          ? 'WhatsApp'
+          : this.selectedChannelFilter === 'SMS'
+            ? 'SMS'
+            : 'Email';
+      const count = this.visibleCampaigns.length;
+      return `Showing ${count} ${count === 1 ? 'campaign' : 'campaigns'} for ${channelName}.`;
+    }
+
+    public toPlainText(value: string | undefined): string {
+      if (!value) return '';
+      const textArea = document.createElement('textarea');
+      textArea.innerHTML = value.replace(/<[^>]*>/g, ' ');
+      return textArea.value.replace(/\s+/g, ' ').trim();
+    }
+
+    public slideCampaignList(list: HTMLElement): void {
+      list.scrollBy({ left: Math.min(list.clientWidth * 0.8, 320), behavior: 'smooth' });
+    }
 
    public getCampaignDetails() {
     this.campaignSendService.getCampaignDetails().subscribe({

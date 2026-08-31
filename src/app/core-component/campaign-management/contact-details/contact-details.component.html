@@ -1,3 +1,60 @@
+<div class="contacts-page">
+  <p-toast></p-toast>
+  <header class="contacts-header">
+    <div>
+      <h1>Contacts</h1>
+      <nav aria-label="Breadcrumb" class="contacts-breadcrumb">
+        <span>Home</span><i class="feather icon-chevron-right"></i><span>Campaign Management</span><i class="feather icon-chevron-right"></i><strong>Contacts</strong>
+      </nav>
+    </div>
+    <div class="header-actions">
+      <button class="btn contact-primary-btn" type="button" (click)="openAddModal(addContactTemplate)"><i class="feather icon-plus-circle"></i> Add Contact</button>
+      <input #fileInput type="file" accept=".xls,.xlsx" (change)="onFileChange($event)" hidden />
+      <button class="btn contact-outline-btn" type="button" (click)="fileInput.click()"><i class="feather icon-upload"></i> Upload Excel</button>
+    </div>
+  </header>
+
+  <section class="contacts-panel">
+    <div class="contacts-filter-row">
+      <label class="contact-search"><i class="feather icon-search"></i><input [(ngModel)]="searchDataValue" [ngModelOptions]="{ standalone: true }" (ngModelChange)="searchData($event)" type="search" placeholder="Search by name, mobile, organisation..." /></label>
+      <button class="btn contact-filter-btn" type="button" (click)="openFilter()" [class.is-active]="filter"><i class="feather icon-filter"></i> Filter</button>
+      <button class="btn contact-reset-btn" type="button" (click)="resetSearch()"><i class="feather icon-rotate-ccw"></i> Reset</button>
+    </div>
+
+    <div class="advanced-filters" [class.show]="filter">
+      <div><span>Search is applied across contact, mobile, organisation, city, source, and status.</span></div>
+    </div>
+
+    <div class="contacts-toolbar">
+      <span class="toolbar-caption">Contact directory</span>
+      <div class="upload-inline" *ngIf="selectedFileName"><span>{{ selectedFileName }}</span><button class="btn contact-primary-btn" type="button" (click)="uploadFile()"><i class="feather icon-upload"></i> Upload</button></div>
+    </div>
+
+    <div class="table-responsive" *ngIf="!isLoading">
+      <table matSort (matSortChange)="sortData($event)" class="table contacts-table">
+        <thead><tr>
+          <th mat-sort-header="contactName">Contact</th><th mat-sort-header="mobileNumber">Mobile</th><th mat-sort-header="companyName">Organisation</th><th mat-sort-header="city">City</th><th mat-sort-header="leadSource">Source</th><th mat-sort-header="status">Status</th><th class="no-sort">Actions</th>
+        </tr></thead>
+        <tbody>
+          @if (tableData.length > 0) {
+            @for (data of tableData; track $index) {
+              <tr>
+                <td><div class="contact-person"><span class="contact-avatar">{{ getInitials(data.contactName) }}</span><div><strong>{{ data.contactName || '-' }}</strong><small>{{ data.emailId || 'No email address' }}</small></div></div></td>
+                <td>{{ data.mobileNumber || '-' }}</td><td>{{ data.companyName || '-' }}</td><td>{{ data.city || '-' }}</td><td>{{ data.leadSource || '-' }}</td>
+                <td><button class="contact-status" [ngClass]="{'active': data.status === 'ACTIVE', 'inactive': data.status === 'INACTIVE', 'pending': data.status === 'PENDING'}" (click)="changeStatus(data)">{{ data.status || '-' }}</button></td>
+                <td><div class="contact-actions"><button type="button" aria-label="Edit contact" (click)="openEditModal(editContactTemplate, data)"><i class="feather icon-edit-2"></i></button><button type="button" class="delete" aria-label="Delete contact" (click)="openDeleteModal(deleteTemplate, data)"><i class="feather icon-trash-2"></i></button></div></td>
+              </tr>
+            }
+          } @else { <tr><td colspan="7" class="empty-state">No contact details found</td></tr> }
+        </tbody>
+      </table>
+    </div>
+    <div *ngIf="isLoading" class="contacts-loading">Loading contact details...</div>
+    <app-custom-pagination></app-custom-pagination>
+  </section>
+</div>
+
+<ng-container *ngIf="false">
 <div class="page-header">
   <div class="add-item d-flex">
     <div class="page-title">
@@ -215,6 +272,7 @@
   </div>
 </div>
 
+</ng-container>
 <ng-template #editContactTemplate let-dialog>
   <div class="modalHeaderContainer">
     <h2 mat-dialog-title class="p-0">Update Contact Details</h2>
@@ -313,101 +371,32 @@
   </form>
 </ng-template>
 
-<!-- Edit -->
- <ng-template #addContactTemplate let-dialog>
-  <div class="modalHeaderContainer">
-    <h2 mat-dialog-title class="p-0">Add Contact Details</h2>
-
-    <div class="closeBtn">
-      <button type="button" mat-dialog-close class="close" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
-      </button>
-    </div>
-  </div>
-
-  <form [formGroup]="addContactForm" (ngSubmit)="saveContactDetails()">
-    <mat-dialog-content class="modalContent">
-      <div class="modal-body custom-modal-body">
-        <div class="card">
-          <div class="card-body">
-            <div class="new-employee-field">
-              <div class="card-title-head">
-                <h6>
-                  <span><i class="feather icon-info feather-edit"></i></span>
-                  Contact Details
-                </h6>
-              </div>
-
-              <div class="row">
-                <div class="col-lg-4 col-md-4">
-                  <div class="mb-3">
-                    <label class="form-label">Contact Name</label>
-                    <input class="form-control" type="text" formControlName="contactName" />
-                  </div>
-                </div>
-
-                <div class="col-lg-4 col-md-4">
-                  <div class="mb-3">
-                    <label class="form-label">Mobile Number</label>
-                    <input class="form-control" type="text" formControlName="mobileNumber" />
-                  </div>
-                </div>
-
-                <div class="col-lg-4 col-md-4">
-                  <div class="mb-3">
-                    <label class="form-label">Alternate Number</label>
-                    <input class="form-control" type="text" formControlName="alternateNumber" />
-                    
-                  </div>
-                </div>
-
-                <div class="col-lg-4 col-md-4">
-                <div class="mb-3">
-                  <label class="form-label">Email Id</label>
-                  <input class="form-control" type="text" formControlName="emailId" />
-                </div>
-                </div>
-
-                <div class="col-lg-4 col-md-4">
-                <div class="mb-3">
-                  <label class="form-label">Organization Name</label>
-                    <input class="form-control" type="text" formControlName="companyName" />
-                </div>  
-                </div>
-
-                <div class="col-lg-4 col-md-4">
-                <div class="mb-3">
-                  <label class="form-label">address</label>
-                    <input class="form-control" type="text" formControlName="address" />
-                </div>  
-                </div>
-
-                <div class="col-lg-4 col-md-4">
-                <div class="mb-3">
-                  <label class="form-label">city</label>
-                    <input class="form-control" type="text" formControlName="city" />
-                </div>  
-                </div>
-                <div class="col-lg-4 col-md-4">
-                <div class="mb-3">
-                  <label class="form-label">Lead Source</label>
-                    <input class="form-control" type="text" formControlName="leadSource" />
-                </div>  
-                </div>
-
-              </div>
-            </div>
-          </div>
-        </div>
+<ng-template #addContactTemplate let-dialog>
+  <form class="contact-dialog" [formGroup]="addContactForm" (ngSubmit)="saveContactDetails()">
+    <header class="contact-dialog-header">
+      <div class="dialog-title-icon"><i class="feather icon-user-plus"></i></div>
+      <div><h2 mat-dialog-title>Add Contact</h2><p>Create a contact record for your campaign.</p></div>
+      <button type="button" mat-dialog-close class="dialog-close" aria-label="Close"><i class="feather icon-x"></i></button>
+    </header>
+    <mat-dialog-content class="contact-dialog-content">
+      <div class="contact-dialog-section"><i class="feather icon-user"></i><span>Personal details</span></div>
+      <div class="contact-form-grid">
+        <label class="contact-field">Contact name <b>*</b><input class="form-control" type="text" placeholder="Enter full name" formControlName="contactName" /></label>
+        <label class="contact-field">Mobile number <b>*</b><input class="form-control" type="tel" placeholder="Enter 10-digit mobile number" formControlName="mobileNumber" /></label>
+        <label class="contact-field">Alternate number <input class="form-control" type="tel" placeholder="Optional" formControlName="alternateNumber" /></label>
+        <label class="contact-field">Email address <b>*</b><input class="form-control" type="email" placeholder="name@example.com" formControlName="emailId" /></label>
+      </div>
+      <div class="contact-dialog-section"><i class="feather icon-briefcase"></i><span>Organisation details</span></div>
+      <div class="contact-form-grid">
+        <label class="contact-field">Organisation name <b>*</b><input class="form-control" type="text" placeholder="Enter organisation name" formControlName="companyName" /></label>
+        <label class="contact-field">Lead source <b>*</b><input class="form-control" type="text" placeholder="e.g. Website, Referral" formControlName="leadSource" /></label>
+        <label class="contact-field">City <b>*</b><input class="form-control" type="text" placeholder="Enter city" formControlName="city" /></label>
+        <label class="contact-field">Address <input class="form-control" type="text" placeholder="Optional" formControlName="address" /></label>
       </div>
     </mat-dialog-content>
-
-    <mat-dialog-actions class="dialogAction">
-      <div class="text-end mb-3 w-100">
-        <button type="submit" class="btn btn-submit">
-          Save Contact
-        </button>
-      </div>
+    <mat-dialog-actions class="contact-dialog-actions">
+      <span><b>*</b> Required fields</span>
+      <div><button type="button" class="btn dialog-cancel" mat-dialog-close>Cancel</button><button type="submit" class="btn dialog-save"><i class="feather icon-check"></i> Save Contact</button></div>
     </mat-dialog-actions>
   </form>
 </ng-template>

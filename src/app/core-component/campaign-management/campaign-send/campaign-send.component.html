@@ -1,45 +1,30 @@
 <p-toast></p-toast>
-
-<form [formGroup]="sendCompaignForm" (ngSubmit)="sendCompaign()">
-    <div class="card">
-        <div class="card-body">
-            <div class="new-employee-field">
-                <div class="card-title-head">
-                    <h6>
-                        <span><i class="feather icon-info feather-edit"></i></span>Send Campaign
-                    </h6>
-                </div>
-
-
-                <div class="row">
-
-                    <div class="col-sm-3 form-group">
-                        <label class="form-label">Campaign Channel</label>
-                        <mat-select formControlName="campaignChannel" class="select"
-                            placeholder="Select Campaign Channel">
-                            <mat-option value="EMAIL">Email</mat-option>
-                            <mat-option value="WHATSAPP">Whats App</mat-option>
-                            <mat-option value="SMS">SMS</mat-option>
-                        </mat-select>
-                    </div>
-                    <div class="col-sm-3 form-group">
-                        <label class="form-label">Campaign Name</label>
-                        <mat-select formControlName="campaignId" class="select" placeholder="Select CampaignName">
-                            <mat-option *ngFor="let campaignDetails of campaignDetailsList"
-                                [value]="campaignDetails.id">
-                                {{ campaignDetails.campaignName }}
-                            </mat-option>
-                        </mat-select>
-                    </div>
-
-
-                </div>
-
-
-            </div>
+<form class="campaign-send-page" [formGroup]="sendCompaignForm" (ngSubmit)="sendCompaign()">
+  <header class="campaign-send-header"><div><h1>Send Campaign</h1><div class="campaign-breadcrumb">Campaigns <i class="feather icon-chevron-right"></i> Send Campaign</div></div><button type="submit" class="btn send-campaign-btn"><i class="feather icon-send"></i> Preview &amp; Send</button></header>
+  <div class="campaign-workspace">
+    <main class="campaign-main">
+      <div class="campaign-steps"><div class="step active"><b>1</b><span><strong>Select Channel</strong><small>Choose channel</small></span></div><div class="step"><b>2</b><span><strong>Select Campaign</strong><small>Choose campaign</small></span></div><div class="step"><b>3</b><span><strong>Review &amp; Send</strong><small>Confirm and send</small></span></div></div>
+      <section class="campaign-section"><div class="section-heading"><h2>1. Select Channel</h2><p>Choose the channel where you want to send this campaign.</p></div><div class="channel-grid">
+        <button type="button" class="channel-card all" [class.selected]="selectedChannelFilter === 'ALL'" (click)="selectChannel('ALL')"><span><i class="feather icon-grid"></i></span><div><strong>All Channels</strong><small>Show all campaigns</small></div><i class="feather icon-check-circle"></i></button>
+        <button type="button" class="channel-card whatsapp" [class.selected]="selectedChannelFilter === 'WHATSAPP'" (click)="selectChannel('WHATSAPP')"><span><i class="feather icon-message-circle"></i></span><div><strong>WhatsApp</strong><small>Send via WhatsApp</small></div><i class="feather icon-check-circle"></i></button>
+        <button type="button" class="channel-card sms" [class.selected]="selectedChannelFilter === 'SMS'" (click)="selectChannel('SMS')"><span><i class="feather icon-message-circle"></i></span><div><strong>SMS</strong><small>Send via SMS</small></div><i class="feather icon-check-circle"></i></button>
+        <button type="button" class="channel-card email" [class.selected]="selectedChannelFilter === 'EMAIL'" (click)="selectChannel('EMAIL')"><span><i class="feather icon-mail"></i></span><div><strong>Email</strong><small>Send via Email</small></div><i class="feather icon-check-circle"></i></button>
+      </div></section>
+      <section class="campaign-section campaign-picker"><div class="section-heading"><h2>2. Select Campaign</h2><p>Choose the campaign you want to send.</p><div class="channel-selection-message"><i class="feather icon-filter"></i>{{ channelSelectionMessage }}</div></div>
+        <div class="campaign-list-wrapper" *ngIf="visibleCampaigns.length; else noCampaigns">
+          <div #campaignList class="campaign-list">
+            <button type="button" class="campaign-list-card" *ngFor="let campaignDetails of visibleCampaigns" [class.selected]="sendCompaignForm.get('campaignId')?.value === campaignDetails.id" (click)="selectCampaign(campaignDetails.id)">
+            <span class="campaign-card-icon"><i class="feather" [ngClass]="campaignDetails.campaignChannel === 'EMAIL' ? 'icon-mail' : 'icon-message-circle'"></i></span>
+            <span class="campaign-card-content"><strong>{{ campaignDetails.campaignName }}</strong><span class="campaign-message" role="textbox" aria-readonly="true" *ngIf="campaignDetails.message || campaignDetails.campaignDescription || campaignDetails.description" [innerHTML]="campaignDetails.message || campaignDetails.campaignDescription || campaignDetails.description"></span></span>
+            <i class="feather icon-check-circle"></i>
+            </button>
+          </div>
+          <button type="button" class="campaign-slide-next" aria-label="Show more campaigns" (click)="slideCampaignList(campaignList)"><i class="feather icon-chevron-right"></i></button>
         </div>
-    </div>
-    <div class="text-mid mb-3">
-        <button type="submit" class="btn btn-submit">send Compaign</button>
-    </div>
+        <ng-template #noCampaigns><div class="no-campaigns">No campaigns available. Please create a campaign first.</div></ng-template>
+      </section>
+      <section class="campaign-section review-section"><div class="section-heading"><h2>3. Review &amp; Send</h2><p>Review your campaign settings before sending.</p></div><div class="review-card"><i class="feather icon-info"></i><span>Choose a channel and campaign, then send when you are ready.</span></div><div class="send-row"><button type="submit" class="btn send-campaign-btn" [disabled]="sendCompaignForm.invalid"><i class="feather icon-send"></i> Send Campaign</button></div></section>
+    </main>
+    <aside class="campaign-summary"><section><h2>Campaign Summary</h2><dl><dt>Campaign Name</dt><dd>{{ selectedCampaign?.campaignName || 'Not selected' }}</dd><dt>Channel</dt><dd class="summary-channel"><i class="feather" [ngClass]="sendCompaignForm.get('campaignChannel')?.value === 'EMAIL' ? 'icon-mail' : 'icon-message-circle'"></i>{{ sendCompaignForm.get('campaignChannel')?.value || 'Not selected' }}</dd></dl></section><section><h2>Sending Summary</h2><dl><dt>Selected Campaign</dt><dd>{{ selectedCampaign ? 'Ready to send' : 'Not selected' }}</dd><dt>Status</dt><dd>Draft</dd></dl></section><section class="summary-tip"><i class="feather icon-lightbulb"></i><div><h3>Tip</h3><p>Please review your campaign selection before sending.</p></div></section></aside>
+  </div>
 </form>

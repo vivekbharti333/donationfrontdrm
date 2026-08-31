@@ -234,6 +234,24 @@ export class ContactDetailsComponent implements OnInit, OnDestroy {
     });
   }
 
+  public resetSearch(): void {
+    this.searchDataValue = '';
+    this.searchData('');
+  }
+
+  public getContactsWith(field: string): number {
+    return this.allTableData.filter((contact: any) => !!contact?.[field]).length;
+  }
+
+  public getActiveContacts(): number {
+    return this.allTableData.filter((contact: any) => contact?.status === 'ACTIVE').length;
+  }
+
+  public getInitials(name: string | undefined): string {
+    if (!name) return '?';
+    return name.split(' ').filter(Boolean).slice(0, 2).map(part => part[0]).join('').toUpperCase();
+  }
+
   toggleCollapse(): void {
     this.sidebar.toggleCollapse();
     this.isCollapsed = !this.isCollapsed;
@@ -245,10 +263,10 @@ export class ContactDetailsComponent implements OnInit, OnDestroy {
 
   openAddModal(templateRef: TemplateRef<any>) {
       this.addContactDialog = this.dialog.open(templateRef, {
-        width: '1400px', // Set your desired width
-        // height: '600px', // Set your desired height
-        disableClose: true, // Optional: prevent closing by clicking outside
-        panelClass: 'custom-modal', // Optional: add custom class for additional styling
+        width: '880px',
+        maxWidth: 'calc(100vw - 32px)',
+        disableClose: true,
+        panelClass: 'custom-modal',
       });
     }
 
