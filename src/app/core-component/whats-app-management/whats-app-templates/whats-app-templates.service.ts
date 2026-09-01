@@ -27,7 +27,7 @@ export class WhatsAppTemplatesService {
           // roleType: this.loginUser['roleType'],
           // loginId: this.loginUser['loginId'],
           // token: this.loginUser['token'],
-          // superadminId: this.loginUser['superadminId'],
+          superadminId: this.loginUser['superadminId'],
   
         }
       };

@@ -33,11 +33,27 @@ export class CampaignSendService {
     return this.http.post<any>(Constant.Site_Url + "getCampaignDetails", request);
   }
 
+  getWhatsAppTemplate(): Observable<any> {
+    return this.http.post<any>(Constant.Site_Url + 'getWhatsAppTemplate', {
+      payload: {
+        requestFor: 'ALL',
+        superadminId: this.loginUser['superadminId'],
+      },
+    });
+  }
+
   sendCompaign(campaignDetails: any): Observable<any> {
     let request: any = {
       payload: {
         campaignId: campaignDetails.campaignId,
+        templateId: campaignDetails.templateId,
         campaignChannel: campaignDetails.campaignChannel,
+        campaignName: campaignDetails.campaignName,
+        campaignType: campaignDetails.campaignType,
+        campaignTo: campaignDetails.campaignTo,
+        description: campaignDetails.description,
+        recipientMode: campaignDetails.recipientMode,
+        contactIds: campaignDetails.contactIds,
 
         roleType: this.cookieService.get('roleType'),
         token: this.cookieService.get('token'),
