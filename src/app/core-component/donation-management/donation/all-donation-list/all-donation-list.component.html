@@ -24,94 +24,111 @@
   </div>
 </div>
 
-<div class="card table-list-card">
-  <div class="card-body">
-    <div class="table-top">
+<div class="card table-list-card donation-list-card">
+  <div class="card-body donation-list-body">
+    <div class="table-top donation-toolbar">
       <div class="search-set">
         <div class="search-input">
-          <a href="javascript:void(0);" class="btn btn-searchset"><i class="feather icon-search feather-search"></i></a>
+          <span class="btn btn-searchset"><i class="feather icon-search feather-search"></i></span>
           <div class="dataTables_filter">
-            <label>
+            <label aria-label="Search donation receipts">
               <input [(ngModel)]="searchDataValue" [ngModelOptions]="{ standalone: true }"
                 (ngModelChange)="searchData(searchDataValue)" type="search" class="form-control"
-                placeholder="Search..." />
+                placeholder="Search donor, mobile, receipt…" />
             </label>
           </div>
         </div>
       </div>
-      
+      <button *ngIf="showExcelReport" type="button" class="toolbar-export-btn" (click)="exportAsExcelFile()">
+        <img src="assets/img/icons/xls.svg" width="20" alt="">
+        <span>Export Excel</span>
+      </button>
     </div>
 
+    <div class="report-workspace">
 
+  <div class="report-heading">
+    <div>
+      <span class="report-eyebrow">Donation analytics</span>
+      <h5>Choose a report period</h5>
+      <p>View donations from a preset period or select your own date range.</p>
+    </div>
+    <span class="report-count" *ngIf="!isLoading">
+      <strong>{{ totalData }}</strong> {{ totalData === 1 ? 'record' : 'records' }}
+    </span>
+  </div>
 
-    <div class="card-body">
+  <!-- Mobile report selector -->
+  <div class="mobile-report-select d-block d-lg-none">
+    <label for="mobileReportPeriod">Report period</label>
+    <select id="mobileReportPeriod" class="form-select orange-select"
+            [value]="activeTab" (change)="handleMobileReportChange($event)">
+      <option value="TODAY">Today</option>
+      <option value="YESTERDAY">Yesterday</option>
+      <option value="MONTH">Current month ({{ currentMonthName }})</option>
+      <option *ngIf="isSuperadmin" value="CUSTOM">Custom date range</option>
+    </select>
+  </div>
 
-  <!-- MOBILE TABS (scrollable) -->
-  <!-- Mobile Dropdown (visible only on mobile) -->
-<div class="d-block d-lg-none mb-3">
-  <select class="form-select orange-select" (change)="handleMobileReportChange($event)">
-    <option value="TODAY">Today's Reports</option>
-    <option value="YESTERDAY">Yesterday's Reports</option>
-    <option value="MONTH">{{ currentMonthName }}'s Reports</option>
-    <ng-container *ngIf="isSuperadmin">
-      <option value="CUSTOM">Custom Report</option>
-    </ng-container>
-  </select>
-</div>
-
-
-
-
-  <!-- DESKTOP TABS (normal bootstrap tabs) -->
-  <ul class="nav nav-tabs nav-tabs-solid nav-justified mb-3 d-none d-lg-flex">
-    <li class="nav-item">
-      <a class="nav-link active" data-bs-toggle="tab" href="#solid-justified-tab"
-         (click)="getDonationList('TODAY')">Today's Reports</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" data-bs-toggle="tab" href="#solid-justified-tab"
-         (click)="getDonationList('YESTERDAY')">Yesterday's Reports</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" data-bs-toggle="tab" href="#solid-justified-tab"
-         (click)="getDonationList('MONTH')">{{ currentMonthName }}'s Reports</a>
-    </li>
-    <li class="nav-item" *ngIf="isSuperadmin">
-      <a class="nav-link" data-bs-toggle="tab" href="#solid-justified-tab4"
-         (click)="dataTableClear()">Custom Report</a>
-    </li>
-  </ul>
+  <!-- Desktop report tabs -->
+  <div class="report-tabs d-none d-lg-grid" role="tablist" aria-label="Donation report period">
+    <button type="button" class="report-tab" [class.active]="activeTab === 'TODAY'"
+            [attr.aria-selected]="activeTab === 'TODAY'" (click)="getDonationList('TODAY')">
+      <i class="feather icon-sun"></i>
+      <span><strong>Today</strong><small>Today's donations</small></span>
+    </button>
+    <button type="button" class="report-tab" [class.active]="activeTab === 'YESTERDAY'"
+            [attr.aria-selected]="activeTab === 'YESTERDAY'" (click)="getDonationList('YESTERDAY')">
+      <i class="feather icon-clock"></i>
+      <span><strong>Yesterday</strong><small>Previous day</small></span>
+    </button>
+    <button type="button" class="report-tab" [class.active]="activeTab === 'MONTH'"
+            [attr.aria-selected]="activeTab === 'MONTH'" (click)="getDonationList('MONTH')">
+      <i class="feather icon-calendar"></i>
+      <span><strong>Current month</strong><small>{{ currentMonthName }}</small></span>
+    </button>
+    <button *ngIf="isSuperadmin" type="button" class="report-tab" [class.active]="activeTab === 'CUSTOM'"
+            [attr.aria-selected]="activeTab === 'CUSTOM'" (click)="dataTableClear()">
+      <i class="feather icon-sliders"></i>
+      <span><strong>Custom report</strong><small>Select dates</small></span>
+    </button>
+  </div>
 
   <div class="tab-content">
 
    <!-- SHOW ONLY FOR CUSTOM REPORT -->
 <div *ngIf="showCustomFilter" class="custom-filter-box">
 
+  <div class="custom-filter-heading">
+    <i class="feather icon-calendar"></i>
+    <div><strong>Custom date range</strong><span>Select both dates to generate your report.</span></div>
+  </div>
+
   <div class="row g-3 align-items-end">
 
     <!-- From Date -->
     <div class="col-6 col-md-2">
-      <label class="filter-label">From</label>
-      <input type="date" class="form-control filter-input" #firstDate>
+      <label class="filter-label" for="donationFromDate">From date</label>
+      <input id="donationFromDate" type="date" class="form-control filter-input" #firstDate>
     </div>
 
     <!-- To Date -->
     <div class="col-6 col-md-2">
-      <label class="filter-label">To</label>
-      <input type="date" class="form-control filter-input" #lastDate>
+      <label class="filter-label" for="donationToDate">To date</label>
+      <input id="donationToDate" type="date" class="form-control filter-input" #lastDate>
     </div>
 
     <!-- Search Button -->
     <div class="col-12 col-md-2">
-      <button class="btn btn-warning w-100 filter-btn"
+      <button class="btn w-100 filter-btn"
               (click)="getDonationListByDate(firstDate.value, lastDate.value)">
-        <i class="feather icon-search feather-search"></i> Search
+        <i class="feather icon-search feather-search"></i> Generate report
       </button>
     </div>
 
     <!-- Excel Download -->
     <div class="col-12 col-md-2" *ngIf="showExcelReport">
-      <label class="filter-label d-none d-md-block">Export Excel</label>
+      <label class="filter-label d-none d-md-block">Download</label>
       <div>
         <a class="excel-icon" (click)="exportAsExcelFile()">
           <img src="assets/img/icons/xls.svg" width="35" alt="Export Excel">
@@ -127,7 +144,7 @@
     <!-- DESKTOP TABLE -->
     <div class="desktop-table">
       <div class="tab-pane show active" id="solid-justified-tab">
-        <div class="table-responsive">
+        <div class="table-responsive donation-table-shell">
           <table matSort (matSortChange)="sortData($event)" class="table datanew">
             <thead>
               <tr>
@@ -148,9 +165,9 @@
             <tbody>
               @for (data of tableData; track data) {
               <tr>
-                <td>{{ data.donorName }}</td>
+                <td><span class="donor-name-cell">{{ data.donorName }}</span></td>
                 <td>{{ data.mobileNumber }}</td>
-                <td>{{ data.amount }} {{ data.currency }}</td>
+                <td><span class="amount-cell">{{ data.amount }} {{ data.currency }}</span></td>
                 <td>{{ data.paymentMode }}</td>
                 <td>{{ data.createdbyName }}</td>
                 <!-- <td>{{ data.programName }}</td> -->
@@ -189,31 +206,35 @@
 
                 <td class="action-table-data">
                   <div class="edit-delete-action">
-                    <a class="me-2 p-2 mb-0" *ngIf="isSuperadmin"
+                    <button type="button" class="table-action-btn edit-action" *ngIf="isSuperadmin" title="Edit donation"
                        (click)="openEditModal(dialogTemplate, data)">
                       <i class="feather icon-edit feather-edit"></i>
-                    </a>
+                    </button>
 
-                    <a class="me-2 p-2 mb-0 whatsapp-share" *ngIf="isSuperadmin"
+                    <button type="button" class="table-action-btn whatsapp-share" *ngIf="isSuperadmin"
                       (click)="shareOnWhatsApp(data.receiptNumber, data.mobileNumber)"
                       title="Share on WhatsApp">
                       <i class="feather icon-share-2"></i>
-                    </a>
+                    </button>
 
-                    <a class="me-2 p-2 mb-0" 
+                    <button type="button" class="table-action-btn download-action" title="Download receipt"
                        (click)="downloadInvoice(data.receiptNumber)">
                       <i class="feather icon-download feather-download"></i>
-                    </a>
+                    </button>
                   </div>
                 </td>
               </tr>
               }
             </tbody>
           </table>
-          <div *ngIf="isLoading" class="table-state">
-            <span class="spinner-border spinner-border-sm text-warning me-2"></span>Loading donations…
+          <div *ngIf="isLoading" class="table-state loading-state">
+            <span class="spinner-border spinner-border-sm me-2"></span>Loading donations…
           </div>
-          <div *ngIf="!isLoading && !tableData.length" class="table-state">No donations found.</div>
+          <div *ngIf="!isLoading && !tableData.length" class="table-state empty-state">
+            <span class="empty-state-icon"><i class="feather icon-inbox"></i></span>
+            <strong>No donations found</strong>
+            <span>Try another report period or change your search.</span>
+          </div>
         </div>
       </div>
     </div>
@@ -295,7 +316,11 @@
       <div *ngIf="isLoading" class="table-state">
         <span class="spinner-border spinner-border-sm text-warning me-2"></span>Loading donations…
       </div>
-      <div *ngIf="!isLoading && !tableData.length" class="table-state">No donations found.</div>
+      <div *ngIf="!isLoading && !tableData.length" class="table-state empty-state">
+        <span class="empty-state-icon"><i class="feather icon-inbox"></i></span>
+        <strong>No donations found</strong>
+        <span>Try another period or change your search.</span>
+      </div>
     </div>
 
     <!-- /Filter -->

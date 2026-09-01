@@ -255,6 +255,7 @@ export class AllDonationListComponent implements OnDestroy {
 
 
   public getDonationList(tabName: string): void {
+  this.activeTab = tabName;
   this.showCustomFilter = false;
   this.tabName = tabName;
 
@@ -299,6 +300,7 @@ export class AllDonationListComponent implements OnDestroy {
 
 
   dataTableClear(){
+    this.activeTab = 'CUSTOM';
     this.showCustomFilter = true;
     this.tableData = [];
     this.activeData = [];
@@ -322,6 +324,7 @@ export class AllDonationListComponent implements OnDestroy {
 
   // 🔥 CLEAR DATA BEFORE API CALL
   this.showExcelReport = false;
+  this.activeTab = 'CUSTOM';
   this.donationList = [];
   this.firstDate = firstDate;
   this.lastDate = lastDate;

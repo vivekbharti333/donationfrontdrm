@@ -43,6 +43,32 @@ export class CustomPaginationComponent {
     });
   }
 
+  public get visiblePageItems(): Array<number | 'ellipsis'> {
+    const visiblePages = new Set<number>([
+      1,
+      2,
+      this.currentPage - 1,
+      this.currentPage,
+      this.currentPage + 1,
+      this.totalPages - 1,
+      this.totalPages,
+    ]);
+
+    const sortedPages = [...visiblePages]
+      .filter((page) => page >= 1 && page <= this.totalPages)
+      .sort((a, b) => a - b);
+    const items: Array<number | 'ellipsis'> = [];
+
+    sortedPages.forEach((page, index) => {
+      if (index > 0 && page - sortedPages[index - 1] > 1) {
+        items.push('ellipsis');
+      }
+      items.push(page);
+    });
+
+    return items;
+  }
+
    
 
   public getMoreData(event: string): void {
