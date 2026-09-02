@@ -76,10 +76,11 @@ export class AddWhatsAppTemplatesComponent {
       new RegExp(`${variablePattern}$`).test(body);
   }
 
-  createVariableGroup(key: string, value: string = '') {
+  createVariableGroup(key: string, value: string = '', type: string = 'contactName') {
     return this.fb.group({
       key: [key],
-      value: [value, Validators.required]
+      value: [value, Validators.required],
+      type: [type]
     });
   }
 
@@ -179,7 +180,7 @@ export class AddWhatsAppTemplatesComponent {
     unique.forEach((v: string) => {
       const existing = oldValues.find((x: any) => x.key === v);
 
-      formArray.push(this.createVariableGroup(v, existing?.value || ''));
+      formArray.push(this.createVariableGroup(v, existing?.value || '', existing?.type || 'contactName'));
     });
   }
 
@@ -206,7 +207,7 @@ export class AddWhatsAppTemplatesComponent {
     variables.forEach((variable: any, index: number) => {
       const newKey = this.getVariableKey(index);
       body = body.replaceAll(`__WA_FORMAT_VARIABLE_${index}__`, newKey);
-      this.variablesArray.push(this.createVariableGroup(newKey, variable.value));
+      this.variablesArray.push(this.createVariableGroup(newKey, variable.value, variable.type || 'contactName'));
     });
     headerVariables.forEach((variable: any, index: number) => {
       const newKey = this.getHeaderVariableKey();
@@ -239,7 +240,7 @@ export class AddWhatsAppTemplatesComponent {
     remainingVariables.forEach((variable: any, variableIndex: number) => {
       const newKey = this.getVariableKey(variableIndex);
       body = body.replaceAll(`__WA_VARIABLE_${variableIndex}__`, newKey);
-      this.variablesArray.push(this.createVariableGroup(newKey, variable.value));
+      this.variablesArray.push(this.createVariableGroup(newKey, variable.value, variable.type || 'contactName'));
     });
 
     body = body
@@ -397,7 +398,8 @@ export class AddWhatsAppTemplatesComponent {
 
         msgBodyVariable: form.msgBodyVariable.map((variable: any) => ({
           bodyVariable: String(variable.key).replace(/[{}]/g, ''),
-          example: variable.value
+          example: variable.value,
+          variableType: variable.type
         })),
 
         bodyExample: [

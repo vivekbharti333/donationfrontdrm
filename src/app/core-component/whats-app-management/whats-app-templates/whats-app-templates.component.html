@@ -87,7 +87,7 @@
                       <i class="feather icon-edit feather-edit"></i>
                     </a>
 
-                    <a class="me-2 confirm-text p-2 mb-0" href="javascript:void(0);" (click)="deleteTemplateByName(data.templateName)">
+                    <a class="me-2 confirm-text p-2 mb-0" href="javascript:void(0);" (click)="deleteTemplateByName(data.templateName, data.templateId)">
                       <i class="feather icon-trash-2 feather-trash-2"></i>
                     </a>
 
@@ -283,6 +283,12 @@
               </div>
 
               <input formControlName="value" placeholder="Example value" />
+              <select formControlName="type" aria-label="Contact field for variable">
+                <option value="contactName">Contact Name</option>
+                <option value="mobileNumber">Mobile Number</option>
+                <option value="emailId">Email Id</option>
+                <option value="companyName">Company Name</option>
+              </select>
             </div>
 
           </div>

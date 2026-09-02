@@ -39,6 +39,7 @@ export class CampaignSendComponent {
   public contactSearch = '';
   public isContactsLoading = false;
   public selectedChannelFilter: 'ALL' | 'EMAIL' | 'WHATSAPP' | 'SMS' = 'ALL';
+  public isCampaignDropdownOpen = false;
     public sendCompaignForm!: FormGroup;
 
   constructor(
@@ -67,8 +68,15 @@ export class CampaignSendComponent {
         });
       }
 
+    public get currentCampaignStep(): number {
+      if (!this.selectedChannelFilter || this.selectedChannelFilter === 'ALL') return 1;
+      if (!this.sendCompaignForm?.get('campaignId')?.value) return 2;
+      return 3;
+    }
+
     public selectChannel(channel: 'ALL' | 'EMAIL' | 'WHATSAPP' | 'SMS'): void {
       this.selectedChannelFilter = channel;
+      this.isCampaignDropdownOpen = false;
       this.sendCompaignForm.patchValue({
         campaignChannel: channel === 'ALL' ? '' : channel,
         campaignId: '',
@@ -92,6 +100,15 @@ export class CampaignSendComponent {
         this.selectedChannelFilter = 'WHATSAPP';
         this.getWhatsAppTemplates();
       }
+      this.isCampaignDropdownOpen = false;
+    }
+
+    public toggleCampaignDropdown(): void {
+      this.isCampaignDropdownOpen = !this.isCampaignDropdownOpen;
+    }
+
+    public isCampaignSelected(campaign: any): boolean {
+      return String(campaign?.id) === String(this.sendCompaignForm?.get('campaignId')?.value || '');
     }
 
     public getWhatsAppTemplates(): void {
@@ -120,7 +137,25 @@ export class CampaignSendComponent {
     }
 
     public get eligibleContacts(): any[] {
-      return this.contacts.filter(contact => !!(contact?.mobileNumber || contact?.whatsAppNumber || contact?.phoneNumber));
+      return this.contacts.filter(contact => {
+        if (this.recipientChannel === 'EMAIL') return !!contact?.emailId;
+        if (this.recipientChannel === 'ALL') return !!(contact?.mobileNumber || contact?.whatsAppNumber || contact?.phoneNumber || contact?.emailId);
+        return !!(contact?.mobileNumber || contact?.whatsAppNumber || contact?.phoneNumber);
+      });
+    }
+
+    public get recipientChannel(): string {
+      return String(this.sendCompaignForm?.get('campaignChannel')?.value || this.selectedChannelFilter || 'ALL').toUpperCase();
+    }
+
+    public recipientContactDetail(contact: any): string {
+      return this.recipientChannel === 'EMAIL'
+        ? contact?.emailId || 'No email address'
+        : contact?.mobileNumber || contact?.whatsAppNumber || contact?.phoneNumber || 'No mobile number';
+    }
+
+    public get recipientContactLabel(): string {
+      return this.recipientChannel === 'EMAIL' ? 'email addresses' : this.recipientChannel === 'ALL' ? 'contacts available' : 'contacts with mobile numbers';
     }
 
     public get filteredContacts(): any[] {
@@ -249,6 +284,13 @@ export class CampaignSendComponent {
     recipientMode: this.recipientMode,
     contactIds: this.recipientMode === 'ALL' ? [] : selectedContactIds,
     campaignTo: this.recipientMode === 'ALL' ? 'ALL_ELIGIBLE_CONTACTS' : `${selectedContactIds.length} selected contacts`,
+    whatsAppRequest: this.selectedWhatsAppTemplate ? {
+      templateName: this.selectedWhatsAppTemplate.templateName,
+      language: this.selectedWhatsAppTemplate.language || 'en',
+      msgBodyVariable: (this.selectedWhatsAppTemplate.msgBodyVariable || []).map((variable: any) => ({
+        bodyVariable: variable.bodyVariable || variable.value || '',
+      })),
+    } : null,
     description: this.selectedWhatsAppTemplate
       ? this.selectedWhatsAppTemplate.msgBodyText || this.selectedWhatsAppTemplate.message || this.selectedWhatsAppTemplate.body || ''
       : this.selectedCampaign?.campaignDescription || this.selectedCampaign?.description || '',

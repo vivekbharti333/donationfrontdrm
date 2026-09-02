@@ -80,10 +80,11 @@ export class WhatsAppTemplatesComponent {
     });
   }
 
-  createVariableGroup(key: string, value = ''): FormGroup {
+  createVariableGroup(key: string, value = '', type = 'contactName'): FormGroup {
     return this.fb.group({
       key: [key],
-      value: [value, Validators.required]
+      value: [value, Validators.required],
+      type: [type]
     });
   }
 
@@ -199,7 +200,7 @@ export class WhatsAppTemplatesComponent {
     this.variablesArray.clear();
     matches.forEach(key => {
       const existing = oldValues.find((item: any) => item.key === key);
-      this.variablesArray.push(this.createVariableGroup(key, existing?.value || ''));
+      this.variablesArray.push(this.createVariableGroup(key, existing?.value || '', existing?.type || 'contactName'));
     });
   }
 
@@ -267,7 +268,7 @@ export class WhatsAppTemplatesComponent {
     });
 
     variables.forEach(variable =>
-      this.variablesArray.push(this.createVariableGroup(variable.key, variable.value))
+      this.variablesArray.push(this.createVariableGroup(variable.key, variable.value, variable.type || 'contactName'))
     );
     this.detectVariables();
 
@@ -293,6 +294,11 @@ export class WhatsAppTemplatesComponent {
       ...form,
       headerAvailable: !!form.headerText || form.headerFormat !== 'TEXT',
       headerExample: form.headerFormat === 'TEXT' ? [form.headerText || 'Sample'] : [],
+      msgBodyVariable: form.msgBodyVariable.map((variable: any) => ({
+        bodyVariable: String(variable.key).replace(/[{}]/g, ''),
+        example: variable.value,
+        variableType: variable.type
+      })),
       bodyExample: [form.msgBodyVariable.map((variable: any) => variable.value)],
       footerAvailable: !!form.footerText,
       replyButtonAvailable: false
@@ -318,7 +324,7 @@ export class WhatsAppTemplatesComponent {
     });
   }
 
-  async deleteTemplateByName(templateName: string): Promise<void> {
+  async deleteTemplateByName(templateName: string, templateId?: string | number): Promise<void> {
     const result = await Swal.fire({
       title: 'Delete template?',
       text: `"${templateName}" will be permanently deleted.`,
@@ -331,7 +337,7 @@ export class WhatsAppTemplatesComponent {
       return;
     }
 
-    this.whatsAppTemplatesService.deleteWhatsAppTemplateByName(templateName).subscribe({
+    this.whatsAppTemplatesService.deleteWhatsAppTemplateByName(templateName, templateId).subscribe({
       next: (response: any) => {
         if (Number(response?.responseCode) === 200) {
           Swal.fire('Deleted', response?.responseMessage || 'Template deleted.', 'success');
@@ -356,17 +362,18 @@ export class WhatsAppTemplatesComponent {
     return Math.max(0, ...keys.filter(Number.isFinite)) + 1;
   }
 
-  private normalizeVariables(data: any): Array<{ key: string; value: string }> {
+  private normalizeVariables(data: any): Array<{ key: string; value: string; type: string }> {
     const source = Array.isArray(data?.msgBodyVariable) ? data.msgBodyVariable : [];
+    const placeholders = [...new Set(String(data?.msgBodyText || '').match(/{{\d+}}/g) || [])];
     if (source.length) {
       return source.map((variable: any, index: number) => ({
-        key: variable.key || variable.variableType || `{{${index + 1}}}`,
-        value: variable.value || variable.bodyVariable || ''
+        key: variable.key || placeholders[index] || `{{${index + 1}}}`,
+        value: variable.value || variable.example || variable.bodyVariable || '',
+        type: variable.type || variable.variableType || 'contactName'
       }));
     }
 
-    return [...new Set(String(data?.msgBodyText || '').match(/{{\d+}}/g) || [])]
-      .map(key => ({ key, value: '' }));
+    return placeholders.map(key => ({ key, value: '', type: 'contactName' }));
   }
 
   private mediaTypeFromHeader(headerFormat: string): string {

@@ -245,6 +245,12 @@
           </div>
 
           <input formControlName="value" placeholder="Example value" />
+          <select formControlName="type" aria-label="Variable type">
+            <option value="contactName">Contact Name</option>
+            <option value="mobileNumber">Mobile Number</option>
+            <option value="emailId">Email Id</option>
+            <option value="companyName">Company Name</option>
+          </select>
           <button type="button"
                   class="remove-variable"
                   (click)="removeVariable(i)"

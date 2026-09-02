@@ -193,8 +193,12 @@
   <!-- Mobile Menu -->
   <div class="dropdown mobile-user-menu">
     <a href="javascript:void(0);" class="nav-link dropdown-toggle mobile-profile-toggle" data-bs-toggle="dropdown"
-      aria-expanded="false">
-      <img [src]="userPicture" [alt]="userName || 'User profile'" (error)="useDefaultUserImage($event)">
+      aria-expanded="false" aria-label="Open profile menu">
+      <span class="mobile-profile-dots" aria-hidden="true">
+        <span></span>
+        <span></span>
+        <span></span>
+      </span>
     </a>
     <div class="dropdown-menu dropdown-menu-right">
       <a class="dropdown-item" [routerLink] = "routes.profile">My Profile</a>

@@ -34,10 +34,12 @@ export class WhatsAppTemplatesService {
       return this.http.post<any>(Constant.Site_Url + "getWhatsAppTemplate", request);
     }
 
-    deleteWhatsAppTemplateByName(templateName : string): Observable<any> {
+    deleteWhatsAppTemplateByName(templateName: string, templateId?: string | number): Observable<any> {
       let request: any = {
         payload: {
           "templateName": templateName,  
+          "superadminId": this.loginUser?.superadminId,
+          "templateId": templateId,
         }
       };
       return this.http.post<any>(Constant.Site_Url + "deleteWhatsAppTemplateByName", request);

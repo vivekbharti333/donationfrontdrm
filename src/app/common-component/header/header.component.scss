@@ -2,14 +2,36 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0 !important;
-}
-
-.mobile-profile-toggle img {
   width: 38px;
   height: 38px;
-  border: 2px solid #fff;
+  min-width: 38px;
+  padding: 0 !important;
+  border: 0;
+  background: transparent;
+}
+
+.mobile-profile-toggle::after {
+  display: none;
+}
+
+.mobile-profile-dots {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.mobile-profile-dots span {
+  display: block;
+  width: 5px;
+  height: 5px;
   border-radius: 50%;
-  object-fit: cover;
-  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.16);
+  background: #ff9f43;
+}
+
+@media (max-width: 480px) {
+  .mobile-profile-toggle {
+    margin-top: 0;
+    margin-right: 18px;
+  }
 }

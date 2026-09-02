@@ -54,12 +54,12 @@ export class CampaignSendService {
         description: campaignDetails.description,
         recipientMode: campaignDetails.recipientMode,
         contactIds: campaignDetails.contactIds,
+        whatsAppRequest: campaignDetails.whatsAppRequest,
 
         roleType: this.cookieService.get('roleType'),
         token: this.cookieService.get('token'),
         createdBy: this.cookieService.get('loginId'),
         superadminId: this.cookieService.get('superadminId'),
-        // superadminId: '8800689752',
 
       }
     };
