@@ -302,6 +302,7 @@ export class AllDonationListComponent implements OnDestroy {
   dataTableClear(){
     this.activeTab = 'CUSTOM';
     this.showCustomFilter = true;
+    this.showExcelReport = false;
     this.tableData = [];
     this.activeData = [];
     this.pageSize = 10;

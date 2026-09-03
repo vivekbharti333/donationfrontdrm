@@ -264,9 +264,11 @@ export class UsersComponent {
       this.userPhoto = this.userImageUrl(user);
   
       this.userUpdateDialog = this.dialog.open(templateRef, {
-        width: '1400px',
+        width: '1100px',
+        maxWidth: '95vw',
+        maxHeight: '92vh',
         disableClose: true,
-        panelClass: 'custom-modal',
+        panelClass: ['custom-modal', 'user-edit-dialog'],
       });
     });
   }

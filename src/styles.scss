@@ -83,6 +83,13 @@ $template-angular-theme: mat.define-light-theme((color: (primary: $template-angu
   font-weight: 600;
 }
 
+/* Keep the user editor inside the viewport with its header and actions visible. */
+.user-edit-dialog .mat-mdc-dialog-surface,
+.user-edit-dialog .mat-dialog-container {
+  overflow: hidden !important;
+  border-radius: 14px !important;
+}
+
 // .show-sub-menu {
 //   display: block;
 //   animation: fadeIn 1s;

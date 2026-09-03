@@ -39,17 +39,17 @@
 </div>
 
 <!-- /product list -->
-<div class="card table-list-card">
-  <div class="card-body">
-    <div class="table-top">
+<div class="card table-list-card users-list-card">
+  <div class="card-body users-list-body">
+    <div class="table-top users-toolbar">
       <div class="search-set">
         <div class="search-input">
-          <a href="javascript:void(0);" class="btn btn-searchset"><i class="feather icon-search feather-search"></i></a>
+          <span class="btn btn-searchset"><i class="feather icon-search feather-search"></i></span>
           <div class="dataTables_filter">
-            <label>
+            <label aria-label="Search users">
               <input [(ngModel)]="searchDataValue" [ngModelOptions]="{ standalone: true }"
                 (ngModelChange)="searchData(searchDataValue)" type="search" class="form-control"
-                placeholder="Search..." />
+                placeholder="Search name, user ID, mobile or role…" />
             </label>
           </div>
         </div>
@@ -59,7 +59,7 @@
         </div>
       </div>
       <div class="form-sort">
-
+        <span class="users-count"><strong>{{ totalData }}</strong> {{ totalData === 1 ? 'user' : 'users' }}</span>
       </div>
     </div>
     <!-- /Filter -->
@@ -112,7 +112,7 @@
     </div>
     <!-- /Filter -->
      <div class="desktop-view">
-    <div class="table-responsive">
+    <div class="table-responsive users-table-shell">
       <table matSort (matSortChange)="sortData($event)" class="table datanew">
         <thead>
           <tr>
@@ -120,7 +120,7 @@
             <th mat-sort-header="userName">Full Name</th>
             <th mat-sort-header="loginId">Userid</th>
             <th mat-sort-header="phone">Mobile</th>
-            <th mat-sort-header="phone">User Code</th>
+            <th mat-sort-header="userCode">User Code</th>
             <th mat-sort-header="role">Role</th>
             <th mat-sort-header="createdOn">Created On</th>
             <th mat-sort-header="status">Status</th>
@@ -141,11 +141,11 @@
                 </a>
               </div>
             </td>
-            <td>{{ data.firstName }} {{ data.lastName }}</td>
+            <td><span class="user-name-cell">{{ data.firstName }} {{ data.lastName }}</span></td>
             <td>{{ data.loginId }}</td>
             <td>{{ data.mobileNo }}</td>
             <td>{{ data.userCode }}</td>
-            <td>{{ data.roleType }}</td>
+            <td><span class="role-pill">{{ data.roleType }}</span></td>
             <td>{{ data.createdAt | date : "dd-MM-yyyy | HH:mm" }}</td>
             <td>
               <button
@@ -165,16 +165,16 @@
                 {{ data.status }}
               </button> -->
             </td>
-            <td class="action-table-data">
+            <td *ngIf="isSuperadmin" class="action-table-data">
               <div class="edit-delete-action">
                 
-                <a *ngIf="isSuperadmin" class="me-2 p-2 mb-0" data-bs-toggle="modal" data-bs-target="#edit-units"
+                <button *ngIf="isSuperadmin" type="button" class="user-action-btn edit-action" title="Edit user"
                   (click)="openEditModal(dialogTemplate, data)">
-                  <i class="feather icon-edit feather-edit"></i></a>
+                  <i class="feather icon-edit feather-edit"></i></button>
 
-                  <a *ngIf="isSuperadmin" class="me-2 confirm-text p-2 mb-0" href="javascript:void(0);" (click)="confirmColor(data.loginId)">
+                  <button *ngIf="isSuperadmin" type="button" class="user-action-btn delete-action" title="Delete user" (click)="confirmColor(data.loginId)">
                     <i class="feather icon-trash-2 feather-trash-2"></i>
-                  </a>
+                  </button>
 
                 <!-- <a *ngif("isSuperadmin") class="me-2 confirm-text p-2 mb-0" href="javascript:void(0);" (click)="confirmColor(data.loginId)">
                   <i class="feather icon-trash-2 feather-trash-2"></i></a> -->
@@ -195,7 +195,7 @@
     <!-- HEADER WITH IMAGE + NAME -->
     <div class="card-header">
 
-      <div class="user-info">
+      <div class="user-card-identity">
         <img 
           class="user-img-mobile"
           [src]="userImageUrl(u)"
@@ -203,7 +203,7 @@
           (error)="useDefaultUserImage($event)"
         />
 
-        <h3 class="username">{{ u.firstName }} {{ u.lastName }}</h3>
+        <h3 class="user-card-name">{{ u.firstName }} {{ u.lastName }}</h3>
       </div>
 
     </div>
@@ -260,28 +260,30 @@
 </div>
 
 <ng-template #dialogTemplate let-dialog>
-  <div class="modalHeaderContainer">
-    <h2 mat-dialog-title class="p-0">Edit User</h2>
-    <div mat-dialog-close class="closeBtn">
-      <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
-      </button>
+  <div class="modalHeaderContainer user-edit-header">
+    <div>
+      <span class="edit-dialog-eyebrow">User management</span>
+      <h2 mat-dialog-title class="p-0">Edit User</h2>
+      <p>Update account details, access, and address information.</p>
     </div>
+    <button type="button" mat-dialog-close class="user-edit-close" aria-label="Close edit user dialog">
+      <i class="feather icon-x" aria-hidden="true"></i>
+    </button>
   </div>
 
-  <form [formGroup]="editUserForm" (ngSubmit)="updateUserDetails()">
-    <mat-dialog-content class="modalContent">
+  <form class="user-edit-form" [formGroup]="editUserForm" (ngSubmit)="updateUserDetails()">
+    <mat-dialog-content class="modalContent user-edit-content">
       <div class="modal-body custom-modal-body">
-        <div class="card">
+        <div class="card user-edit-card">
           <div class="card-body">
             <div class="new-employee-field">
-              <div class="card-title-head">
+              <div class="card-title-head user-section-heading">
                 <h6>
                   <span><i class="feather icon-info feather-edit"></i></span>Personal Information
                 </h6>
               </div>
 
-              <div class="profile-pic-upload">
+              <div class="profile-pic-upload user-photo-panel">
           <div class="profile-pic">
             <!-- Check if the userPicture field in the form is empty -->
             <ng-container *ngIf="!editUserForm.get('userPicture')?.value; else showImage">
@@ -403,13 +405,13 @@
 
                 <div formArrayName="addressList">
                   <div *ngFor="let address of addressList.controls; let i=index">
-                    <div class="card-title-head">
+                    <div class="card-title-head address-section">
                       <div [formGroupName]="i">
                         <div class="inner-header" *ngIf="i === 0 ">
                           <h6><span><i class="feather icon-info feather-edit"></i></span>Current Address </h6>
                         </div>
                         <div class="inner-header" *ngIf="i === 1">
-                          <h6><span><i class="feather icon-info feather-edit"></i></span>Parmanent Address </h6>
+                          <h6><span><i class="feather icon-map-pin"></i></span>Permanent Address</h6>
                         </div>
 
                         <div class="row">
@@ -467,10 +469,13 @@
         </div>
       </div>
     </mat-dialog-content>
-    <mat-dialog-actions class="dialogAction">
-      <div class="text-end mb-3">
+    <mat-dialog-actions class="dialogAction user-edit-actions">
+      <div class="user-edit-action-buttons">
+        <button type="button" class="btn user-cancel-btn" mat-dialog-close>Cancel</button>
         <!-- <button type="submit" class="btn btn-submit" [disabled]="!userForm.form.valid"> Update User </button> -->
-        <button type="submit" class="btn btn-submit">Update User</button>
+        <button type="submit" class="btn btn-submit user-save-btn">
+          <i class="feather icon-check me-1"></i>Update User
+        </button>
       </div>
       <!-- <button mat-button (click)="dialog.close()">Close</button> -->
     </mat-dialog-actions>
