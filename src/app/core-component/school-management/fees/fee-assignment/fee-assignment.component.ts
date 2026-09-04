@@ -45,7 +45,6 @@ export class FeeAssignmentComponent implements OnInit {
   isResizing = false;
   private resizeContainer?: DOMRect;
   private assignedFeesRequestId = 0;
-  readonly studentImageBaseUrl = Constant.Site_Url + 'studentImage/';
   readonly academicYearOptions = Constant.ACADEMIC_YEAR_OPTIONS;
   feeComponents: AssignmentFeeComponent[] = [];
 
@@ -264,8 +263,7 @@ export class FeeAssignmentComponent implements OnInit {
     return student?.gradeSection ? `${grade} - ${student.gradeSection}` : grade;
   }
   studentImage(student: any): string {
-    const picture = student?.studentPicture || student?.profilePicture;
-    return picture ? this.studentImageBaseUrl + picture : 'assets/img/profiles/avatar-01.jpg';
+    return this.schoolManagementService.studentImageUrl(student, 'assets/img/profiles/avatar-01.jpg');
   }
   trackByStudent(index: number, student: any): any { return student?.studentId || student?.id || index; }
 

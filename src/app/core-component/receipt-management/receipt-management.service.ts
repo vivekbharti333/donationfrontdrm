@@ -45,10 +45,12 @@ export class ReceiptManagementService {
     return this.http.post<any>(Constant.Site_Url + "getInvoiceHeaderList", request);
   }
 
-  getInvoiceHeaderImage(superadminId: string, imageName: string): Observable<Blob> {
-    const url = Constant.Site_Url + 'invoiceHeaderImage/'
+  getInvoiceHeaderImage(service: string, superadminId: string, imageName: string): Observable<Blob> {
+    const serviceFolder = String(service || '').split(',')[0].trim().replace(/[^A-Za-z0-9_-]/g, '_');
+    const url = Constant.Site_Url + 'media/'
+      + encodeURIComponent(serviceFolder) + '/'
       + encodeURIComponent(superadminId) + '/'
-      + encodeURIComponent(imageName);
+      + 'receipt_pic/' + encodeURIComponent(imageName);
     return this.http.get(url, { responseType: 'blob' });
   }
 
@@ -85,6 +87,7 @@ export class ReceiptManagementService {
         token: this.loginUser['token'],
         createdBy: superadninId,
         superadminId: superadninId,
+        service: this.loginUser?.service || this.cookieService.get('service'),
       }
     };
     return this.http.post<any>(Constant.Site_Url + "addInvoiceHeader", request);

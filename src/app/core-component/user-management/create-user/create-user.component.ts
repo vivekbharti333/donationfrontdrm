@@ -317,10 +317,14 @@ onPermissionChange(event: any) {
     const superadminId = String(
       this.loginUser?.superadminId || this.loginUser?.loginId || ''
     ).trim();
-    if (!superadminId) {
+    const service = String(
+      this.loginUser?.service || ''
+    ).trim();
+    if (!superadminId || !service) {
       return null;
     }
     return Constant.Site_Url + 'userImage/'
+      + encodeURIComponent(service) + '/'
       + encodeURIComponent(superadminId) + '/'
       + encodeURIComponent(value);
   }

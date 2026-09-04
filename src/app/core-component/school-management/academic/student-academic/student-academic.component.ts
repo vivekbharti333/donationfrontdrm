@@ -37,7 +37,6 @@ export class StudentAcademicComponent implements OnInit, OnDestroy {
   public selectedStudentPicture = '';
   public selectedStudentSuperadminId = '';
   public loginUser: any;
-  public readonly studentImageBaseUrl = Constant.Site_Url + 'studentImage/';
   public readonly academicYearOptions = Constant.ACADEMIC_YEAR_OPTIONS;
   public readonly sectionOptions = Constant.SECTION_OPTIONS;
   public gradeOptions: any[] = [];
@@ -176,20 +175,10 @@ export class StudentAcademicComponent implements OnInit, OnDestroy {
   }
 
   public studentImageUrl(student: any): string {
-    const picture = String(student?.studentPicture || student?.profilePicture || '').trim();
-    if (!picture) return 'assets/img/profiles/avatar-02.jpg';
-    if (/^(data:image\/|blob:|https?:)/i.test(picture)) return picture;
-    if (picture.length > 100 && /^[A-Za-z0-9+/=\r\n]+$/.test(picture)) {
-      return 'data:image/png;base64,' + picture;
-    }
-    const superadminId = String(
-      student?.superadminId || this.selectedStudentSuperadminId ||
-      this.loginUser?.superadminId || this.loginUser?.loginId || ''
-    ).trim();
-    const imageUrl = this.studentImageBaseUrl + encodeURIComponent(picture);
-    return superadminId
-      ? imageUrl + '?superadminId=' + encodeURIComponent(superadminId)
-      : imageUrl;
+    return this.schoolManagementService.studentImageUrl({
+      ...student,
+      superadminId: student?.superadminId || this.selectedStudentSuperadminId
+    });
   }
 
   public useDefaultStudentImage(event: Event): void {

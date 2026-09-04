@@ -4,6 +4,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Constant } from 'src/app/core/constant/constants';
 import { CookieService } from 'ngx-cookie-service';
 import { AuthenticationService } from 'src/app/auth/authentication.service';
+import { TenantMediaUrlService } from 'src/app/core/service/tenant-media-url.service';
 
 @Injectable({
   providedIn: 'root'
@@ -18,6 +19,7 @@ export class SchoolManagementService {
     private http: HttpClient,
     private cookieService: CookieService,
     private authenticationService: AuthenticationService,
+    private tenantMediaUrl: TenantMediaUrlService,
   ) {
     this.loginUser = this.authenticationService.getLoginUser();
   }
@@ -31,6 +33,7 @@ export class SchoolManagementService {
         createdBy: this.cookieService.get('superadminId'),
         createdByName: this.cookieService.get('superadminName'),
         superadminId: this.cookieService.get('superadminId'),
+        service: this.loginUser?.service || this.cookieService.get('service'),
 
         // Student Basic Details
         admissionNo: studentDetails.admissionNo,
@@ -93,6 +96,7 @@ export class SchoolManagementService {
         createdBy: studentDetails.createdBy || this.cookieService.get('loginId'),
         createdByName: studentDetails.createdByName || this.cookieService.get('userName'),
         superadminId: studentDetails.superadminId || this.cookieService.get('superadminId'),
+        service: this.loginUser?.service || this.cookieService.get('service'),
 
         // Student Basic Details
         admissionNo: studentDetails.admissionNo,
@@ -184,6 +188,20 @@ export class SchoolManagementService {
       ? { headers: new HttpHeaders({ Authorization: `Bearer ${token}` }) }
       : {};
     return this.http.post<any>(Constant.Site_Url + "getStudentAcademicDetails", request, options);
+  }
+
+  studentImageUrl(student: any, fallback = 'assets/img/profiles/avatar-02.jpg'): string {
+    const picture = String(student?.studentPicture || student?.profilePicture || '').trim();
+    if (!picture) return fallback;
+    if (/^(data:image\/|blob:|https?:)/i.test(picture)) return picture;
+    if (picture.length > 100 && /^[A-Za-z0-9+/=\r\n]+$/.test(picture)) {
+      return 'data:image/png;base64,' + picture;
+    }
+    const currentUser = this.authenticationService.getLoginUser() || this.loginUser;
+    const service = currentUser?.service || this.cookieService.get('service');
+    const superadminId = student?.superadminId || currentUser?.superadminId
+      || this.cookieService.get('superadminId');
+    return this.tenantMediaUrl.studentPicture(service, superadminId, picture) || fallback;
   }
 
   updateStudentAcademic(academicDetails: any): Observable<any> {

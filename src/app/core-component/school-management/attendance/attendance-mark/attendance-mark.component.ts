@@ -28,7 +28,6 @@ export class AttendanceMarkComponent implements OnInit {
   readonly statuses: AttendanceStatus[] = ['PRESENT', 'ABSENT'];
   readonly academicSessions = Constant.ACADEMIC_YEAR_OPTIONS;
   readonly sections = Constant.SECTION_OPTIONS;
-  readonly studentImageBaseUrl = Constant.Site_Url + 'studentImage/';
   readonly filterForm = this.formBuilder.group({
     sessionName: [this.currentAcademicSession()],
     attendanceDate: [this.today()], grade: [''], gradeSection: ['']
@@ -126,19 +125,7 @@ export class AttendanceMarkComponent implements OnInit {
   reset(): void { this.filterForm.reset({ sessionName: this.currentAcademicSession(), attendanceDate: this.today(), grade: this.grades.length ? this.gradeValue(this.grades[0]) : '', gradeSection: 'A' }); this.students = []; this.selectedStudentIds.clear(); this.searchTerm = ''; this.successMessage = ''; this.errorMessage = ''; }
   studentName(student: AttendanceStudent): string { return [student.firstName, student.middleName, student.lastName].filter(Boolean).join(' ') || 'Unnamed student'; }
   studentImage(student: AttendanceStudent): string {
-    const picture = String(student?.studentPicture || '').trim();
-    if (!picture) return 'assets/img/profiles/avatar-02.jpg';
-    if (/^(data:image\/|blob:|https?:)/i.test(picture)) return picture;
-    if (picture.length > 100 && /^[A-Za-z0-9+/=\r\n]+$/.test(picture)) {
-      return 'data:image/png;base64,' + picture;
-    }
-    const superadminId = String(
-      student?.superadminId || this.loginUser?.superadminId || this.loginUser?.loginId || ''
-    ).trim();
-    const imageUrl = this.studentImageBaseUrl + encodeURIComponent(picture);
-    return superadminId
-      ? imageUrl + '?superadminId=' + encodeURIComponent(superadminId)
-      : imageUrl;
+    return this.schoolManagementService.studentImageUrl(student);
   }
   useDefaultStudentImage(event: Event): void {
     const image = event.target as HTMLImageElement;

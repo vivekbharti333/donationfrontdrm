@@ -124,7 +124,7 @@
             <th mat-sort-header="role">Role</th>
             <th mat-sort-header="createdOn">Created On</th>
             <th mat-sort-header="status">Status</th>
-            <th *ngIf="isSuperadmin" class="no-sort">Action</th>
+            <th *ngIf="canManageUsers" class="no-sort">Action</th>
           </tr>
         </thead>
         <tbody>
@@ -133,10 +133,9 @@
             <td>
               <div class="userimgname">
                 <a href="javascript:void(0);" class="userslist-img bg-img">
-                  <img 
+                  <img class="user-list-avatar"
                     [src]="userImageUrl(data)" 
                     alt="user image" 
-                    style="border-radius: 100%;" 
                     (error)="useDefaultUserImage($event)" />
                 </a>
               </div>
@@ -154,7 +153,7 @@
                   'badge-linesuccess': data.status === 'ACTIVE',
                   'badge-linedanger': data.status === 'INACTIVE'
                 }"
-                [disabled]="!isSuperadmin"
+                [disabled]="!canManageUsers"
                 (click)="changeUserStatus(data)">
                 {{ data.status }}
               </button>
@@ -165,14 +164,14 @@
                 {{ data.status }}
               </button> -->
             </td>
-            <td *ngIf="isSuperadmin" class="action-table-data">
+            <td *ngIf="canManageUsers" class="action-table-data">
               <div class="edit-delete-action">
                 
-                <button *ngIf="isSuperadmin" type="button" class="user-action-btn edit-action" title="Edit user"
+                <button *ngIf="canManageUsers" type="button" class="user-action-btn edit-action" title="Edit user"
                   (click)="openEditModal(dialogTemplate, data)">
                   <i class="feather icon-edit feather-edit"></i></button>
 
-                  <button *ngIf="isSuperadmin" type="button" class="user-action-btn delete-action" title="Delete user" (click)="confirmColor(data.loginId)">
+                  <button *ngIf="canManageUsers" type="button" class="user-action-btn delete-action" title="Delete user" (click)="confirmColor(data.loginId)">
                     <i class="feather icon-trash-2 feather-trash-2"></i>
                   </button>
 
@@ -225,7 +224,7 @@
                   'btn-green': u.status === 'ACTIVE',
                   'btn-red': u.status === 'INACTIVE'
                 }"
-                [disabled]="!isSuperadmin"
+                [disabled]="!canManageUsers"
                 (click)="changeUserStatus(u)">
           {{ u.status }}
         </button>
@@ -239,7 +238,7 @@
         </button> -->
       </div>
 
-      <div *ngIf="isSuperadmin" class="right-actions">
+      <div *ngIf="canManageUsers" class="right-actions">
 
         <button class="icon-btn" (click)="openEditModal(dialogTemplate, u)">
           <i class="feather icon-edit edit-icon"></i>

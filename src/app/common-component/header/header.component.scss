@@ -35,3 +35,17 @@
     margin-right: 18px;
   }
 }
+
+@media (max-width: 991.98px) {
+  .mobile-user-menu {
+    align-items: center;
+    display: flex !important;
+    justify-content: center;
+    line-height: normal;
+  }
+
+  .mobile-profile-toggle {
+    flex: 0 0 38px;
+    margin-top: 0;
+  }
+}

@@ -125,8 +125,11 @@ export class HeaderComponent  {
     // this.displayLogo = this.cookieService.get('displayLogo');
 
 
-     this.displayLogo =localStorage.getItem('displayLogo');
-     this.displayLogo = 'data:image/png;base64,'+this.displayLogo;
+     this.displayLogo = this.mediaUrl.applicationImage(
+       this.loginUser?.service || this.cookieService.get('service'),
+       this.loginUser?.superadminId || this.cookieService.get('superadminId'),
+       localStorage.getItem('displayLogo') || ''
+     );
 
 
     this.userPicture = this.resolveUserPicture(
@@ -183,7 +186,9 @@ export class HeaderComponent  {
     if (!superadminId) {
       return 'assets/img/profiles/avatar-02.jpg';
     }
-    return this.mediaUrl.userPicture(superadminId, picture);
+    return this.mediaUrl.userPicture(
+      this.loginUser?.service || this.cookieService.get('service'), superadminId, picture
+    );
   }
 
   public useDefaultUserImage(event: Event): void {

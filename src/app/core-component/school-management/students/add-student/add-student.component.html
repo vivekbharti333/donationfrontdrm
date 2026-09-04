@@ -40,7 +40,7 @@
       </div>
 
 
-      <div class="profile-pic-upload">
+      <div class="profile-pic-upload student-photo-upload">
 
     <div class="profile-pic">
 
@@ -54,15 +54,17 @@
         <ng-template #imagePreview>
     <img
         [src]="addStudentForm.get('studentPicture')?.value"
+        alt="Student photo preview"
         class="uploaded-profile-pic"
     >
 </ng-template>
 
     </div>
 
-    <!-- Gallery Upload -->
-    <div class="mt-2">
-        <label class="btn btn-primary">
+    <div class="photo-actions">
+        <!-- Gallery Upload -->
+        <label class="btn btn-primary photo-action-btn">
+            <i class="feather icon-image me-1"></i>
             Upload From Gallery
             <input
                 type="file"
@@ -71,20 +73,13 @@
                 (change)="onFileSelected($event)"
             >
         </label>
-    </div>
 
-    <!-- Camera Capture -->
-    <div class="mt-2">
-        <label class="btn btn-success">
+        <!-- Camera Capture -->
+        <button type="button" class="btn btn-success photo-action-btn" (click)="openCamera()">
+            <i class="feather icon-camera me-1"></i>
             Take Live Photo
-            <input
-                type="file"
-                hidden
-                accept="image/*"
-                capture="environment"
-                (change)="onFileSelected($event)"
-            >
-        </label>
+        </button>
+        <small class="photo-help">JPG or PNG. You can upload a photo or take one now.</small>
     </div>
 
 </div>
@@ -330,10 +325,57 @@
   </div>
 
   <!-- ================= SUBMIT ================= -->
-  <div class="text-end">
-    <button type="submit" class="btn btn-primary">
-      Save Student
+  <div class="student-form-actions">
+    <div class="save-help">
+      <i class="feather icon-info"></i>
+      <span>Please review the student information before saving.</span>
+    </div>
+    <button type="submit" class="btn btn-primary save-student-btn">
+      <i class="feather icon-save"></i>
+      <span>Save Student</span>
     </button>
   </div>
 
 </form>
+
+<div class="camera-backdrop" *ngIf="isCameraOpen" (click)="closeCamera()">
+  <div class="camera-dialog" role="dialog" aria-modal="true" aria-labelledby="camera-title"
+    (click)="$event.stopPropagation()">
+    <div class="camera-header">
+      <h5 id="camera-title">Take Live Photo</h5>
+      <button type="button" class="camera-close" aria-label="Close camera" (click)="closeCamera()">&times;</button>
+    </div>
+
+    <div class="camera-viewport">
+      <video #cameraVideo *ngIf="!capturedPhoto && !cameraError" autoplay muted playsinline></video>
+      <button type="button" class="camera-flip" *ngIf="!capturedPhoto && !cameraError"
+        [disabled]="isSwitchingCamera" (click)="switchCamera()" aria-label="Switch between front and rear camera"
+        title="Flip camera">
+        <i class="feather icon-refresh-cw"></i>
+        <span>{{ isSwitchingCamera ? 'Switching...' : 'Flip camera' }}</span>
+      </button>
+      <img *ngIf="capturedPhoto" [src]="capturedPhoto" alt="Captured student photo">
+      <div class="camera-error" *ngIf="cameraError">
+        <i class="feather icon-camera-off"></i>
+        <p>{{ cameraError }}</p>
+      </div>
+    </div>
+
+    <div class="camera-actions" [class.has-captured-photo]="capturedPhoto">
+      <button type="button" class="btn btn-light" (click)="closeCamera()">Cancel</button>
+      <button type="button" class="btn btn-success" *ngIf="!capturedPhoto && !cameraError"
+        (click)="capturePhoto()">
+        <i class="feather icon-camera me-1"></i>Capture Photo
+      </button>
+      <button type="button" class="btn btn-outline-secondary" *ngIf="capturedPhoto" (click)="retakePhoto()">
+        Retake
+      </button>
+      <button type="button" class="btn btn-primary" *ngIf="capturedPhoto" (click)="useCapturedPhoto()">
+        Use Photo
+      </button>
+      <button type="button" class="btn btn-primary" *ngIf="cameraError" (click)="openCamera()">
+        Try Again
+      </button>
+    </div>
+  </div>
+</div>

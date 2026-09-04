@@ -36,7 +36,6 @@ export class FeeAssignmentComponent implements OnInit {
   splitPercent = 43;
   isResizing = false;
   private resizeContainer?: DOMRect;
-  readonly studentImageBaseUrl = Constant.Site_Url + 'studentImage/';
   readonly feeComponents: AssignmentFeeComponent[] = [
     { name: 'Tuition Fee', amount: 25000, discount: 0, removable: false },
     { name: 'Transport Fee', amount: 12000, discount: 2000, removable: true },
@@ -121,8 +120,7 @@ export class FeeAssignmentComponent implements OnInit {
     return student?.gradeSection ? `${grade} - ${student.gradeSection}` : grade;
   }
   studentImage(student: any): string {
-    const picture = student?.studentPicture || student?.profilePicture;
-    return picture ? this.studentImageBaseUrl + picture : 'assets/img/profiles/avatar-01.jpg';
+    return this.schoolManagementService.studentImageUrl(student, 'assets/img/profiles/avatar-01.jpg');
   }
   trackByStudent(index: number, student: any): any { return student?.studentId || student?.id || index; }
 

@@ -18,7 +18,6 @@ interface StudentReport {
 })
 export class AttendanceReportComponent implements OnInit {
   readonly sections=Constant.SECTION_OPTIONS;
-  readonly imageBaseUrl=Constant.Site_Url+'studentImage/';
   readonly filterForm=this.fb.group({grade:[''],gradeSection:['A'],fromDate:[this.firstDay()],toDate:[this.today()]});
   grades:any[]=[]; reports:StudentReport[]=[]; isLoading=false; isGradesLoading=false; errorMessage='';
   page=1; pageSize=10; selectedReport:StudentReport|null=null;
@@ -70,13 +69,7 @@ export class AttendanceReportComponent implements OnInit {
   gradeValue(g:any):string{return String(g?.gradeName??g?.name??g?.gradeCode??g?.grade??'').trim();}
   gradeLabel(g:any):string{const v=this.gradeValue(g);return v.toLowerCase().startsWith('grade')?v:'Grade '+(v||g?.id||'');}
   studentImage(student:StudentReport):string{
-    const picture=String(student?.studentPicture||'').trim();
-    if(!picture)return'assets/img/profiles/avatar-02.jpg';
-    if(/^(data:image\/|blob:|https?:)/i.test(picture))return picture;
-    if(picture.length>100&&/^[A-Za-z0-9+/=\r\n]+$/.test(picture))return'data:image/png;base64,'+picture;
-    const superadminId=String(student?.superadminId||this.loginUser?.superadminId||this.loginUser?.loginId||'').trim();
-    const url=this.imageBaseUrl+encodeURIComponent(picture);
-    return superadminId?url+'?superadminId='+encodeURIComponent(superadminId):url;
+    return this.schoolService.studentImageUrl(student);
   }
   useDefaultStudentImage(event:Event):void{const image=event.target as HTMLImageElement;image.onerror=null;image.src='assets/img/profiles/avatar-02.jpg';}
   rowPercent(value:number,row:StudentReport):number{return row.total?value/row.total*100:0;}

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ElementRef, OnDestroy, ViewChild } from '@angular/core';
 import { FormGroup, FormArray, FormBuilder, Validators} from '@angular/forms';
 import { SidebarService } from 'src/app/core/core.index'; // Ensure correct import path
 import { SchoolManagementService } from '../../school-management.service';
@@ -14,7 +14,14 @@ import { ToastModule } from 'primeng/toast';
   styleUrl: './add-student.component.scss',
    providers: [MessageService, ToastModule],
 })
-export class AddStudentComponent {
+export class AddStudentComponent implements OnDestroy {
+ @ViewChild('cameraVideo') cameraVideo?: ElementRef<HTMLVideoElement>;
+ public isCameraOpen = false;
+ public capturedPhoto: string | null = null;
+ public cameraError = '';
+ public cameraFacingMode: 'user' | 'environment' = 'environment';
+ public isSwitchingCamera = false;
+ private cameraStream: MediaStream | null = null;
  public readonly academicYearOptions = Constant.ACADEMIC_YEAR_OPTIONS;
  public gradeOptions: any[] = [];
  public isGradesLoading = false;
@@ -161,6 +168,136 @@ onFileSelected(event: any): void {
     };
     reader.readAsDataURL(file);
   }
+}
+
+async openCamera(): Promise<void> {
+  this.cameraError = '';
+  this.capturedPhoto = null;
+
+  if (!navigator.mediaDevices?.getUserMedia) {
+    this.cameraError = 'Camera access is not supported by this browser.';
+    this.isCameraOpen = true;
+    return;
+  }
+
+  this.isCameraOpen = true;
+
+  await this.startCamera();
+}
+
+async switchCamera(): Promise<void> {
+  if (this.isSwitchingCamera) {
+    return;
+  }
+
+  this.isSwitchingCamera = true;
+  this.cameraError = '';
+  this.cameraFacingMode = this.cameraFacingMode === 'environment' ? 'user' : 'environment';
+  this.stopCameraStream();
+
+  try {
+    await this.startCamera();
+  } finally {
+    this.isSwitchingCamera = false;
+  }
+}
+
+private async startCamera(): Promise<void> {
+  if (!navigator.mediaDevices?.getUserMedia) {
+    this.cameraError = 'Camera access is not supported by this browser.';
+    return;
+  }
+
+  try {
+    this.cameraStream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: { ideal: this.cameraFacingMode } },
+      audio: false
+    });
+
+    // Wait until Angular has rendered the video element in the dialog.
+    setTimeout(() => {
+      const video = this.cameraVideo?.nativeElement;
+      if (video && this.cameraStream) {
+        video.srcObject = this.cameraStream;
+        void video.play();
+      }
+    });
+  } catch (error) {
+    this.stopCameraStream();
+    this.cameraError = this.getCameraErrorMessage(error);
+  }
+}
+
+capturePhoto(): void {
+  const video = this.cameraVideo?.nativeElement;
+  if (!video || !video.videoWidth || !video.videoHeight) {
+    this.cameraError = 'Camera is still loading. Please try again.';
+    return;
+  }
+
+  const canvas = document.createElement('canvas');
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  const context = canvas.getContext('2d');
+
+  if (!context) {
+    this.cameraError = 'Unable to capture the photo.';
+    return;
+  }
+
+  context.drawImage(video, 0, 0, canvas.width, canvas.height);
+  this.capturedPhoto = canvas.toDataURL('image/jpeg', 0.9);
+  this.stopCameraStream();
+}
+
+useCapturedPhoto(): void {
+  if (!this.capturedPhoto) {
+    return;
+  }
+
+  this.addStudentForm.patchValue({ studentPicture: this.capturedPhoto });
+  this.addStudentForm.get('studentPicture')?.markAsDirty();
+  this.closeCamera();
+}
+
+retakePhoto(): void {
+  void this.openCamera();
+}
+
+closeCamera(): void {
+  this.stopCameraStream();
+  this.isCameraOpen = false;
+  this.capturedPhoto = null;
+  this.cameraError = '';
+}
+
+ngOnDestroy(): void {
+  this.stopCameraStream();
+}
+
+private stopCameraStream(): void {
+  this.cameraStream?.getTracks().forEach(track => track.stop());
+  this.cameraStream = null;
+
+  if (this.cameraVideo?.nativeElement) {
+    this.cameraVideo.nativeElement.srcObject = null;
+  }
+}
+
+private getCameraErrorMessage(error: unknown): string {
+  if (error instanceof DOMException) {
+    if (error.name === 'NotAllowedError') {
+      return 'Camera permission was denied. Please allow camera access and try again.';
+    }
+    if (error.name === 'NotFoundError') {
+      return 'No camera was found on this device.';
+    }
+    if (error.name === 'NotReadableError') {
+      return 'The camera is already in use by another application.';
+    }
+  }
+
+  return 'Unable to open the camera. Camera access requires HTTPS or localhost.';
 }
   submitStudentForm() {
     this.schoolManagementService.addStudent(this.addStudentForm.value)

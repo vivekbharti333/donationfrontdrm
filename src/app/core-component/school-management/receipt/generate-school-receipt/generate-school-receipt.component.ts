@@ -5,6 +5,8 @@ import { MessageService } from 'primeng/api';
 import { GenerateSchoolReceiptService } from './generate-school-receipt.service';
 import { Constant } from 'src/app/core/constant/constants';
 import { AuthenticationService } from 'src/app/auth/authentication.service';
+import { SchoolManagementService } from '../../school-management.service';
+import { TenantMediaUrlService } from 'src/app/core/service/tenant-media-url.service';
 
 @Component({
   selector: 'app-generate-school-receipt',
@@ -27,7 +29,6 @@ export class GenerateSchoolReceiptComponent implements OnInit {
   gradeOptions: any[] = [];
   readonly academicYearOptions = Constant.ACADEMIC_YEAR_OPTIONS;
   readonly sectionOptions = Constant.SECTION_OPTIONS;
-  readonly studentImageBaseUrl = Constant.Site_Url + 'studentImage/';
   isGradesLoading = false;
   isAssignedFeesLoading = false;
   assignedFeesError = '';
@@ -44,6 +45,8 @@ export class GenerateSchoolReceiptComponent implements OnInit {
     private messageService: MessageService,
     private generateSchoolReceiptService: GenerateSchoolReceiptService,
     private authenticationService: AuthenticationService,
+    private schoolManagementService: SchoolManagementService,
+    private tenantMediaUrl: TenantMediaUrlService,
   ) {
     this.loginUser = this.authenticationService.getLoginUser();
   }
@@ -351,8 +354,7 @@ export class GenerateSchoolReceiptComponent implements OnInit {
       return `data:image/png;base64,${image}`;
     }
     const superadminId = String(this.invoiceHeader?.superadminId || '').trim();
-    return !superadminId ? '' : Constant.Site_Url + 'invoiceHeaderImage/'
-      + encodeURIComponent(superadminId) + '/' + encodeURIComponent(image);
+    return this.tenantMediaUrl.receiptPicture(this.loginUser?.service, superadminId, image);
   }
 
   public amountInWords(value: number): string {
@@ -608,19 +610,7 @@ createReceiptDetailGroup(data?: any): FormGroup {
 }
 
 studentImage(student: any): string {
-  const picture = String(student?.studentPicture || student?.profilePicture || '').trim();
-  if (!picture) return 'assets/img/profiles/avatar-02.jpg';
-  if (/^(data:image\/|blob:|https?:)/i.test(picture)) return picture;
-  if (picture.length > 100 && /^[A-Za-z0-9+/=\r\n]+$/.test(picture)) {
-    return 'data:image/png;base64,' + picture;
-  }
-  const superadminId = String(
-    student?.superadminId || this.loginUser?.superadminId || this.loginUser?.loginId || ''
-  ).trim();
-  const imageUrl = this.studentImageBaseUrl + encodeURIComponent(picture);
-  return superadminId
-    ? imageUrl + '?superadminId=' + encodeURIComponent(superadminId)
-    : imageUrl;
+  return this.schoolManagementService.studentImageUrl(student);
 }
 
 useDefaultStudentImage(event: Event): void {

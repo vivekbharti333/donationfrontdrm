@@ -105,7 +105,7 @@ export class ProfileComponent implements OnInit {
     if (!picture) return 'assets/img/profiles/avatar-02.jpg';
     if (picture.startsWith('data:image/') || /^https?:\/\//i.test(picture)) return picture;
     const tenantId = this.userDetails?.superadminId || localStorage.getItem('superadminId') || '';
-    return this.mediaUrl.userPicture(tenantId, picture);
+    return this.mediaUrl.userPicture(this.userDetails?.service, tenantId, picture);
   }
 
   useDefaultImage(event: Event): void { (event.target as HTMLImageElement).src = 'assets/img/profiles/avatar-02.jpg'; }

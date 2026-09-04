@@ -21,3 +21,29 @@
         }
     }
 }
+
+@media (max-width: 767.98px) {
+    :host ::ng-deep .login-toast.p-toast {
+        left: 50% !important;
+        max-width: calc(100vw - 24px);
+        right: auto !important;
+        top: calc(12px + env(safe-area-inset-top)) !important;
+        transform: translateX(-50%);
+        width: 25rem;
+        z-index: 1100;
+    }
+
+    :host ::ng-deep .login-toast .p-toast-message {
+        width: 100%;
+    }
+
+    :host ::ng-deep .login-toast .p-toast-message-text {
+        min-width: 0;
+        overflow-wrap: anywhere;
+    }
+
+    :host ::ng-deep .login-toast .p-toast-detail,
+    :host ::ng-deep .login-toast .p-toast-summary {
+        white-space: normal;
+    }
+}

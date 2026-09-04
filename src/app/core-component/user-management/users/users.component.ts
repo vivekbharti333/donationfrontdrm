@@ -608,6 +608,10 @@ export class UsersComponent {
     }
   }
 
+  get canManageUsers(): boolean {
+    return this.isMainAdmin || this.isSuperadmin;
+  }
+
   userImageUrl(user: any): string {
     return this.resolveUserImage(
       user?.userPicture,
@@ -640,10 +644,12 @@ export class UsersComponent {
       return 'data:image/png;base64,' + imageValue;
     }
     const tenantId = String(superadminId || '').trim();
-    if (!tenantId) {
+    const service = String(this.loginUser?.service || '').trim();
+    if (!tenantId || !service) {
       return 'assets/img/profiles/avatar-02.jpg';
     }
     return Constant.Site_Url + 'userImage/'
+      + encodeURIComponent(service) + '/'
       + encodeURIComponent(tenantId) + '/'
       + encodeURIComponent(imageValue);
   }

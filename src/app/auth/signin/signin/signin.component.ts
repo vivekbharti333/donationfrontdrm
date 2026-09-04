@@ -36,7 +36,18 @@ export class SigninComponent {
     password: '',
   };
 
+  removeLoginSpaces(field: 'loginId' | 'password', event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const sanitizedValue = input.value.replace(/\s+/g, '');
+    input.value = sanitizedValue;
+    this.login[field] = sanitizedValue;
+  }
+
   validateUser() {
+    // Sanitize once more before submission to cover browser autofill and pasted text.
+    this.login.loginId = String(this.login.loginId || '').replace(/\s+/g, '');
+    this.login.password = String(this.login.password || '').replace(/\s+/g, '');
+
     this.userManagementService.doLogin(this.login)
       .subscribe({
         next: (response: any) => {

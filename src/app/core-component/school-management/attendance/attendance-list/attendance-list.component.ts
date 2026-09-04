@@ -19,7 +19,6 @@ interface StudentRow {
 })
 export class AttendanceListComponent implements OnInit {
   readonly sections = Constant.SECTION_OPTIONS;
-  readonly imageBaseUrl = Constant.Site_Url + 'studentImage/';
   readonly months = ['January','February','March','April','May','June','July','August','September','October','November','December']
     .map((name, index) => ({ name, value: index + 1 }));
   readonly filterForm = this.fb.group({
@@ -92,13 +91,7 @@ export class AttendanceListComponent implements OnInit {
   dayPresent(day:Day):number { return this.students.filter(s => this.cell(s,day)==='PRESENT').length; }
   percentageClass(n:number):string { return n >= 80 ? 'good' : n >= 70 ? 'warning' : 'low'; }
   image(student:StudentRow):string {
-    const picture=String(student?.studentPicture||'').trim();
-    if(!picture)return 'assets/img/profiles/avatar-02.jpg';
-    if(/^(data:image\/|blob:|https?:)/i.test(picture))return picture;
-    if(picture.length>100&&/^[A-Za-z0-9+/=\r\n]+$/.test(picture))return 'data:image/png;base64,'+picture;
-    const superadminId=String(student?.superadminId||this.loginUser?.superadminId||this.loginUser?.loginId||'').trim();
-    const url=this.imageBaseUrl+encodeURIComponent(picture);
-    return superadminId?url+'?superadminId='+encodeURIComponent(superadminId):url;
+    return this.schoolService.studentImageUrl(student);
   }
   useDefaultStudentImage(event:Event):void { const image=event.target as HTMLImageElement; image.onerror=null; image.src='assets/img/profiles/avatar-02.jpg'; }
 

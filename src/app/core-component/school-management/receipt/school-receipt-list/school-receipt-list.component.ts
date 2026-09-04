@@ -10,6 +10,8 @@ import { routes } from 'src/app/core/helpers/routes';
 import { PaginationService, tablePageSize } from 'src/app/shared/shared.index';
 import { GenerateSchoolReceiptService } from '../generate-school-receipt/generate-school-receipt.service';
 import { SchoolReceiptListService } from './school-receipt-list.service';
+import { AuthenticationService } from 'src/app/auth/authentication.service';
+import { TenantMediaUrlService } from 'src/app/core/service/tenant-media-url.service';
 
 @Component({
   selector: 'app-school-receipt-list',
@@ -47,7 +49,9 @@ export class SchoolReceiptListComponent implements OnInit, OnDestroy {
     private generateSchoolReceiptService: GenerateSchoolReceiptService,
     private pagination: PaginationService,
     private router: Router,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private authenticationService: AuthenticationService,
+    private tenantMediaUrl: TenantMediaUrlService
   ) {}
 
   ngOnInit(): void {
@@ -101,8 +105,8 @@ export class SchoolReceiptListComponent implements OnInit, OnDestroy {
       return `data:image/png;base64,${image}`;
     }
     const superadminId = String(this.invoiceHeader?.superadminId || '').trim();
-    return !superadminId ? '' : Constant.Site_Url + 'invoiceHeaderImage/'
-      + encodeURIComponent(superadminId) + '/' + encodeURIComponent(image);
+    const loginUser = this.authenticationService.getLoginUser();
+    return this.tenantMediaUrl.receiptPicture(loginUser?.service, superadminId, image);
   }
 
   getInvoiceHeaderDetails(): void {

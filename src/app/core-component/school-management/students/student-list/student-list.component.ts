@@ -48,7 +48,6 @@ export class StudentListComponent {
   public searchDataValue = '';
   // pagination variables
 
-  baseUrl: string = '';
 
 
   constructor(
@@ -71,27 +70,10 @@ export class StudentListComponent {
     this.getStudentDetails();
     this.createForms();
     this.getGradeDetails();
-    this.baseUrl = Constant.Site_Url+'studentImage/';
   }
 
   studentImageUrl(student: any): string {
-    const picture = String(student?.studentPicture || '').trim();
-    if (!picture) {
-      return 'assets/img/profiles/avatar-02.jpg';
-    }
-    if (/^(data:image\/|blob:|https?:)/i.test(picture)) {
-      return picture;
-    }
-    if (picture.length > 100 && /^[A-Za-z0-9+/=\r\n]+$/.test(picture)) {
-      return 'data:image/png;base64,' + picture;
-    }
-    const superadminId = String(
-      student?.superadminId || this.loginUser?.superadminId || this.loginUser?.loginId || ''
-    ).trim();
-    const url = this.baseUrl + encodeURIComponent(picture);
-    return superadminId
-      ? url + '?superadminId=' + encodeURIComponent(superadminId)
-      : url;
+    return this.schoolManagementService.studentImageUrl(student);
   }
 
   useDefaultStudentImage(event: Event): void {

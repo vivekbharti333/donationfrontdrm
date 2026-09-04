@@ -296,7 +296,7 @@ export class AddReceiptHeaderComponent implements OnInit, OnDestroy {
     }
 
     this.receiptManagementService
-      .getInvoiceHeaderImage(headerSuperadminId, imageName)
+      .getInvoiceHeaderImage(this.loginUser?.service, headerSuperadminId, imageName)
       .subscribe({
         next: (imageBlob: Blob) => {
           if (!imageBlob?.size) {
@@ -338,7 +338,7 @@ export class AddReceiptHeaderComponent implements OnInit, OnDestroy {
       this.stamp = 'data:image/png;base64,' + imageName;
       return;
     }
-    this.receiptManagementService.getInvoiceHeaderImage(headerSuperadminId, imageName).subscribe({
+    this.receiptManagementService.getInvoiceHeaderImage(this.loginUser?.service, headerSuperadminId, imageName).subscribe({
       next: (imageBlob: Blob) => {
         if (!imageBlob?.size) {
           this.stamp = null;
