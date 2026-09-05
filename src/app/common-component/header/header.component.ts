@@ -122,19 +122,57 @@ export class HeaderComponent  {
     this.userName = firstName+" "+lastName
     this.userRole =  this.cookieService.get('roleType');
 
-    // this.displayLogo = this.cookieService.get('displayLogo');
+    const service = this.loginUser?.service || this.cookieService.get('service');
+    const superadminId = this.loginUser?.superadminId || this.cookieService.get('superadminId');
 
+    this.setHeaderLogosFromNames(
+      localStorage.getItem('crmDisplayLogoLong') || '',
+      localStorage.getItem('crmDisplayLogoSmall') || '',
+      service,
+      superadminId
+    );
 
-     this.displayLogo = this.mediaUrl.applicationImage(
-       this.loginUser?.service || this.cookieService.get('service'),
-       this.loginUser?.superadminId || this.cookieService.get('superadminId'),
-       localStorage.getItem('displayLogo') || ''
-     );
+    if (superadminId) {
+      this.commonComponentService.getApplicaionHeaderDetails(superadminId).subscribe({
+        next: (response: any) => {
+          if (Number(response?.responseCode) !== Constant.SUCCESS_CODE || !response?.payload) {
+            return;
+          }
+          const header = response.payload;
+          const crmDisplayLogoLong = String(header.crmDisplayLogoLong || '').trim();
+          const crmDisplayLogoSmall = String(header.crmDisplayLogoSmall || '').trim();
+
+          if (crmDisplayLogoLong) localStorage.setItem('crmDisplayLogoLong', crmDisplayLogoLong);
+          if (crmDisplayLogoSmall) localStorage.setItem('crmDisplayLogoSmall', crmDisplayLogoSmall);
+
+          this.setHeaderLogosFromNames(crmDisplayLogoLong, crmDisplayLogoSmall, service, superadminId);
+        }
+      });
+    }
 
 
     this.userPicture = this.resolveUserPicture(
       this.loginUser?.userPicture || localStorage.getItem('userPicture') || ''
     );
+  }
+
+  private setHeaderLogosFromNames(longLogo: string, smallLogo: string, service: any, superadminId: any): void {
+    this.displayLogo = this.resolveApplicationLogo(longLogo, service, superadminId, 'assets/img/logo.png');
+    this.displayLogoSmall = this.resolveApplicationLogo(smallLogo, service, superadminId, 'assets/img/logo-small.png');
+  }
+
+  private resolveApplicationLogo(value: any, service: any, superadminId: any, fallback: string): string {
+    const logo = String(value || '').trim();
+    if (!logo || logo === 'undefined' || logo === 'null') {
+      return fallback;
+    }
+    if (/^(data:image\/|blob:|https?:)/i.test(logo)) {
+      return logo;
+    }
+    if (!service || !superadminId) {
+      return fallback;
+    }
+    return this.mediaUrl.applicationImage(service, superadminId, logo);
   }
 
   private loadCurrentUserPicture(): void {

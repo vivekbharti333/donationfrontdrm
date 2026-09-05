@@ -1,3 +1,21 @@
+.crm-logo-long {
+  display: block;
+  width: 260px;
+  height: 90px;
+  object-fit: contain;
+}
+
+.crm-logo-small {
+  display: block;
+  width: 54px;
+  height: 54px;
+  object-fit: contain;
+}
+
+.mobile-header-logo {
+  display: none;
+}
+
 .mobile-profile-toggle {
   display: inline-flex;
   align-items: center;
@@ -37,6 +55,44 @@
 }
 
 @media (max-width: 991.98px) {
+  :host ::ng-deep .header {
+    left: 0;
+    position: fixed !important;
+    right: 0;
+    top: 0;
+    width: 100%;
+    z-index: 1050;
+  }
+
+  .header-left .logo,
+  .header-left .logo-normal,
+  .header-left .logo-white,
+  .header-left .logo-small {
+    display: none !important;
+  }
+
+  .mobile-header-logo {
+    align-items: center;
+    display: flex;
+    height: 100%;
+    justify-content: center;
+    left: 50%;
+    max-width: calc(100% - 120px);
+    pointer-events: auto;
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+  }
+
+  .mobile-header-logo img {
+    display: block;
+    height: 48px;
+    max-width: 190px;
+    object-fit: contain;
+    width: auto;
+  }
+
   .mobile-user-menu {
     align-items: center;
     display: flex !important;

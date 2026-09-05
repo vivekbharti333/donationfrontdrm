@@ -74,42 +74,77 @@
 }
 .users-count strong { font-size: 15px; }
 
-.users-table-shell { margin: 10px 22px 0; border: 1px solid #e8ecf1; border-radius: 12px; }
+.users-table-shell { margin: 10px 22px 0; border: 1px solid #e8ecf1; border-radius: 12px; overflow-x: auto; }
 .users-table-shell .table { margin-bottom: 0; }
 .users-table-shell thead th {
-  padding: 13px 12px;
-  border-bottom: 1px solid #e5e9ef;
-  background: #f7f8fa;
-  color: #596579;
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: .035em;
-  text-transform: uppercase;
+  padding: 14px 12px;
+  border-bottom: 1px solid #e4e7ec;
+  background: #f8fafc;
+  color: #475467;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
   white-space: nowrap;
+  vertical-align: middle;
 }
-.users-table-shell tbody td { padding: 13px 12px; border-color: #edf0f3; color: #4b5565; font-size: 12px; vertical-align: middle; }
+.users-table-shell tbody td {
+  height: 68px;
+  padding: 10px 12px;
+  border-bottom: 1px solid #f0f2f5;
+  color: #344054;
+  font-size: 14px;
+  vertical-align: middle;
+}
 .users-table-shell tbody tr { transition: background-color .15s ease; }
 .users-table-shell tbody tr:hover { background: #fffaf5; }
-.userslist-img {
+.user-photo-column {
+  text-align: center;
+  width: 72px;
+}
+.user-photo-column .userimgname {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.users-list-card .users-table-shell td .userslist-img {
   display: inline-flex;
-  flex: 0 0 48px;
-  width: 48px;
-  height: 48px;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 48px !important;
+  width: 48px !important;
+  min-width: 48px !important;
+  max-width: 48px !important;
+  height: 48px !important;
+  min-height: 48px !important;
+  max-height: 48px !important;
+  aspect-ratio: 1 / 1;
+  margin: 0 !important;
+  padding: 0 !important;
   overflow: hidden;
   border-radius: 50% !important;
+  line-height: 0;
 }
-.userslist-img .user-list-avatar {
+.users-list-card .users-table-shell td .userslist-img .user-list-avatar {
   display: block;
-  width: 48px;
-  height: 48px;
+  flex: 0 0 48px !important;
+  width: 48px !important;
+  min-width: 48px !important;
+  max-width: 48px !important;
+  height: 48px !important;
+  min-height: 48px !important;
+  max-height: 48px !important;
+  aspect-ratio: 1 / 1;
+  border: 2px solid #fff;
   border-radius: 50% !important;
+  box-shadow: 0 0 0 1px #e4e7ec;
   object-fit: cover;
   object-position: center;
 }
-.user-name-cell { color: #202a3c; font-weight: 750; }
-.role-pill { display: inline-block; padding: 4px 8px; border-radius: 6px; background: #f1f5f9; color: #475569; font-size: 11px; font-weight: 700; }
-.edit-delete-action { display: flex; align-items: center; gap: 6px; }
-.user-action-btn { display: inline-grid; place-items: center; width: 32px; height: 32px; padding: 0; border: 1px solid #e3e7ed; border-radius: 8px; background: #fff; transition: .18s ease; }
+.user-name-cell { color: #101828; font-weight: 600; }
+.role-pill { display: inline-block; padding: 5px 10px; border-radius: 16px; background: #f2f4f7; color: #344054; font-size: 12px; font-weight: 600; }
+.edit-delete-action { display: flex; align-items: center; gap: 7px; white-space: nowrap; }
+.user-action-btn { display: inline-grid; place-items: center; width: 34px; height: 34px; padding: 0; border: 1px solid #e4e7ec; border-radius: 7px; background: #fff; transition: .18s ease; }
 .user-action-btn.edit-action { color: #2563eb; }
 .user-action-btn.delete-action { color: #dc2626; }
 .user-action-btn:hover { transform: translateY(-1px); }
@@ -332,13 +367,13 @@
   .users-count strong { font-size: 14px; }
 }
 
-.userslist-img,
+.users-list-card .users-table-shell td .userslist-img,
 .user-card-identity {
   position: relative;
   overflow: visible;
 }
 
-.userslist-img img,
+.users-list-card .users-table-shell td .userslist-img img,
 .user-img-mobile {
   position: relative;
   z-index: 1;
@@ -347,7 +382,7 @@
   transform-origin: center;
 }
 
-.userslist-img img:hover,
+.users-list-card .users-table-shell td .userslist-img img:hover,
 .user-img-mobile:hover {
   z-index: 100;
   transform: scale(2.35);

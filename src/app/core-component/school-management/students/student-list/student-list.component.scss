@@ -52,6 +52,14 @@
   padding: 18px 20px;
 }
 
+.desktop-view {
+  display: block !important;
+}
+
+.mobile-cards {
+  display: none !important;
+}
+
 .student-list-toolbar {
   align-items: center;
   display: flex;
@@ -111,9 +119,16 @@
   padding: 8px 13px;
 }
 
-.desktop-view .table-responsive {
+.desktop-view .table-responsive,
+.student-table-shell {
   border-top: 0 !important;
   overflow-x: auto;
+}
+
+.student-table-shell {
+  border: 1px solid #e8ecf1;
+  border-radius: 12px;
+  margin: 0 20px;
 }
 
 .datanew {
@@ -152,20 +167,47 @@
 
 .student-photo-column .userimgname {
   display: flex;
+  align-items: center;
   justify-content: center;
 }
 
-.student-photo-column .userslist-img,
-.student-photo-column .userslist-img img {
+.student-photo-column .userslist-img {
+  align-items: center;
+  aspect-ratio: 1 / 1;
   border-radius: 50% !important;
-  height: 44px;
-  width: 44px;
+  display: inline-flex;
+  flex: 0 0 48px !important;
+  height: 48px !important;
+  justify-content: center;
+  line-height: 0;
+  margin: 0 !important;
+  max-height: 48px !important;
+  max-width: 48px !important;
+  min-height: 48px !important;
+  min-width: 48px !important;
+  overflow: hidden;
+  padding: 0 !important;
+  width: 48px !important;
+}
+
+.student-photo-column .userslist-img img {
+  aspect-ratio: 1 / 1;
+  border-radius: 50% !important;
+  display: block;
+  flex: 0 0 48px !important;
+  height: 48px !important;
+  max-height: 48px !important;
+  max-width: 48px !important;
+  min-height: 48px !important;
+  min-width: 48px !important;
+  width: 48px !important;
 }
 
 .student-photo-column .userslist-img img {
   border: 2px solid #fff;
   box-shadow: 0 0 0 1px #e4e7ec;
   object-fit: cover;
+  object-position: center;
 }
 
 .student-name-cell {
@@ -262,6 +304,167 @@
   color: #667085;
 }
 
+.student-card {
+  background: #ffffff;
+  border: 1px solid #e7eaf0;
+  border-radius: 12px;
+  box-shadow: 0 3px 10px rgba(15, 23, 42, .06);
+  margin-bottom: 12px;
+  padding: 14px;
+}
+
+.student-card .card-header {
+  background: transparent;
+  border-bottom: 1px solid #eef1f4;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  padding: 0 0 10px;
+}
+
+.student-card-identity {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+  min-width: 0;
+  overflow: visible;
+  position: relative;
+}
+
+.student-img-mobile {
+  aspect-ratio: 1 / 1;
+  border: 2px solid #fff;
+  border-radius: 50% !important;
+  box-shadow: 0 0 0 1px #e4e7ec;
+  flex: 0 0 68px;
+  height: 68px;
+  object-fit: cover;
+  object-position: center;
+  position: relative;
+  transition: transform 180ms ease, box-shadow 180ms ease;
+  width: 68px;
+  z-index: 1;
+}
+
+.student-img-mobile:hover,
+.student-img-mobile:focus {
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.28);
+  transform: scale(1.8);
+  z-index: 30;
+}
+
+.student-card-name {
+  color: #111;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.25;
+  margin: 0 0 3px;
+}
+
+.student-card small {
+  color: #667085;
+  display: block;
+  font-size: 12px;
+}
+
+.student-card .card-body {
+  padding: 0;
+}
+
+.student-card .card-body p {
+  color: #444;
+  display: flex;
+  font-size: 13px;
+  gap: 12px;
+  justify-content: space-between;
+  margin: 5px 0;
+  text-align: right;
+}
+
+.student-card .label {
+  color: #667085;
+  flex: 0 0 auto;
+  font-size: 13px;
+  font-weight: 700;
+  text-align: left;
+}
+
+.card-actions {
+  align-items: center;
+  border-top: 1px solid #eef1f4;
+  display: flex;
+  justify-content: space-between;
+  margin-top: 12px;
+  padding-top: 11px;
+}
+
+.right-actions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.status-btn {
+  border: 0;
+  border-radius: 6px;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 5px 10px;
+}
+
+.btn-green {
+  background: #28a745 !important;
+}
+
+.btn-red {
+  background: #dc3545 !important;
+}
+
+.icon-btn {
+  background: #fff;
+  border: 1px solid #e3e7ed;
+  border-radius: 8px;
+  cursor: pointer;
+  display: inline-grid;
+  height: 34px;
+  padding: 0;
+  place-items: center;
+  width: 34px;
+}
+
+.edit-icon {
+  color: #007bff !important;
+  font-size: 18px;
+}
+
+.assign-icon {
+  color: #7c3aed !important;
+  font-size: 18px;
+}
+
+.download-icon {
+  color: #16a34a !important;
+  font-size: 18px;
+}
+
+.delete-icon {
+  color: #ec0404 !important;
+  font-size: 18px;
+}
+
+.student-mobile-empty {
+  background: #fff;
+  border: 1px solid #e7eaf0;
+  border-radius: 12px;
+  box-shadow: 0 3px 10px rgba(15, 23, 42, .06);
+  height: auto !important;
+  margin-bottom: 12px;
+  padding: 32px 18px;
+}
+
 .assign-student-summary {
   align-items: center;
   background: #f8fafc;
@@ -317,40 +520,199 @@
 
 .edit-student-photo {
   align-items: center;
+  background: #f8fafc;
+  border: 1px solid #e4e7ec;
+  border-radius: 12px;
   display: flex;
-  gap: 14px;
+  gap: 18px;
   margin-bottom: 20px;
+  padding: 16px;
+}
+
+.edit-student-photo-preview {
+  align-items: center;
+  background: #fff;
+  border: 1px solid #dbe2ea;
+  border-radius: 10px;
+  display: flex;
+  flex: 0 0 132px;
+  height: 132px;
+  justify-content: center;
+  overflow: hidden;
+  width: 132px;
 }
 
 .edit-student-photo img {
-  border: 1px solid #dbe2ea;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.14);
-  height: 110px;
-  object-fit: cover;
+  border: 0;
+  border-radius: 10px;
+  box-shadow: none;
+  height: 100%;
+  object-fit: contain;
   transform-origin: top left;
-  width: 110px;
+  width: 100%;
 }
 
 .edit-student-photo img:hover {
-  transform: scale(2);
+  transform: none;
 }
 
-.change-student-photo-btn {
+.edit-student-photo-actions {
+  align-items: flex-start;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.edit-student-photo-actions small {
+  color: #667085;
+  flex-basis: 100%;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.change-student-photo-btn,
+.take-student-photo-btn {
   align-items: center;
-  background: #ff9f43;
+  border: 0;
   border-radius: 6px;
   color: #fff;
   cursor: pointer;
   display: inline-flex;
   gap: 7px;
+  justify-content: center;
   margin-left: 0;
+  min-height: 40px;
   padding: 9px 14px;
   transition: background-color 160ms ease;
 }
 
+.change-student-photo-btn {
+  background: #ff9f43;
+}
+
 .change-student-photo-btn:hover {
   background: #f18725;
+}
+
+.take-student-photo-btn {
+  background: #22a06b;
+}
+
+.take-student-photo-btn:hover {
+  background: #16855a;
+}
+
+.camera-backdrop {
+  align-items: center;
+  background: rgba(0, 0, 0, .72);
+  display: flex;
+  inset: 0;
+  justify-content: center;
+  padding: 16px;
+  position: fixed;
+  z-index: 20000;
+}
+
+.camera-dialog {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, .3);
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100dvh - 32px);
+  max-width: 680px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.camera-header,
+.camera-actions {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+  padding: 14px 18px;
+}
+
+.camera-header {
+  justify-content: space-between;
+}
+
+.camera-header h5 {
+  margin: 0;
+}
+
+.camera-close {
+  background: transparent;
+  border: 0;
+  font-size: 28px;
+  line-height: 1;
+  min-height: 40px;
+  min-width: 40px;
+}
+
+.camera-viewport {
+  align-items: center;
+  aspect-ratio: 4 / 3;
+  background: #111;
+  display: flex;
+  flex: 1 1 auto;
+  justify-content: center;
+  min-height: 0;
+  overflow: hidden;
+  position: relative;
+}
+
+.camera-flip {
+  align-items: center;
+  background: rgba(0, 0, 0, .62);
+  border: 1px solid rgba(255, 255, 255, .55);
+  border-radius: 999px;
+  bottom: 14px;
+  color: #fff;
+  display: inline-flex;
+  gap: 7px;
+  min-height: 42px;
+  padding: 8px 14px;
+  position: absolute;
+  right: 14px;
+  z-index: 1;
+}
+
+.camera-flip:disabled {
+  opacity: .65;
+}
+
+.camera-viewport video,
+.camera-viewport img {
+  height: 100%;
+  object-fit: contain;
+  width: 100%;
+}
+
+.camera-error {
+  color: #fff;
+  padding: 24px;
+  text-align: center;
+}
+
+.camera-error i {
+  font-size: 42px;
+}
+
+.camera-error p {
+  margin: 12px 0 0;
+}
+
+.camera-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.camera-actions .btn {
+  align-items: center;
+  display: inline-flex;
+  justify-content: center;
+  min-height: 42px;
 }
 
 .student-update-form {
@@ -423,14 +785,55 @@
   padding: 10px 20px;
 }
 
+.modalHeaderContainer {
+  align-items: center;
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+}
+
+.modalHeaderContainer h2 {
+  color: #101828;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.25;
+  margin: 0;
+}
+
+.dialog-content {
+  max-height: calc(92vh - 120px);
+  overflow-y: auto;
+}
+
+.student-dialog-actions {
+  flex-wrap: wrap;
+}
+
+.student-dialog-actions .btn {
+  min-height: 42px;
+}
+
 @media (max-width: 575.98px) {
+  :host {
+    display: block;
+    margin-top: -13px;
+  }
+
   .student-page-header {
     align-items: flex-start;
     gap: 12px;
+    margin-top: 0;
+    padding-top: 0;
+  }
+
+  .student-page-header .page-title {
+    margin-top: 0;
+    padding-top: 0;
   }
 
   .student-page-header .page-title h4 {
     font-size: 21px;
+    margin-top: 0;
   }
 
   .student-page-header .table-top-head {
@@ -462,13 +865,32 @@
 
   .edit-student-photo {
     align-items: flex-start;
-    flex-wrap: wrap;
+    flex-direction: column;
+    gap: 14px;
   }
 
-  .change-student-photo-btn {
+  .edit-student-photo-preview {
+    flex-basis: auto;
+    height: min(72vw, 260px);
+    width: 100%;
+  }
+
+  .edit-student-photo-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+    width: 100%;
+  }
+
+  .change-student-photo-btn,
+  .take-student-photo-btn {
     justify-content: center;
     margin-left: 0;
+    min-height: 46px;
     width: 100%;
+  }
+
+  .edit-student-photo-actions small {
+    text-align: center;
   }
 
   .student-update-form .card-body {
@@ -477,5 +899,205 @@
 
   .student-update-form > .text-end .btn {
     width: 100%;
+  }
+
+  .modalHeaderContainer {
+    align-items: flex-start;
+    padding: 14px 16px;
+  }
+
+  .modalHeaderContainer h2 {
+    font-size: 18px;
+    padding-right: 8px;
+  }
+
+  .modalHeaderContainer .closeBtn .close {
+    align-items: center;
+    border: 1px solid #e4e7ec;
+    border-radius: 8px;
+    display: inline-flex;
+    height: 36px;
+    justify-content: center;
+    width: 36px;
+  }
+
+  .dialog-content {
+    max-height: calc(92vh - 112px);
+    padding: 14px !important;
+  }
+
+  .dialog-content .row {
+    margin-left: -6px;
+    margin-right: -6px;
+  }
+
+  .dialog-content .row > [class*="col-"] {
+    padding-left: 6px;
+    padding-right: 6px;
+  }
+
+  .assign-student-summary {
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .assign-student-summary img {
+    flex: 0 0 50px;
+    height: 50px;
+    width: 50px;
+  }
+
+  .assign-student-summary strong {
+    font-size: 15px;
+    line-height: 1.25;
+  }
+
+  .assign-student-summary small {
+    line-height: 1.35;
+  }
+
+  .student-dialog-actions {
+    align-items: stretch !important;
+    display: flex !important;
+    flex-direction: column-reverse;
+    padding: 0 14px 14px !important;
+  }
+
+  .student-dialog-actions .btn {
+    width: 100%;
+  }
+
+  .camera-backdrop {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .camera-dialog {
+    border-radius: 16px 16px 0 0;
+    max-height: 100dvh;
+  }
+
+  .camera-header {
+    padding: 12px 14px;
+  }
+
+  .camera-viewport {
+    aspect-ratio: 3 / 4;
+    max-height: calc(100dvh - 188px);
+  }
+
+  .camera-flip {
+    bottom: 12px;
+    min-height: 46px;
+    right: 12px;
+  }
+
+  .camera-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    padding: 12px 14px calc(12px + env(safe-area-inset-bottom));
+  }
+
+  .camera-actions .btn {
+    min-height: 46px;
+    min-width: 0;
+  }
+
+  .camera-actions:not(.has-captured-photo) .btn:last-child {
+    grid-column: 2;
+  }
+
+  .camera-actions.has-captured-photo {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .camera-actions.has-captured-photo .btn {
+    padding-left: 8px;
+    padding-right: 8px;
+    width: 100%;
+  }
+}
+
+@media (max-width: 992px) {
+  .desktop-view {
+    display: none !important;
+  }
+
+  .mobile-cards {
+    background: #f8fafc;
+    display: block !important;
+    overflow: visible;
+    padding: 14px 14px 2px;
+  }
+
+  .table-top.student-list-toolbar {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) max-content;
+    align-items: center;
+    gap: 8px;
+    padding: 14px;
+  }
+
+  .student-list-body {
+    padding: 0;
+  }
+
+  .student-list-toolbar .search-set {
+    margin: 0 !important;
+    max-width: none;
+    min-width: 0;
+    width: 100% !important;
+  }
+
+  .student-list-toolbar .search-input,
+  .student-list-toolbar .dataTables_filter,
+  .student-list-toolbar .dataTables_filter label {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .student-count {
+    white-space: nowrap;
+  }
+
+  .student-card .card-actions {
+    flex-direction: row;
+  }
+
+  .student-card .right-actions {
+    flex-wrap: nowrap;
+    margin-left: auto;
+    overflow-x: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .table-top.student-list-toolbar {
+    grid-template-columns: 1fr;
+  }
+
+  .student-count {
+    align-self: flex-start;
+  }
+
+  .card-actions {
+    align-items: center;
+    flex-direction: row;
+    gap: 10px;
+  }
+
+  .right-actions {
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+    margin-left: auto;
+    max-width: calc(100vw - 120px);
+    overflow-x: auto;
+    padding-bottom: 2px;
+  }
+
+  .status-btn {
+    flex: 0 0 auto;
   }
 }

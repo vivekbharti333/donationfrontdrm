@@ -201,7 +201,8 @@ export class StudentAcademicComponent implements OnInit, OnDestroy {
     });
     this.editDialog = this.dialog.open(template, {
       width: '620px',
-      maxWidth: '95vw',
+      maxWidth: '96vw',
+      maxHeight: '92vh',
       disableClose: true,
       panelClass: 'custom-modal'
     });
@@ -258,7 +259,8 @@ export class StudentAcademicComponent implements OnInit, OnDestroy {
     });
     this.promoteDialog = this.dialog.open(template, {
       width: '620px',
-      maxWidth: '95vw',
+      maxWidth: '96vw',
+      maxHeight: '92vh',
       disableClose: true,
       panelClass: 'custom-modal'
     });

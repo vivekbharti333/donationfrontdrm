@@ -2,6 +2,14 @@
   width: 100%;
 }
 
+#sidebar .sidebar-menu {
+  padding-bottom: 88px !important;
+}
+
+#sidebar .sidebar-footer {
+  margin-top: 12px;
+}
+
 // Keep every configured menu icon visually consistent with the original sidebar icons.
 #sidebar .sidebar-menu .sub-active > i.feather {
   display: inline-flex;

@@ -37,10 +37,7 @@ export class SchoolManagementService {
 
         // Student Basic Details
         admissionNo: studentDetails.admissionNo,
-        rollNumber: studentDetails.rollNumber,
         studentPicture: studentDetails.studentPicture,
-        grade: studentDetails.grade,
-        gradeSection: studentDetails.gradeSection,
         firstName: studentDetails.firstName,
         middleName: studentDetails.middleName,
         lastName: studentDetails.lastName,
@@ -161,6 +158,18 @@ export class SchoolManagementService {
       }
     };
     return this.http.post<any>(Constant.Site_Url + "getStudentDetails", request);
+  }
+
+  downloadAdmissionDetails(studentId: number): Observable<Blob> {
+    const token = this.getAuthenticationToken();
+    const options: { headers?: HttpHeaders; responseType: 'blob' } = {
+      responseType: 'blob'
+    };
+    if (token) {
+      options.headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
+    }
+    return this.http.get(Constant.Site_Url + 'downloadAdmissionForm?id=' + encodeURIComponent(String(studentId)),
+      options);
   }
 
   getStudentAcademicDetails(filters: {

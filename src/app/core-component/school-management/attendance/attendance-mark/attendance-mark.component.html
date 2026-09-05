@@ -26,10 +26,6 @@
 
   <section class="attendance-card">
     <div class="toolbar">
-      <div class="bulk">
-        <button class="present" type="button" (click)="markAll('PRESENT')"><i class="feather icon-check"></i>Mark All Present</button>
-        <button class="absent" type="button" (click)="markAll('ABSENT')"><i class="feather icon-x"></i>Mark All Absent</button>
-      </div>
       <div class="toolbar-right">
         <label class="search"><input [(ngModel)]="searchTerm" [ngModelOptions]="{standalone:true}" placeholder="Search Student..."><i class="feather icon-search"></i></label>
         <button class="save" type="button" (click)="saveAttendance()" [disabled]="isSaving||!students.length"><i class="feather icon-save"></i>{{isSaving?'Saving...':'Save Attendance'}}</button>
@@ -45,7 +41,7 @@
           <tr *ngFor="let student of filteredStudents">
             <td class="check"><input type="checkbox" [checked]="selectedStudentIds.has(student.studentAcademicId)" (change)="toggleStudent(student.studentAcademicId,$any($event.target).checked)"></td>
             <td class="roll">{{student.rollNumber||'—'}}</td>
-            <td><div class="student"><img [src]="studentImage(student)" [alt]="studentName(student)" (error)="useDefaultStudentImage($event)"><span>{{studentName(student)}}</span></div></td>
+            <td><div class="student"><img [src]="studentImage(student)" [alt]="studentName(student)" (error)="useDefaultStudentImage($event)"><span><b class="student-roll-inline">{{student.rollNumber||'—'}}</b> {{studentName(student)}}</span></div></td>
             <td><div class="status-options">
               <button *ngFor="let status of statuses" type="button" [ngClass]="[status.toLowerCase(),student.status===status?'active':'']" (click)="setStatus(student,status)">
                 <i class="feather" [ngClass]="status==='PRESENT'?'icon-check-circle':'icon-x-circle'"></i>{{status|titlecase}}
@@ -55,6 +51,7 @@
         </tbody>
       </table>
     </div>
+
     <p class="note">Note: Click on any status to change the attendance.</p>
   </section>
 </section>

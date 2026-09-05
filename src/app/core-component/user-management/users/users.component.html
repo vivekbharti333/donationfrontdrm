@@ -116,7 +116,7 @@
       <table matSort (matSortChange)="sortData($event)" class="table datanew">
         <thead>
           <tr>
-            <th></th>
+            <th class="user-photo-column"></th>
             <th mat-sort-header="userName">Full Name</th>
             <th mat-sort-header="loginId">Userid</th>
             <th mat-sort-header="phone">Mobile</th>
@@ -130,9 +130,9 @@
         <tbody>
           @for (data of tableData; track data) {
           <tr>
-            <td>
+            <td class="user-photo-column">
               <div class="userimgname">
-                <a href="javascript:void(0);" class="userslist-img bg-img">
+                <a href="javascript:void(0);" class="userslist-img">
                   <img class="user-list-avatar"
                     [src]="userImageUrl(data)" 
                     alt="user image" 

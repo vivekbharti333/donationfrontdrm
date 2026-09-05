@@ -44,6 +44,8 @@ export class ExamScheduleComponent implements OnInit, OnDestroy {
       next: responses => {
         this.exams = this.rows(responses.exams); this.gradeSubjects = this.rows(responses.mappings);
         this.subjects = this.rows(responses.subjects); this.grades = this.rows(responses.grades);
+        this.addScheduleForm.updateValueAndValidity();
+        this.editScheduleForm.updateValueAndValidity();
         this.isMastersLoading = false;
         if (this.gradeSubjects.length === 0) {
           this.showMessage('No grade subjects found', 'Assign subjects to grades before creating an exam schedule.', 'error');
@@ -109,11 +111,30 @@ export class ExamScheduleComponent implements OnInit, OnDestroy {
   }
 
   onExamChange(form: FormGroup): void { form.get('examGradeSubjectId')?.setValue(null); }
+  selectedExamFor(form: FormGroup): any | null {
+    return this.exams.find(item => Number(item.id) === Number(form.get('examId')?.value)) || null;
+  }
+  examStartDate(form: FormGroup): string | null { return this.dateInput(this.selectedExamFor(form)?.startDate) || null; }
+  examEndDate(form: FormGroup): string | null { return this.dateInput(this.selectedExamFor(form)?.endDate) || null; }
+  shouldShowExamDateRangeHint(form: FormGroup): boolean {
+    if (!this.examDateRangeHint(form)) return false;
+    const examDate = this.dateInput(form.get('examDate')?.value);
+    if (!examDate) return true;
+    return form.hasError('examDateOutsideRange');
+  }
+  examDateRangeHint(form: FormGroup): string {
+    const start = this.displayDate(this.examStartDate(form)); const end = this.displayDate(this.examEndDate(form));
+    return start && end ? `${start} to ${end}` : start ? `from ${start}` : end ? `up to ${end}` : '';
+  }
   gradeSubjectOptionsFor(form: FormGroup): any[] {
-    const exam = this.exams.find(item => Number(item.id) === Number(form.get('examId')?.value));
+    const exam = this.selectedExamFor(form);
     if (!exam) return this.gradeSubjects;
     const examYear = this.normalizeAcademicYear(exam.academicYear);
-    return this.gradeSubjects.filter(item => this.normalizeAcademicYear(item.academicYear) === examYear);
+    if (!examYear) return this.gradeSubjects;
+    return this.gradeSubjects.filter(item => {
+      const mappingYear = this.normalizeAcademicYear(item.academicYear);
+      return !mappingYear || mappingYear === examYear;
+    });
   }
   examLabel(id: number): string { const item = this.exams.find(row => Number(row.id) === Number(id)); return item ? `${item.examName} (${item.examCode})` : `Exam #${id}`; }
   mappingLabel(id: number): string {
@@ -142,17 +163,42 @@ export class ExamScheduleComponent implements OnInit, OnDestroy {
     return (control: AbstractControl): ValidationErrors | null => {
       const start = control.get('startTime')?.value; const end = control.get('endTime')?.value;
       const maximum = Number(control.get('maximumMarks')?.value); const passing = Number(control.get('passingMarks')?.value);
+      const examId = control.get('examId')?.value; const examDate = this.dateInput(control.get('examDate')?.value);
       const errors: ValidationErrors = {};
       if (start && end && end <= start) errors['invalidTimeRange'] = true;
       if (Number.isFinite(maximum) && Number.isFinite(passing) && passing > maximum) errors['invalidMarks'] = true;
+      const exam = this.exams.find(item => Number(item.id) === Number(examId));
+      const examStart = this.dateInput(exam?.startDate); const examEnd = this.dateInput(exam?.endDate);
+      if (examDate && ((examStart && examDate < examStart) || (examEnd && examDate > examEnd))) errors['examDateOutsideRange'] = true;
       return Object.keys(errors).length ? errors : null;
     };
   }
   private rows(response: any): any[] { const rows = response?.listPayload ?? response?.payload ?? response?.data; return Array.isArray(rows) ? rows : []; }
   private success(response: any): boolean { return Number(response?.responseCode) === 200 && Number(response?.payload?.respCode) === 200; }
   private message(response: any, fallback: string): string { return response?.payload?.respMesg || response?.responseMessage || fallback; }
-  private dateInput(value: any): string { return value ? String(value).slice(0, 10) : ''; }
-  private normalizeAcademicYear(value: any): string { return String(value ?? '').trim().replace(/\s+/g, '').replace(/\//g, '-'); }
+  private dateInput(value: any): string {
+    if (!value) return '';
+    if (value instanceof Date) return value.toISOString().slice(0, 10);
+    const text = String(value).trim();
+    const iso = text.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if (iso) return `${iso[1]}-${iso[2]}-${iso[3]}`;
+    const indian = text.match(/^(\d{2})-(\d{2})-(\d{4})/);
+    if (indian) return `${indian[3]}-${indian[2]}-${indian[1]}`;
+    return text.slice(0, 10);
+  }
+  private displayDate(value: any): string {
+    const date = this.dateInput(value);
+    if (!date) return '';
+    const [year, month, day] = date.split('-');
+    return year && month && day ? `${day}-${month}-${year}` : date;
+  }
+  private normalizeAcademicYear(value: any): string {
+    const year = String(value ?? '').trim().replace(/\s+/g, '').replace(/\//g, '-');
+    const match = year.match(/^(\d{4})-(\d{2}|\d{4})$/);
+    if (!match) return year.toLowerCase();
+    const endYear = match[2].length === 4 ? match[2].slice(-2) : match[2];
+    return `${match[1]}-${endYear}`.toLowerCase();
+  }
   private openDialog(template: TemplateRef<any>): MatDialogRef<any> { return this.dialog.open(template, { width: '900px', maxWidth: '96vw', disableClose: true, panelClass: 'custom-modal' }); }
   private applyPagination(): void { this.totalData = this.fullData.length; if (this.currentSkip >= this.totalData) this.currentSkip = 0; this.tableData = this.fullData.slice(this.currentSkip, this.currentSkip + this.pageSize); this.serialNumberArray = this.tableData.map((_, i) => this.currentSkip + i + 1); this.pagination.calculatePageSize.next({ totalData: this.totalData, pageSize: this.pageSize, tableData: this.tableData, serialNumberArray: this.serialNumberArray }); }
   private showMessage(summary: string, detail: string, severity: 'success' | 'error'): void { this.messageService.add({ summary, detail, severity }); }

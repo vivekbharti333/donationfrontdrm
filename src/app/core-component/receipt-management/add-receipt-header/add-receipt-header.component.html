@@ -40,7 +40,7 @@
                         </mat-select>
                     </div>
                 
-                    <div class="col-sm-4 form-group">
+                    <div class="col-sm-4 form-group d-none">
                         <mat-select class="space-select select" formControlName="id"  (selectionChange)="getInvoiceHeaderById($event.value,'BYID')" placeholder="Select Invoice">
                             <mat-option *ngFor="let invoiceList of invoiceHeaderList" [value]="invoiceList.id">
                                 {{ invoiceList.companyFirstName + ' ' + invoiceList.companyLastName }}

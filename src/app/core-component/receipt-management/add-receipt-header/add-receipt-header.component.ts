@@ -28,7 +28,8 @@ export class AddReceiptHeaderComponent implements OnInit, OnDestroy {
   public isSuperadmin = false;
 
   public superadminId: any;
-    public loginUser : any;
+  public selectedSuperadminService = '';
+  public loginUser : any;
 
   public logo: string | null = null;
   public logoVersion = Date.now();
@@ -126,12 +127,18 @@ export class AddReceiptHeaderComponent implements OnInit, OnDestroy {
       thankYouNote: [''],
       createdBy: [''],
       superadminId: [''],
+      service: [''],
     });
   }
 
 
   getInvoiceHeaderList(selectedValue: string, requestFor: string): void {
     this.superadminId = selectedValue;
+    this.selectedSuperadminService = this.resolveSelectedSuperadminService(selectedValue);
+    this.addInvoiceHeaderForm.patchValue({
+      superadminId: selectedValue,
+      service: this.selectedSuperadminService
+    }, { emitEvent: false });
     this.loading = true;
     this.receiptManagementService.getInvoiceHeaderBySuperadminId(this.superadminId, "", requestFor)
       .subscribe({
@@ -144,6 +151,10 @@ export class AddReceiptHeaderComponent implements OnInit, OnDestroy {
             } else {
               this.isInvoiceHeaderExists = false;
               this.addInvoiceHeaderForm.reset();
+              this.addInvoiceHeaderForm.patchValue({
+                superadminId: this.superadminId,
+                service: this.selectedSuperadminService
+              }, { emitEvent: false });
             }
           } else {
             this.showError(response?.responseMessage || 'Unable to load receipt headers.');
@@ -269,6 +280,10 @@ export class AddReceiptHeaderComponent implements OnInit, OnDestroy {
       this.isInvoiceHeaderExists = true;
     }
     this.addInvoiceHeaderForm.patchValue(header);
+    this.addInvoiceHeaderForm.patchValue({
+      superadminId: header?.superadminId || this.superadminId,
+      service: header?.service || this.selectedSuperadminService
+    }, { emitEvent: false });
     this.logoVersion = Date.now();
     this.loadCompanyLogo(header);
     this.loadCompanyStamp(header);
@@ -296,7 +311,7 @@ export class AddReceiptHeaderComponent implements OnInit, OnDestroy {
     }
 
     this.receiptManagementService
-      .getInvoiceHeaderImage(this.loginUser?.service, headerSuperadminId, imageName)
+      .getInvoiceHeaderImage(this.selectedSuperadminService, headerSuperadminId, imageName)
       .subscribe({
         next: (imageBlob: Blob) => {
           if (!imageBlob?.size) {
@@ -338,7 +353,7 @@ export class AddReceiptHeaderComponent implements OnInit, OnDestroy {
       this.stamp = 'data:image/png;base64,' + imageName;
       return;
     }
-    this.receiptManagementService.getInvoiceHeaderImage(this.loginUser?.service, headerSuperadminId, imageName).subscribe({
+    this.receiptManagementService.getInvoiceHeaderImage(this.selectedSuperadminService, headerSuperadminId, imageName).subscribe({
       next: (imageBlob: Blob) => {
         if (!imageBlob?.size) {
           this.stamp = null;
@@ -369,7 +384,11 @@ export class AddReceiptHeaderComponent implements OnInit, OnDestroy {
     // }
 
     this.loading = true;
-    this.receiptManagementService.saveInvoiceHeader(this.superadminId, this.addInvoiceHeaderForm.value)
+    this.receiptManagementService.saveInvoiceHeader(this.superadminId, {
+      ...this.addInvoiceHeaderForm.value,
+      superadminId: this.superadminId,
+      service: this.selectedSuperadminService
+    })
       .subscribe({
         next: (response: any) => {
           this.loading = false;
@@ -405,6 +424,13 @@ export class AddReceiptHeaderComponent implements OnInit, OnDestroy {
 
   private looksLikeBase64(value: string): boolean {
     return value.length > 100 && /^[A-Za-z0-9+/=\r\n]+$/.test(value);
+  }
+
+  private resolveSelectedSuperadminService(superadminId: string): string {
+    const selectedUser = (this.superadminList || []).find((user: any) =>
+      String(user?.loginId || user?.superadminId || '').trim() === String(superadminId || '').trim()
+    );
+    return String(selectedUser?.service || this.loginUser?.service || '').trim();
   }
 
 }

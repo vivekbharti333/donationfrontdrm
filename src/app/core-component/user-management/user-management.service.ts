@@ -225,6 +225,7 @@ export class UserManagementService {
         alternateMobile: userDetails.alternateMobile || '',
         userPicture: userDetails.userPicture || null,
         token: loginUser['token'] || this.cookieService.get('token'),
+        service: userDetails.service || loginUser['service'] || this.cookieService.get('service'),
         superadminId: loginUser['superadminId'] || this.cookieService.get('superadminId')
       }
     };

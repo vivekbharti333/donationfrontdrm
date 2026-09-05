@@ -29,7 +29,7 @@ export class AttendanceMarkComponent implements OnInit {
   readonly academicSessions = Constant.ACADEMIC_YEAR_OPTIONS;
   readonly sections = Constant.SECTION_OPTIONS;
   readonly filterForm = this.formBuilder.group({
-    sessionName: [this.currentAcademicSession()],
+    sessionName: [{ value: this.currentAcademicSession(), disabled: true }],
     attendanceDate: [this.today()], grade: [''], gradeSection: ['']
   });
   students: AttendanceStudent[] = [];
@@ -122,7 +122,7 @@ export class AttendanceMarkComponent implements OnInit {
           this.errorMessage = `Attendance saved for ${saved} of ${markedStudents.length} marked students. Please retry the remaining records.`;
       });
   }
-  reset(): void { this.filterForm.reset({ sessionName: this.currentAcademicSession(), attendanceDate: this.today(), grade: this.grades.length ? this.gradeValue(this.grades[0]) : '', gradeSection: 'A' }); this.students = []; this.selectedStudentIds.clear(); this.searchTerm = ''; this.successMessage = ''; this.errorMessage = ''; }
+  reset(): void { this.filterForm.reset({ sessionName: this.currentAcademicSession(), attendanceDate: this.today(), grade: this.grades.length ? this.gradeValue(this.grades[0]) : '', gradeSection: 'A' }); this.filterForm.controls.sessionName.disable(); this.students = []; this.selectedStudentIds.clear(); this.searchTerm = ''; this.successMessage = ''; this.errorMessage = ''; }
   studentName(student: AttendanceStudent): string { return [student.firstName, student.middleName, student.lastName].filter(Boolean).join(' ') || 'Unnamed student'; }
   studentImage(student: AttendanceStudent): string {
     return this.schoolManagementService.studentImageUrl(student);

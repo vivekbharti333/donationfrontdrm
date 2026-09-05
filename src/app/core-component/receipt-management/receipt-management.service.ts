@@ -47,14 +47,15 @@ export class ReceiptManagementService {
 
   getInvoiceHeaderImage(service: string, superadminId: string, imageName: string): Observable<Blob> {
     const serviceFolder = String(service || '').split(',')[0].trim().replace(/[^A-Za-z0-9_-]/g, '_');
-    const url = Constant.Site_Url + 'media/'
+    const url = Constant.Site_Url + 'invoiceHeaderImage/'
       + encodeURIComponent(serviceFolder) + '/'
       + encodeURIComponent(superadminId) + '/'
-      + 'receipt_pic/' + encodeURIComponent(imageName);
+      + encodeURIComponent(imageName);
     return this.http.get(url, { responseType: 'blob' });
   }
 
-  saveInvoiceHeader(superadninId: any,invoiceHeader: any){
+  saveInvoiceHeader(superadminId: any, invoiceHeader: any){
+    const selectedSuperadminId = invoiceHeader?.superadminId || superadminId;
     let request: any = {
       payload: {
         invoiceInitial: invoiceHeader.invoiceInitial,
@@ -85,9 +86,9 @@ export class ReceiptManagementService {
         thankYouNote: invoiceHeader.thankYouNote,
         footer: invoiceHeader.footer,
         token: this.loginUser['token'],
-        createdBy: superadninId,
-        superadminId: superadninId,
-        service: this.loginUser?.service || this.cookieService.get('service'),
+        createdBy: selectedSuperadminId,
+        superadminId: selectedSuperadminId,
+        service: invoiceHeader?.service || this.loginUser?.service || this.cookieService.get('service'),
       }
     };
     return this.http.post<any>(Constant.Site_Url + "addInvoiceHeader", request);

@@ -20,6 +20,12 @@ export class StudentExamResultService {
   generateExamResults(examId:number):Observable<any>{return this.post('generateExamResults',{examId:Number(examId),createdBy:this.loginId,superadminId:this.superadminId});}
   publishExamResult(examId:number,studentAcademicId:number,published:boolean):Observable<any>{return this.post('publishExamResult',{examId:Number(examId),studentAcademicId:Number(studentAcademicId),published,superadminId:this.superadminId});}
   getExamDetails():Observable<any>{return this.post('getExamDetails',{superadminId:this.superadminId});}
+  getInvoiceHeaderList():Observable<any>{return this.post('getInvoiceHeaderList',{requestFor:'BYSUPERADMINID',token:this.authentication.getLoginUser()?.token||this.cookies.get('token'),createdBy:this.loginId,superadminId:this.superadminId});}
+  getStudentExamMarks(examId:number,studentAcademicId:number):Observable<any>{return this.post('getStudentExamMarks',{examId:Number(examId),studentAcademicId:Number(studentAcademicId),superadminId:this.superadminId,status:'ACTIVE'});}
+  getExamSchedule():Observable<any>{return this.post('getExamSchedule',{superadminId:this.superadminId,status:'ACTIVE'});}
+  getExamGradeSubject():Observable<any>{return this.post('getExamGradeSubject',{superadminId:this.superadminId,status:'ACTIVE'});}
+  getExamSubject():Observable<any>{return this.post('getExamSubject',{superadminId:this.superadminId,status:'ACTIVE'});}
+  getGradeDetails():Observable<any>{return this.post('getGradeDetails',{});}
   getStudentAcademicDetails():Observable<any>{return this.post('getStudentAcademicDetails',{superadminId:this.superadminId});}
   private post(endpoint:string,payload:any):Observable<any>{const token=this.authentication.getLoginUser()?.token||this.cookies.get('token');const options=token?{headers:new HttpHeaders({Authorization:`Bearer ${token}`})}:{};return this.http.post<any>(Constant.Site_Url+endpoint,{payload},options);}
   private get superadminId():string{return this.authentication.getLoginUser()?.superadminId||this.cookies.get('superadminId');}

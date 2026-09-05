@@ -91,34 +91,6 @@
         </div>
 
         <div class="col-md-4 mb-3">
-          <label>Roll Number *</label>
-          <input class="form-control" formControlName="rollNumber">
-        </div>
-
-        <div class="col-md-2 mb-3">
-          <label>Grade *</label>
-           <select class="form-control" formControlName="grade">
-            <option value="">{{ isGradesLoading ? 'Loading grades...' : 'Select Grade' }}</option>
-            <option *ngFor="let grade of gradeOptions" [value]="grade.gradeName || grade.name || grade.id">
-              {{ grade.gradeName || grade.name || ('Grade ' + grade.id) }}
-            </option>
-          </select>
-        </div>
-
-        <div class="col-md-2 mb-3">
-          <label>Grade Section</label>
-          <!-- <input class="form-control" formControlName="gradeSection"> -->
-           <select class="form-control" formControlName="gradeSection">
-            <option value="">Select Section</option>
-            <option value="A">A</option>
-            <option value="B">B</option>
-            <option value="C">C</option>
-            <option value="D">D</option>
-            <option value="E">E</option>
-          </select>
-        </div>
-
-        <div class="col-md-4 mb-3">
           <label>First Name *</label>
           <input class="form-control" formControlName="firstName">
         </div>

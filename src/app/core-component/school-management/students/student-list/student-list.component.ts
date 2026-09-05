@@ -1,4 +1,4 @@
-import { Component, TemplateRef } from '@angular/core';
+import { Component, ElementRef, OnDestroy, TemplateRef, ViewChild } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { SchoolManagementService } from '../../school-management.service';
 import { MessageService } from 'primeng/api';
@@ -21,7 +21,8 @@ import { Constant } from 'src/app/core/constant/constants';
   templateUrl: './student-list.component.html',
   styleUrl: './student-list.component.scss'
 })
-export class StudentListComponent {
+export class StudentListComponent implements OnDestroy {
+  @ViewChild('editCameraVideo') editCameraVideo?: ElementRef<HTMLVideoElement>;
 
   public readonly academicYearOptions = Constant.ACADEMIC_YEAR_OPTIONS;
 
@@ -37,6 +38,13 @@ export class StudentListComponent {
   public isAssigningClass = false;
   public fullData: any[] = [];
   public routes = routes;
+  private studentImageRefreshToken = 0;
+  public isEditCameraOpen = false;
+  public editCapturedPhoto: string | null = null;
+  public editCameraError = '';
+  public editCameraFacingMode: 'user' | 'environment' = 'environment';
+  public isSwitchingEditCamera = false;
+  private editCameraStream: MediaStream | null = null;
 
   // pagination variables
   public tableData: Array<any> = [];
@@ -73,7 +81,14 @@ export class StudentListComponent {
   }
 
   studentImageUrl(student: any): string {
-    return this.schoolManagementService.studentImageUrl(student);
+    const imageUrl = this.schoolManagementService.studentImageUrl(student);
+    if (!this.studentImageRefreshToken
+      || !imageUrl
+      || imageUrl.startsWith('data:image/')
+      || imageUrl.startsWith('assets/')) {
+      return imageUrl;
+    }
+    return `${imageUrl}${imageUrl.includes('?') ? '&' : '?'}v=${this.studentImageRefreshToken}`;
   }
 
   useDefaultStudentImage(event: Event): void {
@@ -113,6 +128,134 @@ export class StudentListComponent {
       this.editStudentForm.get('studentPicture')?.markAsDirty();
     };
     reader.readAsDataURL(file);
+  }
+
+  async openEditCamera(): Promise<void> {
+    this.editCameraError = '';
+    this.editCapturedPhoto = null;
+
+    if (!navigator.mediaDevices?.getUserMedia) {
+      this.editCameraError = 'Camera access is not supported by this browser.';
+      this.isEditCameraOpen = true;
+      return;
+    }
+
+    this.isEditCameraOpen = true;
+    await this.startEditCamera();
+  }
+
+  async switchEditCamera(): Promise<void> {
+    if (this.isSwitchingEditCamera) {
+      return;
+    }
+
+    this.isSwitchingEditCamera = true;
+    this.editCameraError = '';
+    this.editCameraFacingMode = this.editCameraFacingMode === 'environment' ? 'user' : 'environment';
+    this.stopEditCameraStream();
+
+    try {
+      await this.startEditCamera();
+    } finally {
+      this.isSwitchingEditCamera = false;
+    }
+  }
+
+  captureEditPhoto(): void {
+    const video = this.editCameraVideo?.nativeElement;
+    if (!video || !video.videoWidth || !video.videoHeight) {
+      this.editCameraError = 'Camera is still loading. Please try again.';
+      return;
+    }
+
+    const canvas = document.createElement('canvas');
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    const context = canvas.getContext('2d');
+
+    if (!context) {
+      this.editCameraError = 'Unable to capture the photo.';
+      return;
+    }
+
+    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+    this.editCapturedPhoto = canvas.toDataURL('image/jpeg', 0.9);
+    this.stopEditCameraStream();
+  }
+
+  useEditCapturedPhoto(): void {
+    if (!this.editCapturedPhoto) {
+      return;
+    }
+
+    this.editStudentForm.patchValue({ studentPicture: this.editCapturedPhoto });
+    this.editStudentForm.get('studentPicture')?.markAsDirty();
+    this.closeEditCamera();
+  }
+
+  retakeEditPhoto(): void {
+    void this.openEditCamera();
+  }
+
+  closeEditCamera(): void {
+    this.stopEditCameraStream();
+    this.isEditCameraOpen = false;
+    this.editCapturedPhoto = null;
+    this.editCameraError = '';
+  }
+
+  ngOnDestroy(): void {
+    this.stopEditCameraStream();
+  }
+
+  private async startEditCamera(): Promise<void> {
+    if (!navigator.mediaDevices?.getUserMedia) {
+      this.editCameraError = 'Camera access is not supported by this browser.';
+      return;
+    }
+
+    try {
+      this.editCameraStream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { ideal: this.editCameraFacingMode } },
+        audio: false
+      });
+
+      setTimeout(() => {
+        const video = this.editCameraVideo?.nativeElement;
+        if (video && this.editCameraStream) {
+          video.srcObject = this.editCameraStream;
+          void video.play();
+        }
+      });
+    } catch (error) {
+      this.stopEditCameraStream();
+      this.editCameraError = this.getEditCameraErrorMessage(error);
+    }
+  }
+
+  private stopEditCameraStream(): void {
+    this.editCameraStream?.getTracks().forEach(track => track.stop());
+    this.editCameraStream = null;
+
+    if (this.editCameraVideo?.nativeElement) {
+      this.editCameraVideo.nativeElement.srcObject = null;
+    }
+  }
+
+  private getEditCameraErrorMessage(error: unknown): string {
+    if (error instanceof DOMException) {
+      if (error.name === 'NotAllowedError') {
+        return 'Camera permission was denied. Please allow camera access and try again.';
+      }
+      if (error.name === 'NotFoundError') {
+        return 'No camera was found on this device.';
+      }
+      if (error.name === 'NotReadableError') {
+        return 'The camera is already in use by another application.';
+      }
+    }
+
+    return 'Unable to open the camera. Camera access requires HTTPS or localhost.';
   }
 
   createForms() {
@@ -206,7 +349,8 @@ export class StudentListComponent {
     });
     this.assignClassDialog = this.dialog.open(templateRef, {
       width: '620px',
-      maxWidth: '95vw',
+      maxWidth: '96vw',
+      maxHeight: '92vh',
       disableClose: true,
       panelClass: 'custom-modal'
     });
@@ -365,6 +509,7 @@ export class StudentListComponent {
   openEditModal(templateRef: TemplateRef<any>, rawData: any): void {
 
     this.editingStudent = rawData;
+    this.closeEditCamera();
 
     this.editStudentForm.patchValue({
 
@@ -426,6 +571,8 @@ export class StudentListComponent {
 
     this.studentUpdateDialog = this.dialog.open(templateRef, {
       width: '1400px',
+      maxWidth: '96vw',
+      maxHeight: '92vh',
       disableClose: true,
       panelClass: 'custom-modal',
     });
@@ -445,6 +592,8 @@ export class StudentListComponent {
                 styleClass: 'success-background-popover',
               });
               this.studentUpdateDialog?.close();
+              this.closeEditCamera();
+              this.studentImageRefreshToken = Date.now();
               this.getStudentDetails();
               this.editStudentForm.reset();
               this.createForms();
@@ -483,8 +632,24 @@ export class StudentListComponent {
       });
   }
 
-    downloadReceipt(id: number) {
-      window.open(Constant.Site_Url + "downloadAdmissionForm?id=" + id, '_blank');
+    downloadAdmissionDetails(id: number) {
+      this.schoolManagementService.downloadAdmissionDetails(id).subscribe({
+        next: (pdfBlob: Blob) => {
+          const fileUrl = window.URL.createObjectURL(pdfBlob);
+          const link = document.createElement('a');
+          link.href = fileUrl;
+          link.download = `Admission_Details_${id}.pdf`;
+          link.click();
+          window.URL.revokeObjectURL(fileUrl);
+        },
+        error: () => {
+          this.messageService.add({
+            summary: 'Error',
+            detail: 'Unable to download admission details. Please try again.',
+            styleClass: 'danger-background-popover',
+          });
+        }
+      });
     }
 
 }

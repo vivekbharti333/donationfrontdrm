@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { Constant } from 'src/app/core/constant/constants';
 import { UserManagementService } from '../../user-management/user-management.service';
 import { TenantMediaUrlService } from 'src/app/core/service/tenant-media-url.service';
+import { AuthenticationService } from 'src/app/auth/authentication.service';
+import { CookieService } from 'ngx-cookie-service';
 
 @Component({
   selector: 'app-profile',
@@ -11,15 +13,25 @@ import { TenantMediaUrlService } from 'src/app/core/service/tenant-media-url.ser
 export class ProfileComponent implements OnInit {
   userDetails: any = {};
   private savedDetails: any = {};
+  private loginUser: any = {};
+  private profileImageVersion = 0;
   isLoading = true;
   isSaving = false;
   loadError = '';
   message = '';
   messageType: 'success' | 'error' | '' = '';
 
-  constructor(private userManagementService: UserManagementService, private mediaUrl: TenantMediaUrlService) {}
+  constructor(
+    private userManagementService: UserManagementService,
+    private mediaUrl: TenantMediaUrlService,
+    private authenticationService: AuthenticationService,
+    private cookieService: CookieService
+  ) {}
 
-  ngOnInit(): void { this.getUserByLoginId(); }
+  ngOnInit(): void {
+    this.loginUser = this.authenticationService.getLoginUser() || {};
+    this.getUserByLoginId();
+  }
 
   getUserByLoginId(): void {
     this.isLoading = true;
@@ -27,7 +39,7 @@ export class ProfileComponent implements OnInit {
     this.userManagementService.getUserDetailsByLoginId().subscribe({
       next: (response: any) => {
         if (Number(response?.responseCode) === Constant.SUCCESS_CODE && response?.payload) {
-          this.userDetails = { ...response.payload, addressList: response.payload.addressList || [] };
+          this.userDetails = this.withTenantInfo({ ...response.payload, addressList: response.payload.addressList || [] });
           this.savedDetails = { ...this.userDetails };
         } else {
           this.loadError = response?.responseMessage || 'Unable to load profile details.';
@@ -53,11 +65,14 @@ export class ProfileComponent implements OnInit {
       next: (response: any) => {
         this.isSaving = false;
         if (Number(response?.responseCode) === Constant.SUCCESS_CODE) {
-          const savedPicture = response?.payload?.userPicture;
-          if (savedPicture) {
-            this.userDetails.userPicture = savedPicture;
-            localStorage.setItem('userPicture', savedPicture);
-          }
+          const updatedDetails = response?.payload || {};
+          this.profileImageVersion = Date.now();
+          this.userDetails = this.withTenantInfo({
+            ...this.userDetails,
+            ...updatedDetails,
+            addressList: this.userDetails.addressList || updatedDetails.addressList || []
+          });
+          if (this.userDetails.userPicture) localStorage.setItem('userPicture', this.userDetails.userPicture);
           this.savedDetails = { ...this.userDetails };
           this.showMessage('Profile updated successfully.', 'success');
         } else {
@@ -100,12 +115,23 @@ export class ProfileComponent implements OnInit {
     this.messageType = type;
   }
 
+  private withTenantInfo(details: any): any {
+    return {
+      ...details,
+      service: details?.service || this.loginUser?.service || this.cookieService.get('service'),
+      superadminId: details?.superadminId || this.loginUser?.superadminId || this.cookieService.get('superadminId')
+    };
+  }
+
   get profileImageUrl(): string {
     const picture = String(this.userDetails?.userPicture || '').trim();
     if (!picture) return 'assets/img/profiles/avatar-02.jpg';
     if (picture.startsWith('data:image/') || /^https?:\/\//i.test(picture)) return picture;
-    const tenantId = this.userDetails?.superadminId || localStorage.getItem('superadminId') || '';
-    return this.mediaUrl.userPicture(this.userDetails?.service, tenantId, picture);
+    const service = this.userDetails?.service || this.loginUser?.service || this.cookieService.get('service');
+    const tenantId = this.userDetails?.superadminId || this.loginUser?.superadminId || this.cookieService.get('superadminId');
+    const imageUrl = this.mediaUrl.userPicture(service, tenantId, picture);
+    if (!imageUrl || !this.profileImageVersion) return imageUrl;
+    return `${imageUrl}${imageUrl.includes('?') ? '&' : '?'}v=${this.profileImageVersion}`;
   }
 
   useDefaultImage(event: Event): void { (event.target as HTMLImageElement).src = 'assets/img/profiles/avatar-02.jpg'; }

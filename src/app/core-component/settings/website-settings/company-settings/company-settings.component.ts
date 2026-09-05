@@ -40,6 +40,7 @@ export class CompanySettingsComponent implements OnInit {
   public loginUser: any;
   public userOptions: any[] = [];
   public selectedUserLoginId = '';
+  public selectedUserService = '';
   public isUsersLoading = false;
   public isSuperadmin = false;
   public isMainadmin = false;
@@ -49,7 +50,8 @@ export class CompanySettingsComponent implements OnInit {
     loginPageWallpaper: '',
     loginPageLogo: '',
     ipAddress: '',
-    displayLogo: '',
+    crmDisplayLogoLong: '',
+    crmDisplayLogoSmall: '',
     displayName: '',
     emailId: '',
     website: '',
@@ -63,6 +65,7 @@ export class CompanySettingsComponent implements OnInit {
     this.isSuperadmin = this.loggedInRoleType === 'SUPERADMIN';
     this.isMainadmin = this.loggedInRoleType === 'MAINADMIN';
     this.selectedUserLoginId = this.loginUser?.superadminId || this.loginUser?.loginId || '';
+    this.selectedUserService = this.loginUser?.service || this.cookieService.get('service') || '';
     this.getUserDetails();
     if (!this.isMainadmin) this.getApplicationDetailsList(this.selectedUserLoginId);
   }
@@ -98,6 +101,7 @@ export class CompanySettingsComponent implements OnInit {
 
   public onSuperadminSelected(superadminId: string): void {
     this.selectedUserLoginId = superadminId;
+    this.selectedUserService = this.resolveSelectedUserService(superadminId);
     this.clearApplicationDetails();
     if (superadminId) this.getApplicationDetailsList(superadminId);
   }
@@ -110,11 +114,15 @@ export class CompanySettingsComponent implements OnInit {
     this.readImage(event, 'loginPageLogo');
   }
 
-  displayLogoBase64(event: any) {
-    this.readImage(event, 'displayLogo');
+  crmDisplayLogoLongBase64(event: any) {
+    this.readImage(event, 'crmDisplayLogoLong');
   }
 
-  private readImage(event: Event, field: 'loginPageWallpaper' | 'loginPageLogo' | 'displayLogo'): void {
+  crmDisplayLogoSmallBase64(event: any) {
+    this.readImage(event, 'crmDisplayLogoSmall');
+  }
+
+  private readImage(event: Event, field: 'loginPageWallpaper' | 'loginPageLogo' | 'crmDisplayLogoLong' | 'crmDisplayLogoSmall'): void {
     const input = event.target as HTMLInputElement;
     const selectedFile = input.files?.[0];
     if (!selectedFile) return;
@@ -136,7 +144,7 @@ export class CompanySettingsComponent implements OnInit {
   public imageUrl(value: string): string {
     if (!value || value.startsWith('data:') || /^https?:/i.test(value)) return value;
     return this.mediaUrl.applicationImage(
-      this.loginUser?.service || this.cookieService.get('service'),
+      this.selectedUserService || this.loginUser?.service || this.cookieService.get('service'),
       this.selectedUserLoginId || this.loginUser?.superadminId,
       value
     );
@@ -147,7 +155,10 @@ export class CompanySettingsComponent implements OnInit {
       this.messageService.add({ summary: 'Select Superadmin', detail: 'Please select a Superadmin before saving.', styleClass: 'danger-background-popover' });
       return;
     }
-    this.websiteSettingService.saveCompanyDetails(this.comapany, this.selectedUserLoginId).subscribe({
+    this.websiteSettingService.saveCompanyDetails({
+      ...this.comapany,
+      service: this.selectedUserService
+    }, this.selectedUserLoginId).subscribe({
       next: (response: any) => {
         if (response.responseCode == '200') {
           if (response.payload.respCode == '200') {
@@ -156,7 +167,9 @@ export class CompanySettingsComponent implements OnInit {
               detail: response.payload.respMesg,
               styleClass: 'success-background-popover',
             });
-            localStorage.setItem('displayLogo', response.payload.displayLogo || this.comapany.displayLogo);
+            localStorage.setItem('crmDisplayLogoLong', response.payload.crmDisplayLogoLong || this.comapany.crmDisplayLogoLong);
+            localStorage.setItem('crmDisplayLogoSmall', response.payload.crmDisplayLogoSmall || this.comapany.crmDisplayLogoSmall);
+            localStorage.removeItem('displayLogo');
             this.getApplicationDetailsList(this.selectedUserLoginId);
           } else {
             this.messageService.add({
@@ -202,7 +215,8 @@ export class CompanySettingsComponent implements OnInit {
     this.comapany.loginPageWallpaper = this.applicationDetailsList.loginPageWallpaper;
     this.comapany.loginPageLogo = this.applicationDetailsList.loginPageLogo;
     this.comapany.ipAddress = this.applicationDetailsList.ipAddress;
-    this.comapany.displayLogo = this.applicationDetailsList.displayLogo;
+    this.comapany.crmDisplayLogoLong = this.applicationDetailsList.crmDisplayLogoLong;
+    this.comapany.crmDisplayLogoSmall = this.applicationDetailsList.crmDisplayLogoSmall;
     this.comapany.displayName = this.applicationDetailsList.displayName;
     this.comapany.emailId = this.applicationDetailsList.emailId;
     this.comapany.website = this.applicationDetailsList.website;
@@ -212,9 +226,16 @@ export class CompanySettingsComponent implements OnInit {
   private clearApplicationDetails(): void {
     this.applicationDetailsList = null;
     this.comapany = {
-      loginPageWallpaper: '', loginPageLogo: '', ipAddress: '', displayLogo: '',
+      loginPageWallpaper: '', loginPageLogo: '', ipAddress: '', crmDisplayLogoLong: '', crmDisplayLogoSmall: '',
       displayName: '', emailId: '', website: '', phoneNumber: ''
     };
+  }
+
+  private resolveSelectedUserService(superadminId: string): string {
+    const selectedUser = this.userOptions.find((user: any) =>
+      String(user?.loginId || user?.superadminId || '').trim() === String(superadminId || '').trim()
+    );
+    return String(selectedUser?.service || this.loginUser?.service || this.cookieService.get('service') || '').trim();
   }
 
   isCollapsed: boolean = false;

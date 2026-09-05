@@ -13,7 +13,7 @@
     <article><i class="bubble green feather icon-check-circle"></i><div><small>Present Days</small><b>{{totalPresent}} <em>({{totalMarked?(totalPresent/totalMarked*100|number:'1.2-2'):'0.00'}}%)</em></b></div></article>
     <article><i class="bubble red feather icon-x-circle"></i><div><small>Absent Days</small><b>{{totalAbsent}} <em>({{totalMarked?(totalAbsent/totalMarked*100|number:'1.2-2'):'0.00'}}%)</em></b></div></article>
   </section>
-  <article class="sheet">
+  <article class="sheet desktop-attendance-sheet">
     <div class="sheet-head"><h2>Attendance Sheet - {{monthName}} {{selectedYear}}</h2><div class="legend"><span><i class="present"></i>P - Present</span><span><i class="absent"></i>A - Absent</span><span><i class="holiday"></i>H - Holiday</span></div></div>
     <div class="table-wrap"><table>
       <thead><tr><th>#</th><th>Roll No.</th><th class="student-col">Student Name</th><th class="day" *ngFor="let day of days"><b>{{day.day}}</b><small>{{day.weekday}}</small></th><th>Present</th><th>Absent</th><th>Attendance<br>%</th></tr></thead>
@@ -26,4 +26,93 @@
     </table></div>
     <footer><span>Note: H - Holiday</span><div><span>Total Working Days: {{workingDays}}</span><i></i><span>Holidays: {{holidays}}</span><i></i><span>Attendance Calculated on Marked Working Days</span></div></footer>
   </article>
+
+  <section class="mobile-attendance-view" [formGroup]="filterForm">
+    <div class="mobile-attendance-controls">
+      <label>
+        <i class="feather icon-award"></i>
+        <select formControlName="grade">
+          <option value="">{{isGradesLoading?'Loading classes...':'All grades'}}</option>
+          <option *ngFor="let grade of grades" [value]="gradeValue(grade)">{{gradeLabel(grade)}}</option>
+        </select>
+      </label>
+      <label>
+        <i class="feather icon-calendar"></i>
+        <select formControlName="month">
+          <option *ngFor="let month of months" [ngValue]="month.value">{{month.name}} {{selectedYear}}</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="mobile-section-row">
+      <label>
+        <span>Section</span>
+        <select formControlName="gradeSection">
+          <option value="">All sections</option>
+          <option *ngFor="let section of sections" [value]="section.value">{{section.name}}</option>
+        </select>
+      </label>
+      <label>
+        <span>Year</span>
+        <select formControlName="year">
+          <option *ngFor="let year of years" [ngValue]="year">{{year}}</option>
+        </select>
+      </label>
+      <button type="button" class="mobile-view-btn" (click)="viewAttendance()" [disabled]="isLoading">
+        {{isLoading ? 'Loading...' : 'View'}}
+      </button>
+    </div>
+
+    <div class="mobile-date-strip">
+      <button type="button" class="date-arrow" (click)="previousMobileDay()" [disabled]="selectedDay <= 1">
+        <i class="feather icon-chevron-left"></i>
+      </button>
+      <button type="button" class="date-card" *ngFor="let day of mobileDays"
+        [class.active]="day.day === selectedDay"
+        [class.weekend]="day.holiday"
+        (click)="setSelectedDay(day.day)">
+        <b>{{day.day}}</b>
+        <span>{{day.weekday}}</span>
+      </button>
+      <button type="button" class="date-arrow" (click)="nextMobileDay()" [disabled]="selectedDay >= days.length">
+        <i class="feather icon-chevron-right"></i>
+      </button>
+    </div>
+
+    <div class="mobile-legend">
+      <span><i class="present"></i>P - Present</span>
+      <span><i class="absent"></i>A - Absent</span>
+      <span><i class="holiday"></i>H - Holiday</span>
+    </div>
+
+    <div class="mobile-attendance-card">
+      <div class="mobile-attendance-title">
+        <span>{{selectedDay}} {{selectedDateLabel}}</span>
+        <small>{{students.length}} students</small>
+      </div>
+      <div class="mobile-table">
+        <div class="mobile-table-head">
+          <span>#</span>
+          <span>Roll No.</span>
+          <span>Student Name</span>
+          <span>Status</span>
+        </div>
+        <div class="mobile-state" *ngIf="isLoading">Loading attendance...</div>
+        <div class="mobile-state" *ngIf="!isLoading&&!students.length">No attendance records found.</div>
+        <div class="mobile-table-row" *ngFor="let student of students;let i=index">
+          <span>{{i+1}}</span>
+          <span>{{student.rollNumber}}</span>
+          <span class="mobile-student-name">
+            <img [src]="image(student)" (error)="useDefaultStudentImage($event)" [alt]="student.studentName">
+            <b>{{student.studentName}}</b>
+          </span>
+          <span class="mobile-status-group" [title]="mobileStatusText(student)">
+            <i class="status-pill present" [class.active]="mobileStatus(student)==='PRESENT'">P</i>
+            <i class="status-pill absent" [class.active]="mobileStatus(student)==='ABSENT'">A</i>
+            <i class="status-pill holiday" [class.active]="mobileStatus(student)==='HOLIDAY' || selectedDayInfo.holiday">H</i>
+          </span>
+        </div>
+      </div>
+    </div>
+  </section>
 </section>

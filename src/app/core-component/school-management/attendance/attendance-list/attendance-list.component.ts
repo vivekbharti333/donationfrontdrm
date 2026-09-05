@@ -28,6 +28,7 @@ export class AttendanceListComponent implements OnInit {
   grades:any[] = []; years:number[] = []; days:Day[] = []; students:StudentRow[] = [];
   isLoading = false; isGradesLoading = false; errorMessage = '';
   loginUser:any;
+  selectedDay = new Date().getDate();
 
   constructor(private fb:FormBuilder, private schoolService:SchoolManagementService, private attendanceService:AttendanceService,
     private authenticationService:AuthenticationService) {
@@ -47,6 +48,18 @@ export class AttendanceListComponent implements OnInit {
   get overallPercentage():number { return this.totalMarked ? this.totalPresent / this.totalMarked * 100 : 0; }
   get workingDays():number { return this.days.filter(d => !d.holiday).length; }
   get holidays():number { return this.days.length - this.workingDays; }
+  get selectedDayInfo():Day {
+    return this.days.find(day => day.day === this.selectedDay) || this.days[0] || { day: 1, weekday: '', holiday: false };
+  }
+  get selectedDateLabel():string {
+    return `${this.monthName} ${this.selectedYear}`;
+  }
+  get mobileDays():Day[] {
+    if (!this.days.length) return [];
+    const index = Math.max(0, this.days.findIndex(day => day.day === this.selectedDay));
+    const start = Math.max(0, Math.min(index - 2, this.days.length - 5));
+    return this.days.slice(start, start + 5);
+  }
 
   getGrades():void {
     this.isGradesLoading = true;
@@ -61,7 +74,7 @@ export class AttendanceListComponent implements OnInit {
     });
   }
   viewAttendance():void {
-    this.buildDays(); this.errorMessage = ''; this.isLoading = true;
+    this.buildDays(); this.ensureSelectedDayInMonth(); this.errorMessage = ''; this.isLoading = true;
     const f = this.filterForm.getRawValue(), month = Number(f.month), year = Number(f.year);
     this.attendanceService.getStudentAttendance({
       sessionName: this.session(year, month), grade: f.grade || undefined, gradeSection: f.gradeSection || undefined,
@@ -88,6 +101,25 @@ export class AttendanceListComponent implements OnInit {
   gradeLabel(g:any):string { const v=this.gradeValue(g); return v.toLowerCase().startsWith('grade') ? v : 'Grade '+(v || g?.id || ''); }
   cell(s:StudentRow,d:Day):Code { return s.attendance[d.day] || (d.holiday ? 'HOLIDAY' : ''); }
   label(code:Code):string { return ({PRESENT:'P',ABSENT:'A',LATE:'L',LEAVE:'LV',HOLIDAY:'H','':'—'} as Record<Code,string>)[code]; }
+  mobileStatus(student:StudentRow):Code { return this.cell(student, this.selectedDayInfo); }
+  mobileStatusLabel(student:StudentRow):string {
+    const status = this.mobileStatus(student);
+    return status ? this.label(status) : '—';
+  }
+  mobileStatusText(student:StudentRow):string {
+    const status = this.mobileStatus(student);
+    return ({
+      PRESENT: 'Present',
+      ABSENT: 'Absent',
+      LATE: 'Late',
+      LEAVE: 'Leave',
+      HOLIDAY: 'Holiday',
+      '': 'Not marked'
+    } as Record<Code,string>)[status];
+  }
+  setSelectedDay(day:number):void { this.selectedDay = day; }
+  previousMobileDay():void { if (this.selectedDay > 1) this.selectedDay--; }
+  nextMobileDay():void { if (this.selectedDay < this.days.length) this.selectedDay++; }
   dayPresent(day:Day):number { return this.students.filter(s => this.cell(s,day)==='PRESENT').length; }
   percentageClass(n:number):string { return n >= 80 ? 'good' : n >= 70 ? 'warning' : 'low'; }
   image(student:StudentRow):string {
@@ -98,6 +130,16 @@ export class AttendanceListComponent implements OnInit {
   private buildDays():void {
     const m=Number(this.filterForm.controls.month.value), y=Number(this.filterForm.controls.year.value), count=new Date(y,m,0).getDate();
     this.days=Array.from({length:count},(_,i)=>{const d=new Date(y,m-1,i+1); return {day:i+1,weekday:d.toLocaleDateString('en-US',{weekday:'short'}),holiday:d.getDay()===0};});
+  }
+  private ensureSelectedDayInMonth():void {
+    const month = Number(this.filterForm.controls.month.value);
+    const year = Number(this.filterForm.controls.year.value);
+    const today = new Date();
+    if (today.getMonth() + 1 === month && today.getFullYear() === year) {
+      this.selectedDay = today.getDate();
+      return;
+    }
+    this.selectedDay = Math.min(this.selectedDay || 1, this.days.length || 1);
   }
   private group(records:any[]):StudentRow[] {
     const map=new Map<string,StudentRow>();

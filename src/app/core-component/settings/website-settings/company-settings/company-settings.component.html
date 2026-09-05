@@ -36,17 +36,20 @@
       <div class="settings-page-wrap">
         <!-- <form> -->
           <form #companyForm="ngForm" (ngSubmit)="submitCompanyForm()">
-          <div class="company-user-selector">
-            <label class="form-label">Select User</label>
-            <mat-select class="space-select select" name="selectedUserLoginId"
-              [(ngModel)]="selectedUserLoginId" [disabled]="isUsersLoading"
-              (selectionChange)="onSuperadminSelected($event.value)"
-              [placeholder]="isUsersLoading ? 'Loading users...' : 'Select User'">
-              <mat-option *ngFor="let user of userOptions" [value]="user.loginId">
-                {{ userOptionLabel(user) }}
-              </mat-option>
-            </mat-select>
-            <small class="text-muted" *ngIf="!isUsersLoading && !userOptions.length">No users available</small>
+          <div class="row account-selector company-user-selector">
+            <div class="col-sm-4 form-group">
+              <label class="form-label">Select Superadmin</label>
+              <mat-select class="space-select select" name="selectedUserLoginId"
+                [(ngModel)]="selectedUserLoginId" [disabled]="isUsersLoading"
+                (selectionChange)="onSuperadminSelected($event.value)"
+                placeholder="Select Superadmin">
+                <mat-option *ngIf="isUsersLoading" disabled>Loading superadmins...</mat-option>
+                <mat-option *ngIf="!isUsersLoading && !userOptions.length" disabled>No superadmins available</mat-option>
+                <mat-option *ngFor="let user of userOptions" [value]="user.loginId">
+                  {{ userOptionLabel(user) }}
+                </mat-option>
+              </mat-select>
+            </div>
           </div>
           <div class="setting-title">
             <h4>Company Settings</h4>
@@ -138,21 +141,42 @@
               <article class="image-setting-card">
                 <div class="image-card-heading">
                   <span class="image-card-icon"><i class="feather icon-layout"></i></span>
-                  <div><h6>CRM Display Logo</h6><p>Logo displayed in the application header</p></div>
+                  <div><h6>CRM Display Logo Long</h6><p>Wide logo displayed in the application header</p></div>
                 </div>
                 <div class="company-image-preview logo-preview">
-                  <img *ngIf="comapany.displayLogo" [src]="imageUrl(comapany.displayLogo)" alt="CRM display logo preview">
-                  <div class="empty-image-preview" *ngIf="!comapany.displayLogo">
+                  <img *ngIf="comapany.crmDisplayLogoLong" [src]="imageUrl(comapany.crmDisplayLogoLong)" alt="CRM long display logo preview">
+                  <div class="empty-image-preview" *ngIf="!comapany.crmDisplayLogoLong">
                     <i class="feather icon-image"></i><span>No image selected</span>
                   </div>
                   <span class="preview-label">Preview</span>
                 </div>
                 <div class="image-card-footer">
-                  <label class="btn btn-outline-primary image-upload-button" for="displayLogo">
+                  <label class="btn btn-outline-primary image-upload-button" for="crmDisplayLogoLong">
                     <i class="feather icon-upload-cloud"></i>Change image
                   </label>
-                  <input hidden type="file" id="displayLogo" accept="image/*" (change)="displayLogoBase64($event)">
+                  <input hidden type="file" id="crmDisplayLogoLong" accept="image/*" (change)="crmDisplayLogoLongBase64($event)">
                   <small>500 × 160px · Max 5MB</small>
+                </div>
+              </article>
+
+              <article class="image-setting-card">
+                <div class="image-card-heading">
+                  <span class="image-card-icon"><i class="feather icon-sidebar"></i></span>
+                  <div><h6>CRM Display Logo Small</h6><p>Compact logo displayed in collapsed header/sidebar</p></div>
+                </div>
+                <div class="company-image-preview logo-preview">
+                  <img *ngIf="comapany.crmDisplayLogoSmall" [src]="imageUrl(comapany.crmDisplayLogoSmall)" alt="CRM small display logo preview">
+                  <div class="empty-image-preview" *ngIf="!comapany.crmDisplayLogoSmall">
+                    <i class="feather icon-image"></i><span>No image selected</span>
+                  </div>
+                  <span class="preview-label">Preview</span>
+                </div>
+                <div class="image-card-footer">
+                  <label class="btn btn-outline-primary image-upload-button" for="crmDisplayLogoSmall">
+                    <i class="feather icon-upload-cloud"></i>Change image
+                  </label>
+                  <input hidden type="file" id="crmDisplayLogoSmall" accept="image/*" (change)="crmDisplayLogoSmallBase64($event)">
+                  <small>225 × 225px · Max 5MB</small>
                 </div>
               </article>
             </div>

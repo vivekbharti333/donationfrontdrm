@@ -183,9 +183,11 @@ export class SigninComponent {
         next: (response: any) => {
           if (response['responseCode'] == '200') {
             let headerDetails = JSON.parse(JSON.stringify(response['payload']));
-            let base = headerDetails['displayLogo'];
+            let base = headerDetails['crmDisplayLogoLong'];
             console.log("base : " + base);
-            localStorage.setItem('displayLogo', base);
+            localStorage.setItem('crmDisplayLogoLong', base);
+            localStorage.setItem('crmDisplayLogoSmall', headerDetails['crmDisplayLogoSmall'] || '');
+            localStorage.removeItem('displayLogo');
           } else {
           }
         },

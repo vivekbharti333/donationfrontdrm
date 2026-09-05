@@ -1,4 +1,4 @@
-<div class="page-header">
+<div class="page-header academic-page-header">
   <p-toast></p-toast>
   <div class="add-item d-flex">
     <div class="page-title">
@@ -16,8 +16,8 @@
   </ul>
 </div>
 
-<div class="card table-list-card">
-  <div class="card-body">
+<div class="card table-list-card academic-list-card">
+  <div class="card-body academic-list-body">
     <section class="academic-filter-card">
       <div class="filter-card-heading">
         <div><h5>Search Student Academics</h5><p>Use one or more filters to find academic records.</p></div>
@@ -59,7 +59,7 @@
       <span class="spinner-border spinner-border-sm"></span> Loading academic details...
     </div>
 
-    <div *ngIf="!isLoading" class="table-responsive mt-3">
+    <div *ngIf="!isLoading" class="desktop-view table-responsive academic-table-shell mt-3">
       <table matSort (matSortChange)="sortData($event)" class="table datanew">
         <thead>
           <tr>
@@ -81,7 +81,7 @@
             <td>{{ serialNumberArray[i] }}</td>
             <td>
               <div class="userimgname">
-                <span class="userslist-img bg-img">
+                <span class="userslist-img">
                   <img [src]="studentImageUrl(data)"
                        [alt]="studentName(data) || 'Student'"
                        class="academic-student-image"
@@ -125,8 +125,58 @@
           </tr>
         </tbody>
       </table>
-      <app-custom-pagination *ngIf="totalData > 0"></app-custom-pagination>
     </div>
+
+    <div *ngIf="!isLoading" class="mobile-cards academic-mobile-cards">
+      <div class="academic-card" *ngFor="let data of tableData">
+        <div class="card-header">
+          <div class="academic-card-identity">
+            <img [src]="studentImageUrl(data)"
+                 [alt]="studentName(data) || 'Student'"
+                 class="academic-img-mobile"
+                 (error)="useDefaultStudentImage($event)">
+            <div>
+              <h3 class="academic-card-name">{{ studentName(data) || '—' }}</h3>
+              <small>Admission No: {{ data.admissionNo || '—' }}</small>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-body">
+          <p><span class="label">Roll No:</span> {{ data.rollNumber || '—' }}</p>
+          <p><span class="label">Session:</span> {{ data.sessionName || '—' }}</p>
+          <p><span class="label">Grade / Section:</span> {{ data.grade || '—' }}<ng-container *ngIf="data.gradeSection"> - {{ data.gradeSection }}</ng-container></p>
+          <p><span class="label">Father Name:</span> {{ data.fatherName || '—' }}<ng-container *ngIf="data.fatherMobileNo"> ({{ data.fatherMobileNo }})</ng-container></p>
+          <p><span class="label">Gender:</span> {{ data.gender || '—' }}</p>
+        </div>
+
+        <div class="card-actions">
+          <div class="left-actions">
+            <span class="status-btn"
+                  [ngClass]="(data.status === 'ACTIVE' || data.status === 'PROMOTED') ? 'btn-green' : 'btn-red'">
+              {{ data.status || '—' }}
+            </span>
+          </div>
+
+          <div class="right-actions">
+            <button type="button" class="icon-btn" title="Edit academic details"
+                    (click)="openEditAcademic(editAcademicDialog, data)">
+              <i class="feather icon-edit edit-icon"></i>
+            </button>
+            <button type="button" class="icon-btn" title="Promote student"
+                    (click)="openPromoteAcademic(promoteAcademicDialog, data)">
+              <i class="feather icon-arrow-up-circle promote-icon"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="tableData.length === 0" class="academic-mobile-empty academic-state">
+        No student academic details found.
+      </div>
+    </div>
+
+    <app-custom-pagination *ngIf="!isLoading && totalData > 0"></app-custom-pagination>
   </div>
 </div>
 

@@ -23,8 +23,6 @@ export class AddStudentComponent implements OnDestroy {
  public isSwitchingCamera = false;
  private cameraStream: MediaStream | null = null;
  public readonly academicYearOptions = Constant.ACADEMIC_YEAR_OPTIONS;
- public gradeOptions: any[] = [];
- public isGradesLoading = false;
 public loginUser: any;
  public addStudentForm!: FormGroup;
  public sameAsCurrentAddress = false;
@@ -45,23 +43,7 @@ public loginUser: any;
       ngOnInit() {
 
     this.createForms();
-    this.getGradeDetails();
    
-  }
-
-  getGradeDetails(): void {
-    this.isGradesLoading = true;
-    this.schoolManagementService.getGradeDetails().subscribe({
-      next: (response: any) => {
-        const rows = response?.listPayload ?? response?.payload ?? response?.data;
-        this.gradeOptions = Array.isArray(rows) ? rows : [];
-        this.isGradesLoading = false;
-      },
-      error: () => {
-        this.gradeOptions = [];
-        this.isGradesLoading = false;
-      }
-    });
   }
 
   createForms() {
@@ -70,10 +52,7 @@ public loginUser: any;
 
     // Student Basic Details
     admissionNo: ['', [Validators.required, Validators.pattern('[0-9A-Za-z ]{3,150}')]],
-    rollNumber: ['', [Validators.required, Validators.pattern('[0-9A-Za-z ]{1,100}')]],
     studentPicture: [''],
-    grade: ['', Validators.required],
-    gradeSection: [''],
     firstName: ['', Validators.required],
     middleName: [''],
     lastName: ['', Validators.required],

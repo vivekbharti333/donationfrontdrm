@@ -59,7 +59,7 @@
   </div>
   <!-- /Filter -->
   <div class="desktop-view">
-    <div class="table-responsive">
+    <div class="table-responsive student-table-shell">
       <table matSort (matSortChange)="sortData($event)" class="table datanew">
         <thead>
           <tr>
@@ -78,7 +78,7 @@
           <tr>
             <td class="student-photo-column">
               <div class="userimgname">
-                <a href="javascript:void(0);" class="userslist-img bg-img">
+                <a href="javascript:void(0);" class="userslist-img">
                   <img
                     [src]="studentImageUrl(data)"
                     alt="image"
@@ -113,8 +113,8 @@
                   (click)="openAssignClassModal(assignClassTemplate, data)">
                   <i class="feather icon-book-open"></i></a>
 
-                  <a class="student-action download-action" title="Download receipt"
-                       (click)="downloadReceipt(data.id)">
+                  <a class="student-action download-action" title="Download admission details"
+                       (click)="downloadAdmissionDetails(data.id)">
                       <i class="feather icon-download feather-download"></i>
                     </a>
 
@@ -135,9 +135,78 @@
           }
         </tbody>
       </table>
-      <app-custom-pagination></app-custom-pagination>
     </div>
   </div>
+
+  <div class="mobile-cards student-mobile-cards">
+    @for (student of tableData; track student) {
+    <div class="student-card">
+      <div class="card-header">
+        <div class="student-card-identity">
+          <img
+            class="student-img-mobile"
+            [src]="studentImageUrl(student)"
+            alt="student image"
+            (error)="useDefaultStudentImage($event)"
+          />
+          <div>
+            <h3 class="student-card-name">{{ student.firstName }} {{ student.middleName }} {{ student.lastName }}</h3>
+            <small>Admission No: {{ student.admissionNo || '—' }}</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-body">
+        <p>
+          <span class="label">Father Name:</span>
+          {{ student.fatherName || '—' }}<ng-container *ngIf="student.fatherMobileNo"> ({{ student.fatherMobileNo }})</ng-container>
+        </p>
+        <p>
+          <span class="label">Mother Name:</span>
+          {{ student.motherName || '—' }}<ng-container *ngIf="student.motherMobileNo"> ({{ student.motherMobileNo }})</ng-container>
+        </p>
+        <p><span class="label">Address:</span> {{ student.currentAddress || '—' }}<ng-container *ngIf="student.currentCity">, {{ student.currentCity }}</ng-container><ng-container *ngIf="student.currentPin"> - {{ student.currentPin }}</ng-container></p>
+        <p><span class="label">Gender:</span> {{ student.gender || '—' }}</p>
+        <p><span class="label">Admission Date:</span> {{ student.createdAt | date : "dd-MM-yyyy | HH:mm" }}</p>
+      </div>
+
+      <div class="card-actions">
+        <div class="left-actions">
+          <button class="status-btn"
+            [ngClass]="{'btn-green': student.status === 'ACTIVE','btn-red': student.status === 'INACTIVE'}"
+            (click)="changeUserStatus(student)">
+            {{ student.status }}
+          </button>
+        </div>
+
+        <div class="right-actions">
+          <button type="button" class="icon-btn" title="Edit student" (click)="openEditModal(dialogTemplate, student)">
+            <i class="feather icon-edit edit-icon"></i>
+          </button>
+          <button type="button" class="icon-btn" title="Assign grade / class" (click)="openAssignClassModal(assignClassTemplate, student)">
+            <i class="feather icon-book-open assign-icon"></i>
+          </button>
+          <button type="button" class="icon-btn" title="Download admission details" (click)="downloadAdmissionDetails(student.id)">
+            <i class="feather icon-download download-icon"></i>
+          </button>
+          <button type="button" class="icon-btn" title="Delete student" (click)="confirmColor(student.loginId)">
+            <i class="feather icon-trash-2 delete-icon"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+    }
+
+    @if (tableData.length === 0) {
+    <div class="student-mobile-empty student-empty-state">
+      <span class="empty-state-icon"><i class="feather icon-users"></i></span>
+      <strong>No students found</strong>
+      <small>Try changing your search or refresh the student list.</small>
+    </div>
+    }
+  </div>
+
+  <app-custom-pagination></app-custom-pagination>
 
   <ng-template #assignClassTemplate>
     <div class="modalHeaderContainer">
@@ -190,7 +259,7 @@
         </div>
       </form>
     </mat-dialog-content>
-    <mat-dialog-actions align="end" class="px-4 pb-4 gap-2">
+    <mat-dialog-actions align="end" class="student-dialog-actions px-4 pb-4 gap-2">
       <button type="button" class="btn btn-light" mat-dialog-close [disabled]="isAssigningClass">Cancel</button>
       <button type="button" class="btn btn-primary" (click)="assignClass()" [disabled]="isAssigningClass">
         <span *ngIf="isAssigningClass" class="spinner-border spinner-border-sm me-1"></span>
@@ -203,7 +272,7 @@
     <div class="modalHeaderContainer">
       <h2 mat-dialog-title class="p-0">Update Student Details</h2>
       <div mat-dialog-close class="closeBtn">
-        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close" (click)="closeEditCamera()">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
@@ -223,14 +292,23 @@
             </div>
 
             <div class="edit-student-photo" *ngIf="editingStudent as student">
-              <img [src]="editStudentImageUrl" alt="Student profile photo"
-                (error)="useDefaultStudentImage($event)">
-              <label class="change-student-photo-btn">
-                <i class="feather icon-upload"></i>
-                Change Image
-                <input type="file" accept="image/*" hidden
-                  (change)="onEditStudentImageSelected($event)">
-              </label>
+              <div class="edit-student-photo-preview">
+                <img [src]="editStudentImageUrl" alt="Student profile photo"
+                  (error)="useDefaultStudentImage($event)">
+              </div>
+              <div class="edit-student-photo-actions">
+                <label class="change-student-photo-btn">
+                  <i class="feather icon-upload"></i>
+                  Upload From Gallery
+                  <input type="file" accept="image/*" hidden
+                    (change)="onEditStudentImageSelected($event)">
+                </label>
+                <button type="button" class="take-student-photo-btn" (click)="openEditCamera()">
+                  <i class="feather icon-camera"></i>
+                  Take Live Photo
+                </button>
+                <small>Upload a photo or click a fresh student picture now.</small>
+              </div>
             </div>
 
             <div class="row">
@@ -450,6 +528,48 @@
         </div>
 
       </form>
+
+      <div class="camera-backdrop" *ngIf="isEditCameraOpen" (click)="closeEditCamera()">
+        <div class="camera-dialog" role="dialog" aria-modal="true" aria-labelledby="edit-camera-title"
+          (click)="$event.stopPropagation()">
+          <div class="camera-header">
+            <h5 id="edit-camera-title">Take Live Photo</h5>
+            <button type="button" class="camera-close" aria-label="Close camera" (click)="closeEditCamera()">&times;</button>
+          </div>
+
+          <div class="camera-viewport">
+            <video #editCameraVideo *ngIf="!editCapturedPhoto && !editCameraError" autoplay muted playsinline></video>
+            <button type="button" class="camera-flip" *ngIf="!editCapturedPhoto && !editCameraError"
+              [disabled]="isSwitchingEditCamera" (click)="switchEditCamera()" aria-label="Switch between front and rear camera"
+              title="Flip camera">
+              <i class="feather icon-refresh-cw"></i>
+              <span>{{ isSwitchingEditCamera ? 'Switching...' : 'Flip camera' }}</span>
+            </button>
+            <img *ngIf="editCapturedPhoto" [src]="editCapturedPhoto" alt="Captured student photo">
+            <div class="camera-error" *ngIf="editCameraError">
+              <i class="feather icon-camera-off"></i>
+              <p>{{ editCameraError }}</p>
+            </div>
+          </div>
+
+          <div class="camera-actions" [class.has-captured-photo]="editCapturedPhoto">
+            <button type="button" class="btn btn-light" (click)="closeEditCamera()">Cancel</button>
+            <button type="button" class="btn btn-success" *ngIf="!editCapturedPhoto && !editCameraError"
+              (click)="captureEditPhoto()">
+              <i class="feather icon-camera me-1"></i>Capture Photo
+            </button>
+            <button type="button" class="btn btn-outline-secondary" *ngIf="editCapturedPhoto" (click)="retakeEditPhoto()">
+              Retake
+            </button>
+            <button type="button" class="btn btn-primary" *ngIf="editCapturedPhoto" (click)="useEditCapturedPhoto()">
+              Use Photo
+            </button>
+            <button type="button" class="btn btn-primary" *ngIf="editCameraError" (click)="openEditCamera()">
+              Try Again
+            </button>
+          </div>
+        </div>
+      </div>
 
     </mat-dialog-content>
   </ng-template>
