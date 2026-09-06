@@ -4,7 +4,7 @@ import { routes } from 'src/app/core/helpers/routes';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { UserManagementService } from 'src/app/core-component/user-management/user-management.service';
 import { MessageService } from 'primeng/api';
-  import { AuthenticationService } from '../../authenticationService/authentication.service';
+import { AuthenticationService } from '../../authenticationService/authentication.service';
 
 @Component({
   selector: 'app-forgot-password',
@@ -33,23 +33,39 @@ export class ForgotPasswordComponent {
 
   createForms() {
     this.sendOtpForm = this.fb.group({
-      mobileNo: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]], // Assuming a 10-digit phone number
+      mobileNo: ['', [Validators.required]],
       requestedFor: ['RESET_PASS']
     });
   }
 
+  removeLoginIdSpaces(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const sanitizedValue = input.value.replace(/\s+/g, '');
+    input.value = sanitizedValue;
+    this.sendOtpForm.patchValue({ mobileNo: sanitizedValue }, { emitEvent: false });
+  }
 
   sendOtp() {
-    console.log("sendOtpForm : "+this.sendOtpForm.value.mobileNo)
+    const loginId = String(this.sendOtpForm.value.mobileNo || '').replace(/\s+/g, '');
+    this.sendOtpForm.patchValue({ mobileNo: loginId }, { emitEvent: false });
+
     if (this.sendOtpForm.invalid) {
       this.sendOtpForm.markAllAsTouched();
       return;
     }
+
     this.userManagementService.sendOtp(this.sendOtpForm.value)
       .subscribe({
         next: (response: any) => {
-          if (response['responseCode'] === 200) {
-            if (response['payload']['respCode'] === 200) {
+          const responseCode = Number(response?.responseCode);
+          const respCode = Number(response?.payload?.respCode);
+          const respMesg = response?.payload?.respMesg
+            || response?.responseMessage
+            || response?.responseMesg
+            || 'Unable to send OTP.';
+
+          if (responseCode === 200) {
+            if (respCode === 200) {
 
               this.authenticationService.setResetMobileNo(this.sendOtpForm.value.mobileNo);
               this.authenticationService.setOtpSent(true);
@@ -61,23 +77,26 @@ export class ForgotPasswordComponent {
                   mobileNo: this.sendOtpForm.value.mobileNo
                 }
               });
-              this.messageService.add({ severity: 'success', summary: 'Success', detail: response['payload']['respMesg'] });
+              this.messageService.add({ severity: 'success', summary: 'Success', detail: respMesg });
             } else {
               this.messageService.add({
-                summary: response['payload']['respCode'],
-                detail: response['payload']['respMesg'],
+                severity: 'error',
+                summary: String(response?.payload?.respCode || 'Error'),
+                detail: respMesg,
                 styleClass: 'danger-background-popover',
               });
             }
           } else {
             this.messageService.add({
-              summary: response['payload']['responseCode'],
-              detail: response['payload']['responseMesg'],
+              severity: 'error',
+              summary: String(response?.responseCode || 'Error'),
+              detail: respMesg,
               styleClass: 'danger-background-popover',
             });
           }
         },
         error: (error: any) => this.messageService.add({
+          severity: 'error',
           summary: '500',
           detail: 'Server Error',
           styleClass: 'danger-background-popover',
