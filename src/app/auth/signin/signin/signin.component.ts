@@ -80,15 +80,7 @@ export class SigninComponent {
                 detail: response['payload']['respMesg'],
                 styleClass: 'success-background-popover',
               });
-              if (this.isSchoolService(response['payload']['service'])) {
-                this.router.navigate([routes.schoolDashboard]);
-              } else if (response['payload']['roleType'] == Constant.donorExecutive) {
-                this.router.navigate([routes.adminDashboard]);
-              } else if (response['payload']['roleType'] == Constant.superAdmin) {
-                this.router.navigate([routes.donationDashboard]);
-              } else {
-                this.router.navigate([routes.donationDashboard]);
-              } 
+              this.router.navigateByUrl(this.resolveDashboardRoute(permission, response['payload']));
             } else {
               this.messageService.add({
                 summary: response['payload']['respCode'],
@@ -133,6 +125,41 @@ export class SigninComponent {
     } catch {
       return [];
     }
+  }
+
+  private resolveDashboardRoute(permissions: string[], payload: any): string {
+    const normalizedPermissions = permissions
+      .map((permission) => String(permission || '').trim().toLowerCase())
+      .filter(Boolean);
+
+    const dashboardPermissionRoutes: Record<string, string> = {
+      'dashboard': routes.salesDashboard,
+      'sales-dashboard': routes.salesDashboard,
+      'sale-dashboard': routes.donationDashboard,
+      'donation-dashboard': routes.donationDashboard,
+      'admin-dashboard': routes.adminDashboard,
+      'call-dashboard': routes.adminDashboard,
+      'campaign-dashboard': routes.campaignDashboard,
+      'school-dashboard': routes.schoolDashboard,
+    };
+
+    const dashboardPermission = normalizedPermissions.find((permission) =>
+      Boolean(dashboardPermissionRoutes[permission])
+    );
+
+    if (dashboardPermission) {
+      return dashboardPermissionRoutes[dashboardPermission];
+    }
+
+    if (this.isSchoolService(payload?.service)) {
+      return routes.schoolDashboard;
+    }
+
+    if (payload?.roleType === Constant.donorExecutive) {
+      return routes.adminDashboard;
+    }
+
+    return routes.donationDashboard;
   }
 
   private isSchoolService(service: unknown): boolean {

@@ -1,5 +1,5 @@
 // import { Component } from '@angular/core';
-import { AfterViewInit, Component } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 import {
   Chart,
   DoughnutController,
@@ -57,6 +57,7 @@ import { CookieService } from 'ngx-cookie-service';
   styleUrl: './donation-dashboard.component.scss'
 })
 export class DonationDashboardComponent implements AfterViewInit {
+  @ViewChild('mobileSummaryCards') mobileSummaryCards?: ElementRef<HTMLDivElement>;
 
   public username!: string;
   public loginUser: any;
@@ -72,6 +73,17 @@ export class DonationDashboardComponent implements AfterViewInit {
   public get totalUserCount(): number {
     return this.activeUserCount + this.inactiveUserCount;
   }
+  public activeMobileSummaryIndex = 0;
+  public readonly mobileSummaryIndexes = [0, 1, 2, 3];
+  private mobileSummarySlideTimer?: ReturnType<typeof setTimeout>;
+  private mobileSummaryTouchStartX = 0;
+  private mobileSummaryTouchStartY = 0;
+  private mobileSummaryStartScrollLeft = 0;
+  private isMobileSummarySwiping = false;
+  private mobileSummaryPointerStartX = 0;
+  private mobileSummaryPointerStartY = 0;
+  private mobileSummaryPointerStartScrollLeft = 0;
+  private isMobileSummaryPointerDragging = false;
 
   donationTrendList: any[] = [];
   donationTrendChart: any;
@@ -536,4 +548,154 @@ changeTopDonorTab(tab: string): void {
     });
   }
 
+  scrollMobileSummaryTo(index: number): void {
+    const container = this.mobileSummaryCards?.nativeElement;
+    if (!container) {
+      this.activeMobileSummaryIndex = index;
+      return;
+    }
+
+    const card = container.querySelectorAll<HTMLElement>('.summary-card')[index];
+    if (!card) {
+      return;
+    }
+
+    this.activeMobileSummaryIndex = index;
+    container.scrollTo({
+      left: card.offsetLeft - container.offsetLeft - 18,
+      behavior: 'smooth'
+    });
+  }
+
+  onMobileSummaryScroll(): void {
+    const container = this.mobileSummaryCards?.nativeElement;
+    if (!container) {
+      return;
+    }
+
+    this.showMobileSummarySlideAnimation(container);
+
+    const cards = Array.from(container.querySelectorAll('.summary-card')) as HTMLElement[];
+    if (!cards.length) {
+      return;
+    }
+
+    const containerLeft = container.scrollLeft;
+    const containerOffsetLeft = container.offsetLeft;
+    let closestIndex = 0;
+    let closestDistance = Number.MAX_VALUE;
+
+    cards.forEach((card: HTMLElement, index: number) => {
+      const cardLeft = card.offsetLeft - containerOffsetLeft;
+      const distance = Math.abs(cardLeft - containerLeft);
+      if (distance < closestDistance) {
+        closestDistance = distance;
+        closestIndex = index;
+      }
+    });
+
+    this.activeMobileSummaryIndex = closestIndex;
+  }
+
+  private showMobileSummarySlideAnimation(container: HTMLDivElement): void {
+    container.classList.add('is-sliding');
+
+    if (this.mobileSummarySlideTimer) {
+      clearTimeout(this.mobileSummarySlideTimer);
+    }
+
+    this.mobileSummarySlideTimer = setTimeout(() => {
+      container.classList.remove('is-sliding');
+    }, 220);
+  }
+
+  onMobileSummaryTouchStart(event: TouchEvent): void {
+    const container = this.mobileSummaryCards?.nativeElement;
+    const touch = event.touches[0];
+    if (!container || !touch) {
+      return;
+    }
+
+    this.mobileSummaryTouchStartX = touch.clientX;
+    this.mobileSummaryTouchStartY = touch.clientY;
+    this.mobileSummaryStartScrollLeft = container.scrollLeft;
+    this.isMobileSummarySwiping = true;
+    container.classList.add('is-dragging');
+  }
+
+  onMobileSummaryTouchMove(event: TouchEvent): void {
+    const container = this.mobileSummaryCards?.nativeElement;
+    const touch = event.touches[0];
+    if (!container || !touch || !this.isMobileSummarySwiping) {
+      return;
+    }
+
+    const deltaX = this.mobileSummaryTouchStartX - touch.clientX;
+    const deltaY = this.mobileSummaryTouchStartY - touch.clientY;
+
+    if (Math.abs(deltaX) > Math.abs(deltaY)) {
+      event.preventDefault();
+      this.showMobileSummarySlideAnimation(container);
+      container.scrollLeft = this.mobileSummaryStartScrollLeft + deltaX;
+      this.onMobileSummaryScroll();
+    }
+  }
+
+  onMobileSummaryTouchEnd(): void {
+    if (!this.isMobileSummarySwiping) {
+      return;
+    }
+
+    this.isMobileSummarySwiping = false;
+    this.mobileSummaryCards?.nativeElement.classList.remove('is-dragging');
+    this.scrollMobileSummaryTo(this.activeMobileSummaryIndex);
+  }
+
+  onMobileSummaryPointerDown(event: PointerEvent): void {
+    if (event.pointerType === 'touch') {
+      return;
+    }
+
+    const container = this.mobileSummaryCards?.nativeElement;
+    if (!container) {
+      return;
+    }
+
+    this.mobileSummaryPointerStartX = event.clientX;
+    this.mobileSummaryPointerStartY = event.clientY;
+    this.mobileSummaryPointerStartScrollLeft = container.scrollLeft;
+    this.isMobileSummaryPointerDragging = true;
+    container.classList.add('is-dragging');
+    container.setPointerCapture?.(event.pointerId);
+  }
+
+  onMobileSummaryPointerMove(event: PointerEvent): void {
+    const container = this.mobileSummaryCards?.nativeElement;
+    if (!container || !this.isMobileSummaryPointerDragging) {
+      return;
+    }
+
+    const deltaX = this.mobileSummaryPointerStartX - event.clientX;
+    const deltaY = this.mobileSummaryPointerStartY - event.clientY;
+
+    if (Math.abs(deltaX) > Math.abs(deltaY)) {
+      event.preventDefault();
+      container.scrollLeft = this.mobileSummaryPointerStartScrollLeft + deltaX;
+      this.onMobileSummaryScroll();
+    }
+  }
+
+  onMobileSummaryPointerUp(event?: PointerEvent): void {
+    const container = this.mobileSummaryCards?.nativeElement;
+    if (!this.isMobileSummaryPointerDragging) {
+      return;
+    }
+
+    this.isMobileSummaryPointerDragging = false;
+    container?.classList.remove('is-dragging');
+    if (event && container?.hasPointerCapture?.(event.pointerId)) {
+      container.releasePointerCapture(event.pointerId);
+    }
+    this.scrollMobileSummaryTo(this.activeMobileSummaryIndex);
+  }
 }

@@ -125,12 +125,8 @@ export class HeaderComponent  {
     const service = this.loginUser?.service || this.cookieService.get('service');
     const superadminId = this.loginUser?.superadminId || this.cookieService.get('superadminId');
 
-    this.setHeaderLogosFromNames(
-      localStorage.getItem('crmDisplayLogoLong') || '',
-      localStorage.getItem('crmDisplayLogoSmall') || '',
-      service,
-      superadminId
-    );
+    this.displayLogo = '';
+    this.displayLogoSmall = '';
 
     if (superadminId) {
       this.commonComponentService.getApplicaionHeaderDetails(superadminId).subscribe({
@@ -141,9 +137,6 @@ export class HeaderComponent  {
           const header = response.payload;
           const crmDisplayLogoLong = String(header.crmDisplayLogoLong || '').trim();
           const crmDisplayLogoSmall = String(header.crmDisplayLogoSmall || '').trim();
-
-          if (crmDisplayLogoLong) localStorage.setItem('crmDisplayLogoLong', crmDisplayLogoLong);
-          if (crmDisplayLogoSmall) localStorage.setItem('crmDisplayLogoSmall', crmDisplayLogoSmall);
 
           this.setHeaderLogosFromNames(crmDisplayLogoLong, crmDisplayLogoSmall, service, superadminId);
         }
@@ -157,22 +150,28 @@ export class HeaderComponent  {
   }
 
   private setHeaderLogosFromNames(longLogo: string, smallLogo: string, service: any, superadminId: any): void {
-    this.displayLogo = this.resolveApplicationLogo(longLogo, service, superadminId, 'assets/img/logo.png');
-    this.displayLogoSmall = this.resolveApplicationLogo(smallLogo, service, superadminId, 'assets/img/logo-small.png');
+    this.displayLogo = this.resolveApplicationLogo(longLogo, service, superadminId);
+    this.displayLogoSmall = this.resolveApplicationLogo(smallLogo, service, superadminId);
   }
 
-  private resolveApplicationLogo(value: any, service: any, superadminId: any, fallback: string): string {
+  private resolveApplicationLogo(value: any, service: any, superadminId: any): string {
     const logo = String(value || '').trim();
     if (!logo || logo === 'undefined' || logo === 'null') {
-      return fallback;
+      return '';
     }
     if (/^(data:image\/|blob:|https?:)/i.test(logo)) {
       return logo;
     }
     if (!service || !superadminId) {
-      return fallback;
+      return '';
     }
     return this.mediaUrl.applicationImage(service, superadminId, logo);
+  }
+
+  public hideBrokenLogo(event: Event): void {
+    const image = event.target as HTMLImageElement;
+    image.onerror = null;
+    image.style.display = 'none';
   }
 
   private loadCurrentUserPicture(): void {

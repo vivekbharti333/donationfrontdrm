@@ -40,8 +40,18 @@
     </div>
 
     <!-- ========================= TOP CARDS ========================= -->
-    <div class="top-cards">
-        <div class="summary-card orange">
+    <div class="top-cards" #mobileSummaryCards
+        (scroll)="onMobileSummaryScroll()"
+        (touchstart)="onMobileSummaryTouchStart($event)"
+        (touchmove)="onMobileSummaryTouchMove($event)"
+        (touchend)="onMobileSummaryTouchEnd()"
+        (touchcancel)="onMobileSummaryTouchEnd()"
+        (pointerdown)="onMobileSummaryPointerDown($event)"
+        (pointermove)="onMobileSummaryPointerMove($event)"
+        (pointerup)="onMobileSummaryPointerUp($event)"
+        (pointercancel)="onMobileSummaryPointerUp($event)"
+        (pointerleave)="onMobileSummaryPointerUp($event)">
+        <div class="summary-card orange" [class.active-mobile-summary]="activeMobileSummaryIndex === 0">
             <div class="summary-left">
                 <div class="summary-icon">
                     <i class="bi bi-heart"></i>
@@ -55,7 +65,7 @@
             <div class="mini-line orange-line"></div>
         </div>
 
-        <div class="summary-card green">
+        <div class="summary-card green" [class.active-mobile-summary]="activeMobileSummaryIndex === 1">
             <div class="summary-left">
                 <div class="summary-icon">
                     <i class="bi bi-cash-stack"></i>
@@ -69,7 +79,7 @@
             <div class="mini-line green-line"></div>
         </div>
 
-        <div class="summary-card blue">
+        <div class="summary-card blue" [class.active-mobile-summary]="activeMobileSummaryIndex === 2">
             <div class="summary-left">
                 <div class="summary-icon">
                     <i class="bi bi-calendar-heart"></i>
@@ -83,7 +93,7 @@
             <div class="mini-line blue-line"></div>
         </div>
 
-        <div class="summary-card purple">
+        <div class="summary-card purple" [class.active-mobile-summary]="activeMobileSummaryIndex === 3">
             <div class="summary-left">
                 <div class="summary-icon">
                     <i class="bi bi-people"></i>
@@ -103,6 +113,13 @@
             </div>
             <div class="mini-line purple-line"></div>
         </div>
+    </div>
+    <div class="mobile-summary-dots" aria-label="Donation summary carousel">
+        <button type="button" *ngFor="let dot of mobileSummaryIndexes; let i = index"
+            [class.active]="activeMobileSummaryIndex === i"
+            (click)="scrollMobileSummaryTo(i)"
+            [attr.aria-label]="'Show summary card ' + (i + 1)">
+        </button>
     </div>
 
     <!-- ========================= ROW 1 ========================= -->
