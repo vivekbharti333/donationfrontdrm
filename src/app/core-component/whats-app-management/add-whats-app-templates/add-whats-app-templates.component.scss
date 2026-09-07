@@ -1044,3 +1044,82 @@
 
 
 
+.buttons-section {
+  margin-top: 20px;
+  padding: 18px;
+  border: 1px solid #dce4e8;
+  border-radius: 6px;
+  background: #fff;
+
+  h3 { font-size: 18px; margin-bottom: 10px; }
+  p { font-size: 14px; line-height: 1.5; }
+  .add-button-select { width: auto; padding: 8px 12px; border: 1px solid #aabac4; border-radius: 4px; background: #fff; }
+  .template-button-row { margin-top: 14px; padding: 14px; border: 1px solid #dce4e8; border-radius: 4px; }
+  .button-row-heading { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+}
+
+.preview-template-button {
+  padding: 10px;
+  border-top: 1px solid #e4e9ec;
+  color: #168ac0;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.template-form { min-width: 0; }
+.buttons-section {
+  .action-title { margin: 22px 0 10px; font-size: 14px; font-weight: 600; }
+  .action-editor { border: 8px solid #f5f6f7; border-radius: 4px; overflow-x: auto; }
+  .action-row { display: flex; align-items: flex-start; gap: 10px; padding: 18px 12px 24px; min-width: 760px; }
+  .action-content { flex: 1; min-width: 0; }
+  .action-fields { display: flex; align-items: flex-start; gap: 8px; }
+  .action-field { display: flex; flex-direction: column; flex: 1; min-width: 0; }
+  .action-field label { color: #263640; font-size: 13px; font-weight: 600; margin-bottom: 5px; }
+  .action-type { flex: 0 0 160px; }
+  .compact-field { flex: 0 0 105px; }
+  .button-label-field { flex: 1.2; min-width: 160px; }
+  .destination-field { flex: 1.7; min-width: 190px; }
+  .action-field input, .action-field select { width: 100%; min-width: 0; height: 37px; padding: 7px 10px; border: 1px solid #c7d2df; border-radius: 4px; background: #fff; color: #263640; font-size: 13px; }
+  .action-field input:focus, .action-field select:focus { outline: 2px solid #83bceb; outline-offset: 1px; }
+  .counted-input { display: flex; align-items: center; border: 1px solid #c7d2df; border-radius: 4px; overflow: hidden; }
+  .counted-input input { border: 0; flex: 1; width: 0; }
+  .counted-input span { padding-right: 10px; color: #74818b; font-size: 13px; white-space: nowrap; }
+  .counted-input:focus-within { outline: 2px solid #83bceb; }
+  .counted-input input:focus { outline: none; }
+  .input-error { border-color: #ef3340; }
+  .conversion-check { display: flex; align-items: center; gap: 8px; margin: 20px 0 0; font-size: 13px; }
+  .conversion-check input { width: 22px; height: 22px; accent-color: #008bca; }
+  .calling-info { margin-top: 15px; padding: 14px; border-radius: 4px; background: #f0f3f6; color: #263640; font-size: 13px; line-height: 1.7; }
+  .flow-actions { display: flex; gap: 8px; margin-top: 8px; }
+  .flow-actions button { border: 1px solid #aabac4; border-radius: 3px; padding: 7px 13px; background: white; color: #263640; }
+  .flow-actions button.selected { background: #edf7ff; border-color: #168ac0; color: #0875ad; }
+  .sample-field { margin-top: 12px; max-width: 450px; }
+  .reorder-actions { display: flex; flex-direction: column; padding-top: 20px; }
+  .reorder-actions button, .remove-action { border: 0; background: transparent; color: #405665; cursor: pointer; }
+  .reorder-actions button { font-size: 13px; padding: 0 2px; }
+  .reorder-actions button:disabled { opacity: .25; cursor: default; }
+  .remove-action { margin-top: 25px; font-size: 25px; line-height: 1; }
+}
+
+/* Keep the whole message and its actions reachable in the phone preview. */
+.template-preview .phone { overflow-y: auto; }
+.template-preview .chat-bubble { display: block; width: 100%; max-height: none; overflow: visible; }
+.preview-buttons { margin: 10px -12px -8px; border-top: 1px solid #e4e9ec; }
+.preview-buttons .preview-template-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-height: 44px;
+  padding: 10px 12px;
+  color: #168ac0;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.4;
+  border-top: 0;
+  border-bottom: 1px solid #e4e9ec;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.preview-buttons .preview-template-button:last-child { border-bottom: 0; }
+.preview-buttons .preview-template-button i { flex-shrink: 0; font-size: 15px; }

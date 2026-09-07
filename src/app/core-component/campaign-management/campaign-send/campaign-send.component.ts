@@ -19,6 +19,7 @@ import { CampaignSendService } from './campaign-send.service';
 import { Constant } from 'src/app/core/constant/constants';
 import { MatDialog } from '@angular/material/dialog';
 import { ContactDetailsService } from '../contact-details/contact-details.service';
+import { AudienceService } from './audience.service';
 
 @Component({
   selector: 'app-campaign-send',
@@ -27,13 +28,54 @@ import { ContactDetailsService } from '../contact-details/contact-details.servic
   providers: [MessageService, ToastModule],
 })
 export class CampaignSendComponent {
+  public audiences: any[] = [];
+  public audienceId: number | null = null;
+  public audienceError = '';
+  public isSending = false;
+  public skipPreviouslySent = true;
+  public recipientLogs: any[] = [];
+  public isHistoryLoading = false;
+  public historyError = '';
+
+  private contactLoadId = 0;
+  private historyLoadId = 0;
+  public get selectedAudience(): any { return this.audiences.find(a => Number(a.id) === Number(this.audienceId)); }
+  public loadAudiences(): void {
+    this.audienceError = '';
+    this.audienceService.list().subscribe({ next: r => {
+      if ([200, 204].includes(Number(r.responseCode))) this.audiences = r.listPayload || [];
+      else this.audienceError = r.responseMessage || 'Could not load audiences';
+    }, error: () => this.audienceError = 'Could not load audiences. Please try again.' });
+  }
+  public selectAudience(value: any): void {
+    this.audienceId = value ? Number(value) : null;
+    this.contacts = []; this.selectedContactIds = new Set(); this.recipientMode = 'SELECTED';
+    this.contactSearch = '';
+    this.getContacts();
+  }
+  public loadRecipientLogs(): void {
+    const requestId = ++this.historyLoadId;
+    this.recipientLogs = []; this.historyError = '';
+    const id = this.sendCompaignForm.get('campaignId')?.value;
+    this.isHistoryLoading = !!id;
+    if (!id) return;
+    this.audienceService.logs(Number(id)).subscribe({ next: r => {
+      if (requestId !== this.historyLoadId) return;
+      this.isHistoryLoading = false;
+      if ([200, 204].includes(Number(r.responseCode))) this.recipientLogs = r.listPayload || [];
+      else this.historyError = r.responseMessage || 'Could not load campaign history';
+    }, error: () => { if (requestId !== this.historyLoadId) return; this.isHistoryLoading = false; this.historyError = 'Could not load campaign history. Retry before sending.'; } });
+  }
+  public get selectedRecipients(): any[] {
+    return this.recipientMode === 'ALL' ? this.eligibleContacts : this.eligibleContacts.filter(c => this.selectedContactIds.has(c.id));
+  }
 
   public campaignDetailsList:any=[];
   public whatsAppTemplates: any[] = [];
   public selectedWhatsAppTemplate: any = null;
   public isWhatsAppTemplatesLoading = false;
   public whatsAppTemplatesError = '';
-  public recipientMode: 'ALL' | 'SELECTED' = 'ALL';
+  public recipientMode: 'ALL' | 'SELECTED' = 'SELECTED';
   public contacts: any[] = [];
   public selectedContactIds = new Set<any>();
   public contactSearch = '';
@@ -51,6 +93,7 @@ export class CampaignSendComponent {
       private campaignSendService: CampaignSendService,
       private dialog: MatDialog,
       private contactDetailsService: ContactDetailsService,
+      private audienceService: AudienceService,
        private fb: FormBuilder,
     ) {}
   
@@ -58,6 +101,7 @@ export class CampaignSendComponent {
       this.getCampaignDetails();
       this.getContacts();
       this.createForms();
+      this.loadAudiences();
     }
 
     createForms() {
@@ -82,6 +126,7 @@ export class CampaignSendComponent {
         campaignId: '',
       });
       this.selectedWhatsAppTemplate = null;
+      this.loadRecipientLogs();
 
       if (channel === 'WHATSAPP') {
         this.getWhatsAppTemplates();
@@ -101,6 +146,7 @@ export class CampaignSendComponent {
         this.getWhatsAppTemplates();
       }
       this.isCampaignDropdownOpen = false;
+      this.loadRecipientLogs();
     }
 
     public toggleCampaignDropdown(): void {
@@ -137,7 +183,10 @@ export class CampaignSendComponent {
     }
 
     public get eligibleContacts(): any[] {
+      const previouslySent = new Set(this.skipPreviouslySent ? this.recipientLogs.filter(r =>
+        ['PENDING', 'SENT', 'DELIVERED', 'READ', 'UNKNOWN'].includes(r.status) && r.channel === this.recipientChannel).map(r => Number(r.contactId)) : []);
       return this.contacts.filter(contact => {
+        if (contact.status === 'INACTIVE' || previouslySent.has(Number(contact.id))) return false;
         if (this.recipientChannel === 'EMAIL') return !!contact?.emailId;
         if (this.recipientChannel === 'ALL') return !!(contact?.mobileNumber || contact?.whatsAppNumber || contact?.phoneNumber || contact?.emailId);
         return !!(contact?.mobileNumber || contact?.whatsAppNumber || contact?.phoneNumber);
@@ -167,7 +216,7 @@ export class CampaignSendComponent {
     }
 
     public get recipientCount(): number {
-      return this.recipientMode === 'ALL' ? this.eligibleContacts.length : this.selectedContactIds.size;
+      return this.selectedRecipients.length;
     }
 
     public setRecipientMode(mode: 'ALL' | 'SELECTED'): void {
@@ -189,25 +238,27 @@ export class CampaignSendComponent {
     }
 
     public get areAllEligibleContactsSelected(): boolean {
-      return this.eligibleContacts.length > 0 && this.eligibleContacts.every(contact => this.selectedContactIds.has(contact.id));
+      return this.filteredContacts.length > 0 && this.filteredContacts.every(contact => this.recipientMode === 'ALL' || this.selectedContactIds.has(contact.id));
     }
 
     public toggleAllEligibleContacts(checked: boolean): void {
-      this.recipientMode = 'SELECTED';
-      this.selectedContactIds = checked
-        ? new Set(this.eligibleContacts.map(contact => contact.id))
-        : new Set();
+      const ids = new Set(this.selectedRecipients.map(c => c.id));
+      this.filteredContacts.forEach(c => checked ? ids.add(c.id) : ids.delete(c.id));
+      this.recipientMode = 'SELECTED'; this.selectedContactIds = ids;
     }
 
     private getContacts(): void {
-      if (this.contacts.length || this.isContactsLoading) return;
+      const requestId = ++this.contactLoadId;
+      if (!this.audienceId) { this.contacts = []; this.isContactsLoading = false; return; }
       this.isContactsLoading = true;
-      this.contactDetailsService.getContactDetails().subscribe({
+      this.audienceService.contacts(this.audienceId).subscribe({
         next: response => {
+          if (requestId !== this.contactLoadId) return;
+          if (![200, 204].includes(Number(response.responseCode))) { this.contacts = []; this.audienceError = response.responseMessage; this.isContactsLoading = false; return; }
           this.contacts = Array.isArray(response?.listPayload) ? response.listPayload : [];
           this.isContactsLoading = false;
         },
-        error: () => this.isContactsLoading = false,
+        error: () => { if (requestId !== this.contactLoadId) return; this.contacts = []; this.isContactsLoading = false; this.audienceError = 'Could not load audience contacts.'; },
       });
     }
 
@@ -217,8 +268,10 @@ export class CampaignSendComponent {
     }
 
     public get visibleCampaigns(): any[] {
-      if (this.selectedChannelFilter === 'ALL') return this.campaignDetailsList;
-      return this.campaignDetailsList.filter((campaign: any) =>
+      const configuredCampaigns = this.campaignDetailsList.filter((campaign: any) =>
+        ['WHATSAPP', 'EMAIL'].includes(String(campaign.campaignChannel).toUpperCase()));
+      if (this.selectedChannelFilter === 'ALL') return configuredCampaigns;
+      return configuredCampaigns.filter((campaign: any) =>
         campaign?.campaignChannel?.toUpperCase() === this.selectedChannelFilter,
       );
     }
@@ -266,6 +319,10 @@ export class CampaignSendComponent {
   }
 
   public sendCompaign() {
+  if (this.isSending || this.isContactsLoading || this.isHistoryLoading || this.historyError) return;
+  if (this.sendCompaignForm.invalid || !this.audienceId || this.recipientCount === 0) {
+    this.messageService.add({ severity: 'error', summary: 'Selection required', detail: 'Select an audience, contacts, channel and campaign.' }); return;
+  }
   if (this.selectedChannelFilter === 'WHATSAPP' && (!this.selectedWhatsAppTemplate || this.recipientCount === 0)) {
     this.messageService.add({
       severity: 'error',
@@ -275,15 +332,17 @@ export class CampaignSendComponent {
     return;
   }
 
-  const selectedContactIds = Array.from(this.selectedContactIds);
+  const selectedContactIds = this.selectedRecipients.map(contact => contact.id);
   const campaignRequest = {
     ...this.sendCompaignForm.value,
     campaignName: this.selectedCampaign?.campaignName || '',
     templateId: this.selectedWhatsAppTemplate?.templateId || null,
     campaignType: this.selectedWhatsAppTemplate?.category || this.selectedCampaign?.campaignType || 'MARKETING',
-    recipientMode: this.recipientMode,
-    contactIds: this.recipientMode === 'ALL' ? [] : selectedContactIds,
-    campaignTo: this.recipientMode === 'ALL' ? 'ALL_ELIGIBLE_CONTACTS' : `${selectedContactIds.length} selected contacts`,
+    audienceId: this.audienceId,
+    skipPreviouslySent: this.skipPreviouslySent,
+    recipientMode: 'SELECTED',
+    contactIds: selectedContactIds,
+    campaignTo: `${this.selectedAudience?.audienceName}: ${selectedContactIds.length} selected contacts`,
     whatsAppRequest: this.selectedWhatsAppTemplate ? {
       templateName: this.selectedWhatsAppTemplate.templateName,
       language: this.selectedWhatsAppTemplate.language || 'en',
@@ -296,8 +355,10 @@ export class CampaignSendComponent {
       : this.selectedCampaign?.campaignDescription || this.selectedCampaign?.description || '',
   };
 
+  this.isSending = true;
   this.campaignSendService.sendCompaign(campaignRequest).subscribe({
     next: (response: any) => {
+      this.isSending = false;
       if (response.responseCode === 200) {
         if (response.payload.respCode === 200) {
           this.messageService.add({
@@ -306,11 +367,9 @@ export class CampaignSendComponent {
             detail: response.payload.respMesg
           });
 
-          this.sendCompaignForm.reset();
-          this.selectedWhatsAppTemplate = null;
           this.selectedContactIds = new Set();
-          this.recipientMode = 'ALL';
-          this.selectedChannelFilter = 'ALL';
+          this.recipientMode = 'SELECTED';
+          this.loadRecipientLogs();
         } else {
           this.messageService.add({
             severity: 'error',
@@ -327,6 +386,7 @@ export class CampaignSendComponent {
       }
     },
     error: () => {
+      this.isSending = false; this.loadRecipientLogs();
       this.messageService.add({
         severity: 'error',
         summary: 'Error',

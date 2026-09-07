@@ -49,7 +49,7 @@ export class AddWhatsAppTemplatesService {
     );
   }
 
-  private uploadTemplateMedia(file: File, mediaType: string, superadminId: string): Observable<any> {
+  public uploadTemplateMedia(file: File, mediaType: string, superadminId?: string): Observable<any> {
     const formData = new FormData();
     formData.append('file', file, file.name);
     formData.append('mediaType', mediaType.toUpperCase());

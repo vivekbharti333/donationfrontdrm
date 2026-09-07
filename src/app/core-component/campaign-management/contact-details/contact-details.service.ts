@@ -19,13 +19,15 @@ public loginUser;
     this.loginUser = this.authenticationService.getLoginUser();
   }
 
-  uploadExcel(file: File): Observable<any> {
+  uploadExcel(file: File, audienceName: string, audienceId: number | null = null): Observable<any> {
     const formData = new FormData();
     formData.append('file', file);
+    formData.append('audienceName', audienceName);
+    if (audienceId) formData.append('audienceId', String(audienceId));
     formData.append('createdBy', this.cookieService.get('loginId'));
     formData.append('superadminId', this.cookieService.get('superadminId'));
 
-    return this.http.post<any>(Constant.Site_Url + 'uploadExcel', formData);
+    return this.http.post<any>(Constant.Site_Url + 'uploadAudienceExcel', formData);
   }
 
   getContactDetails(): Observable<any> {

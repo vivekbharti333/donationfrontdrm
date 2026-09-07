@@ -104,6 +104,31 @@
       </div>
     </div>
 
+    <div class="template-mobile-cards" *ngIf="!isLoading && !loadError">
+      <article class="template-mobile-card" *ngFor="let data of tableData">
+        <div class="template-mobile-heading">
+          <h3>{{ data.templateName }}</h3>
+          <span class="template-status" [ngClass]="statusClass(data.status)">{{ data.status }}</span>
+        </div>
+        <dl class="template-mobile-details">
+          <div><dt>Template ID:</dt><dd>{{ data.templateId }}</dd></div>
+          <div><dt>Language:</dt><dd>{{ data.language }}</dd></div>
+          <div><dt>Category:</dt><dd>{{ data.category }}</dd></div>
+        </dl>
+        <div class="template-mobile-actions">
+          <button type="button" class="template-mobile-edit" (click)="openEditModal(dialogTemplate, data)" [attr.aria-label]="'Edit ' + data.templateName">
+            <i class="feather icon-edit" aria-hidden="true"></i> Edit
+          </button>
+          <button type="button" class="template-mobile-delete" (click)="deleteTemplateByName(data.templateName, data.templateId)" [attr.aria-label]="'Delete ' + data.templateName">
+            <i class="feather icon-trash-2" aria-hidden="true"></i> Delete
+          </button>
+        </div>
+      </article>
+      <div class="template-state" *ngIf="tableData.length === 0">
+        {{ searchDataValue ? 'No matching templates found.' : 'No templates available.' }}
+      </div>
+    </div>
+
     <div class="template-pagination" *ngIf="!isLoading && !loadError && totalData">
       <span>Showing {{pageStart}}–{{pageEnd}} of {{totalData}}</span>
       <label>
@@ -161,7 +186,7 @@
           <div class="form-row">
             <div class="field">
               <label>Template name <span class="required">*</span></label>
-              <input formControlName="templateName" placeholder="example_template_name" />
+              <input readonly formControlName="templateName" placeholder="example_template_name" />
               <small>Lowercase letters, numbers and underscores only.</small>
               <span class="field-error"
                     *ngIf="editTemplateForm.get('templateName')?.touched && editTemplateForm.get('templateName')?.invalid">
@@ -230,7 +255,14 @@
           </div>
 
           <!-- HEADER -->
-          <div class="field">
+          <div class="field" *ngIf="editTemplateForm.get('mediaType')?.value !== 'None'">
+            <label for="edit-header-media">Header media sample</label>
+            <input id="edit-header-media" type="file" [accept]="headerMediaAccept" (change)="onHeaderFileChange($event)" [disabled]="isSaving" />
+            <small>Select a file to upload with this update. The current sample appears in the preview when available.</small>
+            <small *ngIf="headerFile">Selected: {{ headerFile.name }}</small>
+            <p *ngIf="headerMediaError" class="text-danger" role="alert">{{ headerMediaError }}</p>
+          </div>
+          <div class="field" *ngIf="editTemplateForm.get('mediaType')?.value === 'None'">
             <label>Header <span class="optional">Optional</span></label>
             <input formControlName="headerText" maxlength="60" placeholder="Add a short heading" />
             <small class="counter">{{editTemplateForm.get('headerText')?.value?.length || 0}}/60</small>
@@ -265,6 +297,68 @@
             <small class="counter">{{editTemplateForm.get('footerText')?.value?.length || 0}}/60</small>
           </div>
 
+      <section class="buttons-section" aria-labelledby="buttons-heading">
+        <h3 id="buttons-heading">Buttons <span class="optional">Optional</span></h3>
+        <p>Create buttons that let customers respond to your message or take action. You can add up to ten buttons. If you add more than three buttons, they will appear in a list.</p>
+        <select #buttonType class="add-button-select" aria-label="Add button"
+                [disabled]="buttonsArray.length >= 10"
+                (change)="addButton(buttonType.value); buttonType.value = ''">
+          <option value="">+ Add button</option>
+          <option *ngFor="let option of buttonOptions" [value]="option.value">{{ option.label }}</option>
+
+
+        </select>
+        <small *ngIf="buttonsArray.length >= 10">Maximum of 10 buttons reached.</small>
+        <h4 class="action-title" *ngIf="buttonsArray.length">Call to action <span class="optional">Optional</span></h4>
+        <div class="action-editor" formArrayName="buttons" *ngIf="buttonsArray.length">
+          <div class="action-row" *ngFor="let button of buttonsArray.controls; let i = index" [formGroupName]="i">
+            <div class="reorder-actions">
+              <button type="button" (click)="moveButton(i, -1)" [disabled]="i === 0" aria-label="Move button up">&#8593;</button>
+              <button type="button" (click)="moveButton(i, 1)" [disabled]="i === buttonsArray.length - 1" aria-label="Move button down">&#8595;</button>
+            </div>
+            <div class="action-content">
+              <div class="action-fields">
+                <div class="action-field action-type">
+                  <label [for]="'action-type-' + i">Type of action</label>
+                  <select #actionType [id]="'action-type-' + i" formControlName="type" (change)="changeButtonType(i, actionType.value)">
+                    <option *ngFor="let option of buttonOptions" [value]="option.value">{{ option.label }}</option>
+                  </select>
+                </div>
+                <div class="action-field compact-field" *ngIf="button.value.type === 'FLOW'">
+                  <label [for]="'button-icon-' + i">Button icon</label>
+                  <select [id]="'button-icon-' + i" formControlName="icon"><option value="DEFAULT">Default</option></select>
+                </div>
+                <div class="action-field button-label-field">
+                  <label [for]="'button-text-' + i">Button text</label>
+                  <div class="counted-input"><input [id]="'button-text-' + i" formControlName="text" maxlength="25" [readonly]="button.value.type === 'COPY_CODE'" /><span>{{ button.value.text.length }}/25</span></div>
+                </div>
+                <ng-container *ngIf="button.value.type === 'URL'">
+                  <div class="action-field compact-field"><label [for]="'url-type-' + i">URL type</label><select [id]="'url-type-' + i" formControlName="urlType"><option value="STATIC">Static</option><option value="DYNAMIC">Dynamic</option></select></div>
+                  <div class="action-field destination-field"><label [for]="'button-url-' + i">Website URL</label><div class="counted-input"><input [id]="'button-url-' + i" formControlName="url" maxlength="2000" placeholder="https://www.example.com" /><span>{{ button.value.url.length }}/2000</span></div></div>
+                </ng-container>
+                <div class="action-field" *ngIf="button.value.type === 'WHATSAPP_CALL'"><label [for]="'active-for-' + i">Active for &#9432;</label><select [id]="'active-for-' + i" formControlName="activeFor"><option value="1">1 day</option><option value="7">7 days</option><option value="14">14 days</option><option value="30">30 days</option></select></div>
+                <ng-container *ngIf="button.value.type === 'PHONE_NUMBER'">
+                  <div class="action-field compact-field"><label [for]="'country-' + i">Country</label><select [id]="'country-' + i" formControlName="country"><option value="+1">US +1</option><option value="+91">IN +91</option><option value="+44">UK +44</option><option value="+61">AU +61</option><option value="+971">AE +971</option></select></div>
+                  <div class="action-field destination-field"><label [for]="'phone-' + i">Phone number</label><div class="counted-input" [class.input-error]="button.get('phone_number')?.touched && !button.value.phone_number"><input [id]="'phone-' + i" type="tel" formControlName="phone_number" maxlength="20" /><span>{{ button.value.phone_number.length }}/20</span></div><small class="validation-error" *ngIf="button.get('phone_number')?.touched && !button.value.phone_number">You need to enter a phone number. Please add a valid phone number.</small></div>
+                </ng-container>
+                <div class="action-field destination-field" *ngIf="button.value.type === 'COPY_CODE'"><label [for]="'offer-code-' + i">Offer code</label><div class="counted-input" [class.input-error]="button.get('offerCode')?.touched && !button.value.offerCode"><input [id]="'offer-code-' + i" formControlName="offerCode" maxlength="20" placeholder="Enter sample" /><span>{{ button.value.offerCode.length }}/20</span></div><small class="validation-error" *ngIf="button.get('offerCode')?.touched && !button.value.offerCode">Add sample text</small></div>
+              </div>
+              <ng-container *ngIf="button.value.type === 'URL'">
+                <label class="conversion-check"><input type="checkbox" [disabled]="true" title="Requires a separate Marketing Messages API integration" /> Track app conversions (Marketing Messages API for WhatsApp only) &#9432;</label>
+                <div class="action-field sample-field" *ngIf="button.value.urlType === 'DYNAMIC'"><label [for]="'url-sample-' + i">Sample URL</label><input [id]="'url-sample-' + i" formControlName="urlSample" placeholder="Enter a complete example URL" /></div>
+              </ng-container>
+              <div class="calling-info" *ngIf="button.value.type === 'WHATSAPP_CALL'">&#9432; Turn on calling in the WhatsApp Manager portal. Alternatively, you can use the Phone Number Settings API.</div>
+              <ng-container *ngIf="button.value.type === 'FLOW'">
+                <div class="flow-actions"><button type="button" [disabled]="true" title="Create and publish the flow in WhatsApp Manager, then enter its Flow ID">+ Create new</button><button type="button" [class.selected]="button.value.flowMode === 'EXISTING'" (click)="button.get('flowMode')?.setValue('EXISTING')">&#9635; Use existing</button></div>
+                <div class="action-field sample-field" *ngIf="button.value.flowMode === 'NEW'"><label [for]="'flow-name-' + i">Flow name</label><input [id]="'flow-name-' + i" formControlName="flowName" placeholder="Enter a name for your flow" /></div>
+                <div class="action-field sample-field"><label [for]="'flow-screen-' + i">Starting screen ID</label><input [id]="'flow-screen-' + i" formControlName="navigateScreen" placeholder="Enter the screen ID from your published flow" /></div><div class="action-field sample-field" *ngIf="button.value.flowMode === 'EXISTING'"><label [for]="'flow-id-' + i">Flow ID</label><input [id]="'flow-id-' + i" formControlName="flowId" placeholder="Enter an existing flow ID" /></div>
+              </ng-container>
+              <small class="validation-error" *ngIf="button.get('text')?.touched && button.get('text')?.invalid">Enter button text.</small>
+            </div>
+            <button type="button" class="remove-action" (click)="removeButton(i)" [attr.aria-label]="'Remove button ' + (i + 1)">&times;</button>
+          </div>
+        </div>
+      </section>
           <!-- VARIABLES -->
           <div formArrayName="msgBodyVariable" class="variable-section" *ngIf="variablesArray.length">
 
@@ -299,25 +393,24 @@
         <div class="template-preview">
           <div class="preview-heading">
             <div>
-              <span>Live preview</span>
-              <h3>Customer view</h3>
+              <h3>Your template</h3>
             </div>
-            <span class="preview-badge">WhatsApp</span>
           </div>
 
           <div class="phone">
-            <div class="phone-topbar">
-              <span class="preview-avatar">B</span>
-              <div>
-                <strong>Your business</strong>
-                <small>Business account</small>
-              </div>
-            </div>
             <div class="chat-bubble">
 
               <!-- HEADER -->
-              <div class="whats-app-header" *ngIf="editTemplateForm.get('headerText')?.value as header">
-                {{ header }}
+              <div class="edit-header-media-preview" *ngIf="editTemplateForm.get('mediaType')?.value !== 'None'">
+                <ng-container *ngIf="headerPreview && !headerPreviewFailed; else missingHeaderMedia">
+                  <img *ngIf="editTemplateForm.get('headerFormat')?.value === 'IMAGE'" [src]="headerPreview" alt="Template header image" (error)="headerPreviewFailed = true" />
+                  <video *ngIf="editTemplateForm.get('headerFormat')?.value === 'VIDEO'" [src]="headerPreview" controls (error)="headerPreviewFailed = true"></video>
+                  <div *ngIf="editTemplateForm.get('headerFormat')?.value === 'DOCUMENT'">&#128196; {{ headerFile?.name || 'Document header' }}</div>
+                </ng-container>
+                <ng-template #missingHeaderMedia><span>{{ headerPreviewFailed ? 'This sample is unavailable. Select a file to preview it.' : 'Select a header media file to preview it.' }}</span></ng-template>
+              </div>
+              <div class="whats-app-header" *ngIf="editTemplateForm.get('mediaType')?.value === 'None' && editTemplateForm.get('headerText')?.value">
+                {{ editTemplateForm.get('headerText')?.value }}
               </div>
 
               <!-- BODY -->
@@ -330,8 +423,19 @@
                 {{ footer }}
               </div>
 
+
               <!-- META INFO -->
               <div class="time">11:22 <span>✓✓</span></div>
+          <div class="preview-buttons" *ngIf="buttonsArray.length" aria-label="Message buttons" aria-live="polite">
+            <div class="preview-template-button" *ngFor="let button of buttonsArray.controls | slice:0:(buttonsArray.length > 3 && !showAllPreviewButtons ? 2 : buttonsArray.length)">
+              <i class="fa" aria-hidden="true"
+                 [ngClass]="{'fa-external-link-alt': button.value.type === 'URL', 'fa-phone': button.value.type === 'PHONE_NUMBER' || button.value.type === 'WHATSAPP_CALL', 'fa-list-alt': button.value.type === 'FLOW', 'fa-copy': button.value.type === 'COPY_CODE', 'fa-reply': button.value.type === 'QUICK_REPLY'}"></i>
+              <span>{{ button.value.type === 'COPY_CODE' ? 'Copy offer code' : (button.value.text || 'Button text') }}</span>
+            </div>
+            <button type="button" class="preview-template-button preview-options" *ngIf="buttonsArray.length > 3" (click)="showAllPreviewButtons = !showAllPreviewButtons" [attr.aria-expanded]="showAllPreviewButtons">
+              <i class="fa fa-list" aria-hidden="true"></i>{{ showAllPreviewButtons ? 'Show fewer options' : 'See all options' }}
+            </button>
+          </div>
 
               <!-- EXTRA INFO (OPTIONAL DEBUG / UX) -->
               <!-- <div class="meta-info">

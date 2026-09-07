@@ -54,6 +54,8 @@ export class CampaignSendService {
         description: campaignDetails.description,
         recipientMode: campaignDetails.recipientMode,
         contactIds: campaignDetails.contactIds,
+        audienceId: campaignDetails.audienceId,
+        skipPreviouslySent: campaignDetails.skipPreviouslySent,
         whatsAppRequest: campaignDetails.whatsAppRequest,
 
         roleType: this.cookieService.get('roleType'),

@@ -10,6 +10,7 @@ import { MessageService } from 'primeng/api';
 import { ContactDetailsService } from './contact-details.service';
 import { MatDialog } from '@angular/material/dialog';
 import { Subscription } from 'rxjs';
+import { AudienceService } from '../campaign-send/audience.service';
 
 @Component({
   selector: 'app-contact-details',
@@ -18,6 +19,38 @@ import { Subscription } from 'rxjs';
   providers: [MessageService],
 })
 export class ContactDetailsComponent implements OnInit, OnDestroy {
+  audiences: any[] = [];
+  targetAudienceId: number | null = null;
+  audienceError = '';
+  audienceBusy = false;
+  assignmentIds = new Set<number>();
+  loadAudiences(): void {
+    this.audienceService.list().subscribe({ next: r => {
+      if ([200, 204].includes(Number(r.responseCode))) this.audiences = r.listPayload || [];
+      else this.audienceError = r.responseMessage;
+    }, error: () => this.audienceError = 'Could not load audiences.' });
+  }
+  createAudience(): void {
+    if (this.audienceBusy || !this.audienceName.trim()) return;
+    this.audienceBusy = true; this.audienceError = '';
+    this.audienceService.create(this.audienceName.trim()).subscribe({ next: r => {
+      this.audienceBusy = false;
+      if (Number(r.responseCode) !== 200) { this.audienceError = r.responseMessage; return; }
+      this.audiences = [r.payload, ...this.audiences]; this.targetAudienceId = r.payload.id; this.audienceName = '';
+    }, error: () => { this.audienceBusy = false; this.audienceError = 'Could not create audience.'; } });
+  }
+  toggleAssignment(id: number, checked: boolean): void { checked ? this.assignmentIds.add(id) : this.assignmentIds.delete(id); }
+  get pageAssigned(): boolean { return this.tableData.length > 0 && this.tableData.every(c => this.assignmentIds.has(c.id)); }
+  selectAssignmentPage(checked: boolean): void { this.tableData.forEach(c => this.toggleAssignment(c.id, checked)); }
+  assignContacts(): void {
+    if (!this.targetAudienceId || !this.assignmentIds.size || this.audienceBusy) return;
+    this.audienceBusy = true; this.audienceError = '';
+    this.audienceService.attach(this.targetAudienceId, Array.from(this.assignmentIds)).subscribe({ next: r => {
+      this.audienceBusy = false;
+      if (Number(r.responseCode) !== 200) { this.audienceError = r.responseMessage; return; }
+      this.assignmentIds.clear(); this.messageService.add({ severity: 'success', summary: 'Contacts assigned', detail: 'Selected contacts were added to the audience.' });
+    }, error: () => { this.audienceBusy = false; this.audienceError = 'Could not assign contacts.'; } });
+  }
   public routes = routes;
 
   public addContactDialog: any;
@@ -54,6 +87,7 @@ export class ContactDetailsComponent implements OnInit, OnDestroy {
     private sidebar: SidebarService,
     private messageService: MessageService,
     private contactDetailsService: ContactDetailsService,
+    private audienceService: AudienceService,
     private dialog: MatDialog,
     private fb: FormBuilder,
   ) {}
@@ -61,6 +95,7 @@ export class ContactDetailsComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.createForms();
     this.loadContactDetails();
+    this.loadAudiences();
 
     this.pageSizeSub = this.pagination.tablePageSize.subscribe((res: tablePageSize) => {
       if (this.router.url === this.routes.campaignReport || this.router.url.includes('contact-details')) {
@@ -270,38 +305,18 @@ export class ContactDetailsComponent implements OnInit, OnDestroy {
       });
     }
 
-    public saveContactDetails() {
-    this.contactDetailsService.saveContactDetails(this.addContactForm.value)
-      .subscribe({
-        next: (response: any) => {
-          if (response['responseCode'] == '200') {
-            let payload = response['payload'];
-            if (response['payload']['respCode'] == '200') {
-              this.messageService.add({ severity: 'success', summary: 'Success', detail: response['payload']['respMesg'] });
-
-              this.addContactForm.reset();
-              this.addContactDialog.close();
-             
-            } else {
-              this.messageService.add({
-                summary: response['payload']['respCode'],
-                detail: response['payload']['respMesg'],
-                styleClass: 'danger-light-popover',
-              });
-            }
-          } else {
-            this.messageService.add({
-              summary: response['responseCode'],
-              detail: response['responseMessage'],
-              styleClass: 'danger-light-popover',
-            });
-          }
-        },
-        //error: (error: any) => this.toastr.error('Server Error', '500'),
-      });
+  public saveContactDetails(): void {
+    if (this.audienceBusy) return;
+    if (!this.targetAudienceId) { this.audienceError = 'Choose an audience for this contact.'; return; }
+    if (this.addContactForm.invalid) { this.addContactForm.markAllAsTouched(); return; }
+    this.audienceBusy = true; this.audienceError = '';
+    this.audienceService.manual(this.targetAudienceId, this.addContactForm.value).subscribe({ next: r => {
+      this.audienceBusy = false;
+      if (Number(r.responseCode) !== 200) { this.audienceError = r.responseMessage; return; }
+      this.addContactForm.reset(); this.addContactDialog.close(); this.loadContactDetails();
+      this.messageService.add({ severity: 'success', summary: 'Contact saved', detail: 'Contact added to the selected audience.' });
+    }, error: () => { this.audienceBusy = false; this.audienceError = 'Could not save contact.'; } });
   }
-
-
   public changeStatus(rowdata: any): void {
     this.contactDetailsService.changeContactStatus(rowdata)
       .subscribe({
@@ -438,6 +453,8 @@ deleteSelectedContact() {
  
 
 selectedFile: File | null = null;
+audienceName = '';
+isUploadingAudience = false;
 selectedFileName: string = '';
 
 onFileChange(event: any): void {
@@ -457,25 +474,34 @@ onFileChange(event: any): void {
 
     this.selectedFile = file;
     this.selectedFileName = file.name;
+    this.audienceName = file.name.replace(/\.(xlsx|xls)$/i, '');
   }
 }
 
 uploadFile(): void {
+  if (this.isUploadingAudience || this.audienceBusy) return;
+  if (!this.targetAudienceId && !this.audienceName.trim()) { alert('Choose an existing audience or enter a new audience name'); return; }
   if (!this.selectedFile) {
     alert('Please select a file first');
     return;
   }
 
+  this.isUploadingAudience = true;
   this.contactDetailsService
-    .uploadExcel(this.selectedFile)
+    .uploadExcel(this.selectedFile, this.audienceName.trim(), this.targetAudienceId)
     .subscribe({
       next: (res) => {
-        console.log('Upload success', res);
-        alert('File uploaded successfully');
+        this.isUploadingAudience = false;
+        if (Number(res.responseCode) !== 200) { alert(res.responseMessage || 'Upload failed'); return; }
+        alert('Contacts saved to audience "' + res.payload.audienceName + '". Choose this audience on Send Campaign.');
+        this.loadContactDetails();
+        this.targetAudienceId = res.payload.id;
+        this.loadAudiences();
         this.selectedFile = null;
         this.selectedFileName = '';
       },
       error: (err) => {
+        this.isUploadingAudience = false;
         console.error('Upload failed', err);
         alert('File upload failed');
       }

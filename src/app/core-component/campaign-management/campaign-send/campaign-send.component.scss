@@ -45,3 +45,20 @@
 
 @media (max-width: 767px) { .template-message-preview { max-width:310px; border-radius:20px; }.mobile-preview-chat { height:240px; } }
 @media (max-width: 420px) { .recipient-picker-head { grid-template-columns:1fr; }.recipient-picker-head span { justify-self:start; }.recipient-picker-head input { font-size:12px; } }
+
+.campaign-send-fields { border: 0; padding: 0; margin: 0; min-width: 0; width: 100%; }
+.audience-section > select, .audience-create > input, .existing-picker > input { width: 100%; padding: 10px 12px; border: 1px solid #d8e2e7; border-radius: 6px; margin: 6px 0 12px; }
+.audience-create, .audience-members { margin-top: 18px; padding-top: 16px; border-top: 1px solid #e6ecef; }
+.audience-actions { display: flex; flex-wrap: wrap; gap: 10px; margin: 12px 0; }
+.audience-create small { display: block; color: #657781; line-height: 1.6; }
+.manual-contact-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.manual-contact-fields input { min-width: 0; padding: 10px; border: 1px solid #d8e2e7; border-radius: 6px; }
+.audience-members h3 { font-size: 16px; margin-bottom: 12px; }
+.existing-picker { padding: 12px; background: #f5f8fa; border-radius: 6px; }
+.existing-picker label { display: flex; gap: 8px; padding: 8px; }
+.campaign-exclusions { margin: 16px 0; }
+.campaign-exclusions label { display: flex; gap: 8px; align-items: center; }
+.campaign-exclusions p { margin-top: 10px; }
+.campaign-log-table { overflow-x: auto; }
+.channel-card:disabled { opacity: .5; cursor: not-allowed; }
+@media (max-width: 600px) { .manual-contact-fields { grid-template-columns: 1fr; } }

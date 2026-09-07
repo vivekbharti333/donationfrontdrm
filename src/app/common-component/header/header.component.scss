@@ -98,10 +98,13 @@
     display: flex !important;
     justify-content: center;
     line-height: normal;
+    width: 44px;
+    padding: 0;
+    right: env(safe-area-inset-right, 0px);
   }
 
   .mobile-profile-toggle {
-    flex: 0 0 38px;
+    flex: 0 0 44px;
     margin-top: 0;
   }
 }

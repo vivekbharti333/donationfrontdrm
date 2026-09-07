@@ -1,16 +1,17 @@
 export class Constant {
 
-    private static readonly LOCAL_SITE_URL = "http://localhost/mycrm/";
-    private static readonly PRODUCTION_SITE_URL = "https://donexia.in/drmapinew/";
+    // private static readonly LOCAL_SITE_URL = "http://localhost/mycrm/";
+    // private static readonly PRODUCTION_SITE_URL = "https://donexia.in/drmapinew/";
 
-    public static Site_Url = (
-      typeof window !== 'undefined'
-      && ['localhost', '127.0.0.1'].includes(window.location.hostname)
-    )
-      ? Constant.LOCAL_SITE_URL
-      : Constant.PRODUCTION_SITE_URL;
+    // public static Site_Url = 
+    // (
+    //   typeof window !== 'undefined'
+    //   && ['localhost', '127.0.0.1'].includes(window.location.hostname)
+    // )
+      // ? Constant.LOCAL_SITE_URL
+      // : Constant.PRODUCTION_SITE_URL;
 
-    // public static Site_Url = "http://localhost/mycrm/";
+    public static Site_Url = "http://localhost/mycrm/";
     // public static Site_Url = "http://192.168.29.119/mycrm/";
     // public static Site_Url = "https://datfuslab.in/drmapinew/";
     // public static Site_Url = "https://donexia.in/drmapinew/";

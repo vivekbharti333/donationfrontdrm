@@ -28,9 +28,43 @@ export class WhatsAppTemplatesComponent {
   public isSaving = false;
   public loadError = '';
   public formError = '';
+  public headerFile: File | null = null;
+  public headerPreview = '';
+  public headerMediaError = '';
+  public headerPreviewFailed = false;
+  public showAllPreviewButtons = false;
+  private existingHeaderPreview = '';
+  private existingHeaderFormat = '';
+
+  get headerMediaAccept(): string {
+    const format = this.editTemplateForm.get('headerFormat')?.value;
+    return format === 'IMAGE' ? 'image/jpeg,image/png' : format === 'VIDEO' ? 'video/mp4' : 'application/pdf';
+  }
+
+  onHeaderFileChange(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+    const maxMb = this.editTemplateForm.get('headerFormat')?.value === 'IMAGE' ? 5 : 16;
+    if (!this.headerMediaAccept.split(',').includes(file.type) || file.size > maxMb * 1024 * 1024) {
+      this.headerMediaError = `Select ${this.headerMediaAccept} up to ${maxMb} MB.`;
+      input.value = '';
+      return;
+    }
+    this.headerFile = file;
+    input.value = '';
+    this.headerMediaError = '';
+    this.headerPreviewFailed = false;
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (this.headerFile === file) this.headerPreview = String(reader.result);
+    };
+    reader.readAsDataURL(file);
+  }
   public showVarDropdown = false;
   public showMediaDropdown = false;
   private activeSort: Sort = { active: '', direction: '' };
+  private editRequestId = 0;
 
   constructor(
     private fb: FormBuilder,
@@ -41,6 +75,84 @@ export class WhatsAppTemplatesComponent {
 
   ngOnInit(): void {
     this.getWhatsAppTemplate();
+  }
+
+  get buttonsArray(): FormArray {
+    return this.editTemplateForm.get('buttons') as FormArray;
+  }
+
+  readonly buttonOptions = [
+    { value: 'QUICK_REPLY', label: 'Quick reply' },
+    { value: 'URL', label: 'Visit website' },
+    { value: 'WHATSAPP_CALL', label: 'Call on WhatsApp' },
+    { value: 'PHONE_NUMBER', label: 'Call Phone Number' },
+    { value: 'FLOW', label: 'Complete flow' },
+    { value: 'COPY_CODE', label: 'Copy offer code' }
+  ];
+
+  private createButton(type: string): FormGroup {
+    const label = this.buttonOptions.find(option => option.value === type)?.label || '';
+    return this.fb.group({
+      type: [type],
+      text: [type === 'FLOW' ? 'View flow' : label, [Validators.required, Validators.pattern(/\S/), Validators.maxLength(25)]],
+      urlType: ['STATIC'], url: [''], urlSample: [''], trackConversions: [false],
+      activeFor: ['7'], country: ['+1'], phone_number: [''],
+      icon: ['DEFAULT'], flowMode: ['EXISTING'], flowName: [''], flowId: [''], navigateScreen: [''], flowAction: ['navigate'], offerCode: ['']
+    });
+  }
+
+  addButton(type: string): void {
+    if (!this.buttonOptions.some(option => option.value === type) || this.buttonsArray.length >= 10) return;
+    this.buttonsArray.push(this.createButton(type));
+    this.buttonsArray.markAsDirty();
+  }
+
+  changeButtonType(index: number, type: string): void {
+    this.buttonsArray.setControl(index, this.createButton(type));
+    this.buttonsArray.markAsDirty();
+  }
+
+  moveButton(index: number, offset: number): void {
+    const destination = index + offset;
+    if (destination < 0 || destination >= this.buttonsArray.length) return;
+    const button = this.buttonsArray.at(index);
+    this.buttonsArray.removeAt(index);
+    this.buttonsArray.insert(destination, button);
+    this.buttonsArray.markAsDirty();
+  }
+
+  removeButton(index: number): void {
+    this.buttonsArray.removeAt(index);
+    this.buttonsArray.markAsDirty();
+  }
+
+  private loadButtons(data: any): void {
+    const componentButtons = Array.isArray(data.components)
+      ? data.components.filter((component: any) => component.type?.toUpperCase() === 'BUTTONS')
+          .flatMap((component: any) => Array.isArray(component.buttons) ? component.buttons : []) : [];
+    const source = [data.buttonVariable, data.buttons, componentButtons]
+      .find(buttons => Array.isArray(buttons) && buttons.length > 0) || [];
+    this.buttonsArray.clear();
+    source.forEach((button: any) => {
+      const type = String(button.type || '').toUpperCase();
+      const group = this.createButton(type === 'VOICE_CALL' ? 'WHATSAPP_CALL' : type);
+      const url = button.url ?? (type === 'URL' ? button.value : '') ?? '';
+      const phone = String(button.phone_number ?? (type === 'PHONE_NUMBER' ? button.value : '') ?? '');
+      const country = ['+971', '+91', '+44', '+61', '+1'].find(prefix => phone.startsWith(prefix)) || '';
+      group.patchValue({
+        text: button.text || (type === 'COPY_CODE' ? 'Copy offer code' : group.value.text),
+        url, urlType: button.urlType || (url.includes('{{1}}') ? 'DYNAMIC' : 'STATIC'),
+        urlSample: button.urlSample || (type === 'URL' ? button.example?.[0] : '') || '',
+        country: country || '+1',
+        phone_number: country ? phone.slice(country.length) : phone,
+        activeFor: String(button.activeFor || (button.ttl_minutes ? button.ttl_minutes / 1440 : 7)),
+        flowId: button.flowId || button.flow_id || '',
+        flowAction: button.flowAction || button.flow_action || 'navigate',
+        navigateScreen: button.navigateScreen || button.navigate_screen || '',
+        offerCode: button.offerCode || (type === 'COPY_CODE' ? (Array.isArray(button.example) ? button.example[0] : button.example) : '') || ''
+      });
+      this.buttonsArray.push(group);
+    });
   }
 
   get variablesArray(): FormArray {
@@ -70,6 +182,7 @@ export class WhatsAppTemplatesComponent {
       msgBodyText: ['', [Validators.required, Validators.maxLength(1024)]],
       msgBodyVariable: this.fb.array([]),
       footerText: ['', Validators.maxLength(60)],
+      buttons: this.fb.array([]),
       language: ['en', Validators.required],
       status: [null],
       category: ['MARKETING', Validators.required],
@@ -230,6 +343,10 @@ export class WhatsAppTemplatesComponent {
   }
 
   selectMediaType(type: string): void {
+    this.headerFile = null;
+    this.headerMediaError = '';
+    this.headerPreviewFailed = false;
+    this.headerPreview = type.toUpperCase() === this.existingHeaderFormat ? this.existingHeaderPreview : '';
     this.editTemplateForm.get('mediaType')?.setValue(type);
     this.editTemplateForm.get('headerFormat')?.setValue(
       type === 'None' ? 'TEXT' : type.toUpperCase()
@@ -244,10 +361,38 @@ export class WhatsAppTemplatesComponent {
   }
 
   openEditModal(templateRef: TemplateRef<any>, data: any): void {
+    const requestId = ++this.editRequestId;
+    this.whatsAppTemplatesService.getTemplateForEdit(data.templateId).subscribe({
+      next: (response: any) => {
+        if (requestId !== this.editRequestId) return;
+        const details = response?.listPayload?.find((template: any) =>
+          String(template.templateId) === String(data.templateId)) || response?.payload;
+        if (Number(response?.responseCode) !== 200 || !details ||
+            String(details.templateId) !== String(data.templateId)) {
+          Swal.fire('Could not load template', response?.responseMessage || 'Please refresh and try again.', 'error');
+          return;
+        }
+        this.showEditModal(templateRef, { ...data, ...details });
+      },
+      error: () => {
+        if (requestId !== this.editRequestId) return;
+        Swal.fire('Could not load template', 'Could not load the message and its buttons. Please try again.', 'error');
+      }
+    });
+  }
+
+  private showEditModal(templateRef: TemplateRef<any>, data: any): void {
+    this.showAllPreviewButtons = false;
     this.createForms();
     this.formError = '';
 
     const variables = this.normalizeVariables(data);
+    this.headerFile = null;
+    this.headerMediaError = '';
+    this.headerPreviewFailed = false;
+    this.existingHeaderFormat = String(data.headerFormat || '').toUpperCase();
+    this.existingHeaderPreview = (data.headerExample || []).find((value: string) => /^https:\/\//i.test(value)) || '';
+    this.headerPreview = this.existingHeaderPreview;
     const mediaType = this.mediaTypeFromHeader(data.headerFormat);
     this.editTemplateForm.patchValue({
       requestFor: 'UPDATE',
@@ -267,6 +412,8 @@ export class WhatsAppTemplatesComponent {
       mediaType
     });
 
+    this.loadButtons(data);
+
     variables.forEach(variable =>
       this.variablesArray.push(this.createVariableGroup(variable.key, variable.value, variable.type || 'contactName'))
     );
@@ -275,13 +422,19 @@ export class WhatsAppTemplatesComponent {
     this.editTemplateDialog = this.dialog.open(templateRef, {
       width: '1100px',
       maxWidth: '96vw',
+      maxHeight: '96vh',
       disableClose: true,
       panelClass: 'custom-modal'
     });
   }
 
   submitTemplate(): void {
+    if (this.isSaving) return;
     this.formError = '';
+    if (this.editTemplateForm.get('headerFormat')?.value !== 'TEXT' && !this.headerFile) {
+      this.formError = 'Select a header media file to upload as the sample for this update.';
+      return;
+    }
     this.detectVariables();
     if (this.editTemplateForm.invalid) {
       this.editTemplateForm.markAllAsTouched();
@@ -289,7 +442,7 @@ export class WhatsAppTemplatesComponent {
       return;
     }
 
-    const form = this.editTemplateForm.getRawValue();
+    const { buttons, ...form } = this.editTemplateForm.getRawValue();
     const payload = {
       ...form,
       headerAvailable: !!form.headerText || form.headerFormat !== 'TEXT',
@@ -301,15 +454,30 @@ export class WhatsAppTemplatesComponent {
       })),
       bodyExample: [form.msgBodyVariable.map((variable: any) => variable.value)],
       footerAvailable: !!form.footerText,
-      replyButtonAvailable: false
+        replyButtonAvailable: buttons.length > 0,
+        buttonVariable: buttons.map((button: any) => ({
+          type: button.type,
+          text: button.text,
+          value: button.type === 'URL' ? button.url : button.type === 'PHONE_NUMBER'
+            ? (String(button.phone_number).trim().startsWith('+') ? String(button.phone_number).trim()
+              : button.country + String(button.phone_number).replace(/[\s()-]/g, '')) : undefined,
+          urlType: button.urlType,
+          urlSample: button.urlSample,
+          activeFor: Number(button.activeFor),
+          flowId: button.flowId,
+          flowAction: button.flowAction,
+          navigateScreen: button.navigateScreen,
+          offerCode: button.offerCode,
+          trackConversions: button.trackConversions
+        }))
     };
 
     this.isSaving = true;
-    this.whatsAppTemplatesService.updateWhatsAppTemplate(payload).subscribe({
+    this.whatsAppTemplatesService.updateWhatsAppTemplate(payload, this.headerFile).subscribe({
       next: (response: any) => {
         this.isSaving = false;
-        if (Number(response?.responseCode) !== 200) {
-          this.formError = response?.responseMessage || 'Template could not be updated.';
+        if (Number(response?.responseCode) !== 200 || (response?.payload?.respCode != null && Number(response.payload.respCode) !== 200)) {
+          this.formError = response?.payload?.respMesg || response?.responseMessage || 'Template could not be updated.';
           return;
         }
 
@@ -319,7 +487,7 @@ export class WhatsAppTemplatesComponent {
       },
       error: (error: any) => {
         this.isSaving = false;
-        this.formError = error?.error?.responseMessage || 'Template could not be updated.';
+        this.formError = error?.error?.responseMessage || error?.message || 'Template could not be updated.';
       }
     });
   }

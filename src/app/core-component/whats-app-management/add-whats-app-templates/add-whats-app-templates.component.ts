@@ -50,15 +50,66 @@ export class AddWhatsAppTemplatesComponent {
       msgBodyVariable: this.fb.array([]),
 
       footerText: ['', Validators.maxLength(60)],
+      buttons: this.fb.array([]),
       language: ['en', Validators.required],
 
       // dropdown values
       variableType: ['Number'],
-      mediaType: ['None']
+      mediaType: ['None'],
+      headerImageUrl: ['']
     });
   }
 
   // ================= VARIABLES =================
+  get buttonsArray(): FormArray {
+    return this.addTemplateForm.get('buttons') as FormArray;
+  }
+
+  readonly buttonOptions = [
+    { value: 'QUICK_REPLY', label: 'Quick reply' },
+    { value: 'URL', label: 'Visit website' },
+    { value: 'WHATSAPP_CALL', label: 'Call on WhatsApp' },
+    { value: 'PHONE_NUMBER', label: 'Call Phone Number' },
+    { value: 'FLOW', label: 'Complete flow' },
+    { value: 'COPY_CODE', label: 'Copy offer code' }
+  ];
+
+  private createButton(type: string): FormGroup {
+    const label = this.buttonOptions.find(option => option.value === type)?.label || '';
+    return this.fb.group({
+      type: [type],
+      text: [type === 'FLOW' ? 'View flow' : label, [Validators.required, Validators.pattern(/\S/), Validators.maxLength(25)]],
+      urlType: ['STATIC'], url: [''], urlSample: [''], trackConversions: [false],
+      activeFor: ['7'], country: ['+1'], phone_number: [''],
+      icon: ['DEFAULT'], flowMode: ['EXISTING'], flowName: [''], flowId: [''], navigateScreen: [''], offerCode: ['']
+    });
+  }
+
+  addButton(type: string): void {
+    if (!this.buttonOptions.some(option => option.value === type) || this.buttonsArray.length >= 10) return;
+    this.buttonsArray.push(this.createButton(type));
+    this.buttonsArray.markAsDirty();
+  }
+
+  changeButtonType(index: number, type: string): void {
+    this.buttonsArray.setControl(index, this.createButton(type));
+    this.buttonsArray.markAsDirty();
+  }
+
+  moveButton(index: number, offset: number): void {
+    const destination = index + offset;
+    if (destination < 0 || destination >= this.buttonsArray.length) return;
+    const button = this.buttonsArray.at(index);
+    this.buttonsArray.removeAt(index);
+    this.buttonsArray.insert(destination, button);
+    this.buttonsArray.markAsDirty();
+  }
+
+  removeButton(index: number): void {
+    this.buttonsArray.removeAt(index);
+    this.buttonsArray.markAsDirty();
+  }
+
   get variablesArray(): FormArray {
     return this.addTemplateForm?.get('msgBodyVariable') as FormArray;
   }
@@ -328,6 +379,7 @@ export class AddWhatsAppTemplatesComponent {
   }
 
   selectMediaType(type: string) {
+  this.addTemplateForm.get('headerImageUrl')?.setValue('');
 
   this.addTemplateForm.get('mediaType')?.setValue(type);
 
@@ -361,8 +413,13 @@ export class AddWhatsAppTemplatesComponent {
     this.formError = '';
     this.detectVariables();
     const needsMedia = this.addTemplateForm.get('mediaType')?.value !== 'None';
+    const imageUrl = String(this.addTemplateForm.get('headerImageUrl')?.value || '').trim();
+    if (imageUrl && !/^https:\/\/[^\s]+$/i.test(imageUrl)) {
+      this.formError = 'Enter a valid HTTPS image URL.';
+      return;
+    }
     if (this.addTemplateForm.invalid || this.bodyVariablePositionInvalid ||
-        (needsMedia && !this.selectedFile)) {
+        (needsMedia && !this.selectedFile && !imageUrl)) {
       this.addTemplateForm.markAllAsTouched();
       this.formError = this.bodyVariablePositionInvalid
         ? `Variables can't be at the start or end of the message body.`
@@ -383,6 +440,7 @@ export class AddWhatsAppTemplatesComponent {
 
         headerAvailable: !!form.headerText || form.headerFormat !== 'TEXT',
         headerFormat: form.headerFormat,
+        headerImageUrl: imageUrl || null,
         headerText: form.headerText,
 
         headerExample: form.headerFormat === 'TEXT'
@@ -409,20 +467,35 @@ export class AddWhatsAppTemplatesComponent {
         footerAvailable: !!form.footerText,
         footerText: form.footerText,
 
-        replyButtonAvailable: false
+        replyButtonAvailable: form.buttons.length > 0,
+        buttonVariable: form.buttons.map((button: any) => ({
+          type: button.type,
+          text: button.text,
+          value: button.type === 'URL' ? button.url : button.type === 'PHONE_NUMBER'
+            ? (String(button.phone_number).trim().startsWith('+') ? String(button.phone_number).trim()
+              : button.country + String(button.phone_number).replace(/[\s()-]/g, '')) : undefined,
+          urlType: button.urlType,
+          urlSample: button.urlSample,
+          activeFor: Number(button.activeFor),
+          flowId: button.flowId,
+          flowAction: 'navigate',
+          navigateScreen: button.navigateScreen,
+          offerCode: button.offerCode,
+          trackConversions: button.trackConversions
+        }))
       }
     };
 
     this.isSaving = true;
     this.addWhatsAppTemplatesService
-      .createTemplate(payload, this.selectedFile, form.mediaType)
+      .createTemplate(payload, imageUrl ? null : this.selectedFile, form.mediaType)
       .subscribe({
       next: (res: any) => {
         this.isSaving = false;
         const metaResult = res?.payload;
         if ((res?.responseCode != null && Number(res.responseCode) !== 200) ||
             (metaResult?.respCode != null && Number(metaResult.respCode) !== 200)) {
-          this.formError = res?.responseMessage || metaResult?.respMesg || 'Template could not be created.';
+          this.formError = metaResult?.respMesg || res?.responseMessage || 'Template could not be created.';
           return;
         }
         Swal.fire({

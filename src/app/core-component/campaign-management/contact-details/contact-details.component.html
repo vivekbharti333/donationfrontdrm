@@ -14,6 +14,23 @@
     </div>
   </header>
 
+  <section class="contacts-panel audience-management">
+    <h2>Manage audiences</h2>
+    <p>Choose where to save uploaded or manually added contacts, or assign selected directory contacts.</p>
+    <label for="directory-audience">Audience</label>
+    <select id="directory-audience" class="form-control" [(ngModel)]="targetAudienceId" [disabled]="audienceBusy || isUploadingAudience">
+      <option [ngValue]="null">Create a new audience</option>
+      <option *ngFor="let audience of audiences" [ngValue]="audience.id">{{ audience.audienceName }} (#{{ audience.id }})</option>
+    </select>
+    <div *ngIf="!targetAudienceId" class="audience-create-row">
+      <input class="form-control" aria-label="New audience name" [(ngModel)]="audienceName" maxlength="150" placeholder="New audience name, e.g. NGO Batch 2" />
+      <button class="btn contact-outline-btn" type="button" (click)="createAudience()" [disabled]="audienceBusy || isUploadingAudience || (!targetAudienceId && !audienceName.trim())">Create audience</button>
+    </div>
+    <p *ngIf="!targetAudienceId">Excel upload can create this audience. For manual entry or assignment, click Create audience first.</p>
+    <button class="btn contact-outline-btn" type="button" (click)="assignContacts()" [disabled]="audienceBusy || isUploadingAudience || !targetAudienceId || !assignmentIds.size">Add {{ assignmentIds.size }} selected contacts to audience</button>
+    <p *ngIf="audienceError" class="text-danger" role="alert">{{ audienceError }}</p>
+    <small>Contacts stay in the directory and can belong to multiple audiences.</small>
+  </section>
   <section class="contacts-panel">
     <div class="contacts-filter-row">
       <label class="contact-search"><i class="feather icon-search"></i><input [(ngModel)]="searchDataValue" [ngModelOptions]="{ standalone: true }" (ngModelChange)="searchData($event)" type="search" placeholder="Search by name, mobile, organisation..." /></label>
@@ -27,25 +44,25 @@
 
     <div class="contacts-toolbar">
       <span class="toolbar-caption">Contact directory</span>
-      <div class="upload-inline" *ngIf="selectedFileName"><span>{{ selectedFileName }}</span><button class="btn contact-primary-btn" type="button" (click)="uploadFile()"><i class="feather icon-upload"></i> Upload</button></div>
+      <div class="upload-inline" *ngIf="selectedFileName"><span>{{ selectedFileName }}</span><button [disabled]="isUploadingAudience || (!targetAudienceId && !audienceName.trim())" class="btn contact-primary-btn" type="button" (click)="uploadFile()"><i class="feather icon-upload"></i> Upload</button></div>
     </div>
 
     <div class="table-responsive" *ngIf="!isLoading">
       <table matSort (matSortChange)="sortData($event)" class="table contacts-table">
         <thead><tr>
-          <th mat-sort-header="contactName">Contact</th><th mat-sort-header="mobileNumber">Mobile</th><th mat-sort-header="companyName">Organisation</th><th mat-sort-header="city">City</th><th mat-sort-header="leadSource">Source</th><th mat-sort-header="status">Status</th><th class="no-sort">Actions</th>
+          <th><input type="checkbox" aria-label="Select contacts on this page" [checked]="pageAssigned" (change)="selectAssignmentPage($any($event.target).checked)" /></th><th mat-sort-header="contactName">Contact</th><th mat-sort-header="mobileNumber">Mobile</th><th mat-sort-header="companyName">Organisation</th><th mat-sort-header="city">City</th><th mat-sort-header="leadSource">Source</th><th mat-sort-header="status">Status</th><th class="no-sort">Actions</th>
         </tr></thead>
         <tbody>
           @if (tableData.length > 0) {
             @for (data of tableData; track $index) {
               <tr>
-                <td><div class="contact-person"><span class="contact-avatar">{{ getInitials(data.contactName) }}</span><div><strong>{{ data.contactName || '-' }}</strong><small>{{ data.emailId || 'No email address' }}</small></div></div></td>
+                <td><input type="checkbox" [attr.aria-label]="'Select ' + data.contactName" [checked]="assignmentIds.has(data.id)" (change)="toggleAssignment(data.id, $any($event.target).checked)" /></td><td><div class="contact-person"><span class="contact-avatar">{{ getInitials(data.contactName) }}</span><div><strong>{{ data.contactName || '-' }}</strong><small>{{ data.emailId || 'No email address' }}</small></div></div></td>
                 <td>{{ data.mobileNumber || '-' }}</td><td>{{ data.companyName || '-' }}</td><td>{{ data.city || '-' }}</td><td>{{ data.leadSource || '-' }}</td>
                 <td><button class="contact-status" [ngClass]="{'active': data.status === 'ACTIVE', 'inactive': data.status === 'INACTIVE', 'pending': data.status === 'PENDING'}" (click)="changeStatus(data)">{{ data.status || '-' }}</button></td>
                 <td><div class="contact-actions"><button type="button" aria-label="Edit contact" (click)="openEditModal(editContactTemplate, data)"><i class="feather icon-edit-2"></i></button><button type="button" class="delete" aria-label="Delete contact" (click)="openDeleteModal(deleteTemplate, data)"><i class="feather icon-trash-2"></i></button></div></td>
               </tr>
             }
-          } @else { <tr><td colspan="7" class="empty-state">No contact details found</td></tr> }
+          } @else { <tr><td colspan="8" class="empty-state">No contact details found</td></tr> }
         </tbody>
       </table>
     </div>
@@ -372,7 +389,14 @@
 </ng-template>
 
 <ng-template #addContactTemplate let-dialog>
-  <form class="contact-dialog" [formGroup]="addContactForm" (ngSubmit)="saveContactDetails()">
+  <form class="contact-dialog" [formGroup]="addContactForm" (ngSubmit)="saveContactDetails()">    <div class="manual-audience-selector">
+      <label for="manual-audience">Audience (required)</label>
+      <select id="manual-audience" class="form-control" [(ngModel)]="targetAudienceId" [ngModelOptions]="{standalone: true}" [disabled]="audienceBusy">
+        <option [ngValue]="null">Choose an audience</option>
+        <option *ngFor="let audience of audiences" [ngValue]="audience.id">{{ audience.audienceName }}</option>
+      </select>
+      <p *ngIf="audienceError" class="text-danger">{{ audienceError }}</p>
+    </div>
     <header class="contact-dialog-header">
       <div class="dialog-title-icon"><i class="feather icon-user-plus"></i></div>
       <div><h2 mat-dialog-title>Add Contact</h2><p>Create a contact record for your campaign.</p></div>
@@ -396,7 +420,7 @@
     </mat-dialog-content>
     <mat-dialog-actions class="contact-dialog-actions">
       <span><b>*</b> Required fields</span>
-      <div><button type="button" class="btn dialog-cancel" mat-dialog-close>Cancel</button><button type="submit" class="btn dialog-save"><i class="feather icon-check"></i> Save Contact</button></div>
+      <div><button type="button" class="btn dialog-cancel" mat-dialog-close>Cancel</button><button type="submit" class="btn dialog-save" [disabled]="audienceBusy || !targetAudienceId"><i class="feather icon-check"></i> Save Contact</button></div>
     </mat-dialog-actions>
   </form>
 </ng-template>
