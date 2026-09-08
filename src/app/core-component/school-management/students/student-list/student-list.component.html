@@ -271,8 +271,8 @@
   <ng-template #dialogTemplate let-dialog>
     <div class="modalHeaderContainer">
       <h2 mat-dialog-title class="p-0">Update Student Details</h2>
-      <div mat-dialog-close class="closeBtn">
-        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close" (click)="closeEditCamera()">
+      <div class="closeBtn">
+        <button type="button" mat-dialog-close class="close" aria-label="Close" [disabled]="isUpdatingStudent" (click)="closeEditCamera()">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
@@ -522,8 +522,8 @@
 
         <!-- ================= SUBMIT ================= -->
         <div class="text-end">
-          <button type="submit" class="btn btn-primary" [disabled]="!editStudentForm.get('id')?.value">
-            Update Student
+          <button type="submit" class="btn btn-primary" [disabled]="isUpdatingStudent || !editStudentForm.get('id')?.value" [attr.aria-busy]="isUpdatingStudent">
+            {{ isUpdatingStudent ? 'Please wait, processing…' : 'Update Student' }}
           </button>
         </div>
 

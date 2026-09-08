@@ -6,6 +6,8 @@ import { CampaignDetailsComponent } from './campaign-details/campaign-details.co
 import { CampaignReportComponent } from './campaign-report/campaign-report.component';
 import { CampaignSendComponent } from './campaign-send/campaign-send.component';
 import { ContactDetailsComponent } from './contact-details/contact-details.component';
+import { AudienceComponent } from './audience/audience.component';
+import { CampaignRecipientComponent } from './campaign-recipient/campaign-recipient.component';
 
 const routes: Routes = [
   {
@@ -28,7 +30,15 @@ const routes: Routes = [
         path: 'contact-details',
         component: ContactDetailsComponent,
       },
-      
+      {
+        path: 'audience',
+        component: AudienceComponent,
+      },
+      {
+        path: 'campaign-recipient',
+        component: CampaignRecipientComponent
+        ,
+      }
     ],
   },
 ];

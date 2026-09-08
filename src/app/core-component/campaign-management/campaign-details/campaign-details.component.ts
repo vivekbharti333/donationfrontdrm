@@ -18,7 +18,7 @@ import { ToastModule } from 'primeng/toast';
 import { CampaignDetailsService } from './campaign-details.service';
 import { Constant } from 'src/app/core/constant/constants';
 import { MatDialog } from '@angular/material/dialog';
-import { Editor, Toolbar } from 'ngx-editor';
+
 
 @Component({
   selector: 'app-campaign-details',
@@ -26,7 +26,7 @@ import { Editor, Toolbar } from 'ngx-editor';
   styleUrls: ['./campaign-details.component.scss'],
   providers: [MessageService],
 })
-export class CampaignDetailsComponent implements OnInit, OnDestroy {
+export class CampaignDetailsComponent implements OnInit {
 
   public addCampaignDialog: any;
   public addCompaignForm!: FormGroup;
@@ -46,19 +46,6 @@ export class CampaignDetailsComponent implements OnInit, OnDestroy {
   dataSource!: MatTableDataSource<users>;
   public searchDataValue = '';
 
-  editor!: Editor;
-
-  toolbar: Toolbar = [
-    ['bold', 'italic'],
-    ['underline', 'strike'],
-    ['code', 'blockquote'],
-    ['ordered_list', 'bullet_list'],
-    [{ heading: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'] }],
-    ['link', 'image'],
-    ['text_color', 'background_color'],
-    ['align_left', 'align_center', 'align_right', 'align_justify'],
-  ];
-
   constructor(
     private pagination: PaginationService,
     private router: Router,
@@ -72,11 +59,7 @@ export class CampaignDetailsComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.getCampaignDetailsList();
     this.createForms();
-    this.editor = new Editor();
-  }
 
-  ngOnDestroy(): void {
-    this.editor.destroy();
   }
 
 
@@ -85,8 +68,7 @@ export class CampaignDetailsComponent implements OnInit, OnDestroy {
       id: [''],
       campaignType: ['', [Validators.required, Validators.pattern("[0-9A-Za-z ]{3,150}")]],
       campaignName: ['', [Validators.required, Validators.pattern("[0-9A-Za-z ]{3,150}")]],
-      subject: [''],
-      description: ['', [Validators.required, Validators.pattern("[0-9A-Za-z ]{3,150}")]],
+      description: ['', [Validators.required, Validators.maxLength(50), Validators.pattern(/\S/)]],
       campaignChannel: ['', [Validators.required, Validators.pattern("[0-9A-Za-z ]{3,150}")]],
 
     });
@@ -94,8 +76,7 @@ export class CampaignDetailsComponent implements OnInit, OnDestroy {
       id: [''],
       campaignType: ['', [Validators.required, Validators.pattern("[0-9A-Za-z ]{3,150}")]],
       campaignName: ['', [Validators.required, Validators.pattern("[0-9A-Za-z ]{3,150}")]],
-      subject: [''],
-      description: ['', [Validators.required, Validators.pattern("[0-9A-Za-z ]{3,150}")]],
+      description: ['', [Validators.required, Validators.maxLength(50), Validators.pattern(/\S/)]],
       campaignChannel: ['', [Validators.required, Validators.pattern("[0-9A-Za-z ]{3,150}")]],
 
     });
@@ -169,15 +150,22 @@ export class CampaignDetailsComponent implements OnInit, OnDestroy {
 
   openAddModal(templateRef: TemplateRef<any>) {
     this.addCampaignDialog = this.dialog.open(templateRef, {
-      width: '1400px', // Set your desired width
+      width: '760px',
+      maxWidth: 'calc(100vw - 24px)',
+      maxHeight: '92vh',
       // height: '600px', // Set your desired height
       disableClose: true, // Optional: prevent closing by clicking outside
-      panelClass: 'custom-modal', // Optional: add custom class for additional styling
+      panelClass: 'campaign-details-dialog',
     });
   }
 
 
   public saveCompaignDetails() {
+    this.addCompaignForm.markAllAsTouched();
+    if (this.addCompaignForm.invalid) {
+      this.messageService.add({ severity: 'error', summary: 'Check campaign details', detail: 'Complete the required fields and keep the description within 50 characters.' });
+      return;
+    }
     this.campaignDetailsService.saveCompaignDetails(this.addCompaignForm.value)
       .subscribe({
         next: (response: any) => {
@@ -217,6 +205,11 @@ export class CampaignDetailsComponent implements OnInit, OnDestroy {
   }
 
 
+  private plainDescription(value: string | null): string {
+    const document = new DOMParser().parseFromString(value || '', 'text/html');
+    return document.body.textContent || '';
+  }
+
   openEditModal(templateRef: TemplateRef<any>, rawData: any) {
 
     this.editCompaignForm.patchValue({
@@ -224,20 +217,27 @@ export class CampaignDetailsComponent implements OnInit, OnDestroy {
       campaignType: rawData['campaignType'],
       campaignName: rawData['campaignName'],
       subject: rawData['subject'],
-      description: rawData['description'],
+      description: this.plainDescription(rawData['description']),
       campaignChannel: rawData['campaignChannel'],
     });
 
     this.editCampaignDialog = this.dialog.open(templateRef, {
-      width: '1400px', // Set your desired width
+      width: '760px',
+      maxWidth: 'calc(100vw - 24px)',
+      maxHeight: '92vh',
       // height: '600px', // Set your desired height
       disableClose: true, // Optional: prevent closing by clicking outside
-      panelClass: 'custom-modal', // Optional: add custom class for additional styling
+      panelClass: 'campaign-details-dialog',
     });
   }
 
 
   public updateCompaignDetails() {
+    this.editCompaignForm.markAllAsTouched();
+    if (this.editCompaignForm.invalid) {
+      this.messageService.add({ severity: 'error', summary: 'Check campaign details', detail: 'Complete the required fields and keep the description within 50 characters.' });
+      return;
+    }
     this.campaignDetailsService.updateCampaignDetails(this.editCompaignForm.value)
       .subscribe({
         next: (response: any) => {
@@ -311,6 +311,7 @@ export class CampaignDetailsComponent implements OnInit, OnDestroy {
 
     this.deleteMsgCampaignDialog = this.dialog.open(template, {
       width: '450px',
+      maxWidth: 'calc(100vw - 24px)',
       disableClose: true
     });
   }

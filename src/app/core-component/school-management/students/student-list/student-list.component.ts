@@ -13,6 +13,7 @@ import { routes } from 'src/app/core/helpers/routes';
 import { PaginationService, tablePageSize } from 'src/app/shared/shared.index';
 import { UserDetails } from '../../../interface/user-management';
 import { MatDialog } from '@angular/material/dialog';
+import { finalize } from 'rxjs';
 
 import { Constant } from 'src/app/core/constant/constants';
 
@@ -36,6 +37,7 @@ export class StudentListComponent implements OnDestroy {
   public gradeOptions: any[] = [];
   public isGradesLoading = false;
   public isAssigningClass = false;
+  public isUpdatingStudent = false;
   public fullData: any[] = [];
   public routes = routes;
   private studentImageRefreshToken = 0;
@@ -580,15 +582,18 @@ export class StudentListComponent implements OnDestroy {
 
 
   updateStudentForm() {
+    if (this.isUpdatingStudent || !this.editStudentForm.get('id')?.value) return;
+    this.isUpdatingStudent = true;
     this.schoolManagementService.updateStudent(this.editStudentForm.value)
+      .pipe(finalize(() => { this.isUpdatingStudent = false; }))
       .subscribe({
         next: (response: any) => {
           if (response['responseCode'] == '200') {
-            if (response['payload']['respCode'] == '200') {
+            if (response?.payload?.respCode == '200') {
 
               this.messageService.add({
-                summary: response['payload']['respCode'],
-                detail: response['payload']['respMesg'],
+                summary: String(response?.payload?.respCode || response?.responseCode || 'Error'),
+                detail: response?.payload?.respMesg || response?.responseMessage || 'Could not update student.',
                 styleClass: 'success-background-popover',
               });
               this.studentUpdateDialog?.close();
@@ -598,30 +603,30 @@ export class StudentListComponent implements OnDestroy {
               this.editStudentForm.reset();
               this.createForms();
 
-            } else if (response['payload']['respCode'] == '401') {
+            } else if (response?.payload?.respCode == '401') {
 
               this.cookieService.delete('loginDetails');
               window.location.href = "/login";
               window.location.reload();
 
               this.messageService.add({
-                summary: response['payload']['respCode'],
-                detail: response['payload']['respMesg'],
+                summary: String(response?.payload?.respCode || response?.responseCode || 'Error'),
+                detail: response?.payload?.respMesg || response?.responseMessage || 'Could not update student.',
                 styleClass: 'danger-background-popover',
               });
-            } else {
+          } else {
 
               this.messageService.add({
-                summary: response['payload']['respCode'],
-                detail: response['payload']['respMesg'],
+              summary: String(response?.payload?.respCode || response?.responseCode || 'Error'),
+              detail: response?.payload?.respMesg || response?.responseMessage || 'Could not update student.',
                 styleClass: 'danger-background-popover',
               });
             }
           } else {
 
             this.messageService.add({
-              summary: response['payload']['respCode'],
-              detail: response['payload']['respMesg'],
+              summary: String(response?.payload?.respCode || response?.responseCode || 'Error'),
+              detail: response?.payload?.respMesg || response?.responseMessage || 'Could not update student.',
               styleClass: 'danger-background-popover',
             });
           }

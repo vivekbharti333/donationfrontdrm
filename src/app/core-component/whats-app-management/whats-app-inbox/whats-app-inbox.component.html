@@ -74,7 +74,7 @@
                              [class.incoming-message]="msg.direction === 'INCOMING'"
                              [class.outgoing-message]="msg.direction === 'OUTGOING'">
                             <div class="message-text">
-                                <span *ngIf="msg.messageType === 'text'">{{msg.messageText}}</span>
+                                <span *ngIf="msg.messageType === 'text'" [innerHTML]="formatMessageText(msg.messageText)"></span>
 
                                 <ng-container *ngIf="msg.messageType === 'image'">
                                     <button *ngIf="getMediaPreviewUrl(msg) as previewUrl"
@@ -96,7 +96,7 @@
                                         <span class="placeholder-label">{{isMediaDownloading(msg) ? 'Downloading…' : 'Download image'}}</span>
                                     </button>
                                     <span class="media-caption" *ngIf="getMediaDownloadError(msg) as downloadError">{{downloadError}}</span>
-                                    <span class="media-caption" *ngIf="msg.messageText">{{msg.messageText}}</span>
+                                    <span class="media-caption" *ngIf="msg.messageText" [innerHTML]="formatMessageText(msg.messageText)"></span>
                                 </ng-container>
 
                                 <ng-container *ngIf="msg.messageType === 'document'">
@@ -149,12 +149,24 @@
                                         </span>
                                     </button>
                                     <span class="media-caption" *ngIf="getMediaDownloadError(msg) as downloadError">{{downloadError}}</span>
-                                    <span class="media-caption" *ngIf="msg.messageText">{{msg.messageText}}</span>
+                                    <span class="media-caption" *ngIf="msg.messageText" [innerHTML]="formatMessageText(msg.messageText)"></span>
                                 </ng-container>
 
-                                <span class="unsupported"
-                                      *ngIf="msg.messageType !== 'text' && msg.messageType !== 'image' && msg.messageType !== 'document'">
-                                    &#128206; Unsupported message type
+                                <ng-container *ngIf="['audio', 'video', 'sticker'].includes(msg.messageType)">
+                                    <ng-container *ngIf="getMediaPreviewUrl(msg) as previewUrl">
+                                        <audio *ngIf="msg.messageType === 'audio'" controls [src]="previewUrl"></audio>
+                                        <video *ngIf="msg.messageType === 'video'" controls [src]="previewUrl" style="max-width: 100%; max-height: 320px"></video>
+                                        <img *ngIf="msg.messageType === 'sticker'" [src]="previewUrl" alt="WhatsApp sticker" style="max-width: 200px" />
+                                    </ng-container>
+                                    <button *ngIf="!isMediaDownloaded(msg)" type="button" class="btn btn-sm"
+                                            [disabled]="!canDownloadMedia(msg) || isMediaDownloading(msg)" (click)="downloadMedia(msg)">
+                                        {{ isMediaDownloading(msg) ? 'Downloading...' : 'Download ' + msg.messageType }}
+                                    </button>
+                                    <span *ngIf="getMediaDownloadError(msg) as downloadError">{{ downloadError }}</span>
+                                    <span *ngIf="msg.messageText" [innerHTML]="formatMessageText(msg.messageText)"></span>
+                                </ng-container>
+                                <span *ngIf="!['text', 'image', 'document', 'audio', 'video', 'sticker'].includes(msg.messageType)">
+                                    <span [innerHTML]="formatMessageText(msg.messageText || ('Content unavailable for this ' + msg.messageType + ' message.'))"></span>
                                 </span>
                             </div>
 

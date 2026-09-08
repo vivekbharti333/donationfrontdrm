@@ -49,7 +49,7 @@ export class CampaignSendComponent {
   }
   public selectAudience(value: any): void {
     this.audienceId = value ? Number(value) : null;
-    this.contacts = []; this.selectedContactIds = new Set(); this.recipientMode = 'SELECTED';
+    this.contacts = []; this.selectedContactIds = new Set(); this.recipientMode = 'ALL';
     this.contactSearch = '';
     this.getContacts();
   }
@@ -75,7 +75,7 @@ export class CampaignSendComponent {
   public selectedWhatsAppTemplate: any = null;
   public isWhatsAppTemplatesLoading = false;
   public whatsAppTemplatesError = '';
-  public recipientMode: 'ALL' | 'SELECTED' = 'SELECTED';
+  public recipientMode: 'ALL' | 'SELECTED' = 'ALL';
   public contacts: any[] = [];
   public selectedContactIds = new Set<any>();
   public contactSearch = '';
@@ -98,9 +98,9 @@ export class CampaignSendComponent {
     ) {}
   
       ngOnInit() {
+      this.createForms();
       this.getCampaignDetails();
       this.getContacts();
-      this.createForms();
       this.loadAudiences();
     }
 
@@ -119,11 +119,12 @@ export class CampaignSendComponent {
     }
 
     public selectChannel(channel: 'ALL' | 'EMAIL' | 'WHATSAPP' | 'SMS'): void {
+      if (!this.selectedCampaign || channel !== String(this.selectedCampaign.campaignChannel).toUpperCase()) return;
+      if (this.selectedChannelFilter === channel) return;
       this.selectedChannelFilter = channel;
       this.isCampaignDropdownOpen = false;
       this.sendCompaignForm.patchValue({
         campaignChannel: channel === 'ALL' ? '' : channel,
-        campaignId: '',
       });
       this.selectedWhatsAppTemplate = null;
       this.loadRecipientLogs();
@@ -136,6 +137,8 @@ export class CampaignSendComponent {
 
     public selectCampaign(campaignId: any): void {
       const campaign = this.campaignDetailsList.find((item: any) => String(item.id) === String(campaignId));
+      this.selectedWhatsAppTemplate = null;
+      this.selectedChannelFilter = campaign?.campaignChannel?.toUpperCase() || 'ALL';
       this.sendCompaignForm.patchValue({
         campaignId,
         campaignChannel: campaign?.campaignChannel || this.sendCompaignForm.get('campaignChannel')?.value,
@@ -320,6 +323,10 @@ export class CampaignSendComponent {
 
   public sendCompaign() {
   if (this.isSending || this.isContactsLoading || this.isHistoryLoading || this.historyError) return;
+  if (!['WHATSAPP', 'EMAIL'].includes(this.recipientChannel)) {
+    this.messageService.add({ severity: 'error', summary: 'Channel unavailable', detail: 'Select a WhatsApp or Email campaign.' });
+    return;
+  }
   if (this.sendCompaignForm.invalid || !this.audienceId || this.recipientCount === 0) {
     this.messageService.add({ severity: 'error', summary: 'Selection required', detail: 'Select an audience, contacts, channel and campaign.' }); return;
   }

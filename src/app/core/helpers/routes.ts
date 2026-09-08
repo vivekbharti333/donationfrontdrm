@@ -966,6 +966,14 @@ export class routes {
   public static get campaignReport(): string {
     return this.campaignManagement + '/campaign-report';
   }
+  public static get campaignRecipient(): string {
+    return this.campaignManagement + '/campaign-recipient';
+  }
+  
+  
+  public static get audience(): string {
+    return this.campaignManagement + '/audience';
+  }
   public static get contactDetails(): string {
     return this.campaignManagement + '/contact-details';
   }

@@ -9,7 +9,7 @@ import { AuthenticationService } from 'src/app/auth/authentication.service';
   providedIn: 'root'
 })
 export class ContactDetailsService {
-public loginUser;
+  public loginUser;
 
   constructor(
     private http: HttpClient,
@@ -19,15 +19,14 @@ public loginUser;
     this.loginUser = this.authenticationService.getLoginUser();
   }
 
-  uploadExcel(file: File, audienceName: string, audienceId: number | null = null): Observable<any> {
+  uploadExcel(file: File, audienceId: number): Observable<string> {
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('audienceName', audienceName);
-    if (audienceId) formData.append('audienceId', String(audienceId));
+    formData.append('audienceId', String(audienceId));
     formData.append('createdBy', this.cookieService.get('loginId'));
     formData.append('superadminId', this.cookieService.get('superadminId'));
 
-    return this.http.post<any>(Constant.Site_Url + 'uploadAudienceExcel', formData);
+    return this.http.post(Constant.Site_Url + 'uploadExcel', formData, { responseType: 'text' });
   }
 
   getContactDetails(): Observable<any> {
@@ -45,6 +44,7 @@ public loginUser;
   saveContactDetails(contactDetails: any): Observable<any> {
     let request: any = {
       payload: {
+        audienceId: contactDetails.audienceId,
         contactName: contactDetails.contactName,
         mobileNumber: contactDetails.mobileNumber,
         alternateNumber: contactDetails.alternateNumber,
@@ -104,6 +104,20 @@ public loginUser;
     };
     return this.http.post<any>(Constant.Site_Url + "updateContactDetails", request);
   }
+
+  getAudienceList(): Observable<any> {
+    const loginUser = this.authenticationService.getLoginUser();
+    const request = {
+      payload: {
+        requestedFor: 'AUDIENCE_LIST',
+        token: loginUser['token'],
+        createdBy: loginUser['loginId'],
+        superadminId: loginUser['superadminId'],
+      },
+    };
+    return this.http.post<any>(Constant.Site_Url + 'getAudienceList', request);
+  }
+
 
 
 }

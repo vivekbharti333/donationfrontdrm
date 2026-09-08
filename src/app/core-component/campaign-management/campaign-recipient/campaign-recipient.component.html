@@ -1,0 +1,21 @@
+<div class="recipient-page">
+  <header class="page-heading"><div><h1>Campaign Recipients</h1><p>View recipient attempts and results for each campaign.</p></div><button type="button" class="refresh-btn" (click)="getCampaignRecipients()" [disabled]="loading || campaignsLoading || !campaignId"><i class="feather icon-refresh-cw"></i> Refresh</button></header>
+  <section class="recipient-panel">
+    <div class="filters">
+      <label>Campaign<select [(ngModel)]="campaignId" (ngModelChange)="status = ''; getCampaignRecipients()" [disabled]="campaignsLoading"><option [ngValue]="null">{{ campaignsLoading ? 'Loading campaigns...' : 'Choose a campaign' }}</option><option *ngFor="let campaign of campaigns" [ngValue]="campaign.id">{{ campaign.campaignName }}</option></select></label>
+      <label>Search<input type="search" [(ngModel)]="search" (ngModelChange)="resetPage()" placeholder="Contact ID, audience name, details..." /></label>
+      <label>Status<select [(ngModel)]="status" (ngModelChange)="resetPage()"><option value="">All statuses</option><option *ngFor="let item of statuses" [value]="item">{{ item }}</option></select></label>
+    </div>
+    <div class="state error" *ngIf="campaignsError" role="alert">{{ campaignsError }} <button type="button" (click)="loadCampaigns()">Retry</button></div>
+    <div class="state error" *ngIf="error" role="alert">{{ error }} <button type="button" (click)="getCampaignRecipients()">Retry</button></div>
+    <div class="state" *ngIf="loading || campaignsLoading" role="status">Loading...</div>
+    <ng-container *ngIf="!loading && !campaignsLoading && !error && !campaignsError">
+      <p class="state" *ngIf="!rows.length">{{ !campaigns.length ? 'No campaigns available.' : !campaignId ? 'Select a campaign to view recipients.' : 'No recipients found for this selection.' }}</p>
+      <div class="desktop-table" *ngIf="rows.length"><table><thead><tr><th>Contact ID</th><th>Audience Name</th><th>Channel</th><th>Status</th><th>Created</th><th>Sent</th><th>Details</th></tr></thead><tbody>
+        <tr *ngFor="let row of rows"><td>#{{ row.contactId }}</td><td>{{ row.audienceName }}</td><td>{{ row.channel }}</td><td><span class="status" [ngClass]="statusClass(row.status)">{{ row.status }}</span></td><td>{{ row.createdAt ? (row.createdAt | date:'dd MMM yyyy, hh:mm a') : '-' }}</td><td>{{ row.sentAt ? (row.sentAt | date:'dd MMM yyyy, hh:mm a') : '-' }}</td><td><div class="details">{{ row.errorMessage || (row.whatsAppMessageId ? 'Message #' + row.whatsAppMessageId : '-') }}</div></td></tr>
+      </tbody></table></div>
+      <div class="mobile-cards"><article *ngFor="let row of rows"><header><strong>Contact #{{ row.contactId }}</strong><span class="status" [ngClass]="statusClass(row.status)">{{ row.status }}</span></header><dl><div><dt>Audience Name</dt><dd>{{ row.audienceName }}</dd></div><div><dt>Channel</dt><dd>{{ row.channel }}</dd></div><div><dt>Created</dt><dd>{{ row.createdAt ? (row.createdAt | date:'dd MMM yyyy, hh:mm a') : '-' }}</dd></div><div><dt>Sent</dt><dd>{{ row.sentAt ? (row.sentAt | date:'dd MMM yyyy, hh:mm a') : '-' }}</dd></div></dl><p *ngIf="row.errorMessage || row.whatsAppMessageId" class="details">{{ row.errorMessage || 'Message #' + row.whatsAppMessageId }}</p></article></div>
+      <footer class="pagination-bar" *ngIf="recipients.length"><span>Showing {{ first }} to {{ last }} of {{ filtered.length }}</span><label>Rows <select [(ngModel)]="pageSize" (ngModelChange)="resetPage()"><option [ngValue]="10">10</option><option [ngValue]="25">25</option><option [ngValue]="50">50</option></select></label><nav aria-label="Recipient pages"><button type="button" (click)="page = page - 1" [disabled]="page <= 1" aria-label="Previous page">Previous</button><span>{{ page }} / {{ pages }}</span><button type="button" (click)="page = page + 1" [disabled]="page >= pages" aria-label="Next page">Next</button></nav></footer>
+    </ng-container>
+  </section><p class="list-note">SENT means accepted by the provider. WhatsApp delivery updates are available in message history.</p>
+</div>

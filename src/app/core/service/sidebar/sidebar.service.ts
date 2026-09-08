@@ -322,7 +322,12 @@ export class SidebarService {
           showSubRoute: false,
           icon: 'radio',
           subMenus: [
-             {
+            {
+              menuValue: 'Audience',
+              route: routes.audience,
+              permission: 'campaign-details',
+            }, 
+            {
               menuValue: 'Contact Details',
               route: routes.contactDetails,
               permission: 'campaign-details',
@@ -342,7 +347,12 @@ export class SidebarService {
               route: routes.campaignReport,
               permission: 'campaign-report',
             }, 
-            
+
+            {
+              menuValue: 'Campaign Recipient',
+              route: routes.campaignRecipient,
+              permission: 'campaign-report',
+            }
           ],
         },
 

@@ -62,3 +62,61 @@
 .campaign-log-table { overflow-x: auto; }
 .channel-card:disabled { opacity: .5; cursor: not-allowed; }
 @media (max-width: 600px) { .manual-contact-fields { grid-template-columns: 1fr; } }
+
+.campaign-delivery-section .send-row {
+  position: static;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 12px;
+  margin: 16px 0 0;
+  padding: 16px 0 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.campaign-delivery-section .send-row .btn {
+  min-height: 46px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 18px;
+  white-space: normal;
+}
+
+.schedule-campaign-btn:disabled {
+  color: #667085;
+  background: #f2f4f7;
+  border: 1px solid #d0d5dd;
+  border-radius: 6px;
+  opacity: 1;
+  cursor: not-allowed;
+}
+
+.campaign-delivery-section .schedule-note {
+  margin: 6px 0 0;
+  color: #667085;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.campaign-delivery-section .schedule-action {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.campaign-delivery-section .schedule-action .schedule-note {
+  text-align: center;
+}
+
+@media (max-width: 767px) {
+  .campaign-delivery-section .send-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .campaign-delivery-section .send-row .btn {
+    width: 100%;
+  }
+}

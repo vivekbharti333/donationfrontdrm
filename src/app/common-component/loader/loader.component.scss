@@ -26,7 +26,8 @@
   right: 0;
   bottom: 0;
   background-color: rgba(#000000, 0.4);
-  z-index: 1000000;
+  // The application dialog overlay uses z-index: 10000000.
+  z-index: 10000001;
 }
 
 .loading {

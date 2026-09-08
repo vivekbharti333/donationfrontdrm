@@ -12,6 +12,8 @@ import { CampaignSendComponent } from './campaign-send/campaign-send.component';
 import { ContactDetailsComponent } from './contact-details/contact-details.component';
 import { CampaignManagementRoutingModule } from './campaign-management-routing.module';
 import { MatDialogModule } from '@angular/material/dialog';
+import { AudienceComponent } from './audience/audience.component';
+import { CampaignRecipientComponent } from './campaign-recipient/campaign-recipient.component';
 
 
 
@@ -21,7 +23,9 @@ import { MatDialogModule } from '@angular/material/dialog';
     CampaignDetailsComponent,
     CampaignSendComponent,
     CampaignReportComponent,
-    ContactDetailsComponent
+    ContactDetailsComponent,
+    AudienceComponent,
+    CampaignRecipientComponent
   ],
   imports: [
     CommonModule,

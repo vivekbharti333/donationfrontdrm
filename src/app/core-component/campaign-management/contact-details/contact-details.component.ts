@@ -23,12 +23,28 @@ export class ContactDetailsComponent implements OnInit, OnDestroy {
   targetAudienceId: number | null = null;
   audienceError = '';
   audienceBusy = false;
+  audiencesLoading = false;
   assignmentIds = new Set<number>();
   loadAudiences(): void {
-    this.audienceService.list().subscribe({ next: r => {
-      if ([200, 204].includes(Number(r.responseCode))) this.audiences = r.listPayload || [];
-      else this.audienceError = r.responseMessage;
-    }, error: () => this.audienceError = 'Could not load audiences.' });
+    this.audiencesLoading = true;
+    this.contactDetailsService.getAudienceList().subscribe({ next: r => {
+      this.audiencesLoading = false;
+      this.audiences = [];
+      if ([200, 204].includes(Number(r.responseCode))) {
+        this.audiences = r.listPayload || [];
+      } else {
+        this.messageService.add({ severity: 'error', summary: 'Audiences',
+          detail: r.responseMessage || 'Could not load audiences.' });
+      }
+      if (!this.audiences.some(audience => audience.id === this.targetAudienceId)) {
+        this.targetAudienceId = null;
+      }
+    }, error: () => {
+      this.audiencesLoading = false;
+      this.audiences = [];
+      this.targetAudienceId = null;
+      this.messageService.add({ severity: 'error', summary: 'Audiences', detail: 'Could not load audiences.' });
+    } });
   }
   createAudience(): void {
     if (this.audienceBusy || !this.audienceName.trim()) return;
@@ -297,6 +313,9 @@ export class ContactDetailsComponent implements OnInit, OnDestroy {
   }
 
   openAddModal(templateRef: TemplateRef<any>) {
+      this.addContactForm.reset();
+      this.audienceError = '';
+      this.loadAudiences();
       this.addContactDialog = this.dialog.open(templateRef, {
         width: '880px',
         maxWidth: 'calc(100vw - 32px)',
@@ -306,16 +325,33 @@ export class ContactDetailsComponent implements OnInit, OnDestroy {
     }
 
   public saveContactDetails(): void {
-    if (this.audienceBusy) return;
-    if (!this.targetAudienceId) { this.audienceError = 'Choose an audience for this contact.'; return; }
-    if (this.addContactForm.invalid) { this.addContactForm.markAllAsTouched(); return; }
+    if (this.audienceBusy || this.audiencesLoading) return;
+    if (!this.targetAudienceId) {
+      this.messageService.add({ severity: 'error', summary: 'Add Contact', detail: 'Choose an audience for this contact.' });
+      return;
+    }
+    if (this.addContactForm.invalid) {
+      this.addContactForm.markAllAsTouched();
+      this.messageService.add({ severity: 'error', summary: 'Add Contact', detail: 'Please complete all required fields with valid values.' });
+      return;
+    }
     this.audienceBusy = true; this.audienceError = '';
-    this.audienceService.manual(this.targetAudienceId, this.addContactForm.value).subscribe({ next: r => {
+    this.contactDetailsService.saveContactDetails({
+      ...this.addContactForm.value,
+      audienceId: this.targetAudienceId,
+    }).subscribe({ next: r => {
       this.audienceBusy = false;
-      if (Number(r.responseCode) !== 200) { this.audienceError = r.responseMessage; return; }
+      if (Number(r.responseCode) !== 200 || Number(r.payload?.respCode) !== 200) {
+        this.messageService.add({ severity: 'error', summary: 'Add Contact',
+          detail: r.payload?.respMesg || r.responseMessage || 'Could not save contact.' });
+        return;
+      }
       this.addContactForm.reset(); this.addContactDialog.close(); this.loadContactDetails();
       this.messageService.add({ severity: 'success', summary: 'Contact saved', detail: 'Contact added to the selected audience.' });
-    }, error: () => { this.audienceBusy = false; this.audienceError = 'Could not save contact.'; } });
+    }, error: () => {
+      this.audienceBusy = false;
+      this.messageService.add({ severity: 'error', summary: 'Add Contact', detail: 'Could not save contact. Please try again.' });
+    } });
   }
   public changeStatus(rowdata: any): void {
     this.contactDetailsService.changeContactStatus(rowdata)
@@ -418,7 +454,7 @@ deleteSelectedContact() {
 
 
     public updateContactDetails() {
-    this.contactDetailsService.saveContactDetails(this.editContactForm.value)
+    this.contactDetailsService.updateContactDetails(this.editContactForm.value)
       .subscribe({
         next: (response: any) => {
           if (response['responseCode'] == '200') {
@@ -465,7 +501,7 @@ onFileChange(event: any): void {
     const extension = file.name.split('.').pop()?.toLowerCase();
 
     if (!extension || !allowedExtensions.includes(extension)) {
-      alert('Please select a valid Excel file (.xls or .xlsx)');
+      this.messageService.add({ severity: 'error', summary: 'Upload Excel', detail: 'Please select a valid Excel file (.xls or .xlsx).' });
       event.target.value = '';
       this.selectedFile = null;
       this.selectedFileName = '';
@@ -479,33 +515,26 @@ onFileChange(event: any): void {
 }
 
 uploadFile(): void {
-  if (this.isUploadingAudience || this.audienceBusy) return;
-  if (!this.targetAudienceId && !this.audienceName.trim()) { alert('Choose an existing audience or enter a new audience name'); return; }
-  if (!this.selectedFile) {
-    alert('Please select a file first');
+  if (this.isUploadingAudience || this.audienceBusy || this.audiencesLoading) return;
+  if (!this.targetAudienceId || !this.selectedFile) {
+    this.messageService.add({ severity: 'error', summary: 'Upload Excel', detail: 'Select an audience and an Excel file first.' });
     return;
   }
-
   this.isUploadingAudience = true;
-  this.contactDetailsService
-    .uploadExcel(this.selectedFile, this.audienceName.trim(), this.targetAudienceId)
-    .subscribe({
-      next: (res) => {
-        this.isUploadingAudience = false;
-        if (Number(res.responseCode) !== 200) { alert(res.responseMessage || 'Upload failed'); return; }
-        alert('Contacts saved to audience "' + res.payload.audienceName + '". Choose this audience on Send Campaign.');
-        this.loadContactDetails();
-        this.targetAudienceId = res.payload.id;
-        this.loadAudiences();
-        this.selectedFile = null;
-        this.selectedFileName = '';
-      },
-      error: (err) => {
-        this.isUploadingAudience = false;
-        console.error('Upload failed', err);
-        alert('File upload failed');
-      }
-    });
+  this.contactDetailsService.uploadExcel(this.selectedFile, this.targetAudienceId).subscribe({
+    next: message => {
+      this.isUploadingAudience = false;
+      this.messageService.add({ severity: 'success', summary: 'Upload Excel', detail: message });
+      this.loadContactDetails();
+      this.selectedFile = null;
+      this.selectedFileName = '';
+    },
+    error: error => {
+      this.isUploadingAudience = false;
+      this.messageService.add({ severity: 'error', summary: 'Upload Excel',
+        detail: typeof error.error === 'string' ? error.error : 'File upload failed. Please try again.' });
+    },
+  });
 }
 
 }

@@ -2,6 +2,7 @@ import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import * as XLSX from 'xlsx';
 import { WhatsAppInboxService } from './whats-app-inbox.service';
+import { formatWhatsAppText } from './whatsapp-text';
 
 @Component({
   selector: 'app-whats-app-inbox',
@@ -9,6 +10,7 @@ import { WhatsAppInboxService } from './whats-app-inbox.service';
   styleUrl: './whats-app-inbox.component.scss'
 })
 export class WhatsAppInboxComponent implements OnInit, OnDestroy {
+  readonly formatMessageText = formatWhatsAppText;
 
   private readonly mediaCacheName = 'whatsapp-inbox-media-v1';
 
@@ -410,7 +412,7 @@ sendMessage(): void {
       case 'text':
         return message.messageText || 'Message';
       default:
-        return 'Unsupported message';
+        return message.messageText || `${message.messageType || 'Unknown'} message`;
     }
   }
 
@@ -538,6 +540,19 @@ sendMessage(): void {
   }
 
   private normalizeMessage(message: any): any {
+    const raw = this.getRawMessage(message);
+    const messageType = String(message?.messageType || raw?.type || (message?.messageText ? 'text' : 'unknown')).trim().toLowerCase();
+    const content = raw?.[messageType];
+    const reply = raw?.interactive?.button_reply || raw?.interactive?.list_reply;
+    const location = raw?.location;
+    const locationText = location ? [location.name, location.address,
+      location.latitude != null && location.longitude != null ? `${location.latitude}, ${location.longitude}` : '']
+      .filter(Boolean).join(' - ') : '';
+    const contactText = Array.isArray(raw?.contacts) ? raw.contacts.map((contact: any) =>
+      [contact.name?.formatted_name, ...(contact.phones || []).map((phone: any) => phone.phone)]
+        .filter(Boolean).join(' - ')).join('\n') : '';
+    const messageText = message?.messageText || raw?.text?.body || content?.caption ||
+      reply?.title || raw?.button?.text || raw?.reaction?.emoji || locationText || contactText || raw?.system?.body || '';
     const timestamp = Number(message?.messageTimestamp);
     const createdAtTimestamp = this.parseCreatedAt(message?.createdAt);
     const sortTimestamp = Number.isFinite(timestamp) && timestamp > 0
@@ -546,8 +561,29 @@ sendMessage(): void {
 
     return {
       ...message,
+      messageType,
+      messageText,
+      mediaId: message?.mediaId || content?.id || null,
+      mimeType: message?.mimeType || content?.mime_type || null,
+      fileName: message?.fileName || content?.filename || null,
       sortTimestamp
     };
+  }
+
+  private getRawMessage(message: any): any {
+    try {
+      const raw = typeof message?.rawJson === 'string' ? JSON.parse(message.rawJson) : message?.rawJson;
+      if (!raw) return null;
+      const messages = raw.entry?.flatMap((entry: any) =>
+        (entry.changes || []).flatMap((change: any) => change.value?.messages || [])) || raw.messages || [];
+      if (messages.length) {
+        return messages.find((item: any) => item.id === message.messageId) ||
+          (messages.length === 1 ? messages[0] : null);
+      }
+      return raw.type ? raw : null;
+    } catch {
+      return null;
+    }
   }
 
   private getRawMediaValue(message: any, property: 'url' | 'filename'): string | null {

@@ -1,5 +1,5 @@
 <div class="contacts-page">
-  <p-toast></p-toast>
+  <p-toast [baseZIndex]="10000"></p-toast>
   <header class="contacts-header">
     <div>
       <h1>Contacts</h1>
@@ -17,6 +17,7 @@
   <section class="contacts-panel audience-management">
     <h2>Manage audiences</h2>
     <p>Choose where to save uploaded or manually added contacts, or assign selected directory contacts.</p>
+    <p>Excel requires Name, Mobile Number and Email headers. Other columns are optional and can be left blank.</p>
     <label for="directory-audience">Audience</label>
     <select id="directory-audience" class="form-control" [(ngModel)]="targetAudienceId" [disabled]="audienceBusy || isUploadingAudience">
       <option [ngValue]="null">Create a new audience</option>
@@ -26,7 +27,7 @@
       <input class="form-control" aria-label="New audience name" [(ngModel)]="audienceName" maxlength="150" placeholder="New audience name, e.g. NGO Batch 2" />
       <button class="btn contact-outline-btn" type="button" (click)="createAudience()" [disabled]="audienceBusy || isUploadingAudience || (!targetAudienceId && !audienceName.trim())">Create audience</button>
     </div>
-    <p *ngIf="!targetAudienceId">Excel upload can create this audience. For manual entry or assignment, click Create audience first.</p>
+    <p *ngIf="!targetAudienceId">Create an audience first, then select it before uploading contacts.</p>
     <button class="btn contact-outline-btn" type="button" (click)="assignContacts()" [disabled]="audienceBusy || isUploadingAudience || !targetAudienceId || !assignmentIds.size">Add {{ assignmentIds.size }} selected contacts to audience</button>
     <p *ngIf="audienceError" class="text-danger" role="alert">{{ audienceError }}</p>
     <small>Contacts stay in the directory and can belong to multiple audiences.</small>
@@ -44,7 +45,7 @@
 
     <div class="contacts-toolbar">
       <span class="toolbar-caption">Contact directory</span>
-      <div class="upload-inline" *ngIf="selectedFileName"><span>{{ selectedFileName }}</span><button [disabled]="isUploadingAudience || (!targetAudienceId && !audienceName.trim())" class="btn contact-primary-btn" type="button" (click)="uploadFile()"><i class="feather icon-upload"></i> Upload</button></div>
+      <div class="upload-inline" *ngIf="selectedFileName"><span>{{ selectedFileName }}</span><button [disabled]="isUploadingAudience || audiencesLoading || !targetAudienceId" class="btn contact-primary-btn" type="button" (click)="uploadFile()"><i class="feather icon-upload"></i> Upload</button></div>
     </div>
 
     <div class="table-responsive" *ngIf="!isLoading">
@@ -391,16 +392,17 @@
 <ng-template #addContactTemplate let-dialog>
   <form class="contact-dialog" [formGroup]="addContactForm" (ngSubmit)="saveContactDetails()">    <div class="manual-audience-selector">
       <label for="manual-audience">Audience (required)</label>
-      <select id="manual-audience" class="form-control" [(ngModel)]="targetAudienceId" [ngModelOptions]="{standalone: true}" [disabled]="audienceBusy">
-        <option [ngValue]="null">Choose an audience</option>
+      <select id="manual-audience" class="form-control" [(ngModel)]="targetAudienceId" [ngModelOptions]="{standalone: true}" [disabled]="audienceBusy || audiencesLoading">
+        <option [ngValue]="null">{{ audiencesLoading ? 'Loading audiences...' : 'Choose an audience' }}</option>
         <option *ngFor="let audience of audiences" [ngValue]="audience.id">{{ audience.audienceName }}</option>
       </select>
+      <small *ngIf="!audiencesLoading && !audiences.length">No active audiences available. Add an audience first.</small>
       <p *ngIf="audienceError" class="text-danger">{{ audienceError }}</p>
     </div>
     <header class="contact-dialog-header">
       <div class="dialog-title-icon"><i class="feather icon-user-plus"></i></div>
       <div><h2 mat-dialog-title>Add Contact</h2><p>Create a contact record for your campaign.</p></div>
-      <button type="button" mat-dialog-close class="dialog-close" aria-label="Close"><i class="feather icon-x"></i></button>
+      <button type="button" mat-dialog-close class="dialog-close" aria-label="Close" [disabled]="audienceBusy"><i class="feather icon-x"></i></button>
     </header>
     <mat-dialog-content class="contact-dialog-content">
       <div class="contact-dialog-section"><i class="feather icon-user"></i><span>Personal details</span></div>
@@ -420,7 +422,7 @@
     </mat-dialog-content>
     <mat-dialog-actions class="contact-dialog-actions">
       <span><b>*</b> Required fields</span>
-      <div><button type="button" class="btn dialog-cancel" mat-dialog-close>Cancel</button><button type="submit" class="btn dialog-save" [disabled]="audienceBusy || !targetAudienceId"><i class="feather icon-check"></i> Save Contact</button></div>
+      <div><button type="button" class="btn dialog-cancel" mat-dialog-close [disabled]="audienceBusy">Cancel</button><button type="submit" class="btn dialog-save" [disabled]="audienceBusy || audiencesLoading || !targetAudienceId"><i class="feather icon-check"></i> {{ audienceBusy ? 'Saving...' : 'Save Contact' }}</button></div>
     </mat-dialog-actions>
   </form>
 </ng-template>
