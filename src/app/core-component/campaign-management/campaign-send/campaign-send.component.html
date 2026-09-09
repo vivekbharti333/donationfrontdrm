@@ -26,6 +26,17 @@
           <button type="button" class="template-slide-previous" aria-label="Show previous WhatsApp templates" (click)="slideCampaignList(whatsAppTemplateList, -1)"><i class="feather icon-chevron-left"></i></button>
           <button type="button" class="template-slide-next" aria-label="Show more WhatsApp templates" (click)="slideCampaignList(whatsAppTemplateList)"><i class="feather icon-chevron-right"></i></button>
         </div>
+        <div *ngIf="selectedWhatsAppTemplate" class="template-header-details">
+          <p *ngIf="selectedWhatsAppTemplate.headerImageFileName">The saved template image will be included automatically.</p>
+          <p *ngIf="selectedWhatsAppTemplate.headerVariable?.length">Header values will use the mappings saved with this template.</p>
+          <div *ngIf="needsCampaignImageUrl">
+            <label for="campaign-header-image">Header image URL</label>
+            <input id="campaign-header-image" type="url" [(ngModel)]="campaignHeaderImageUrl"
+              [ngModelOptions]="{standalone: true}" placeholder="https://example.com/banner.jpg" />
+            <small>This older template has no saved image. Use a public JPEG or PNG URL, up to 5 MB.</small>
+          </div>
+          <p class="template-state error" *ngIf="templateSendError">{{ templateSendError }}</p>
+        </div>
       </section>
 <section class="campaign-section" *ngIf="selectedChannelFilter !== 'WHATSAPP'">
   <div class="section-heading"><h2>3. Select Template</h2><p>{{ selectedChannelFilter === 'EMAIL' ? 'The selected campaign supplies the email subject and message.' : 'Select a campaign and channel to see its template.' }}</p></div>

@@ -75,6 +75,8 @@ export class CampaignSendComponent {
   public selectedWhatsAppTemplate: any = null;
   public isWhatsAppTemplatesLoading = false;
   public whatsAppTemplatesError = '';
+  public campaignHeaderImageUrl = '';
+  private templateLoadId = 0;
   public recipientMode: 'ALL' | 'SELECTED' = 'ALL';
   public contacts: any[] = [];
   public selectedContactIds = new Set<any>();
@@ -161,12 +163,16 @@ export class CampaignSendComponent {
     }
 
     public getWhatsAppTemplates(): void {
+      const requestId = ++this.templateLoadId;
+      this.selectedWhatsAppTemplate = null;
+      this.campaignHeaderImageUrl = '';
       this.isWhatsAppTemplatesLoading = true;
       this.whatsAppTemplatesError = '';
       this.whatsAppTemplates = [];
 
       this.campaignSendService.getWhatsAppTemplate().subscribe({
         next: (response: any) => {
+          if (requestId !== this.templateLoadId) return;
           this.isWhatsAppTemplatesLoading = false;
           if (Number(response?.responseCode) === 200) {
             this.whatsAppTemplates = Array.isArray(response?.listPayload) ? response.listPayload : [];
@@ -175,6 +181,7 @@ export class CampaignSendComponent {
           }
         },
         error: () => {
+          if (requestId !== this.templateLoadId) return;
           this.isWhatsAppTemplatesLoading = false;
           this.whatsAppTemplatesError = 'Could not load WhatsApp templates. Please try again.';
         },
@@ -183,6 +190,33 @@ export class CampaignSendComponent {
 
     public selectWhatsAppTemplate(template: any): void {
       this.selectedWhatsAppTemplate = template;
+      this.campaignHeaderImageUrl = '';
+    }
+
+    public get needsCampaignImageUrl(): boolean {
+      return String(this.selectedWhatsAppTemplate?.headerFormat || '').toUpperCase() === 'IMAGE'
+        && !this.selectedWhatsAppTemplate?.headerImageFileName;
+    }
+
+    public get templateSendError(): string {
+      const template = this.selectedWhatsAppTemplate;
+      if (this.recipientChannel !== 'WHATSAPP' || !template) return '';
+      if (!template.templateId) return 'Reload templates and select a template with a valid ID.';
+      if (template.status && String(template.status).toUpperCase() !== 'APPROVED')
+        return 'Choose an approved WhatsApp template.';
+      const format = String(template.headerFormat || '').toUpperCase();
+      if (format && !['TEXT', 'IMAGE'].includes(format))
+        return 'Campaigns currently support text and image headers. Choose another template.';
+      if (this.needsCampaignImageUrl) {
+        try {
+          const url = new URL(this.campaignHeaderImageUrl.trim());
+          if (url.protocol !== 'https:' || url.username || url.password || (url.port && url.port !== '443'))
+            return 'Enter a public HTTPS image URL on port 443.';
+        } catch {
+          return 'This template has no saved image. Enter a public HTTPS JPEG or PNG URL.';
+        }
+      }
+      return '';
     }
 
     public get eligibleContacts(): any[] {
@@ -322,7 +356,7 @@ export class CampaignSendComponent {
   }
 
   public sendCompaign() {
-  if (this.isSending || this.isContactsLoading || this.isHistoryLoading || this.historyError) return;
+  if (this.isSending || this.isContactsLoading || this.isHistoryLoading || this.historyError || this.isWhatsAppTemplatesLoading) return;
   if (!['WHATSAPP', 'EMAIL'].includes(this.recipientChannel)) {
     this.messageService.add({ severity: 'error', summary: 'Channel unavailable', detail: 'Select a WhatsApp or Email campaign.' });
     return;
@@ -339,6 +373,10 @@ export class CampaignSendComponent {
     return;
   }
 
+  if (this.templateSendError) {
+    this.messageService.add({ severity: 'error', summary: 'Template needs attention', detail: this.templateSendError });
+    return;
+  }
   const selectedContactIds = this.selectedRecipients.map(contact => contact.id);
   const campaignRequest = {
     ...this.sendCompaignForm.value,
@@ -353,9 +391,10 @@ export class CampaignSendComponent {
     whatsAppRequest: this.selectedWhatsAppTemplate ? {
       templateName: this.selectedWhatsAppTemplate.templateName,
       language: this.selectedWhatsAppTemplate.language || 'en',
-      msgBodyVariable: (this.selectedWhatsAppTemplate.msgBodyVariable || []).map((variable: any) => ({
-        bodyVariable: variable.bodyVariable || variable.value || '',
-      })),
+      templateId: this.selectedWhatsAppTemplate.templateId,
+      headerFormat: this.selectedWhatsAppTemplate.headerFormat || null,
+      parameterFormat: this.selectedWhatsAppTemplate.parameterFormat || 'POSITIONAL',
+      ...(this.needsCampaignImageUrl ? { headerImageUrl: this.campaignHeaderImageUrl.trim() } : {}),
     } : null,
     description: this.selectedWhatsAppTemplate
       ? this.selectedWhatsAppTemplate.msgBodyText || this.selectedWhatsAppTemplate.message || this.selectedWhatsAppTemplate.body || ''

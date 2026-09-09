@@ -37,9 +37,9 @@ export class CampaignSendService {
     return this.http.post<any>(Constant.Site_Url + 'getWhatsAppTemplate', {
       payload: {
         requestFor: 'ALL',
-        superadminId: this.loginUser['superadminId'],
+        superadminId: this.loginUser?.superadminId || this.cookieService.get('superadminId'),
       },
-    });
+    }, this.authOptions());
   }
 
   sendCompaign(campaignDetails: any): Observable<any> {
@@ -65,6 +65,10 @@ export class CampaignSendService {
 
       }
     };
-    return this.http.post<any>(Constant.Site_Url + "sendCampaign", request);
+    return this.http.post<any>(Constant.Site_Url + "sendCampaign", request, this.authOptions());
+  }
+  private authOptions(): { headers: HttpHeaders } {
+    const token = this.cookieService.get('token');
+    return { headers: token ? new HttpHeaders({ Authorization: `Bearer ${token}` }) : new HttpHeaders() };
   }
 }

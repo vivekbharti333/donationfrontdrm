@@ -89,8 +89,8 @@
         <label>Upload {{ addTemplateForm.get('mediaType')?.value }}</label>
         <div *ngIf="addTemplateForm.get('mediaType')?.value === 'Image'" class="field">
           <label for="header-image-url">Image URL (or upload a file below)</label>
-          <input id="header-image-url" type="url" formControlName="headerImageUrl" placeholder="https://example.com/sample.jpg" />
-          <small>Public HTTPS link to a JPEG or PNG, up to 5 MB. When provided, this URL is used instead of the selected file.</small>
+          <input id="header-image-url" type="url" formControlName="headerImageUrl" (input)="clearSelectedFile()" placeholder="https://example.com/sample.jpg" />
+          <small>JPEG or PNG, up to 5 MB. The image is saved with your template and reused in campaigns.</small>
         </div>
 
         <div class="upload-box">
@@ -98,7 +98,7 @@
           <!-- IMAGE -->
           <input *ngIf="addTemplateForm.get('mediaType')?.value === 'Image'"
                  type="file"
-                 accept="image/*"
+                 accept="image/jpeg,image/png"
                  (change)="onFileSelect($event)" />
 
           <!-- VIDEO -->
@@ -162,7 +162,14 @@
              *ngIf="headerVariablesArray.length">
           <div [formGroupName]="0">
             <span class="var-key">{{ headerVariablesArray.at(0).value.key }}</span>
-            <input formControlName="value" placeholder="Header example value" />
+            <select formControlName="type" aria-label="Header value source">
+              <option value="contactName">Contact name</option>
+              <option value="mobileNumber">Mobile number</option>
+              <option value="emailId">Email address</option>
+              <option value="companyName">Company name</option>
+              <option value="FIXED">Fixed value for everyone</option>
+            </select>
+            <input formControlName="value" [placeholder]="headerVariablesArray.at(0).value.type === 'FIXED' ? 'Value to send' : 'Example for template approval'" />
             <button type="button"
                     class="remove-variable"
                     (click)="removeHeaderVariable()"

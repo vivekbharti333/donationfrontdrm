@@ -200,7 +200,7 @@ export class AddWhatsAppTemplatesComponent {
 
     matches.forEach(key => {
       const existing = oldValues.find((variable: any) => variable.key === key);
-      this.headerVariablesArray.push(this.createVariableGroup(key, existing?.value || ''));
+      this.headerVariablesArray.push(this.createVariableGroup(key, existing?.value || '', existing?.type || 'contactName'));
     });
   }
 
@@ -263,7 +263,7 @@ export class AddWhatsAppTemplatesComponent {
     headerVariables.forEach((variable: any, index: number) => {
       const newKey = this.getHeaderVariableKey();
       header = header.replaceAll(`__WA_HEADER_VARIABLE_${index}__`, newKey);
-      this.headerVariablesArray.push(this.createVariableGroup(newKey, variable.value));
+      this.headerVariablesArray.push(this.createVariableGroup(newKey, variable.value, variable.type || 'contactName'));
     });
 
     this.addTemplateForm.get('msgBodyText')?.setValue(body);
@@ -350,10 +350,10 @@ export class AddWhatsAppTemplatesComponent {
     const file = input.files?.[0];
     if (!file) return;
 
-    this.fileError = '';
+    this.clearSelectedFile();
     const mediaType = this.addTemplateForm.get('mediaType')?.value;
     const allowed = mediaType === 'Image'
-      ? file.type.startsWith('image/')
+      ? ['image/jpeg', 'image/png'].includes(file.type)
       : mediaType === 'Video'
         ? file.type.startsWith('video/')
         : ['application/pdf', 'application/msword',
@@ -365,12 +365,14 @@ export class AddWhatsAppTemplatesComponent {
       input.value = '';
       return;
     }
-    if (file.size > 16 * 1024 * 1024) {
-      this.fileError = 'File size must be 16 MB or less.';
+    const maxSizeMb = mediaType === 'Image' ? 5 : 16;
+    if (file.size > maxSizeMb * 1024 * 1024) {
+      this.fileError = `File size must be ${maxSizeMb} MB or less.`;
       input.value = '';
       return;
     }
 
+    this.addTemplateForm.get('headerImageUrl')?.setValue('');
     this.selectedFile = file;
     this.fileName = file.name;
     const reader = new FileReader();
@@ -410,8 +412,10 @@ export class AddWhatsAppTemplatesComponent {
 
   // ================= SUBMIT =================
   submitTemplate() {
+    if (this.isSaving) return;
     this.formError = '';
     this.detectVariables();
+    this.detectHeaderVariables();
     const needsMedia = this.addTemplateForm.get('mediaType')?.value !== 'None';
     const imageUrl = String(this.addTemplateForm.get('headerImageUrl')?.value || '').trim();
     if (imageUrl && !/^https:\/\/[^\s]+$/i.test(imageUrl)) {
@@ -449,7 +453,9 @@ export class AddWhatsAppTemplatesComponent {
 
         headerVariable: form.headerVariable.map((variable: any) => ({
           headerVariable: String(variable.key).replace(/[{}]/g, ''),
-          example: variable.value
+          example: variable.value,
+          variableType: variable.type === 'FIXED' ? null : variable.type,
+          value: variable.type === 'FIXED' ? variable.value : null
         })),
 
         msgBodyText: form.msgBodyText,

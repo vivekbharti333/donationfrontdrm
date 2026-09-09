@@ -43,6 +43,16 @@ export class AddWhatsAppTemplatesService {
           throw new Error('The media upload did not return a media handle.');
         }
 
+        if (mediaType.toUpperCase() === 'IMAGE') {
+          const imageFileName = response?.payload?.headerImageFileName || response?.headerImageFileName
+            || response?.mapPayload?.headerImageFileName;
+          if (!imageFileName) {
+            throw new Error('The image was not saved. Please update the API and upload it again.');
+          }
+          payload.payload.headerImageFileName = imageFileName;
+          payload.payload.headerImageUrl = null;
+          payload.payload.headerImageBase64 = null;
+        }
         payload.payload.headerExample = [mediaHandle];
         return this.submitTemplate(payload);
       })
