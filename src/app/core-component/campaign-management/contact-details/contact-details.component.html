@@ -1,296 +1,64 @@
 <div class="contacts-page">
-  <p-toast [baseZIndex]="10000"></p-toast>
+  <p-toast [baseZIndex]="10000010"></p-toast>
   <header class="contacts-header">
     <div>
-      <h1>Contacts</h1>
-      <nav aria-label="Breadcrumb" class="contacts-breadcrumb">
-        <span>Home</span><i class="feather icon-chevron-right"></i><span>Campaign Management</span><i class="feather icon-chevron-right"></i><strong>Contacts</strong>
-      </nav>
+      <h4>Contact Details List</h4>
+      <p>Manage Your Contacts</p>
     </div>
     <div class="header-actions">
       <button class="btn contact-primary-btn" type="button" (click)="openAddModal(addContactTemplate)"><i class="feather icon-plus-circle"></i> Add Contact</button>
-      <input #fileInput type="file" accept=".xls,.xlsx" (change)="onFileChange($event)" hidden />
-      <button class="btn contact-outline-btn" type="button" (click)="fileInput.click()"><i class="feather icon-upload"></i> Upload Excel</button>
+      <button class="btn contact-outline-btn" type="button" (click)="openUploadModal(uploadTemplate)"><i class="feather icon-upload"></i> Upload Excel</button>
     </div>
   </header>
 
-  <section class="contacts-panel audience-management">
-    <h2>Manage audiences</h2>
-    <p>Choose where to save uploaded or manually added contacts, or assign selected directory contacts.</p>
-    <p>Excel requires Name, Mobile Number and Email headers. Other columns are optional and can be left blank.</p>
-    <label for="directory-audience">Audience</label>
-    <select id="directory-audience" class="form-control" [(ngModel)]="targetAudienceId" [disabled]="audienceBusy || isUploadingAudience">
-      <option [ngValue]="null">Create a new audience</option>
-      <option *ngFor="let audience of audiences" [ngValue]="audience.id">{{ audience.audienceName }} (#{{ audience.id }})</option>
-    </select>
-    <div *ngIf="!targetAudienceId" class="audience-create-row">
-      <input class="form-control" aria-label="New audience name" [(ngModel)]="audienceName" maxlength="150" placeholder="New audience name, e.g. NGO Batch 2" />
-      <button class="btn contact-outline-btn" type="button" (click)="createAudience()" [disabled]="audienceBusy || isUploadingAudience || (!targetAudienceId && !audienceName.trim())">Create audience</button>
-    </div>
-    <p *ngIf="!targetAudienceId">Create an audience first, then select it before uploading contacts.</p>
-    <button class="btn contact-outline-btn" type="button" (click)="assignContacts()" [disabled]="audienceBusy || isUploadingAudience || !targetAudienceId || !assignmentIds.size">Add {{ assignmentIds.size }} selected contacts to audience</button>
-    <p *ngIf="audienceError" class="text-danger" role="alert">{{ audienceError }}</p>
-    <small>Contacts stay in the directory and can belong to multiple audiences.</small>
-  </section>
   <section class="contacts-panel">
     <div class="contacts-filter-row">
-      <label class="contact-search"><i class="feather icon-search"></i><input [(ngModel)]="searchDataValue" [ngModelOptions]="{ standalone: true }" (ngModelChange)="searchData($event)" type="search" placeholder="Search by name, mobile, organisation..." /></label>
-      <button class="btn contact-filter-btn" type="button" (click)="openFilter()" [class.is-active]="filter"><i class="feather icon-filter"></i> Filter</button>
-      <button class="btn contact-reset-btn" type="button" (click)="resetSearch()"><i class="feather icon-rotate-ccw"></i> Reset</button>
+      <label class="contact-search"><i class="feather icon-search"></i><input [(ngModel)]="searchDataValue" [ngModelOptions]="{ standalone: true }" (ngModelChange)="searchData($event)" type="search" aria-label="Search contacts" placeholder="Search by name, mobile, organisation..." /></label>
+      <mat-select class="contact-select audience-filter" aria-label="Choose audience" [(ngModel)]="filterAudienceId" (selectionChange)="loadContactDetails()" [disabled]="audiencesLoading" panelClass="contacts-select-panel" placeholder="All audiences">
+        <mat-option [value]="null">All audiences</mat-option>
+        <mat-option *ngFor="let audience of audiences" [value]="audience.id">{{ audience.audienceName }}</mat-option>
+      </mat-select>
+      <mat-select class="contact-select status-filter" aria-label="Choose status" [(ngModel)]="statusFilter" (selectionChange)="searchData(searchDataValue)" panelClass="contacts-select-panel">
+        <mat-option value="">All statuses</mat-option>
+        <mat-option value="ACTIVE">Active</mat-option>
+        <mat-option value="INACTIVE">Inactive</mat-option>
+        <mat-option value="PENDING">Pending</mat-option>
+      </mat-select>
+      <button class="btn contact-reset-btn" type="button" aria-label="Reset filters" title="Reset filters" (click)="resetSearch()"><i class="feather icon-rotate-ccw"></i> Reset</button>
     </div>
 
-    <div class="advanced-filters" [class.show]="filter">
-      <div><span>Search is applied across contact, mobile, organisation, city, source, and status.</span></div>
-    </div>
-
-    <div class="contacts-toolbar">
-      <span class="toolbar-caption">Contact directory</span>
-      <div class="upload-inline" *ngIf="selectedFileName"><span>{{ selectedFileName }}</span><button [disabled]="isUploadingAudience || audiencesLoading || !targetAudienceId" class="btn contact-primary-btn" type="button" (click)="uploadFile()"><i class="feather icon-upload"></i> Upload</button></div>
-    </div>
-
-    <div class="table-responsive" *ngIf="!isLoading">
+<div class="contacts-toolbar"><span>{{ totalData }} contacts</span></div>
+    <div class="table-responsive contacts-desktop" *ngIf="!isLoading">
       <table matSort (matSortChange)="sortData($event)" class="table contacts-table">
         <thead><tr>
-          <th><input type="checkbox" aria-label="Select contacts on this page" [checked]="pageAssigned" (change)="selectAssignmentPage($any($event.target).checked)" /></th><th mat-sort-header="contactName">Contact</th><th mat-sort-header="mobileNumber">Mobile</th><th mat-sort-header="companyName">Organisation</th><th mat-sort-header="city">City</th><th mat-sort-header="leadSource">Source</th><th mat-sort-header="status">Status</th><th class="no-sort">Actions</th>
+          <th mat-sort-header="contactName">Contact</th><th mat-sort-header="mobileNumber">Mobile</th><th mat-sort-header="companyName">Organisation</th><th mat-sort-header="city">City</th><th mat-sort-header="leadSource">Source</th><th mat-sort-header="status">Status</th><th class="no-sort">Actions</th>
         </tr></thead>
         <tbody>
           @if (tableData.length > 0) {
             @for (data of tableData; track $index) {
               <tr>
-                <td><input type="checkbox" [attr.aria-label]="'Select ' + data.contactName" [checked]="assignmentIds.has(data.id)" (change)="toggleAssignment(data.id, $any($event.target).checked)" /></td><td><div class="contact-person"><span class="contact-avatar">{{ getInitials(data.contactName) }}</span><div><strong>{{ data.contactName || '-' }}</strong><small>{{ data.emailId || 'No email address' }}</small></div></div></td>
+                <td><div class="contact-person"><div><strong>{{ data.contactName || '-' }}</strong><small>{{ data.emailId || 'No email address' }}</small></div></div></td>
                 <td>{{ data.mobileNumber || '-' }}</td><td>{{ data.companyName || '-' }}</td><td>{{ data.city || '-' }}</td><td>{{ data.leadSource || '-' }}</td>
                 <td><button class="contact-status" [ngClass]="{'active': data.status === 'ACTIVE', 'inactive': data.status === 'INACTIVE', 'pending': data.status === 'PENDING'}" (click)="changeStatus(data)">{{ data.status || '-' }}</button></td>
                 <td><div class="contact-actions"><button type="button" aria-label="Edit contact" (click)="openEditModal(editContactTemplate, data)"><i class="feather icon-edit-2"></i></button><button type="button" class="delete" aria-label="Delete contact" (click)="openDeleteModal(deleteTemplate, data)"><i class="feather icon-trash-2"></i></button></div></td>
               </tr>
             }
-          } @else { <tr><td colspan="8" class="empty-state">No contact details found</td></tr> }
+          } @else { <tr><td colspan="7" class="empty-state">No contact details found</td></tr> }
         </tbody>
       </table>
+    </div>
+    <div class="contacts-mobile" *ngIf="!isLoading">
+      <article class="contact-card" *ngFor="let data of tableData">
+
+        <dl><div><dt>Contact Name</dt><dd><strong>{{ data.contactName || '-' }}</strong></dd></div><div><dt>Email</dt><dd>{{ data.emailId || '-' }}</dd></div><div><dt>Mobile</dt><dd>{{ data.mobileNumber || '-' }}</dd></div><div><dt>Organisation</dt><dd>{{ data.companyName || '-' }}</dd></div><div><dt>City</dt><dd>{{ data.city || '-' }}</dd></div><div><dt>Source</dt><dd>{{ data.leadSource || '-' }}</dd></div></dl>
+        <div class="contact-card-actions"><button type="button" class="contact-status" [ngClass]="{'active': data.status === 'ACTIVE', 'inactive': data.status === 'INACTIVE', 'pending': data.status === 'PENDING'}" (click)="changeStatus(data)">{{ data.status || '-' }}</button><div class="contact-actions"><button type="button" aria-label="Edit contact" (click)="openEditModal(editContactTemplate, data)"><i class="feather icon-edit-2"></i></button><button type="button" class="delete" aria-label="Delete contact" (click)="openDeleteModal(deleteTemplate, data)"><i class="feather icon-trash-2"></i></button></div></div>
+      </article><div class="empty-state" *ngIf="!tableData.length">No contact details found</div>
     </div>
     <div *ngIf="isLoading" class="contacts-loading">Loading contact details...</div>
     <app-custom-pagination></app-custom-pagination>
   </section>
 </div>
 
-<ng-container *ngIf="false">
-<div class="page-header">
-  <div class="add-item d-flex">
-    <div class="page-title">
-      <h4>Contact Details List</h4>
-      <p-toast></p-toast>
-    </div>
-  </div>
-</div>
-
-<div class="card table-list-card">
-  <div class="card-body">
-    <div class="table-top">
-      <div class="search-set">
-        <div class="search-input">
-          <a href="javascript:void(0);" class="btn btn-searchset">
-            <i class="feather icon-search feather-search"></i>
-          </a>
-
-          <div class="dataTables_filter">
-            <label>
-              <input
-                [(ngModel)]="searchDataValue"
-                [ngModelOptions]="{ standalone: true }"
-                (ngModelChange)="searchData($event)"
-                type="search"
-                class="form-control"
-                placeholder="Search by name, mobile, company, city..."
-              />
-            </label>
-          </div>
-        </div>
-      </div>
-
-      <div class="search-path">
-        <div class="d-flex align-items-center">
-          <a
-            class="btn btn-filter"
-            id="filter_search"
-            (click)="openFilter()"
-            [ngClass]="{ setclose: filter }"
-          >
-            <i class="feather icon-filter filter-icon"></i>
-            <span><img src="assets/img/icons/closes.svg" alt="img" /></span>
-          </a>
-        </div>
-      </div>
-    </div>
-
-    <div
-      class="card filter-card"
-      id="filter_inputs"
-      [ngClass]="{ 'd-block': filter, 'd-none': !filter }"
-    >
-      <div class="card-body pb-0">
-        <div class="row">
-          <div class="col-lg-3 col-sm-6 col-12">
-            <div class="input-blocks">
-              <i class="feather icon-user info-img"></i>
-              <!-- future filter input -->
-            </div>
-          </div>
-
-          <div class="col-lg-3 col-sm-6 col-12">
-            <div class="input-blocks">
-              <i class="feather icon-stop-circle info-img"></i>
-              <!-- future status filter -->
-            </div>
-          </div>
-
-          <div class="col-lg-3 col-sm-6 col-12">
-            <div class="input-blocks">
-              <a class="btn btn-filters ms-auto">
-                <i class="feather icon-search feather-search"></i> Search
-              </a>
-            </div>
-          </div>
-
-          
-          
-
-        </div>
-      </div>
-    </div>
-
-
-    <!-- <div class="page-btn upload-toolbar">
-  <button
-    class="btn btn-added"
-    data-bs-toggle="modal"
-    data-bs-target="#add-units"
-    (click)="openAddModal(addContactTemplate)">
-    <i class="feather icon-plus-circle me-2"></i>
-    Add Contact
-  </button> -->
-
-<div class="page-header-toolbar">
-  <div class="left-actions">
-
-    <button
-      class="btn add-contact-btn"
-      data-bs-toggle="modal"
-      data-bs-target="#add-units"
-      (click)="openAddModal(addContactTemplate)">
-      <i class="feather icon-plus-circle"></i>
-      <span>Add Contact</span>
-    </button>
- OR
-    <div class="excel-upload-box">
-      <input
-        type="file"
-        #fileInput
-        id="excelFile"
-        accept=".xls,.xlsx"
-        (change)="onFileChange($event)"
-        hidden
-      />
-
-      <button type="button" class="btn choose-file-btn" (click)="fileInput.click()">
-        <i class="feather icon-paperclip"></i>
-        <span>Choose Excel</span>
-      </button>
-
-      <span class="file-name" *ngIf="selectedFileName; else noFile">
-        {{ selectedFileName }}
-      </span>
-
-      <ng-template #noFile>
-        <span class="file-placeholder">No file chosen</span>
-      </ng-template>
-
-      <button
-        type="button"
-        class="btn upload-btn"
-        [disabled]="!selectedFile"
-        (click)="uploadFile()">
-        <i class="feather icon-upload"></i>
-        <span>Upload</span>
-      </button>
-    </div>
-
-  </div>
-</div>
-    
-
-
-    <div class="table-responsive" *ngIf="!isLoading">
-      <table matSort (matSortChange)="sortData($event)" class="table datanew">
-        <thead>
-          <tr>
-            <th mat-sort-header="contactName">Contact Name</th>
-            <th mat-sort-header="mobileNumber">Mobile No</th>
-            <th mat-sort-header="companyName">Organisation Name</th>
-            <th mat-sort-header="city">City</th>
-            <th mat-sort-header="leadSource">Source</th>
-            <th mat-sort-header="status">Status</th>
-            <!-- <th mat-sort-header="createdAt">Created On</th> -->
-            <th class="no-sort">Action</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          @if (tableData.length > 0) {
-            @for (data of tableData; track $index) {
-              <tr>
-                <td>{{ data.contactName || '-' }}</td>
-                <td>{{ data.mobileNumber || '-' }}</td>
-                <td>{{ data.companyName || '-' }}</td>
-                <td>{{ data.city || '-' }}</td>
-                <td>{{ data.leadSource || '-' }}</td>
-               <td>
-                    <button class="badge-button" [ngClass]="{
-                        'badge-linesuccess': data.status === 'ACTIVE',
-                        'badge-linedanger': data.status === 'INACTIVE',
-                        'badge-linewarning': data.status === 'PENDING'}" 
-                        (click)="changeStatus(data)">
-                        {{ data.status }}
-                    </button>
-                </td>
-                <!-- <td>{{ data.createdAt | date:'dd-MM-yyyy, HH:mm' }}</td> -->
-                <td class="action-table-data">
-                  <div class="edit-delete-action">
-                    
-                    <!-- Delete button -->
-                    <a class="me-2 confirm-text p-2 mb-0"
-                      href="javascript:void(0);"
-                      (click)="openDeleteModal(deleteTemplate,data)">
-                        <i class="feather icon-trash-2 feather-trash-2"></i>
-                    </a>
-
-                    <!-- Edit button -->
-                    <a class="me-2 p-2 mb-0"
-                      data-bs-toggle="modal" data-bs-target="#edit-units"
-                      (click)="openEditModal(editContactTemplate, data)">
-                      <i class="feather icon-edit feather-edit"></i>
-                    </a>
-
-                  </div>
-                </td>
-              </tr>
-            }
-          } @else {
-            <tr>
-              <td colspan="8" class="text-center py-4">No contact details found</td>
-            </tr>
-          }
-        </tbody>
-      </table>
-    </div>
-
-    <div *ngIf="isLoading" class="text-center py-4">
-      Loading contact details...
-    </div>
-
-    <app-custom-pagination></app-custom-pagination>
-  </div>
-</div>
-
-</ng-container>
 <ng-template #editContactTemplate let-dialog>
   <div class="modalHeaderContainer">
     <h2 mat-dialog-title class="p-0">Update Contact Details</h2>
@@ -390,21 +158,23 @@
 </ng-template>
 
 <ng-template #addContactTemplate let-dialog>
-  <form class="contact-dialog" [formGroup]="addContactForm" (ngSubmit)="saveContactDetails()">    <div class="manual-audience-selector">
-      <label for="manual-audience">Audience (required)</label>
-      <select id="manual-audience" class="form-control" [(ngModel)]="targetAudienceId" [ngModelOptions]="{standalone: true}" [disabled]="audienceBusy || audiencesLoading">
-        <option [ngValue]="null">{{ audiencesLoading ? 'Loading audiences...' : 'Choose an audience' }}</option>
-        <option *ngFor="let audience of audiences" [ngValue]="audience.id">{{ audience.audienceName }}</option>
-      </select>
-      <small *ngIf="!audiencesLoading && !audiences.length">No active audiences available. Add an audience first.</small>
-      <p *ngIf="audienceError" class="text-danger">{{ audienceError }}</p>
-    </div>
+  <form class="contact-dialog" [formGroup]="addContactForm" (ngSubmit)="saveContactDetails()">
     <header class="contact-dialog-header">
       <div class="dialog-title-icon"><i class="feather icon-user-plus"></i></div>
       <div><h2 mat-dialog-title>Add Contact</h2><p>Create a contact record for your campaign.</p></div>
       <button type="button" mat-dialog-close class="dialog-close" aria-label="Close" [disabled]="audienceBusy"><i class="feather icon-x"></i></button>
     </header>
     <mat-dialog-content class="contact-dialog-content">
+      <div class="contact-form-grid">
+        <div class="contact-field">
+          <label id="manual-audience-label">Audience <b>*</b></label>
+          <mat-select class="contact-select dialog-audience-select" aria-labelledby="manual-audience-label" [(ngModel)]="targetAudienceId" [ngModelOptions]="{standalone: true}" [disabled]="audienceBusy || audiencesLoading" panelClass="contacts-select-panel" placeholder="Choose an audience">
+            <mat-option *ngFor="let audience of audiences" [value]="audience.id">{{ audience.audienceName }}</mat-option>
+          </mat-select>
+          <small class="dialog-help" *ngIf="audiencesLoading">Loading audiences...</small>
+          <small class="dialog-help" *ngIf="!audiencesLoading && !audiences.length">No active audiences available. Add an audience first.</small>
+        </div>
+      </div>
       <div class="contact-dialog-section"><i class="feather icon-user"></i><span>Personal details</span></div>
       <div class="contact-form-grid">
         <label class="contact-field">Contact name <b>*</b><input class="form-control" type="text" placeholder="Enter full name" formControlName="contactName" /></label>
@@ -419,6 +189,7 @@
         <label class="contact-field">City <b>*</b><input class="form-control" type="text" placeholder="Enter city" formControlName="city" /></label>
         <label class="contact-field">Address <input class="form-control" type="text" placeholder="Optional" formControlName="address" /></label>
       </div>
+      <p *ngIf="audienceError" class="dialog-error" role="alert">{{ audienceError }}</p>
     </mat-dialog-content>
     <mat-dialog-actions class="contact-dialog-actions">
       <span><b>*</b> Required fields</span>
@@ -428,31 +199,7 @@
 </ng-template>
 
 <!-- Delete -->
-<!-- <ng-template #deleteContactTemplate let-modal>
-  <div class="modalHeaderContainer">
-    <h2 mat-dialog-title class="p-0">Delete Contact</h2>
-    <div class="closeBtn" (click)="closeDeleteModal()">
-      <button type="button" class="close" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
-      </button>
-    </div>
-  </div>
 
-  <div class="modal-body p-3">
-    <p class="mb-2 fw-semibold">Are you sure you want to delete this contact?</p>
-    <p class="text-danger mb-0">After deleting, you cannot recover this record.</p>
-  </div>
-
-  <div class="modal-footer border-0 pt-0">
-    <button type="button" class="btn btn-secondary" (click)="closeDeleteModal()">
-      Cancel
-    </button>
-
-    <button type="button" class="btn btn-danger" (click)="confirmDelete()">
-      Delete
-    </button>
-  </div>
-</ng-template> -->
 
 <ng-template #deleteTemplate let-dialog>
 
@@ -485,4 +232,46 @@
 
 </div>
 
+</ng-template>
+
+<ng-template #uploadTemplate>
+  <div class="contact-dialog upload-dialog">
+    <header class="contact-dialog-header">
+      <div class="dialog-title-icon"><i class="feather icon-upload"></i></div>
+      <div><h2 id="upload-title">Upload Excel</h2><p>Import contacts into your audience.</p></div>
+      <button type="button" class="dialog-close" aria-label="Close upload" [disabled]="isUploadingAudience" (click)="uploadDialog?.close()"><i class="feather icon-x"></i></button>
+    </header>
+    <div class="contact-dialog-content">
+      <div class="contact-field">
+        <label id="upload-audience-label">Audience <b>*</b></label>
+        <mat-select class="contact-select dialog-audience-select" aria-labelledby="upload-audience-label" [(ngModel)]="uploadAudienceId" [disabled]="audiencesLoading || isUploadingAudience" panelClass="contacts-select-panel" placeholder="Choose an audience">
+          <mat-option *ngFor="let audience of audiences" [value]="audience.id">{{ audience.audienceName }}</mat-option>
+        </mat-select>
+        <small class="dialog-help" *ngIf="audiencesLoading">Loading audiences...</small>
+        <small class="dialog-help" *ngIf="!audiencesLoading && !audiences.length">Create an audience in the Audiences page before uploading.</small>
+      </div>
+      <div class="excel-file-field">
+        <input #excelInput id="upload-file" type="file" accept=".xls,.xlsx" hidden [disabled]="!uploadAudienceId || isUploadingAudience" (change)="onFileChange($event)" />
+        <label class="contact-field" for="upload-file">Excel file <b>*</b></label>
+        <div class="excel-file-picker" *ngIf="!selectedFile" [class.is-disabled]="!uploadAudienceId || isUploadingAudience">
+          <i class="feather icon-file-text" aria-hidden="true"></i>
+          <span class="file-picker-title">Choose your contact spreadsheet</span>
+          <span class="dialog-help">Excel files (.xls or .xlsx)</span>
+          <button type="button" class="btn dialog-cancel" [disabled]="!uploadAudienceId || isUploadingAudience" (click)="excelInput.click()">Choose Excel file</button>
+        </div>
+        <div class="selected-excel-file" *ngIf="selectedFile">
+          <img src="assets/img/icons/excel.svg" alt="Excel file" width="36" height="36" />
+          <div class="selected-excel-details"><strong>{{ selectedFileName }}</strong><small>{{ isUploadingAudience ? 'Uploading...' : 'Ready to upload' }}</small></div>
+          <div class="selected-excel-actions">
+            <button type="button" class="btn dialog-cancel" [disabled]="isUploadingAudience" (click)="excelInput.click()">Replace</button>
+            <button type="button" class="remove-excel-file" aria-label="Remove selected Excel file" title="Remove file" [disabled]="isUploadingAudience" (click)="removeSelectedFile(excelInput)"><i class="feather icon-trash-2"></i></button>
+          </div>
+        </div>
+        <small class="dialog-help" *ngIf="!uploadAudienceId">Choose an audience to enable file selection.</small>
+      </div>
+      <div class="upload-format-note"><i class="feather icon-info" aria-hidden="true"></i><p>Include <strong>Name, Mobile Number and Email</strong> columns. Other columns are optional.</p></div>
+      <p *ngIf="uploadError" class="dialog-error" role="alert">{{ uploadError }}</p>
+    </div>
+    <div class="contact-dialog-actions"><span>Contacts are saved to your selected audience.</span><div><button type="button" class="btn dialog-cancel" [disabled]="isUploadingAudience" (click)="uploadDialog?.close()">Cancel</button><button type="button" class="btn dialog-save" [disabled]="!uploadAudienceId || !selectedFile || audiencesLoading || isUploadingAudience" (click)="uploadFile()">{{ isUploadingAudience ? 'Uploading...' : 'Upload Excel' }}</button></div></div>
+  </div>
 </ng-template>
