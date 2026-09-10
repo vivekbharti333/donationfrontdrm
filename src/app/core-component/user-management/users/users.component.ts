@@ -78,6 +78,8 @@ export class UsersComponent {
   public pageSize = 2;
   public serialNumberArray: Array<number> = [];
   public totalData = 0;
+  public activeUserCount = 0;
+  public inactiveUserCount = 0;
   showFilter = false;
   dataSource!: MatTableDataSource<UserDetails>;
   public searchDataValue = '';
@@ -282,6 +284,7 @@ export class UsersComponent {
     this.userManagementService.getUserDetailsByRoleType(roleType).subscribe((apiRes: any) => {
       this.totalData = apiRes.totalNumber; // Set total data count
       this.fullData = apiRes.listPayload;  // Store the full dataset
+      this.updateUserStatusCounts(this.fullData);
   
       this.pagination.tablePageSize.subscribe((res: tablePageSize) => {
         if (this.router.url === this.routes.users) {
@@ -300,6 +303,7 @@ export class UsersComponent {
     this.userManagementService.getUserDetailsList().subscribe((apiRes: any) => {
       this.totalData = apiRes.totalNumber; // Set total data count
       this.fullData = apiRes.listPayload;  // Store the full dataset
+      this.updateUserStatusCounts(this.fullData);
   
       this.pagination.tablePageSize.subscribe((res: tablePageSize) => {
         if (this.router.url === this.routes.users) {
@@ -365,10 +369,12 @@ export class UsersComponent {
   
         this.prepareTableData(filteredData, { skip: 0, limit: this.pageSize });
         this.totalData = filteredData.length; // Update total data count for pagination
+        this.updateUserStatusCounts(filteredData);
       } else {
         // Reset to the full dataset when the search term is cleared
         this.prepareTableData(this.fullData, { skip: 0, limit: this.pageSize });
         this.totalData = this.fullData.length; // Reset the total data count
+        this.updateUserStatusCounts(this.fullData);
       }
   
       // Reset to the first page after a search or clearing search
@@ -379,6 +385,12 @@ export class UsersComponent {
         serialNumberArray: this.serialNumberArray,
       });
     }
+
+  private updateUserStatusCounts(users: any[] = []): void {
+    const rows = Array.isArray(users) ? users : [];
+    this.activeUserCount = rows.filter(user => String(user?.status || '').toUpperCase() === 'ACTIVE').length;
+    this.inactiveUserCount = rows.filter(user => String(user?.status || '').toUpperCase() === 'INACTIVE').length;
+  }
 
   // public searchData(value: string): void {
   //   this.dataSource.filter = value.trim().toLowerCase();

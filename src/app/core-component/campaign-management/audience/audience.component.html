@@ -1,23 +1,122 @@
-<div class="page-header">
-  <div class="add-item d-flex">
-    <div class="page-title">
+<div class="audience-page">
+  <p-toast [baseZIndex]="10000"></p-toast>
+
+  <header class="audience-header">
+    <div>
       <h4>Audience List</h4>
-      <h6>View your active audiences</h6>
+      <p>View and manage your active audiences</p>
     </div>
-  </div>
-  <div class="page-btn d-flex gap-2">
-  <button type="button" class="btn btn-added" (click)="openAddModal(addAudienceTemplate)" [disabled]="isLoading || isSaving">
-    <i class="feather icon-plus-circle me-2"></i>Add Audience
-  </button>
-  <button type="button" class="btn btn-primary" (click)="getAudienceList()" [disabled]="isLoading || isSaving">
-    Refresh
-  </button>
-  </div>
+    <div class="header-actions">
+      <button type="button" class="btn audience-primary-btn" (click)="openAddModal(addAudienceTemplate)" [disabled]="isLoading || isSaving">
+        <i class="feather icon-plus-circle"></i>Add Audience
+      </button>
+      <button type="button" class="btn audience-outline-btn" (click)="getAudienceList()" [disabled]="isLoading || isSaving">
+        <i class="feather icon-refresh-cw"></i>Refresh
+      </button>
+    </div>
+  </header>
+
+  <section class="audience-panel">
+    <div class="audience-filter-row">
+      <label class="audience-search">
+        <i class="feather icon-search"></i>
+        <input [(ngModel)]="searchDataValue" (ngModelChange)="searchData($event)"
+          type="search" placeholder="Search audiences..." aria-label="Search audiences" />
+      </label>
+    </div>
+
+    <div class="audience-toolbar">
+      <span>{{ totalData }} audiences</span>
+    </div>
+
+    <div class="table-responsive audience-desktop" [attr.aria-busy]="isLoading" *ngIf="!isLoading">
+      <table matSort (matSortChange)="sortData($event)" class="table audience-table">
+        <thead>
+          <tr>
+            <th mat-sort-header="audienceName">Audience Name</th>
+            <th mat-sort-header="description">Description</th>
+            <th mat-sort-header="status">Status</th>
+            <th mat-sort-header="createdAt">Created On</th>
+            <th class="no-sort">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (errorMessage) {
+            <tr><td colspan="5" class="empty-state" role="alert">{{ errorMessage }}</td></tr>
+          } @else {
+            @for (data of tableData; track data.id) {
+              <tr>
+                <td>
+                  <div class="audience-name-cell">
+                    <strong>{{ data.audienceName || '-' }}</strong>
+                  </div>
+                </td>
+                <td><span class="audience-description">{{ data.description || '-' }}</span></td>
+                <td><span class="audience-status" [ngClass]="{
+                  'active': data.status === 'ACTIVE',
+                  'inactive': data.status === 'INACTIVE',
+                  'pending': data.status === 'PENDING'
+                }">{{ data.status || '-' }}</span></td>
+                <td>{{ data.createdAt ? (data.createdAt | date : 'dd-MM-yyyy | HH:mm') : '-' }}</td>
+                <td>
+                  <div class="audience-actions">
+                    <button type="button" aria-label="Edit audience" title="Edit audience" (click)="openEditModal(editAudienceTemplate, data)">
+                      <i class="feather icon-edit-2"></i>
+                    </button>
+                    <button type="button" class="delete" aria-label="Delete audience" title="Delete audience" (click)="openDeleteModal(deleteAudienceTemplate, data)">
+                      <i class="feather icon-trash-2"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            } @empty {
+              <tr><td colspan="5" class="empty-state">{{ searchDataValue ? 'No audiences match your search.' : 'No audiences found.' }}</td></tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <div class="audience-mobile" *ngIf="!isLoading">
+      @for (data of tableData; track data.id) {
+        <article class="audience-card">
+          <header>
+            <div class="audience-name-cell">
+              <strong>{{ data.audienceName || '-' }}</strong>
+            </div>
+            <span class="audience-status" [ngClass]="{
+              'active': data.status === 'ACTIVE',
+              'inactive': data.status === 'INACTIVE',
+              'pending': data.status === 'PENDING'
+            }">{{ data.status || '-' }}</span>
+          </header>
+          <dl>
+            <div><dt>Description</dt><dd>{{ data.description || '-' }}</dd></div>
+            <div><dt>Created On</dt><dd>{{ data.createdAt ? (data.createdAt | date : 'dd-MM-yyyy | HH:mm') : '-' }}</dd></div>
+          </dl>
+          <footer class="audience-card-actions">
+            <button type="button" aria-label="Edit audience" (click)="openEditModal(editAudienceTemplate, data)">
+              <i class="feather icon-edit-2"></i>Edit
+            </button>
+            <button type="button" class="delete" aria-label="Delete audience" (click)="openDeleteModal(deleteAudienceTemplate, data)">
+              <i class="feather icon-trash-2"></i>Delete
+            </button>
+          </footer>
+        </article>
+      } @empty {
+        <div class="empty-state">{{ searchDataValue ? 'No audiences match your search.' : 'No audiences found.' }}</div>
+      }
+    </div>
+
+    <div *ngIf="isLoading" class="audience-loading">Loading audiences...</div>
+    <app-custom-pagination></app-custom-pagination>
+  </section>
 </div>
+
 <ng-template #addAudienceTemplate>
-  <h2 mat-dialog-title>Add Audience</h2>
-  <form [formGroup]="addAudienceForm" (ngSubmit)="addAudience()">
-    <mat-dialog-content>
+  <h2 mat-dialog-title class="audience-dialog-title">Add Audience</h2>
+  <form class="audience-dialog-form" [formGroup]="addAudienceForm" (ngSubmit)="addAudience()">
+    <mat-dialog-content class="audience-dialog-content">
       <div class="mb-3">
         <label for="audience-name" class="form-label">Audience Name <span class="text-danger">*</span></label>
         <input id="audience-name" class="form-control" formControlName="audienceName" maxlength="150" />
@@ -30,61 +129,46 @@
         <textarea id="audience-description" class="form-control" formControlName="description" rows="3"></textarea>
       </div>
     </mat-dialog-content>
-    <mat-dialog-actions align="end">
-      <button type="button" class="btn btn-secondary me-2" mat-dialog-close [disabled]="isSaving">Cancel</button>
-      <button type="submit" class="btn btn-primary" [disabled]="isSaving">{{ isSaving ? 'Saving...' : 'Save Audience' }}</button>
+    <mat-dialog-actions class="audience-dialog-actions" align="end">
+      <button type="button" class="btn audience-dialog-cancel" mat-dialog-close [disabled]="isSaving">Cancel</button>
+      <button type="submit" class="btn audience-dialog-save" [disabled]="isSaving">{{ isSaving ? 'Saving...' : 'Save Audience' }}</button>
     </mat-dialog-actions>
   </form>
 </ng-template>
-<p-toast [baseZIndex]="10000"></p-toast>
-<div class="card table-list-card">
-  <div class="card-body">
-    <div class="table-top">
-      <div class="search-set">
-        <div class="search-input">
-          <div class="dataTables_filter">
-            <label>
-              <input [(ngModel)]="searchDataValue" (ngModelChange)="searchData($event)"
-                type="search" class="form-control" placeholder="Search audiences..." aria-label="Search audiences" />
-            </label>
-          </div>
-        </div>
+
+<ng-template #editAudienceTemplate>
+  <h2 mat-dialog-title class="audience-dialog-title">Update Audience</h2>
+  <form class="audience-dialog-form" [formGroup]="editAudienceForm" (ngSubmit)="updateAudience()">
+    <mat-dialog-content class="audience-dialog-content">
+      <div class="mb-3">
+        <label for="edit-audience-name" class="form-label">Audience Name <span class="text-danger">*</span></label>
+        <input id="edit-audience-name" class="form-control" formControlName="audienceName" maxlength="150" />
+        @if (editAudienceForm.controls.audienceName.touched && editAudienceForm.controls.audienceName.invalid) {
+          <small class="text-danger">Enter an audience name of up to 150 characters.</small>
+        }
       </div>
-    </div>
-    <div class="table-responsive" [attr.aria-busy]="isLoading">
-      <table matSort (matSortChange)="sortData($event)" class="table datanew">
-        <thead>
-          <tr>
-            <th mat-sort-header="audienceName">Audience Name</th>
-            <th mat-sort-header="description">Description</th>
-            <th mat-sort-header="status">Status</th>
-            <th mat-sort-header="createdAt">Created On</th>
-          </tr>
-        </thead>
-        <tbody>
-          @if (isLoading) {
-            <tr><td colspan="4" class="text-center">Loading audiences...</td></tr>
-          } @else if (errorMessage) {
-            <tr><td colspan="4" class="text-center" role="alert">{{ errorMessage }}</td></tr>
-          } @else {
-            @for (data of tableData; track data.id) {
-              <tr>
-                <td>{{ data.audienceName }}</td>
-                <td>{{ data.description || '-' }}</td>
-                <td><span class="badge" [ngClass]="{
-                  'badge-linesuccess': data.status === 'ACTIVE',
-                  'badge-linedanger': data.status === 'INACTIVE',
-                  'badge-linewarning': data.status === 'PENDING'
-                }">{{ data.status }}</span></td>
-                <td>{{ data.createdAt ? (data.createdAt | date : 'dd-MM-yyyy | HH:mm') : '-' }}</td>
-              </tr>
-            } @empty {
-              <tr><td colspan="4" class="text-center">{{ searchDataValue ? 'No audiences match your search.' : 'No audiences found.' }}</td></tr>
-            }
-          }
-        </tbody>
-      </table>
-    </div>
-    <app-custom-pagination></app-custom-pagination>
+      <div class="mb-3">
+        <label for="edit-audience-description" class="form-label">Description</label>
+        <textarea id="edit-audience-description" class="form-control" formControlName="description" rows="3"></textarea>
+      </div>
+    </mat-dialog-content>
+    <mat-dialog-actions class="audience-dialog-actions" align="end">
+      <button type="button" class="btn audience-dialog-cancel" mat-dialog-close [disabled]="isUpdating">Cancel</button>
+      <button type="submit" class="btn audience-dialog-save" [disabled]="isUpdating">{{ isUpdating ? 'Updating...' : 'Update Audience' }}</button>
+    </mat-dialog-actions>
+  </form>
+</ng-template>
+
+<ng-template #deleteAudienceTemplate>
+  <div class="audience-delete-dialog">
+    <h2 mat-dialog-title class="audience-dialog-title">Delete Audience?</h2>
+    <mat-dialog-content class="audience-dialog-content">
+      <p>You're about to delete <strong>{{ selectedAudience?.audienceName }}</strong>.</p>
+      <p class="delete-warning">This action cannot be undone.</p>
+    </mat-dialog-content>
+    <mat-dialog-actions class="audience-dialog-actions" align="end">
+      <button type="button" class="btn audience-dialog-cancel" mat-dialog-close [disabled]="isDeleting">Cancel</button>
+      <button type="button" class="btn audience-dialog-delete" [disabled]="isDeleting" (click)="deleteSelectedAudience()">{{ isDeleting ? 'Deleting...' : 'Delete' }}</button>
+    </mat-dialog-actions>
   </div>
-</div>
+</ng-template>

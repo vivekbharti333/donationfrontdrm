@@ -59,7 +59,11 @@
         </div>
       </div>
       <div class="form-sort">
-        <span class="users-count"><strong>{{ totalData }}</strong> {{ totalData === 1 ? 'user' : 'users' }}</span>
+        <div class="users-count-group">
+          <span class="users-count"><strong>{{ totalData }}</strong> {{ totalData === 1 ? 'user' : 'users' }}</span>
+          <span class="users-count users-count-active"><strong>{{ activeUserCount }}</strong> Active</span>
+          <span class="users-count users-count-inactive"><strong>{{ inactiveUserCount }}</strong> Inactive</span>
+        </div>
       </div>
     </div>
     <!-- /Filter -->

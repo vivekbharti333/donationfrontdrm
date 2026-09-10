@@ -22,11 +22,21 @@ export class AudienceComponent implements OnInit, OnDestroy {
   public isLoading = false;
   public errorMessage = '';
   public isSaving = false;
+  public isUpdating = false;
+  public isDeleting = false;
+  public selectedAudience: Audience | null = null;
   public addAudienceForm = this.fb.nonNullable.group({
     audienceName: ['', [Validators.required, Validators.maxLength(150), Validators.pattern(/\S/)]],
     description: [''],
   });
+  public editAudienceForm = this.fb.nonNullable.group({
+    id: [0, [Validators.required]],
+    audienceName: ['', [Validators.required, Validators.maxLength(150), Validators.pattern(/\S/)]],
+    description: [''],
+  });
   private addDialog?: MatDialogRef<unknown>;
+  private editDialog?: MatDialogRef<unknown>;
+  private deleteDialog?: MatDialogRef<unknown>;
   private audiences: Audience[] = [];
   private skip = 0;
   private sort: Sort = { active: '', direction: '' };
@@ -43,6 +53,97 @@ export class AudienceComponent implements OnInit, OnDestroy {
   openAddModal(template: TemplateRef<unknown>): void {
     this.addAudienceForm.reset();
     this.addDialog = this.dialog.open(template, { width: '520px', maxWidth: '95vw' });
+  }
+
+  openEditModal(template: TemplateRef<unknown>, audience: Audience): void {
+    this.selectedAudience = audience;
+    this.editAudienceForm.patchValue({
+      id: audience.id,
+      audienceName: audience.audienceName ?? '',
+      description: audience.description ?? '',
+    });
+    this.editDialog = this.dialog.open(template, { width: '520px', maxWidth: '95vw', disableClose: true });
+  }
+
+  updateAudience(): void {
+    this.editAudienceForm.markAllAsTouched();
+    if (this.editAudienceForm.invalid || this.isUpdating) return;
+
+    const values = this.editAudienceForm.getRawValue();
+    this.isUpdating = true;
+    if (this.editDialog) this.editDialog.disableClose = true;
+
+    this.audienceService.updateAudienceName({
+      id: values.id,
+      audienceName: values.audienceName.trim(),
+      description: values.description.trim(),
+    }).pipe(takeUntil(this.destroy$)).subscribe({
+      next: response => {
+        this.isUpdating = false;
+        if (this.editDialog) this.editDialog.disableClose = false;
+        if (Number(response.responseCode) === 200 && Number(response.payload?.respCode) === 200) {
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Audience updated',
+            detail: response.payload?.respMesg || 'Audience updated successfully.',
+          });
+          this.editDialog?.close();
+          this.editAudienceForm.reset();
+          this.selectedAudience = null;
+          this.getAudienceList();
+          return;
+        }
+        this.showMutationError(response, 'Unable to update audience.');
+      },
+      error: () => {
+        this.isUpdating = false;
+        if (this.editDialog) this.editDialog.disableClose = false;
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Update Audience',
+          detail: 'Unable to update audience. Please try again.',
+        });
+      },
+    });
+  }
+
+  openDeleteModal(template: TemplateRef<unknown>, audience: Audience): void {
+    this.selectedAudience = audience;
+    this.deleteDialog = this.dialog.open(template, { width: '450px', maxWidth: '95vw', disableClose: true });
+  }
+
+  deleteSelectedAudience(): void {
+    if (!this.selectedAudience || this.isDeleting) return;
+    this.isDeleting = true;
+    if (this.deleteDialog) this.deleteDialog.disableClose = true;
+
+    this.audienceService.deleteAudienceName(this.selectedAudience).pipe(takeUntil(this.destroy$)).subscribe({
+      next: response => {
+        this.isDeleting = false;
+        if (this.deleteDialog) this.deleteDialog.disableClose = false;
+        if (Number(response.responseCode) === 200 && Number(response.payload?.respCode) === 200) {
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Audience deleted',
+            detail: response.payload?.respMesg || 'Audience deleted successfully.',
+          });
+          this.deleteDialog?.close();
+          this.selectedAudience = null;
+          this.getAudienceList();
+          return;
+        }
+        this.showMutationError(response, 'Unable to delete audience.');
+      },
+      error: () => {
+        this.isDeleting = false;
+        if (this.deleteDialog) this.deleteDialog.disableClose = false;
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Delete Audience',
+          detail: 'Unable to delete audience. Please try again.',
+        });
+      },
+    });
   }
 
   addAudience(): void {
@@ -160,8 +261,18 @@ export class AudienceComponent implements OnInit, OnDestroy {
     this.messageService.add({ severity: 'error', summary: 'Audience list', detail: message });
   }
 
+  private showMutationError(response: any, fallback: string): void {
+    this.messageService.add({
+      severity: 'error',
+      summary: 'Audience',
+      detail: response?.payload?.respMesg || response?.responseMessage || fallback,
+    });
+  }
+
   ngOnDestroy(): void {
     this.addDialog?.close();
+    this.editDialog?.close();
+    this.deleteDialog?.close();
     this.destroy$.next();
     this.destroy$.complete();
   }

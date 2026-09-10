@@ -78,7 +78,7 @@
 .filter-btn { min-height: 42px; border-radius: 8px; background: #f97316; color: #fff; font-weight: 700; }
 .filter-btn:hover { background: #ea580c; color: #fff; }
 
-.donation-table-shell { overflow: hidden; border: 1px solid #e8ecf1; border-radius: 12px; }
+.donation-table-shell { overflow-x: auto; overflow-y: visible; border: 1px solid #e8ecf1; border-radius: 12px; }
 .donation-table-shell .table { margin-bottom: 0; }
 .donation-table-shell thead th { padding: 13px 12px; border-bottom: 1px solid #e5e9ef; background: #f7f8fa; color: #596579; font-size: 11px; font-weight: 800; letter-spacing: .035em; text-transform: uppercase; white-space: nowrap; }
 .donation-table-shell tbody td { padding: 14px 12px; border-color: #edf0f3; color: #4b5565; font-size: 12px; vertical-align: middle; }
@@ -86,7 +86,7 @@
 .donation-table-shell tbody tr:hover { background: #fffaf5; }
 .donor-name-cell { color: #202a3c; font-weight: 750; }
 .amount-cell { color: #c2410c; font-weight: 800; white-space: nowrap; }
-.edit-delete-action { display: flex; align-items: center; gap: 5px; }
+.edit-delete-action { display: flex; align-items: center; gap: 5px; flex-wrap: nowrap; white-space: nowrap; }
 .table-action-btn { display: inline-grid; place-items: center; width: 32px; height: 32px; padding: 0; border: 1px solid #e3e7ed; border-radius: 8px; background: #fff; color: #596579; transition: .18s ease; }
 .table-action-btn:hover { border-color: #fb923c; background: #fff7ed; color: #ea580c; transform: translateY(-1px); }
 .table-action-btn.whatsapp-share:hover { border-color: #86d9a5; background: #effcf4; color: #159447; }
@@ -95,6 +95,27 @@
 .empty-state strong { color: #344054; font-size: 14px; }
 .empty-state > span:last-child { color: #8b95a7; font-size: 12px; }
 .empty-state-icon { display: grid; place-items: center; width: 42px; height: 42px; margin-bottom: 4px; border-radius: 50%; background: #fff2e8; color: #f97316; font-size: 19px; }
+
+@media (min-width: 993px) {
+  .donation-table-shell .table {
+    min-width: 1140px;
+  }
+
+  .donation-table-shell th.action-column,
+  .donation-table-shell td.action-table-data {
+    width: 132px;
+    min-width: 132px;
+    text-align: center;
+  }
+
+  .donation-table-shell td.action-table-data {
+    overflow: visible;
+  }
+
+  .donation-table-shell .edit-delete-action {
+    justify-content: center;
+  }
+}
 
 .nav-link {
   font-weight: bold;

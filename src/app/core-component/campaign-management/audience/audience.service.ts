@@ -25,6 +25,8 @@ export interface AddAudienceResponse {
   payload?: { respCode: number; respMesg: string };
 }
 
+export type AudienceMutationResponse = AddAudienceResponse;
+
 @Injectable({ providedIn: 'root' })
 export class AudienceService {
   constructor(
@@ -38,6 +40,30 @@ export class AudienceService {
       payload: {
         audienceName,
         description,
+        createdBy: loginUser['loginId'],
+        superadminId: loginUser['superadminId'],
+      },
+    });
+  }
+
+  updateAudienceName(audience: Pick<Audience, 'id' | 'audienceName' | 'description'>): Observable<AudienceMutationResponse> {
+    const loginUser = this.authenticationService.getLoginUser();
+    return this.http.post<AudienceMutationResponse>(Constant.Site_Url + 'updateAudienceName', {
+      payload: {
+        id: audience.id,
+        audienceName: audience.audienceName,
+        description: audience.description ?? '',
+        createdBy: loginUser['loginId'],
+        superadminId: loginUser['superadminId'],
+      },
+    });
+  }
+
+  deleteAudienceName(audience: Pick<Audience, 'id'>): Observable<AudienceMutationResponse> {
+    const loginUser = this.authenticationService.getLoginUser();
+    return this.http.post<AudienceMutationResponse>(Constant.Site_Url + 'deleteAudienceName', {
+      payload: {
+        id: audience.id,
         createdBy: loginUser['loginId'],
         superadminId: loginUser['superadminId'],
       },

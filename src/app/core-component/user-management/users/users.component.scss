@@ -2,6 +2,7 @@
   overflow: hidden;
   border: 0;
   border-radius: 14px;
+  margin-right: 10px;
   box-shadow: 0 3px 18px rgba(15, 23, 42, .06);
 }
 
@@ -30,6 +31,10 @@
 }
 
 .users-toolbar .search-set { flex: 1 1 auto; max-width: 430px; }
+.users-toolbar .form-sort {
+  flex: 0 0 auto;
+  margin-left: auto;
+}
 .users-toolbar .search-input { position: relative; width: 100%; }
 .users-toolbar .dataTables_filter,
 .users-toolbar .dataTables_filter label { display: block; width: 100%; margin: 0; }
@@ -74,8 +79,28 @@
 }
 .users-count strong { font-size: 15px; }
 
-.users-table-shell { margin: 10px 22px 0; border: 1px solid #e8ecf1; border-radius: 12px; overflow-x: auto; }
-.users-table-shell .table { margin-bottom: 0; }
+.users-count-group {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: nowrap;
+  gap: 8px;
+}
+
+.users-count-active {
+  border-color: #bbf7d0;
+  background: #f0fdf4;
+  color: #15803d;
+}
+
+.users-count-inactive {
+  border-color: #fecaca;
+  background: #fef2f2;
+  color: #dc2626;
+}
+
+.users-table-shell { margin: 10px 32px 0 22px; border: 1px solid #e8ecf1; border-radius: 12px; overflow-x: auto; }
+.users-table-shell .table { min-width: 1320px; margin-bottom: 0; }
 .users-table-shell thead th {
   padding: 14px 12px;
   border-bottom: 1px solid #e4e7ec;
@@ -224,7 +249,8 @@
   .users-toolbar .dataTables_filter,
   .users-toolbar .dataTables_filter label { width: 100%; min-width: 0; }
   .users-toolbar .search-path { display: none; }
-  .users-toolbar .form-sort { display: block !important; width: auto !important; min-width: 0; margin: 0 !important; }
+  .users-toolbar .form-sort { display: block !important; width: 100% !important; min-width: 0; margin: 0 !important; }
+  .users-count-group { justify-content: flex-start; flex-wrap: wrap; }
   .users-table-shell { margin: 0; }
   .mobile-cards { padding: 14px 14px 2px; background: #f8fafc; }
 
