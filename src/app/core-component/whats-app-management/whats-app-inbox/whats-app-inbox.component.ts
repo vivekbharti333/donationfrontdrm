@@ -13,6 +13,7 @@ export class WhatsAppInboxComponent implements OnInit, OnDestroy {
   readonly formatMessageText = formatWhatsAppText;
 
   private readonly mediaCacheName = 'whatsapp-inbox-media-v1';
+  private refreshIntervalId: ReturnType<typeof setInterval> | null = null;
 
   allMessages: any[] = [];
 
@@ -62,15 +63,24 @@ export class WhatsAppInboxComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.getMessages();
+    this.refreshIntervalId = setInterval(() => {
+      this.getMessages(true);
+    }, 10000);
   }
 
   ngOnDestroy(): void {
+    if (this.refreshIntervalId) {
+      clearInterval(this.refreshIntervalId);
+      this.refreshIntervalId = null;
+    }
     this.mediaPreviewUrls.forEach(url => URL.revokeObjectURL(url));
     this.mediaPreviewUrls.clear();
   }
 
-  getMessages(): void {
-    this.isLoading = true;
+  getMessages(silent: boolean = false): void {
+    if (!silent) {
+      this.isLoading = true;
+    }
     this.loadError = '';
 
     this.whatsappService.getWhatsAppMessage().subscribe({
@@ -92,6 +102,7 @@ export class WhatsAppInboxComponent implements OnInit, OnDestroy {
 
           this.prepareContactList();
           this.isLoading = false;
+          this.refreshSelectedChat();
         } else {
           this.isLoading = false;
           this.loadError = response.responseMessage || 'Could not load conversations.';
@@ -161,6 +172,21 @@ export class WhatsAppInboxComponent implements OnInit, OnDestroy {
       this.selectChat(this.contactList[0]);
     }
 
+  }
+
+  private refreshSelectedChat(): void {
+    if (!this.selectedWaId) {
+      return;
+    }
+
+    const selectedContact = this.contactList.find((contact: any) => contact.waId === this.selectedWaId);
+    if (selectedContact) {
+      this.selectedUserName = selectedContact.userName;
+      this.selectedPhoneNumberId = selectedContact.phoneNumberId || this.selectedPhoneNumberId || '';
+    }
+
+    this.selectedMessages = this.allMessages.filter((msg: any) => msg.waId == this.selectedWaId);
+    this.scrollToLatestMessage();
   }
 
   selectChat(contact: any): void {

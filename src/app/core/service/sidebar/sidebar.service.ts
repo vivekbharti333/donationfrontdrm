@@ -132,6 +132,11 @@ export class SidebarService {
               route: routes.campaignDashboard,
               permission: 'campaign-dashboard',
             },
+            {
+              menuValue: 'School Dashboard',
+              route: routes.schoolDashboard,
+              permission: 'school-dashboard',
+            },
             
           ],
         },
@@ -824,6 +829,11 @@ export class SidebarService {
               route: routes.campaignDashboard,
               permission: 'campaign-dashboard',
             },
+            {
+              menuValue: 'School Dashboard',
+              route: routes.schoolDashboard,
+              permission: 'school-dashboard',
+            },
           ],
         },
         {
@@ -1167,6 +1177,11 @@ export class SidebarService {
               menuValue: 'Campaign Dashboard',
               route: routes.campaignDashboard,
               permission: 'campaign-dashboard',
+            },
+            {
+              menuValue: 'School Dashboard',
+              route: routes.schoolDashboard,
+              permission: 'school-dashboard',
             },
           ],
         },

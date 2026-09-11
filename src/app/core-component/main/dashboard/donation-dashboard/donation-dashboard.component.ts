@@ -105,6 +105,7 @@ export class DonationDashboardComponent implements AfterViewInit {
   paymentTotalAmount: number = 0;
   paymentCurrencySymbol: string = '₹';
   paymentChart: any;
+  hasPaymentChartData = false;
 
   public currentMonthName!: string;
   public FRToday: any = {};
@@ -154,21 +155,26 @@ export class DonationDashboardComponent implements AfterViewInit {
 
     const labels = this.paymentModes.map((item: any) => item.mode);
     const amounts = this.paymentModes.map((item: any) => item.amount);
-    const chartAmounts = this.getPaymentChartAmounts(amounts);
-    const colors = this.paymentModes.map((item: any) => item.color);
+    this.hasPaymentChartData = amounts.some((amount: any) => Number(amount) > 0);
+    const chartAmounts = this.hasPaymentChartData ? this.getPaymentChartAmounts(amounts) : [1];
+    const chartLabels = this.hasPaymentChartData ? labels : ['No payment data'];
+    const colors = this.hasPaymentChartData
+      ? this.paymentModes.map((item: any) => item.color)
+      : ['#ffffff'];
 
     this.paymentChart = new Chart(canvas, {
       type: 'doughnut',
       data: {
-        labels: labels,
+        labels: chartLabels,
         datasets: [{
           // Very small payment modes would otherwise render as sub-pixel arcs.
           // These adjusted values are only used to draw the doughnut; the legend
           // and tooltip continue to show the actual API amounts.
           data: chartAmounts,
           backgroundColor: colors,
-          borderWidth: 0,
-          hoverOffset: 3
+          borderColor: this.hasPaymentChartData ? colors : '#edf1f5',
+          borderWidth: this.hasPaymentChartData ? 0 : 1,
+          hoverOffset: this.hasPaymentChartData ? 3 : 0
         }]
       },
       options: {
@@ -178,6 +184,7 @@ export class DonationDashboardComponent implements AfterViewInit {
         plugins: {
           legend: { display: false },
           tooltip: {
+            enabled: this.hasPaymentChartData,
             callbacks: {
               label: (context: any) => {
                 const label = context.label || '';
@@ -494,9 +501,17 @@ changePaymentTab(tab: string): void {
         } else {
           this.paymentModes = [];
           this.paymentTotalAmount = 0;
-          this.destroyPaymentChart();
+          this.paymentCurrencySymbol = '₹';
+          this.initPaymentChart();
         }
       },
+      error: (err) => {
+        console.error('Error while fetching payment mode data:', err);
+        this.paymentModes = [];
+        this.paymentTotalAmount = 0;
+        this.paymentCurrencySymbol = '₹';
+        this.initPaymentChart();
+      }
     });
   }
 

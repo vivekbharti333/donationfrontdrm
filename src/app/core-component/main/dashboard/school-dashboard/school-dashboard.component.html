@@ -1,8 +1,9 @@
 <div class="school-dashboard">
   <div class="dashboard-heading">
     <div>
-      <h2>School Management Dashboard</h2>
-      <p>A complete overview of academics, attendance, fees and examinations</p>
+      <span class="eyebrow">SCHOOL MANAGEMENT / OVERVIEW</span>
+      <h2>Student Dashboard</h2>
+      <p>A clear view of your students, academics and everyday progress.</p>
     </div>
     <div class="heading-actions">
       <select class="form-select" [(ngModel)]="academicYear" aria-label="Academic session">
@@ -16,7 +17,7 @@
     <div class="dashboard-card metric-card" *ngFor="let metric of metrics">
       <span class="metric-icon" [ngClass]="metric.tone"><i class="feather" [ngClass]="metric.icon"></i></span>
       <div class="metric-copy"><p>{{ metric.label }}</p><h3>{{ metric.value }}</h3>
-        <svg class="sparkline" viewBox="0 0 203 22" preserveAspectRatio="none"><polyline [attr.points]="metric.trend"></polyline></svg>
+        <svg class="sparkline" aria-hidden="true" viewBox="0 0 203 22" preserveAspectRatio="none"><polyline [attr.points]="metric.trend"></polyline></svg>
       </div>
     </div>
   </div>
@@ -27,7 +28,7 @@
       <div class="attendance-bars">
         <div *ngFor="let month of ['Dec','Jan','Feb','Mar','Apr','May']; let i=index" class="month-bar">
           <strong>{{ [91,90,93,91,92,92][i] }}%</strong>
-          <div class="bar-track"><span [style.height.%]="[76,73,78,72,69,66][i]"></span></div><small>{{ month }}</small>
+          <div class="bar-track"><span [style.height.%]="[91,90,93,91,92,92][i]"></span></div><small>{{ month }}</small>
         </div>
       </div>
     </section>
