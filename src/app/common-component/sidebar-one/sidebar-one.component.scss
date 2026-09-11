@@ -32,14 +32,12 @@
   color: inherit;
 }
 
-#sidebar .sidebar-menu .sub-active > i.feather.icon-whatsapp {
-  background-color: currentColor !important;
-  mask: url('/assets/icons/svg/whatsapp-monochrome.svg') center / contain no-repeat;
-  -webkit-mask: url('/assets/icons/svg/whatsapp-monochrome.svg') center / contain no-repeat;
+#sidebar .sidebar-menu .sub-active > .whatsapp-menu-icon {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+  color: inherit;
   transform: scale(1.5);
-}
-
-#sidebar .sidebar-menu .sub-active > i.feather.icon-whatsapp::before {
-  content: none;
 }
 

@@ -1,9 +1,42 @@
 import { FormBuilder } from '@angular/forms';
-import { NEVER, of } from 'rxjs';
+import { NEVER, of, Subject } from 'rxjs';
 import { AddWhatsAppTemplatesComponent } from './add-whats-app-templates.component';
 import { AddWhatsAppTemplatesService } from './add-whats-app-templates.service';
 
 describe('Template header requests', () => {
+  it('blocks navigation and duplicate submits until a failed request finishes, then allows retry', () => {
+    const response = new Subject<any>();
+    const api = jasmine.createSpyObj('api', ['createTemplate']);
+    api.createTemplate.and.returnValue(response);
+    const component = new AddWhatsAppTemplatesComponent(new FormBuilder(), api, {} as any);
+    component.createForms();
+    component.addTemplateForm.patchValue({ templateName: 'offer', msgBodyText: 'Welcome.' });
+    component.submitTemplate();
+    expect(component.isSaving).toBeTrue();
+    expect(component.canDeactivate()).toBeFalse();
+    component.submitTemplate();
+    expect(api.createTemplate).toHaveBeenCalledTimes(1);
+    response.error({ error: { responseMessage: 'Please try again' } });
+    expect(component.isSaving).toBeFalse();
+    expect(component.canDeactivate()).toBeTrue();
+    expect(component.formError).toBe('Please try again');
+    api.createTemplate.and.returnValue(NEVER);
+    component.submitTemplate();
+    expect(api.createTemplate).toHaveBeenCalledTimes(2);
+  });
+
+  it('unlocks submission when the stream completes without a response', () => {
+    const response = new Subject<any>();
+    const api = { createTemplate: () => response };
+    const component = new AddWhatsAppTemplatesComponent(new FormBuilder(), api as any, {} as any);
+    component.createForms();
+    component.addTemplateForm.patchValue({ templateName: 'offer', msgBodyText: 'Welcome.' });
+    component.submitTemplate();
+    response.complete();
+    expect(component.isSaving).toBeFalse();
+    expect(component.canDeactivate()).toBeTrue();
+  });
+
   it('keeps the header contact mapping after editing and submits it', () => {
     const api = jasmine.createSpyObj('api', ['createTemplate']);
     api.createTemplate.and.returnValue(NEVER);

@@ -1,4 +1,5 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpContext, HttpHeaders } from '@angular/common/http';
+import { SKIP_GLOBAL_SPINNER } from 'src/app/core/interceptor/spinner/spinner-context';
 import { Injectable } from '@angular/core';
 import { Observable, switchMap } from 'rxjs';
 import { CookieService } from 'ngx-cookie-service';
@@ -24,7 +25,7 @@ export class AddWhatsAppTemplatesService {
       return this.submitTemplate(payload);
     }
 
-    return this.uploadTemplateMedia(file, mediaType, superadminId).pipe(
+    return this.uploadTemplateMedia(file, mediaType, superadminId, true).pipe(
       switchMap((response: any) => {
         if (response?.responseCode != null && Number(response.responseCode) !== 200) {
           throw response;
@@ -59,19 +60,19 @@ export class AddWhatsAppTemplatesService {
     );
   }
 
-  public uploadTemplateMedia(file: File, mediaType: string, superadminId?: string): Observable<any> {
+  public uploadTemplateMedia(file: File, mediaType: string, superadminId?: string, skipGlobalSpinner = false): Observable<any> {
     const formData = new FormData();
     formData.append('file', file, file.name);
     formData.append('mediaType', mediaType.toUpperCase());
     return this.http.post<any>(
       Constant.Site_Url + 'uploadWhatsAppTemplateMedia',
       formData,
-      this.authOptions()
+      this.authOptions(skipGlobalSpinner)
     );
   }
 
   private submitTemplate(payload: any): Observable<any> {
-    return this.http.post<any>(Constant.Site_Url + 'addTemplates', payload, this.authOptions());
+    return this.http.post<any>(Constant.Site_Url + 'addTemplates', payload, this.authOptions(true));
   }
 
   private getSuperadminId(): string {
@@ -79,13 +80,13 @@ export class AddWhatsAppTemplatesService {
     return currentUser?.superadminId || this.cookieService.get('superadminId');
   }
 
-  private authOptions(): { headers: HttpHeaders } {
+  private authOptions(skipGlobalSpinner = false): { headers: HttpHeaders; context: HttpContext } {
     const token = this.cookieService.get('token');
     return {
+      context: new HttpContext().set(SKIP_GLOBAL_SPINNER, skipGlobalSpinner),
       headers: token
         ? new HttpHeaders({ Authorization: `Bearer ${token}` })
         : new HttpHeaders()
     };
   }
 }
-

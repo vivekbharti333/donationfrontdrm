@@ -20,6 +20,8 @@ export class WhatsAppTemplatesComponent {
   public filteredData: any[] = [];
   public tableData: any[] = [];
   public searchDataValue = '';
+  public readonly categories = ['MARKETING', 'UTILITY', 'AUTHENTICATION', 'ALL'] as const;
+  public selectedCategory: typeof this.categories[number] = 'ALL';
   public pageSize = 10;
   public currentPage = 1;
   public totalData = 0;
@@ -229,6 +231,12 @@ export class WhatsAppTemplatesComponent {
     this.applyFilters();
   }
 
+  selectCategory(category: typeof this.categories[number]): void {
+    this.selectedCategory = category;
+    this.currentPage = 1;
+    this.applyFilters();
+  }
+
   sortData(sort: Sort): void {
     this.activeSort = sort;
     this.currentPage = 1;
@@ -257,12 +265,14 @@ export class WhatsAppTemplatesComponent {
 
   private applyFilters(): void {
     const term = this.searchDataValue.trim().toLowerCase();
-    let data = !term
-      ? [...this.fullData]
-      : this.fullData.filter(template =>
-          ['templateId', 'templateName', 'language', 'category', 'status']
-            .some(key => String(template?.[key] ?? '').toLowerCase().includes(term))
-        );
+    let data = this.fullData.filter(template => {
+      const matchesCategory = this.selectedCategory === 'ALL' ||
+        String(template?.category ?? '').trim().toUpperCase() === this.selectedCategory;
+      const matchesSearch = !term ||
+        ['templateId', 'templateName', 'language', 'category', 'status']
+          .some(key => String(template?.[key] ?? '').toLowerCase().includes(term));
+      return matchesCategory && matchesSearch;
+    });
 
     if (this.activeSort.active && this.activeSort.direction) {
       const direction = this.activeSort.direction === 'asc' ? 1 : -1;

@@ -1,6 +1,8 @@
 import { Component } from '@angular/core';
 import {
   NavigationEnd,
+  NavigationCancel,
+  NavigationError,
   NavigationStart,
   Router,
   Event as RouterEvent,
@@ -23,16 +25,7 @@ export class AppComponent {
         this.page = URL[1];
         this.spinner.show();
       }
-      if (event instanceof NavigationEnd) {
-        this.spinner.hide();
-      }
-    });
-
-    this.router.events.subscribe((event: RouterEvent) => {
-      if (event instanceof NavigationStart) {
-        this.spinner.show();
-      }
-      if (event instanceof NavigationEnd) {
+      if (event instanceof NavigationEnd || event instanceof NavigationCancel || event instanceof NavigationError) {
         this.spinner.hide();
       }
     });

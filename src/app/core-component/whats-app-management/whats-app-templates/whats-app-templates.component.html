@@ -45,6 +45,13 @@
 
 
 
+    <div class="template-category-filters" role="group" aria-label="Filter templates by category">
+      <button *ngFor="let category of categories" type="button"
+        [class.active]="selectedCategory === category"
+        [attr.aria-pressed]="selectedCategory === category"
+        (click)="selectCategory(category)">{{ category }}</button>
+    </div>
+
     <div class="template-state" *ngIf="isLoading">
       Loading templates...
     </div>
@@ -98,7 +105,7 @@
             </tbody>
           </table>
           <div class="template-state" *ngIf="tableData.length === 0">
-            {{ searchDataValue ? 'No matching templates found.' : 'No templates available.' }}
+            {{ searchDataValue || selectedCategory !== 'ALL' ? 'No matching templates found.' : 'No templates available.' }}
           </div>
         </div>
       </div>
@@ -125,7 +132,7 @@
         </div>
       </article>
       <div class="template-state" *ngIf="tableData.length === 0">
-        {{ searchDataValue ? 'No matching templates found.' : 'No templates available.' }}
+        {{ searchDataValue || selectedCategory !== 'ALL' ? 'No matching templates found.' : 'No templates available.' }}
       </div>
     </div>
 

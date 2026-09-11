@@ -15,7 +15,11 @@ const routes: Routes = [
       { path: 'whats-app-integration', component: WhatsAppIntegrationComponent },
       { path: 'whats-app-inbox', component: WhatsAppInboxComponent },
       { path: 'whats-app-templates', component: WhatsAppTemplatesComponent }, 
-      { path: 'add-whats-app-templates', component: AddWhatsAppTemplatesComponent }, 
+      {
+        path: 'add-whats-app-templates',
+        component: AddWhatsAppTemplatesComponent,
+        canDeactivate: [(component: AddWhatsAppTemplatesComponent) => component.canDeactivate()]
+      },
     ],
   },
 ];

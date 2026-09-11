@@ -7,6 +7,7 @@ import {
 } from '@angular/common/http';
 import { catchError, finalize, Observable, throwError } from 'rxjs';
 import { SpinnerService } from '../../core.index';
+import { SKIP_GLOBAL_SPINNER } from './spinner-context';
 
 @Injectable()
 export class SpinnerInterceptor implements HttpInterceptor {
@@ -16,6 +17,9 @@ export class SpinnerInterceptor implements HttpInterceptor {
     request: HttpRequest<unknown>,
     next: HttpHandler
   ): Observable<HttpEvent<unknown>> {
+    if (request.context.get(SKIP_GLOBAL_SPINNER)) {
+      return next.handle(request);
+    }
     this.spinner.show();
     return next.handle(request).pipe(
       finalize(() => {

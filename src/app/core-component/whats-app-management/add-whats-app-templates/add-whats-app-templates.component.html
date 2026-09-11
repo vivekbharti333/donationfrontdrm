@@ -414,8 +414,17 @@
 <!-- ACTIONS -->
 <div class="template-actions">
   <span class="form-error" *ngIf="formError">{{ formError }}</span>
-  <a class="cancel-button" [routerLink]="['../whats-app-templates']">Cancel</a>
+  <a class="cancel-button" [routerLink]="isSaving ? null : ['../whats-app-templates']"
+    [attr.aria-disabled]="isSaving" [attr.tabindex]="isSaving ? -1 : 0">Cancel</a>
   <button type="button" class="submit-button" [disabled]="isSaving" (click)="submitTemplate()">
     {{ isSaving ? 'Submitting...' : 'Create template' }}
   </button>
+</div>
+
+<div class="submission-overlay" *ngIf="isSaving" role="status" aria-live="polite" aria-busy="true">
+  <div class="submission-status">
+    <span class="spinner-border" aria-hidden="true"></span>
+    <h3>Submitting your template</h3>
+    <p>Please keep this page open while we upload any media and wait for the server response.</p>
+  </div>
 </div>

@@ -1,4 +1,5 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, HostListener, ViewChild } from '@angular/core';
+import { defer, finalize } from 'rxjs';
 import { FormGroup, FormArray, FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
@@ -23,6 +24,18 @@ export class AddWhatsAppTemplatesComponent {
   fileError = '';
   formError = '';
   isSaving = false;
+
+  canDeactivate(): boolean {
+    return !this.isSaving;
+  }
+
+  @HostListener('window:beforeunload', ['$event'])
+  onBeforeUnload(event: BeforeUnloadEvent): void {
+    if (this.isSaving) {
+      event.preventDefault();
+      event.returnValue = '';
+    }
+  }
 
   constructor(
     private fb: FormBuilder,
@@ -493,11 +506,11 @@ export class AddWhatsAppTemplatesComponent {
     };
 
     this.isSaving = true;
-    this.addWhatsAppTemplatesService
-      .createTemplate(payload, imageUrl ? null : this.selectedFile, form.mediaType)
+    defer(() => this.addWhatsAppTemplatesService
+      .createTemplate(payload, imageUrl ? null : this.selectedFile, form.mediaType))
+      .pipe(finalize(() => { this.isSaving = false; }))
       .subscribe({
       next: (res: any) => {
-        this.isSaving = false;
         const metaResult = res?.payload;
         if ((res?.responseCode != null && Number(res.responseCode) !== 200) ||
             (metaResult?.respCode != null && Number(metaResult.respCode) !== 200)) {
@@ -513,7 +526,6 @@ export class AddWhatsAppTemplatesComponent {
         }).then(() => this.router.navigateByUrl(routes.whatsAppTemplates));
       },
       error: (err: any) => {
-        this.isSaving = false;
         this.formError = err?.error?.responseMessage || err?.responseMessage || err?.message ||
           'Template could not be created.';
       }
