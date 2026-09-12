@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { AddUserComponent } from './users/add-user/add-user.component'; 
 import { UserManagementComponent } from './user-management.component';
 import { RolesPermissionsComponent } from './roles-permissions/roles-permissions.component';
 import { DeleteAccountComponent } from './delete-account/delete-account.component';
@@ -21,10 +20,6 @@ const routes: Routes = [
       {
         path: 'delete-account',
         component: DeleteAccountComponent,
-      },
-      {
-        path: 'add-users',
-        component: AddUserComponent,
       },
       {
         path: 'create-users',

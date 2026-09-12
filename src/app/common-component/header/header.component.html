@@ -3,17 +3,17 @@
 
   <!-- Logo -->
   <div class="header-left active" (mouseover)="miniSideBarMouseHover('over')" (mouseout)="miniSideBarMouseHover('out')" >
-    <a [routerLink] = "routes.adminDashboard" class="logo logo-normal">
+    <span class="logo logo-normal">
       <!-- <img src="assets/img/avatar/logo.png" alt="Logo" style="width: 190px; height: 40px;"> -->
       <img *ngIf="displayLogo" [src]="displayLogo" alt="Logo" class="crm-logo-long" (error)="hideBrokenLogo($event)">
-    </a>
-    <a [routerLink] = "routes.adminDashboard" class="logo logo-white">
+    </span>
+    <span class="logo logo-white">
       <!-- <img src="assets/img/logo-white.png" alt=""> -->
       <img *ngIf="displayLogo" [src]="displayLogo" alt="Logo" class="crm-logo-long" (error)="hideBrokenLogo($event)">
-    </a>
-    <a [routerLink] = "routes.adminDashboard" class="logo-small">
+    </span>
+    <span class="logo-small">
       <img *ngIf="displayLogoSmall" [src]="displayLogoSmall" alt="Logo" class="crm-logo-small" (error)="hideBrokenLogo($event)">
-    </a>
+    </span>
     <a id="toggle_btn" href="javascript:void(0);" (click)="toggleSidebar()" [ngClass]="{'d-none': page === 'pos'}">
       <i class="feather icon-chevrons-left" class="feather icon-16"></i>
     </a>
@@ -28,9 +28,9 @@
     </span>
   </a>
 
-  <a [routerLink]="routes.adminDashboard" class="mobile-header-logo" aria-label="Dashboard">
+  <span class="mobile-header-logo">
     <img *ngIf="displayLogo" [src]="displayLogo" alt="Logo" (error)="hideBrokenLogo($event)">
-  </a>
+  </span>
 
   <!-- Header Menu -->
   <ul class="nav user-menu">

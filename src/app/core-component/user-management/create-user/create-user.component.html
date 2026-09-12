@@ -29,6 +29,7 @@
 </div>
 
 <form [formGroup]="addUserForm" (ngSubmit)="saveUserDetails()">
+  <p class="text-muted">Fields marked <span class="text-danger">*</span> are required.</p>
 
   <div class="card">
     <div class="card-body">
@@ -80,31 +81,49 @@
         <div class="row">
           <div class="col-lg-4 col-md-6">
             <div class="mb-3">
-              <label class="form-label requiredField">Role Type</label>
-              <mat-select class="space-select select" formControlName="roleType" placeholder="Select Role Type">
+              <label class="form-label" id="roleType-label">Role Type <span class="text-danger" aria-hidden="true">*</span></label>
+              <mat-select class="space-select select" formControlName="roleType" placeholder="Select Role Type"
+                required aria-labelledby="roleType-label"
+                [class.is-invalid]="fieldError('roleType', 'Role Type')"
+                [attr.aria-describedby]="fieldError('roleType', 'Role Type') ? 'roleType-error' : null">
                 <mat-option *ngFor="let data of userRoleList" [value]="data.value">
                   {{data.name}}
                 </mat-option>
               </mat-select>
+              <small *ngIf="fieldError('roleType', 'Role Type') as error" id="roleType-error"
+                class="text-danger d-block mt-1" role="alert">{{ error }}</small>
             </div>
           </div>
 
-          <div class="col-lg-4 col-md-6">
+          <div class="col-lg-4 col-md-6" *ngIf="isMainAdmin">
             <div class="mb-3">
-              <label class="form-label requiredField">Team Leader</label>
-              <mat-select class="space-select select" formControlName="createdBy" placeholder="Select Team Leader">
-                <mat-option *ngFor="let data of userList" [value]="data.loginId">
-                  {{data.firstName}} {{data.lastName}}
-                </mat-option>
+              <label class="form-label" id="service-label">Service <span class="text-danger" aria-hidden="true">*</span></label>
+              <mat-select class="space-select select" formControlName="service" placeholder="Select Service"
+                required aria-labelledby="service-label"
+                [class.is-invalid]="fieldError('service', 'Service')"
+                [attr.aria-describedby]="fieldError('service', 'Service') ? 'service-error' : null">
+                <mat-option value="SCHOOL">SCHOOL</mat-option>
+                <mat-option value="DONATION">DONATION</mat-option>
+                <mat-option value="CAMPAIGN">CAMPAIGN</mat-option>
               </mat-select>
+              <small *ngIf="fieldError('service', 'Service') as error" id="service-error"
+                class="text-danger d-block mt-1" role="alert">{{ error }}</small>
             </div>
           </div>
 
           <div class="col-lg-4 col-md-6">
             <div class="mb-3">
-              <label class="form-label requiredField">Permission</label>
+              <label class="form-label">Permission (optional)</label>
               <mat-select class="space-select select" formControlName="permissions" placeholder="Select Permission"
-                multiple (selectionChange)="onPermissionChange($event)">
+                multiple panelClass="create-user-permissions-panel" (selectionChange)="onPermissionChange($event)">
+                <label class="permission-select-all"
+                  *ngIf="permissionsList.length" (click)="$event.stopPropagation()"
+                  (keydown)="$event.stopPropagation()">
+                  <input type="checkbox" [checked]="allPermissionsSelected"
+                    [indeterminate]="!allPermissionsSelected && !!addUserForm.get('permissions')?.value?.length"
+                    (change)="toggleAllPermissions($any($event.target).checked)">
+                  <span>Select All Permissions</span>
+                </label>
                 <mat-option *ngFor="let data of permissionsList" [value]="data.value">
                   {{data.name}}
                 </mat-option>
@@ -114,21 +133,31 @@
 
           <div class="col-lg-4 col-md-6">
             <div class="mb-3">
-              <label class="form-label requiredField">First Name</label>
-              <input type="text" class="form-control" formControlName="firstName" required>
+              <label class="form-label" for="firstName">First Name <span class="text-danger" aria-hidden="true">*</span></label>
+              <input type="text" class="form-control" id="firstName" formControlName="firstName" required
+                [class.is-invalid]="fieldError('firstName', 'First Name')"
+                [attr.aria-invalid]="!!fieldError('firstName', 'First Name')"
+                [attr.aria-describedby]="fieldError('firstName', 'First Name') ? 'firstName-error' : null">
+              <small *ngIf="fieldError('firstName', 'First Name') as error" id="firstName-error"
+                class="text-danger d-block mt-1" role="alert">{{ error }}</small>
             </div>
           </div>
 
           <div class="col-lg-4 col-md-6">
             <div class="mb-3">
-              <label class="form-label requiredField">Last Name</label>
-              <input type="text" class="form-control" formControlName="lastName" required>
+              <label class="form-label" for="lastName">Last Name <span class="text-danger" aria-hidden="true">*</span></label>
+              <input type="text" class="form-control" id="lastName" formControlName="lastName" required
+                [class.is-invalid]="fieldError('lastName', 'Last Name')"
+                [attr.aria-invalid]="!!fieldError('lastName', 'Last Name')"
+                [attr.aria-describedby]="fieldError('lastName', 'Last Name') ? 'lastName-error' : null">
+              <small *ngIf="fieldError('lastName', 'Last Name') as error" id="lastName-error"
+                class="text-danger d-block mt-1" role="alert">{{ error }}</small>
             </div>
           </div>
 
           <div class="col-lg-4 col-md-6">
             <div class="mb-3">
-              <label class="form-label requiredField">Date of Birth</label>
+              <label class="form-label">Date of Birth (optional)</label>
               <div class="input-blocks">
                 <div class="input-groupicon calender-input date-input1">
                   <i class="feather icon-calendar info-img"></i>
@@ -141,22 +170,37 @@
 
           <div class="col-lg-4 col-md-6">
             <div class="mb-3">
-              <label class="form-label requiredField">Mobile Number</label>
-              <input type="text" class="form-control" formControlName="mobileNo" required>
+              <label class="form-label" for="mobileNo">Mobile Number <span class="text-danger" aria-hidden="true">*</span></label>
+              <input type="text" class="form-control" id="mobileNo" formControlName="mobileNo" required
+                [class.is-invalid]="fieldError('mobileNo', 'Mobile Number')"
+                [attr.aria-invalid]="!!fieldError('mobileNo', 'Mobile Number')"
+                [attr.aria-describedby]="fieldError('mobileNo', 'Mobile Number') ? 'mobileNo-error' : null">
+              <small *ngIf="fieldError('mobileNo', 'Mobile Number') as error" id="mobileNo-error"
+                class="text-danger d-block mt-1" role="alert">{{ error }}</small>
             </div>
           </div>
 
           <div class="col-lg-4 col-md-6">
             <div class="mb-3">
-              <label class="form-label requiredField">Alternate Mobile Number</label>
-              <input type="text" class="form-control" formControlName="alternateMobile" required>
+              <label class="form-label" for="alternateMobile">Alternate Mobile Number <span class="text-danger" aria-hidden="true">*</span></label>
+              <input type="text" class="form-control" id="alternateMobile" formControlName="alternateMobile" required
+                [class.is-invalid]="fieldError('alternateMobile', 'Alternate Mobile Number')"
+                [attr.aria-invalid]="!!fieldError('alternateMobile', 'Alternate Mobile Number')"
+                [attr.aria-describedby]="fieldError('alternateMobile', 'Alternate Mobile Number') ? 'alternateMobile-error' : null">
+              <small *ngIf="fieldError('alternateMobile', 'Alternate Mobile Number') as error" id="alternateMobile-error"
+                class="text-danger d-block mt-1" role="alert">{{ error }}</small>
             </div>
           </div>
 
           <div class="col-lg-4 col-md-6">
             <div class="mb-3">
-              <label class="form-label requiredField">Email Id</label>
-              <input type="text" class="form-control" formControlName="emailId" required>
+              <label class="form-label" for="emailId">Email Id <span class="text-danger" aria-hidden="true">*</span></label>
+              <input type="text" class="form-control" id="emailId" formControlName="emailId" required
+                [class.is-invalid]="fieldError('emailId', 'Email Id')"
+                [attr.aria-invalid]="!!fieldError('emailId', 'Email Id')"
+                [attr.aria-describedby]="fieldError('emailId', 'Email Id') ? 'emailId-error' : null">
+              <small *ngIf="fieldError('emailId', 'Email Id') as error" id="emailId-error"
+                class="text-danger d-block mt-1" role="alert">{{ error }}</small>
             </div>
           </div>
 
@@ -311,7 +355,7 @@
 
   <div class="text-end mb-3">
     <!-- <button type="submit" class="btn btn-submit" [disabled]="!userForm.form.valid">Save User</button> -->
-    <button type="submit" class="btn btn-submit" [disabled]="isSubmitting || addUserForm.invalid">
+    <button type="submit" class="btn btn-submit" [disabled]="isSubmitting">
       <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm me-2"></span>
       {{ isSubmitting ? 'Saving...' : 'Save User' }}
     </button>

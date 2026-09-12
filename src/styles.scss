@@ -2288,3 +2288,36 @@ body .mini-sidebar .sidebar .sidebar-menu>ul>li.submenu-open ul li a {
   margin-bottom: 8px;
 }
 @import './app/core-component/donation-management/report/fundrising-officer-report/fundrising-officer-report.component';
+
+// The permission panel is rendered in the CDK overlay, outside the component.
+.create-user-permissions-panel {
+  .permission-select-all {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    min-height: 48px;
+    margin: 0;
+    padding: 0 16px;
+    cursor: pointer;
+    font-size: 14px;
+    border-bottom: 1px solid #e9ecef;
+
+    input {
+      width: 18px;
+      height: 18px;
+      margin: 0;
+      accent-color: #FF9F43;
+      cursor: pointer;
+    }
+  }
+
+  mat-option mat-pseudo-checkbox.mat-pseudo-checkbox {
+    display: inline-block;
+  }
+
+  .mat-pseudo-checkbox-full.mat-pseudo-checkbox-checked,
+  .mat-pseudo-checkbox-full.mat-pseudo-checkbox-indeterminate {
+    background-color: #FF9F43;
+    border-color: transparent;
+  }
+}

@@ -64,11 +64,10 @@ export class CreateUserComponent {
   }
 
   ngOnInit() {
-
+    this.isMainAdmin = (this.loginUser?.roleType || this.cookieService.get('roleType')) === Constant.mainAdmin;
     this.createForms();
     // this.checkRoleType();
     this.getUserRoleType();
-    this.getTeamleaderList();
   }
 
 
@@ -76,13 +75,13 @@ export class CreateUserComponent {
     this.addUserForm = this.fb.group({
       firstName: ['', [Validators.required, Validators.pattern('^[A-Za-z]+(?:[ .][A-Za-z]+)*$')]],
       lastName: ['', [Validators.required, Validators.pattern('^[A-Za-z]+(?:[ .][A-Za-z]+)*$')]],
-      roleType: [''],
-      createdBy: [''],
+      roleType: ['', Validators.required],
+      createdBy: [this.loginUser?.loginId || this.cookieService.get('loginId')],
       mobileNo: ['', [Validators.required, Validators.pattern('^[0-9]*$')]],
       alternateMobile: ['', [Validators.required, Validators.pattern('^[0-9]*$')]],
       emailId: ['', [Validators.required, Validators.email]],
       userPicture: [''],
-      service: ['DONATION'],
+      service: [this.isMainAdmin ? '' : 'DONATION', Validators.required],
       dob: [''],
       gender: [''],
       adminId: [''],
@@ -94,6 +93,10 @@ export class CreateUserComponent {
         this.addressForm()]),
     });
 
+    this.addUserForm.get('service')?.valueChanges.subscribe(() => {
+      this.addUserForm.get('permissions')?.setValue([]);
+    });
+
     this.addressList.at(0).valueChanges.subscribe(() => {
       if (this.sameAsCurrentAddress) {
         this.copyCurrentAddressToPermanent();
@@ -103,6 +106,25 @@ export class CreateUserComponent {
 
   get addressList(): FormArray {
     return this.addUserForm.get("addressList") as FormArray
+  }
+
+  fieldError(field: string, label: string): string | null {
+    const control = this.addUserForm.get(field);
+    if (!control?.touched || !control.invalid) {
+      return null;
+    }
+    if (control.hasError('required')) {
+      return `${label} is required.`;
+    }
+    if (control.hasError('email')) {
+      return 'Enter a valid email address (for example, name@example.com).';
+    }
+    if (control.hasError('pattern')) {
+      return field === 'firstName' || field === 'lastName'
+        ? `${label} must contain letters, with a single space or dot between words (no leading or trailing spaces).`
+        : `${label} must contain digits only (0–9), without spaces or a country-code prefix.`;
+    }
+    return `Please check ${label.toLowerCase()}.`;
   }
 
   addressForm() {
@@ -222,8 +244,40 @@ onPermissionChange(event: any) {
     { value: 'SALE_EXECUTIVE', name: 'SALE EXECUTIVE' },
   ];
 
-  permissionsList: data[] =[
-    { value: 'sale-dashboard', name: 'Donation Dashboard' },
+  get permissionsList(): data[] {
+    const service = this.addUserForm?.get('service')?.value;
+    return service === 'SCHOOL' ? this.schoolPermissionsList
+      : service === 'DONATION' ? this.donationPermissionsList : [];
+  }
+
+  get allPermissionsSelected(): boolean {
+    const selected: string[] = this.addUserForm.get('permissions')?.value || [];
+    return this.permissionsList.length > 0
+      && this.permissionsList.every(permission => selected.includes(permission.value));
+  }
+
+  toggleAllPermissions(checked: boolean): void {
+    const control = this.addUserForm.get('permissions');
+    control?.setValue(checked ? this.permissionsList.map(permission => permission.value) : []);
+    control?.markAsDirty();
+    control?.markAsTouched();
+  }
+
+  schoolPermissionsList: data[] = [
+    { value: 'school-dashboard', name: 'School Dashboard' },
+    { value: 'add-student', name: 'Add Student' },
+    { value: 'student-list', name: 'Student List' },
+    { value: 'generate-school-receipt', name: 'Generate School Receipt' },
+    { value: 'school-receipt-list', name: 'School Receipt List' },
+    { value: 'student-academic', name: 'Student Academic' },
+    { value: 'fee-type', name: 'Fee Type' },
+    { value: 'fee-structure', name: 'Fee Structure' },
+    { value: 'fee-assignment', name: 'Fee Assignment' },
+    { value: 'grade', name: 'Grade' },
+  ];
+
+  donationPermissionsList: data[] =[
+    { value: 'donation-dashboard', name: 'Donation Dashboard' },
     { value: 'create-user', name: 'Create User' },
     { value: 'user-list', name: 'User List' },
     { value: 'add-donation', name: 'Add Donation' },

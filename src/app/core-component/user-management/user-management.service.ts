@@ -170,8 +170,10 @@ export class UserManagementService {
         firstName: userDetails.firstName,
         lastName: userDetails.lastName,
         roleType: userDetails.roleType,
-        permissions: JSON.stringify(userDetails.permissions),
-        // permissions: userDetails.permissions,
+        permissions: '[' + (userDetails.permissions || [])
+          .map((permission: string) => "'" + JSON.stringify(permission).slice(1, -1)
+            .replace(/'/g, '\\u0027') + "'")
+          .join(',') + ']',
         mobileNo: userDetails.mobileNo,
         alternateMobile: userDetails.alternateMobile,
         emailId: userDetails.emailId,
