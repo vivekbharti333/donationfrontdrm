@@ -37,6 +37,7 @@ export class SchoolManagementService {
 
         // Student Basic Details
         admissionNo: studentDetails.admissionNo,
+        admissionDate: studentDetails.admissionDates,
         studentPicture: studentDetails.studentPicture,
         firstName: studentDetails.firstName,
         middleName: studentDetails.middleName,

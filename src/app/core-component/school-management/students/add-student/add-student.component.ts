@@ -52,13 +52,14 @@ public loginUser: any;
 
     // Student Basic Details
     admissionNo: ['', [Validators.required, Validators.pattern('[0-9A-Za-z ]{3,150}')]],
+    c: ['', Validators.required],
     studentPicture: [''],
     firstName: ['', Validators.required],
     middleName: [''],
     lastName: ['', Validators.required],
-    dob: [''],
+    dob: ['', Validators.required],
     dobPlace: [''],
-    gender: [''],
+    gender: ['', Validators.required],
     bloodGroup: [''],
     nationality: [''],
     category: [''],
@@ -94,6 +95,7 @@ public loginUser: any;
     lastClassAttended: [''],
 
     // Audit (usually hidden / auto-filled)
+
     createdBy: [''],
     createdByName: [''],
     superadminId: ['']
