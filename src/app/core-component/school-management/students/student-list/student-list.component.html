@@ -68,7 +68,8 @@
             <th mat-sort-header="phone">Name</th>
             <th mat-sort-header="fatherName">Father Name</th>
             <th mat-sort-header="role">Gender</th>
-            <th mat-sort-header="createdOn">Admission Date</th>
+            <th mat-sort-header="admissionDate">Admission Date</th>
+            <th mat-sort-header="createdAt">Register Date</th>
             <th mat-sort-header="status">Status</th>
             <th class="no-sort">Action</th>
           </tr>
@@ -94,10 +95,11 @@
             <td class="student-name-cell">{{ data.firstName }} {{ data.middleName }} {{ data.lastName }}</td>
             <td>{{ data.fatherName || '—' }}</td>
             <td>{{ data.gender }}</td>
+            <td>{{ (data.admissionDate | date : "dd-MM-yyyy") || '—' }}</td>
             <td>{{ data.createdAt | date : "dd-MM-yyyy | HH:mm" }}</td>
             <td>
               <button class="badge-button"
-                [ngClass]="{'badge-linesuccess': data.status === 'ACTIVE','badge-linedanger': data.status === 'INACTIVE'}"
+                [ngClass]="{'badge-linesuccess': data.status === 'ACTIVE','badge-linedanger': data.status === 'INACTIVE', 'status-new': data.status?.toUpperCase() === 'NEW'}"
                 (click)="changeUserStatus(data)">
                 {{ data.status }}
               </button>
@@ -126,7 +128,7 @@
           }
           @if (tableData.length === 0) {
           <tr>
-            <td colspan="8" class="student-empty-state">
+            <td colspan="9" class="student-empty-state">
               <span class="empty-state-icon"><i class="feather icon-users"></i></span>
               <strong>No students found</strong>
               <small>Try changing your search or refresh the student list.</small>
@@ -167,13 +169,14 @@
         </p>
         <p><span class="label">Address:</span> {{ student.currentAddress || '—' }}<ng-container *ngIf="student.currentCity">, {{ student.currentCity }}</ng-container><ng-container *ngIf="student.currentPin"> - {{ student.currentPin }}</ng-container></p>
         <p><span class="label">Gender:</span> {{ student.gender || '—' }}</p>
-        <p><span class="label">Admission Date:</span> {{ student.createdAt | date : "dd-MM-yyyy | HH:mm" }}</p>
+        <p><span class="label">Admission Date:</span> {{ (student.admissionDate | date : "dd-MM-yyyy") || '—' }}</p>
+        <p><span class="label">Register Date:</span> {{ student.createdAt | date : "dd-MM-yyyy | HH:mm" }}</p>
       </div>
 
       <div class="card-actions">
         <div class="left-actions">
           <button class="status-btn"
-            [ngClass]="{'btn-green': student.status === 'ACTIVE','btn-red': student.status === 'INACTIVE'}"
+            [ngClass]="{'btn-green': student.status === 'ACTIVE','btn-red': student.status === 'INACTIVE', 'status-new': student.status?.toUpperCase() === 'NEW'}"
             (click)="changeUserStatus(student)">
             {{ student.status }}
           </button>
@@ -315,6 +318,10 @@
               <div class="col-md-4 mb-3">
                 <label class="form-label requiredField">Admission No</label>
                 <input class="form-control" formControlName="admissionNo">
+              </div>
+              <div class="col-md-4 mb-3">
+                <label class="form-label" for="edit-admission-date">Admission Date</label>
+                <input id="edit-admission-date" type="date" class="form-control" formControlName="admissionDate">
               </div>
             </div>
 

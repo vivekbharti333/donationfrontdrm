@@ -265,6 +265,7 @@ export class StudentListComponent implements OnDestroy {
       // Student Basic Details
       id: [''],
       admissionNo: ['', [Validators.required, Validators.pattern('[0-9A-Za-z ]{3,150}')]],
+      admissionDate: [''],
       rollNumber: ['', [Validators.required, Validators.pattern('[0-9A-Za-z ]{1,100}')]],
       studentPicture: [''],
       grade: ['', Validators.required],
@@ -518,6 +519,7 @@ export class StudentListComponent implements OnDestroy {
       // Basic Identifiers
       id: rawData['id'] ?? rawData['studentId'],
       admissionNo: rawData['admissionNo'],
+      admissionDate: String(rawData['admissionDate'] || '').slice(0, 10),
       rollNumber: rawData['rollNumber'],
 
       // Student Basic Details
