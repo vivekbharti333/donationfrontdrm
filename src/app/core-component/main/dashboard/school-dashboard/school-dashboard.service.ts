@@ -11,6 +11,17 @@ export interface SchoolDashboardFilters {
   toDate?: string;
 }
 
+export interface SchoolDashboardSummary {
+  totalStudents: number;
+  todayPresent: number;
+  todayAbsent: number;
+  currentMonthFeeCollected: number;
+  feeDue: number;
+  dashboardDate: string;
+  collectionMonth: string;
+  timeZone: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class SchoolDashboardService {
   constructor(
@@ -18,6 +29,10 @@ export class SchoolDashboardService {
     private authentication: AuthenticationService,
     private cookies: CookieService,
   ) {}
+
+  getSchoolDashboard(): Observable<{ responseCode: number; responseMessage: string; payload?: SchoolDashboardSummary }> {
+    return this.post('getSchoolDashboard', { superadminId: this.superadminId });
+  }
 
   getSchoolDashboardDetails(filters: SchoolDashboardFilters = {}): Observable<any> {
     return this.post('getSchoolDashboardDetails', {

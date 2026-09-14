@@ -1,70 +1,182 @@
-<div class="school-dashboard">
-  <div class="dashboard-heading">
-    <div>
-      <span class="eyebrow">SCHOOL MANAGEMENT / OVERVIEW</span>
-      <h2>Student Dashboard</h2>
-      <p>A clear view of your students, academics and everyday progress.</p>
+<div class="school-dash">
+  <!-- Welcome banner -->
+  <section class="welcome-banner">
+    <div class="banner-copy">
+      <h2>{{ greeting }},<br><span class="banner-name">{{ userName }}</span> <span class="wave-hand">👋</span></h2>
+      <p>Together we build brighter futures,<br>one student at a time.</p>
     </div>
-    <div class="heading-actions">
-      <select class="form-select" [(ngModel)]="academicYear" aria-label="Academic session">
-        <option>2025-26</option><option>2026-27</option><option>2027-28</option>
-      </select>
-      <a class="btn btn-primary" routerLink="/school-management/add-student"><i class="feather icon-plus me-1"></i>Add Student</a>
+    <div class="banner-quote">
+      <p>“Education is not preparation for life; education is life itself.”</p>
+      <span>— John Dewey</span>
     </div>
-  </div>
+    <svg class="banner-art" viewBox="0 0 300 170" aria-hidden="true">
+      <circle cx="238" cy="34" r="26" fill="#ffd9ad"/>
+      <circle cx="70" cy="130" r="40" fill="#ffe7cc" opacity=".7"/>
+      <path d="M150 22l38 16-38 16-38-16z" fill="#2f3b52"/>
+      <path d="M118 44v14c0 6 14 12 32 12s32-6 32-12V44l-32 14z" fill="#3d4c68"/>
+      <line x1="188" y1="38" x2="188" y2="60" stroke="#e88835" stroke-width="3" stroke-linecap="round"/>
+      <circle cx="188" cy="64" r="4" fill="#e88835"/>
+      <path d="M28 96c10-8 22-8 30 0v34c-8-8-20-8-30 0z" fill="#ffffff" stroke="#e88835" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M58 96c8-8 20-8 30 0v34c-10-8-22-8-30 0z" fill="#ffffff" stroke="#e88835" stroke-width="3" stroke-linejoin="round"/>
+      <line x1="58" y1="96" x2="58" y2="130" stroke="#e88835" stroke-width="3"/>
+      <circle cx="238" cy="96" r="14" fill="#ffd166"/>
+      <line x1="238" y1="72" x2="238" y2="80" stroke="#e88835" stroke-width="3" stroke-linecap="round"/>
+      <line x1="214" y1="96" x2="222" y2="96" stroke="#e88835" stroke-width="3" stroke-linecap="round"/>
+      <line x1="254" y1="96" x2="262" y2="96" stroke="#e88835" stroke-width="3" stroke-linecap="round"/>
+      <line x1="221" y1="79" x2="227" y2="85" stroke="#e88835" stroke-width="3" stroke-linecap="round"/>
+      <line x1="249" y1="107" x2="255" y2="113" stroke="#e88835" stroke-width="3" stroke-linecap="round"/>
+      <path d="M196 138l52-16-20 20 12 8-10 4z" fill="#ffffff" stroke="#e88835" stroke-width="3" stroke-linejoin="round"/>
+      <text x="150" y="164" text-anchor="middle" font-size="13" font-weight="700" fill="#e88835" font-style="italic">Learn · Grow · Achieve</text>
+    </svg>
+  </section>
 
-  <div class="metric-grid">
-    <div class="dashboard-card metric-card" *ngFor="let metric of metrics">
-      <span class="metric-icon" [ngClass]="metric.tone"><i class="feather" [ngClass]="metric.icon"></i></span>
-      <div class="metric-copy"><p>{{ metric.label }}</p><h3>{{ metric.value }}</h3>
-        <svg class="sparkline" aria-hidden="true" viewBox="0 0 203 22" preserveAspectRatio="none"><polyline [attr.points]="metric.trend"></polyline></svg>
+<div class="dashboard-status"><span *ngIf="loading" role="status">Loading school totals...</span><span *ngIf="dashboardError" role="alert">{{ dashboardError }}</span><span *ngIf="summary">As of {{ summary.dashboardDate | date:'dd MMM yyyy' }} ({{ summary.timeZone }})</span><button type="button" class="btn btn-light" (click)="loadDashboard()" [disabled]="loading">{{ dashboardError ? 'Retry' : 'Refresh totals' }}</button></div>
+  <!-- Stat cards -->
+  <section class="stat-grid" [attr.aria-busy]="loading">
+    <div class="stat-card" *ngFor="let metric of metrics">
+      <span class="stat-icon" [ngClass]="metric.iconClass"><i class="feather" [ngClass]="metric.icon"></i></span>
+      <div class="stat-body">
+        <h3>{{ metric.value }}</h3>
+        <p>{{ metric.label }}</p>
+        <small class="stat-delta" *ngIf="metric.delta"><i class="feather icon-trending-up"></i>{{ metric.delta }}</small>
+        <small class="stat-note" *ngIf="metric.note">{{ metric.note }}</small>
       </div>
     </div>
-  </div>
+  </section>
 
-  <div class="dashboard-grid overview-grid">
-    <section class="dashboard-card attendance-card">
-      <div class="card-title"><h4><i class="feather icon-calendar"></i> Attendance Overview</h4><span>May 2026</span></div>
-      <div class="attendance-bars">
-        <div *ngFor="let month of ['Dec','Jan','Feb','Mar','Apr','May']; let i=index" class="month-bar">
-          <strong>{{ [91,90,93,91,92,92][i] }}%</strong>
-          <div class="bar-track"><span [style.height.%]="[91,90,93,91,92,92][i]"></span></div><small>{{ month }}</small>
+  <!-- Enrollment / Attendance / Events -->
+  <section class="dash-grid middle-grid">
+    <div class="dash-card">
+      <div class="card-head">
+        <h4><i class="feather icon-bar-chart-2"></i> Student Enrollment</h4>
+        <select class="form-select form-select-sm" aria-label="Enrollment period">
+          <option>This Academic Year</option>
+          <option>Last Academic Year</option>
+        </select>
+      </div>
+      <div class="card-body">
+        <apx-chart
+          [series]="enrollmentChart.series"
+          [chart]="enrollmentChart.chart"
+          [xaxis]="enrollmentChart.xaxis"
+          [yaxis]="enrollmentChart.yaxis"
+          [dataLabels]="enrollmentChart.dataLabels"
+          [plotOptions]="enrollmentChart.plotOptions"
+          [grid]="enrollmentChart.grid"
+          [tooltip]="enrollmentChart.tooltip"
+          [colors]="enrollmentChart.colors">
+        </apx-chart>
+      </div>
+    </div>
+
+    <div class="dash-card">
+      <div class="card-head">
+        <h4><i class="feather icon-calendar"></i> Attendance Overview</h4>
+        <span>Today</span>
+      </div>
+      <div class="card-body attendance-body">
+        <div class="donut-wrap">
+          <apx-chart
+            [series]="attendanceChart.series"
+            [chart]="attendanceChart.chart"
+            [labels]="attendanceChart.labels"
+            [colors]="attendanceChart.colors"
+            [legend]="attendanceChart.legend"
+            [dataLabels]="attendanceChart.dataLabels"
+            [stroke]="attendanceChart.stroke"
+            [plotOptions]="attendanceChart.plotOptions"
+            [tooltip]="attendanceChart.tooltip"
+            [responsive]="attendanceChart.responsive">
+          </apx-chart>
+          <div class="donut-center">
+            <strong>{{ summary ? (summary.todayPresent | number) : '-' }}</strong>
+            <span>Present today</span>
+          </div>
+        </div>
+        <ul class="attendance-legend">
+          <li *ngFor="let label of attendanceChart.labels">
+            <i [ngStyle]="{ 'background-color': attendanceColor(label) }"></i>
+            <span>{{ label }}</span>
+            <strong>{{ attendanceCount(label) | number }}</strong>
+          </li>
+        </ul>
+      </div>
+      <div class="attendance-note">
+        <i class="feather icon-trending-up"></i>
+        <span>Only marked present and absent records are included.</span>
+      </div>
+    </div>
+
+    <div class="dash-card">
+      <div class="card-head">
+        <h4><i class="feather icon-calendar"></i> Upcoming Events</h4>
+        <a class="view-all" href="javascript:void(0);">View All</a>
+      </div>
+      <div class="card-body event-list">
+        <div class="event-item" *ngFor="let event of events">
+          <div class="event-date" [ngClass]="event.tone">
+            <strong>{{ event.day }}</strong>
+            <small>{{ event.month }}</small>
+          </div>
+          <div class="event-info">
+            <strong>{{ event.title }}</strong>
+            <small><i class="feather icon-clock"></i>{{ event.time }}</small>
+            <small><i class="feather icon-map-pin"></i>{{ event.venue }}</small>
+          </div>
+          <i class="feather icon-chevron-right event-arrow"></i>
         </div>
       </div>
-    </section>
-    <section class="dashboard-card fee-card">
-      <div class="card-title"><h4>Fee Collection</h4></div>
-      <div class="fee-content"><div class="fee-donut"><span>Total<strong>₹11.1L</strong></span></div>
-        <ul><li><i class="collected"></i><span>Collected</span><strong>₹8.4L</strong></li><li><i class="pending"></i><span>Pending</span><strong>₹2.1L</strong></li><li><i class="discount"></i><span>Discount</span><strong>₹0.6L</strong></li></ul>
+    </div>
+  </section>
+
+  <!-- Admissions / Fees / Quick actions -->
+  <section class="dash-grid bottom-grid">
+    <div class="dash-card">
+      <div class="card-head">
+        <h4><i class="feather icon-user-plus"></i> Recent Admissions</h4>
+        <a class="view-all" routerLink="/school-management/student-list">View All</a>
       </div>
-    </section>
-  </div>
+      <div class="table-responsive">
+        <table class="table admissions-table">
+          <thead>
+            <tr><th>Student Name</th><th>Class</th><th>Date</th><th>Status</th></tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let student of admissions; let i = index">
+              <td>
+                <span class="student-avatar" [ngStyle]="{ 'background-color': avatarColors[i % avatarColors.length].bg, 'color': avatarColors[i % avatarColors.length].fg }">{{ initials(student.name) }}</span>
+                <span class="student-name">{{ student.name }}</span>
+              </td>
+              <td>{{ student.className }}</td>
+              <td>{{ student.date }}</td>
+              <td><span class="status-pill" [ngClass]="student.status.toLowerCase()">{{ student.status }}</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
 
-  <div class="dashboard-grid content-grid">
-    <section class="dashboard-card admissions-card">
-      <div class="card-title"><h4><i class="feather icon-user-plus"></i> Recent Admissions</h4><a routerLink="/school-management/student-list">View All</a></div>
-      <div class="table-responsive"><table class="table"><thead><tr><th>Student</th><th>Admission No.</th><th>Class</th><th>Father Name</th><th>Contact</th><th>Status</th></tr></thead><tbody>
-        <tr *ngFor="let student of admissions"><td><span class="student-avatar">{{ student.name.charAt(0) }}</span><strong>{{ student.name }}</strong></td><td>{{ student.admission }}</td><td>{{ student.className }}</td><td>{{ student.father }}</td><td>{{ student.contact }}</td><td><span class="status-pill">{{ student.status }}</span></td></tr>
-      </tbody></table></div>
-    </section>
-    <section class="dashboard-card academic-card">
-      <div class="card-title"><h4><i class="feather icon-book-open"></i> Academic Overview</h4></div>
-      <div class="academic-head"><span>Class</span><span>Students</span></div>
-      <div class="academic-row" *ngFor="let item of academicOverview"><span>{{ item.className }}</span><strong>{{ item.students }}</strong></div>
-      <div class="academic-row total"><strong>Total</strong><strong>1,248</strong></div>
-    </section>
-    <section class="dashboard-card quick-card">
-      <div class="card-title"><h4><i class="feather icon-zap"></i> Quick Actions</h4></div>
-      <div class="quick-grid"><a *ngFor="let action of quickActions" [routerLink]="action.route"><i class="feather" [ngClass]="action.icon"></i><span>{{ action.label }}</span></a></div>
-    </section>
-  </div>
+    <div class="dash-card">
+      <div class="card-head">
+        <h4><i class="fa-solid fa-indian-rupee-sign"></i> Fee Collection</h4>
+        <span>Current month</span>
+      </div>
+      <div class="card-body fee-body">
+        <div class="fee-summary"><div><h3>{{ money(summary?.currentMonthFeeCollected) }}</h3><small>Collected in {{ summary?.collectionMonth || 'the current month' }}</small></div></div>
+        <div class="fee-summary"><div><h3>{{ money(summary?.feeDue) }}</h3><small>Total outstanding fee balance</small></div></div>
+      </div>
+    </div>
 
-  <div class="dashboard-grid bottom-grid">
-    <section class="dashboard-card events-card"><div class="card-title"><h4><i class="feather icon-calendar"></i> Upcoming Events &amp; Exams</h4></div>
-      <div class="event-row" *ngFor="let event of events"><div class="event-date" [ngClass]="event.tone"><strong>{{event.day}}</strong><small>{{event.month}}</small></div><div><strong>{{event.title}}</strong><small>{{event.detail}}</small></div><span class="event-type" [ngClass]="event.tone">{{event.type}}</span></div>
-      <a class="view-calendar" href="javascript:void(0)">View Calendar <i class="feather icon-chevron-right"></i></a>
-    </section>
-    <section class="dashboard-card performance-card"><div class="card-title"><h4><i class="feather icon-bar-chart-2"></i> Examination Performance</h4></div><div class="performance-list"><div><span class="ring pass">82%</span><p>Pass</p><small>(1,024)</small></div><div><span class="ring fail">12%</span><p>Fail</p><small>(150)</small></div><div><span class="ring waiting">6%</span><p>Results Pending</p><small>(74)</small></div></div><div class="performance-foot"><span>Based on 1,248 students</span><strong>Term: Final Exam 2025-26</strong></div></section>
-    <section class="dashboard-card activity-card"><div class="card-title"><h4><i class="feather icon-activity"></i> Recent Activity</h4></div><div class="activity-row" *ngFor="let activity of activities"><i class="feather" [ngClass]="activity.icon"></i><div><strong>{{ activity.title }}</strong><small>{{ activity.detail }}</small></div><time>{{ activity.time }}</time></div></section>
-  </div>
+    <div class="dash-card">
+      <div class="card-head">
+        <h4><i class="feather icon-zap"></i> Quick Actions</h4>
+      </div>
+      <div class="card-body quick-grid">
+        <a class="quick-tile" *ngFor="let action of quickActions" [routerLink]="action.route">
+          <span class="quick-icon" [ngClass]="action.iconClass"><i class="feather" [ngClass]="action.icon"></i></span>
+          <span>{{ action.label }}</span>
+        </a>
+      </div>
+    </div>
+  </section>
 </div>
