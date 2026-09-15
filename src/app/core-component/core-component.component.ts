@@ -1,7 +1,6 @@
 import { Component, OnInit, Renderer2 } from '@angular/core';
 import {
   NavigationEnd,
-  NavigationStart,
   Router,
   Event as RouterEvent,
 } from '@angular/router';
@@ -51,10 +50,8 @@ export class CoreComponentComponent implements OnInit {
       this.expandMenu = res;
     });
     this.Router.events.subscribe((data: RouterEvent) => {
-      if (data instanceof NavigationStart) {
-        this.getRoutes(data);
-      }
       if (data instanceof NavigationEnd) {
+        this.getRoutes({ url: data.urlAfterRedirects });
         localStorage.removeItem('isMobileSidebar');
         this.mobileSidebar = false;
       }
@@ -88,25 +85,15 @@ export class CoreComponentComponent implements OnInit {
     this.getRoutes(this.Router);
   }
   private getRoutes(data: url): void {
-    const splitVal = data.url.split('/');
-    this.base = splitVal[1];
-    this.page = splitVal[2];
-    this.last = splitVal[3];
-    this.common.base.next(splitVal[1]);
-    this.common.page.next(splitVal[2]);
-    this.common.last.next(splitVal[3]);
-    if (
-      data.url.split('/')[1] === 'errorpages' ||
-      data.url.split('/')[2] === 'pos' ||
-      data.url.split('/')[1] === 'auth'
-    ) {
-      this.sideBaractivePath = true;
-    } else {
-      this.sideBaractivePath = false;
-    }
-    if (data.url.split('/')[2] === 'pos') {
-      this.sideBaractivePath = true;
-    }
+    const splitVal = (data.url || '').split(/[?#]/)[0].split('/');
+    this.base = splitVal[1] || '';
+    this.page = splitVal[2] || '';
+    this.last = splitVal[3] || '';
+    this.common.base.next(this.base);
+    this.common.page.next(this.page);
+    this.common.last.next(this.last);
+    this.sideBaractivePath = this.base === 'errorpages'
+      || this.base === 'auth' || this.page === 'pos';
     if (this.page === 'pos') {
       this.miniSidebar = false;
     }

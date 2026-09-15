@@ -1,7 +1,8 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpContext, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { CookieService } from 'ngx-cookie-service';
-import { Observable } from 'rxjs';
+import { Observable, timeout } from 'rxjs';
+import { SKIP_GLOBAL_SPINNER } from 'src/app/core/interceptor/spinner/spinner-context';
 import { AuthenticationService } from 'src/app/auth/authentication.service';
 import { Constant } from 'src/app/core/constant/constants';
 
@@ -68,11 +69,13 @@ export class SchoolDashboardService {
 
   private post(endpoint: string, payload: Record<string, unknown>): Observable<any> {
     const token = this.authentication.getLoginUser()?.token || this.cookies.get('token');
-    const options = token
-      ? { headers: new HttpHeaders({ Authorization: `Bearer ${token}` }) }
-      : {};
+    const options = {
+      context: new HttpContext().set(SKIP_GLOBAL_SPINNER, true),
+      ...(token ? { headers: new HttpHeaders({ Authorization: `Bearer ${token}` }) } : {}),
+    };
 
-    return this.http.post<any>(Constant.Site_Url + endpoint, { payload }, options);
+    return this.http.post<any>(Constant.Site_Url + endpoint, { payload }, options)
+      .pipe(timeout(15000));
   }
 
   private get superadminId(): string {

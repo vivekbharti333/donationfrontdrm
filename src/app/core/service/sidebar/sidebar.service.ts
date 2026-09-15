@@ -29,6 +29,7 @@ export class SidebarService {
     false
   );
 
+  
   public switchSideMenuPosition(): void {
     if (localStorage.getItem('sideBarPosition')) {
       this.sideBarPosition.next('false');

@@ -34,7 +34,7 @@ export class Constant {
     public static MONTH = 'BYDATE';
     public static CUSTOM = 'CUSTOM'
 
-    //Service
+    //Service 
     public static donation = 'DONATION';
 
     //Code

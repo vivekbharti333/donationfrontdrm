@@ -1,5 +1,5 @@
 // import { Component } from '@angular/core';
-import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
+import { AfterViewInit, OnInit, Component, ElementRef, ViewChild } from '@angular/core';
 import {
   Chart,
   DoughnutController,
@@ -56,7 +56,7 @@ import { CookieService } from 'ngx-cookie-service';
   templateUrl: './donation-dashboard.component.html',
   styleUrl: './donation-dashboard.component.scss'
 })
-export class DonationDashboardComponent implements AfterViewInit {
+export class DonationDashboardComponent implements OnInit, AfterViewInit {
   @ViewChild('mobileSummaryCards') mobileSummaryCards?: ElementRef<HTMLDivElement>;
 
   public username!: string;
@@ -111,9 +111,14 @@ export class DonationDashboardComponent implements AfterViewInit {
   public currencyType: any;
 
 
- ngAfterViewInit(): void {
+ ngOnInit(): void {
   this.username = this.cookieService.get('firstName') + " " + this.cookieService.get('lastName');
+  const currentDate = new Date();
+  const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  this.currentMonthName = months[currentDate.getMonth()];
+ }
 
+ ngAfterViewInit(): void {
   this.initPaymentChart();
   this.initDonationTrendChart();
 
@@ -124,9 +129,6 @@ export class DonationDashboardComponent implements AfterViewInit {
   this.getDonationCountAndAmountGroupByName('TODAY');
   this.getCountAndSum();
 
-  const currentDate = new Date();
-  const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-  this.currentMonthName = months[currentDate.getMonth()];
 }
 
   constructor(

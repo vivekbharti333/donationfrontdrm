@@ -92,10 +92,12 @@ export class SchoolDashboardComponent implements OnInit, OnDestroy {
   userName = 'Priya Sharma';
   academicYear = '2026 - 2027';
 
-  get metrics(): StatMetric[] {
+  metrics: StatMetric[] = [];
+
+  private updateMetrics(): void {
     const d = this.summary;
     const count = (value: number | undefined) => value == null ? '-' : Number(value).toLocaleString('en-IN');
-    return [
+    this.metrics = [
       { label: 'Total Students', value: count(d?.totalStudents), icon: 'fa-solid fa-users', iconClass: 'orange' },
       { label: "Today's Present", value: count(d?.todayPresent), icon: 'fa-solid fa-user-check', iconClass: 'green' },
       { label: "Today's Absent", value: count(d?.todayAbsent), icon: 'fa-solid fa-user-xmark', iconClass: 'purple' },
@@ -119,14 +121,16 @@ export class SchoolDashboardComponent implements OnInit, OnDestroy {
     this.loading = true;
     this.dashboardError = '';
     this.summary = null;
+    this.updateMetrics();
     this.dashboardRequest = this.dashboardService.getSchoolDashboard().subscribe({
       next: response => {
         this.loading = false;
-        if (Number(response.responseCode) !== 200 || !response.payload) {
-          this.dashboardError = response.responseMessage || 'Could not load school dashboard.';
+        if (Number(response?.responseCode) !== 200 || !response?.payload) {
+          this.dashboardError = response?.responseMessage || 'Could not load school dashboard.';
           return;
         }
         this.summary = response.payload;
+        this.updateMetrics();
       },
       error: () => { this.loading = false; this.dashboardError = 'Could not load school dashboard. Please try again.'; },
     });
@@ -186,7 +190,14 @@ export class SchoolDashboardComponent implements OnInit, OnDestroy {
           this.enrollmentError = response?.responseMessage || 'Could not load student enrollment.';
           return;
         }
-        const rows = [...response.payload.classes].sort((a, b) =>
+        const classes = response.payload.classes;
+        if (classes.some(row => !row || typeof row.className !== 'string'
+          || row.studentCount == null || String(row.studentCount).trim() === ''
+          || !Number.isSafeInteger(Number(row.studentCount)) || Number(row.studentCount) < 0)) {
+          this.enrollmentError = 'Could not load student enrollment: invalid class data.';
+          return;
+        }
+        const rows = [...classes].sort((a, b) =>
           a.className.localeCompare(b.className, undefined, { numeric: true, sensitivity: 'base' }));
         this.enrollmentSession = response.payload.sessionName;
         this.enrollmentEmpty = rows.length === 0;
@@ -237,7 +248,11 @@ export class SchoolDashboardComponent implements OnInit, OnDestroy {
   attendanceChart: Partial<ChartOptions>;
   feeChart: Partial<ChartOptions>;
 
-  constructor(private authentication: AuthenticationService, private dashboardService: SchoolDashboardService) {
+  constructor(
+    private authentication: AuthenticationService, 
+    private dashboardService: SchoolDashboardService) 
+    {
+    this.updateMetrics();
     const loginUser: any = this.authentication.getLoginUser();
     if (loginUser && (loginUser.firstName || loginUser.name || loginUser.userName)) {
       this.userName = loginUser.firstName || loginUser.name || loginUser.userName;
@@ -263,7 +278,7 @@ export class SchoolDashboardComponent implements OnInit, OnDestroy {
       colors: ['#ff8a2b'],
     };
 
-    this.attendanceChart = {
+    this.attendanceChart = { 
       series: [0, 0, 0, 0, 0],
       chart: { type: 'donut', height: 230, fontFamily: 'inherit' },
       labels: ['Present', 'Absent', 'Late', 'Half Day', 'Leave'],

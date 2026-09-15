@@ -97,3 +97,35 @@ describe('School dashboard enrollment', () => {
     expect(component.enrollmentSession).toBe('2025-26');
   });
 });
+
+
+describe('School dashboard rendering safety', () => {
+  it('keeps metric objects stable between renders and updates them after loading', () => {
+    const pending = new Subject<any>();
+    const service = {
+      getSchoolDashboard: () => pending,
+      getSchoolAttendanceOverview: () => of({ responseCode: 500 }),
+      getSchoolStudentEnrollment: () => of({ responseCode: 500 }),
+    };
+    const component = new SchoolDashboardComponent({ getLoginUser: () => ({}) } as any, service as any);
+    component.ngOnInit();
+    const metrics = component.metrics;
+    expect(component.metrics).toBe(metrics);
+    pending.next({ responseCode: 200, payload: { totalStudents: 25 } });
+    expect(component.metrics[0].value).toBe('25');
+    expect(component.metrics).not.toBe(metrics);
+    component.ngOnDestroy();
+  });
+
+  for (const row of [null, { className: null, studentCount: 2 }, { className: 'Class 1', studentCount: 'invalid' }, { className: 'Class 1', studentCount: Infinity }, { className: 'Class 1', studentCount: -1 }]) {
+    it('rejects malformed enrollment data before chart rendering: ' + JSON.stringify(row), () => {
+      const service = { getSchoolStudentEnrollment: () => of({ responseCode: 200, payload: { classes: [row] } }) };
+      const component = new SchoolDashboardComponent({ getLoginUser: () => ({}) } as any, service as any);
+      component.loadEnrollment();
+      expect(component.enrollmentLoading).toBeFalse();
+      expect(component.enrollmentError).not.toBe('');
+      expect(component.enrollmentChart.series[0].data).toEqual([]);
+      component.ngOnDestroy();
+    });
+  }
+});
