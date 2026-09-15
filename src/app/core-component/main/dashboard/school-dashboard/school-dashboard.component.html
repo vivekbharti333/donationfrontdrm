@@ -3,38 +3,20 @@
   <section class="welcome-banner">
     <div class="banner-copy">
       <h2>{{ greeting }},<br><span class="banner-name">{{ userName }}</span> <span class="wave-hand">👋</span></h2>
-      <p>Together we build brighter futures,<br>one student at a time.</p>
+      <p>Together we build brighter futures, one student at a time.</p>
     </div>
     <div class="banner-quote">
       <p>“Education is not preparation for life; education is life itself.”</p>
       <span>— John Dewey</span>
     </div>
-    <svg class="banner-art" viewBox="0 0 300 170" aria-hidden="true">
-      <circle cx="238" cy="34" r="26" fill="#ffd9ad"/>
-      <circle cx="70" cy="130" r="40" fill="#ffe7cc" opacity=".7"/>
-      <path d="M150 22l38 16-38 16-38-16z" fill="#2f3b52"/>
-      <path d="M118 44v14c0 6 14 12 32 12s32-6 32-12V44l-32 14z" fill="#3d4c68"/>
-      <line x1="188" y1="38" x2="188" y2="60" stroke="#e88835" stroke-width="3" stroke-linecap="round"/>
-      <circle cx="188" cy="64" r="4" fill="#e88835"/>
-      <path d="M28 96c10-8 22-8 30 0v34c-8-8-20-8-30 0z" fill="#ffffff" stroke="#e88835" stroke-width="3" stroke-linejoin="round"/>
-      <path d="M58 96c8-8 20-8 30 0v34c-10-8-22-8-30 0z" fill="#ffffff" stroke="#e88835" stroke-width="3" stroke-linejoin="round"/>
-      <line x1="58" y1="96" x2="58" y2="130" stroke="#e88835" stroke-width="3"/>
-      <circle cx="238" cy="96" r="14" fill="#ffd166"/>
-      <line x1="238" y1="72" x2="238" y2="80" stroke="#e88835" stroke-width="3" stroke-linecap="round"/>
-      <line x1="214" y1="96" x2="222" y2="96" stroke="#e88835" stroke-width="3" stroke-linecap="round"/>
-      <line x1="254" y1="96" x2="262" y2="96" stroke="#e88835" stroke-width="3" stroke-linecap="round"/>
-      <line x1="221" y1="79" x2="227" y2="85" stroke="#e88835" stroke-width="3" stroke-linecap="round"/>
-      <line x1="249" y1="107" x2="255" y2="113" stroke="#e88835" stroke-width="3" stroke-linecap="round"/>
-      <path d="M196 138l52-16-20 20 12 8-10 4z" fill="#ffffff" stroke="#e88835" stroke-width="3" stroke-linejoin="round"/>
-      <text x="150" y="164" text-anchor="middle" font-size="13" font-weight="700" fill="#e88835" font-style="italic">Learn · Grow · Achieve</text>
-    </svg>
+    <div class="banner-visual"><img src="assets/img/school-welcome-students-transparent.png" alt="Students smiling and holding their school books"><span class="banner-motto" aria-hidden="true">Learn<br>Grow<br>Achieve</span></div>
   </section>
 
-<div class="dashboard-status"><span *ngIf="loading" role="status">Loading school totals...</span><span *ngIf="dashboardError" role="alert">{{ dashboardError }}</span><span *ngIf="summary">As of {{ summary.dashboardDate | date:'dd MMM yyyy' }} ({{ summary.timeZone }})</span><button type="button" class="btn btn-light" (click)="loadDashboard()" [disabled]="loading">{{ dashboardError ? 'Retry' : 'Refresh totals' }}</button></div>
+<div class="dashboard-status"><span *ngIf="loading" role="status">Loading school totals...</span><span *ngIf="dashboardError" role="alert">{{ dashboardError }}</span><button type="button" class="btn btn-light" (click)="loadDashboard()" [disabled]="loading">{{ dashboardError ? 'Retry' : 'Refresh totals' }}</button></div>
   <!-- Stat cards -->
   <section class="stat-grid" [attr.aria-busy]="loading">
-    <div class="stat-card" *ngFor="let metric of metrics">
-      <span class="stat-icon" [ngClass]="metric.iconClass"><i class="feather" [ngClass]="metric.icon"></i></span>
+    <div class="stat-card" *ngFor="let metric of metrics" [ngClass]="'stat-' + metric.iconClass">
+      <span class="stat-icon" [ngClass]="metric.iconClass"><i [ngClass]="metric.icon" aria-hidden="true"></i></span>
       <div class="stat-body">
         <h3>{{ metric.value }}</h3>
         <p>{{ metric.label }}</p>

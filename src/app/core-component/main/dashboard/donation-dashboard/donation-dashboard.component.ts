@@ -75,11 +75,6 @@ export class DonationDashboardComponent implements AfterViewInit {
   }
   public activeMobileSummaryIndex = 0;
   public readonly mobileSummaryIndexes = [0, 1, 2, 3];
-  private mobileSummarySlideTimer?: ReturnType<typeof setTimeout>;
-  private mobileSummaryTouchStartX = 0;
-  private mobileSummaryTouchStartY = 0;
-  private mobileSummaryStartScrollLeft = 0;
-  private isMobileSummarySwiping = false;
   private mobileSummaryPointerStartX = 0;
   private mobileSummaryPointerStartY = 0;
   private mobileSummaryPointerStartScrollLeft = 0;
@@ -588,7 +583,7 @@ changeTopDonorTab(tab: string): void {
       return;
     }
 
-    this.showMobileSummarySlideAnimation(container);
+
 
     const cards = Array.from(container.querySelectorAll('.summary-card')) as HTMLElement[];
     if (!cards.length) {
@@ -610,60 +605,6 @@ changeTopDonorTab(tab: string): void {
     });
 
     this.activeMobileSummaryIndex = closestIndex;
-  }
-
-  private showMobileSummarySlideAnimation(container: HTMLDivElement): void {
-    container.classList.add('is-sliding');
-
-    if (this.mobileSummarySlideTimer) {
-      clearTimeout(this.mobileSummarySlideTimer);
-    }
-
-    this.mobileSummarySlideTimer = setTimeout(() => {
-      container.classList.remove('is-sliding');
-    }, 220);
-  }
-
-  onMobileSummaryTouchStart(event: TouchEvent): void {
-    const container = this.mobileSummaryCards?.nativeElement;
-    const touch = event.touches[0];
-    if (!container || !touch) {
-      return;
-    }
-
-    this.mobileSummaryTouchStartX = touch.clientX;
-    this.mobileSummaryTouchStartY = touch.clientY;
-    this.mobileSummaryStartScrollLeft = container.scrollLeft;
-    this.isMobileSummarySwiping = true;
-    container.classList.add('is-dragging');
-  }
-
-  onMobileSummaryTouchMove(event: TouchEvent): void {
-    const container = this.mobileSummaryCards?.nativeElement;
-    const touch = event.touches[0];
-    if (!container || !touch || !this.isMobileSummarySwiping) {
-      return;
-    }
-
-    const deltaX = this.mobileSummaryTouchStartX - touch.clientX;
-    const deltaY = this.mobileSummaryTouchStartY - touch.clientY;
-
-    if (Math.abs(deltaX) > Math.abs(deltaY)) {
-      event.preventDefault();
-      this.showMobileSummarySlideAnimation(container);
-      container.scrollLeft = this.mobileSummaryStartScrollLeft + deltaX;
-      this.onMobileSummaryScroll();
-    }
-  }
-
-  onMobileSummaryTouchEnd(): void {
-    if (!this.isMobileSummarySwiping) {
-      return;
-    }
-
-    this.isMobileSummarySwiping = false;
-    this.mobileSummaryCards?.nativeElement.classList.remove('is-dragging');
-    this.scrollMobileSummaryTo(this.activeMobileSummaryIndex);
   }
 
   onMobileSummaryPointerDown(event: PointerEvent): void {

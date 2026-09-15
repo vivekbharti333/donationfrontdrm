@@ -98,6 +98,7 @@ export class SchoolManagementService {
 
         // Student Basic Details
         admissionNo: studentDetails.admissionNo,
+        admissionDate: studentDetails.admissionDate || null,
         rollNumber: studentDetails.rollNumber,
         studentPicture: studentDetails.studentPicture,
         grade: studentDetails.grade,

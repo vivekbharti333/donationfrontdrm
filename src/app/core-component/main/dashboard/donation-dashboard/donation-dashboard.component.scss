@@ -1202,7 +1202,9 @@
     padding: 4px 18px 8px;
     scroll-padding-left: 18px;
     scroll-snap-type: x mandatory;
-    touch-action: pan-y;
+    touch-action: pan-x pan-y pinch-zoom;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
     user-select: none;
     -webkit-overflow-scrolling: touch;
     cursor: grab;
@@ -1213,11 +1215,6 @@
     scroll-snap-type: none;
   }
 
-  .top-cards.is-sliding .summary-card,
-  .top-cards.is-dragging .summary-card {
-    transform: scale(.96);
-    opacity: .78;
-  }
 
   .top-cards::-webkit-scrollbar {
     display: none;
@@ -1230,16 +1227,14 @@
     min-height: 118px;
     padding: 16px 18px;
     scroll-snap-align: start;
-    scroll-snap-stop: always;
-    transform: scale(.94);
-    opacity: .72;
-    transition: transform .28s cubic-bezier(.22, .8, .22, 1), opacity .28s ease, box-shadow .28s ease;
-    will-change: transform, opacity;
+    scroll-snap-stop: normal;
+    transform: none;
+    opacity: 1;
   }
 
   .top-cards .summary-card.active-mobile-summary {
     opacity: 1;
-    transform: translateY(-2px) scale(1);
+    transform: none;
     box-shadow: 0 14px 30px rgba(16, 24, 40, 0.14);
   }
 

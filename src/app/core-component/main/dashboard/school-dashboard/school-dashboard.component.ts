@@ -96,9 +96,9 @@ export class SchoolDashboardComponent implements OnInit, OnDestroy {
     const d = this.summary;
     const count = (value: number | undefined) => value == null ? '-' : Number(value).toLocaleString('en-IN');
     return [
-      { label: 'Total Students', value: count(d?.totalStudents), icon: 'icon-users', iconClass: 'orange' },
-      { label: "Today's Present", value: count(d?.todayPresent), icon: 'icon-user-check', iconClass: 'green' },
-      { label: "Today's Absent", value: count(d?.todayAbsent), icon: 'icon-user-x', iconClass: 'purple' },
+      { label: 'Total Students', value: count(d?.totalStudents), icon: 'fa-solid fa-users', iconClass: 'orange' },
+      { label: "Today's Present", value: count(d?.todayPresent), icon: 'fa-solid fa-user-check', iconClass: 'green' },
+      { label: "Today's Absent", value: count(d?.todayAbsent), icon: 'fa-solid fa-user-xmark', iconClass: 'purple' },
       { label: 'Fees Collected This Month', value: this.money(d?.currentMonthFeeCollected), icon: 'fa-solid fa-indian-rupee-sign', iconClass: 'pink', note: d?.collectionMonth },
       { label: 'Fee Due', value: this.money(d?.feeDue), icon: 'fa-solid fa-indian-rupee-sign', iconClass: 'blue', note: 'Total outstanding balance' },
     ];

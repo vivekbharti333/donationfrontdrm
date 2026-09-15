@@ -6,6 +6,7 @@
 
 .student-page-header {
   align-items: center;
+  padding-top: 20px;
   margin-bottom: 18px;
 }
 
@@ -229,10 +230,17 @@
 
 .badge-button {
   border-radius: 16px;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 600;
-  min-width: 72px;
-  padding: 5px 10px;
+  min-width: 88px;
+  min-height: 40px;
+  padding: 8px 16px;
+}
+
+.badge-button.status-new, .status-btn.status-new {
+  background: #218838;
+  border: 1px solid #218838;
+  color: #fff;
 }
 
 .edit-delete-action {
@@ -410,9 +418,11 @@
   border: 0;
   border-radius: 6px;
   color: #fff;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 600;
-  padding: 5px 10px;
+  min-width: 88px;
+  min-height: 44px;
+  padding: 8px 16px;
 }
 
 .btn-green {
