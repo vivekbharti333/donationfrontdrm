@@ -6,35 +6,36 @@ import { SalesDashboardComponent } from './sales-dashboard/sales-dashboard.compo
 import { CampaignDashboardComponent } from './campaign-dashboard/campaign-dashboard.component';
 import { DonationDashboardComponent } from './donation-dashboard/donation-dashboard.component';
 import { SchoolDashboardComponent } from './school-dashboard/school-dashboard.component';
-import { AuthGuard } from 'src/app/core/core.index';
+import { DashboardPermissionGuard } from 'src/app/core/guard/auth/dashboard-permission.guard';
 
 const routes: Routes = [{ path: '', component: DashboardComponent,
 children: [
   {
     path: '',
     pathMatch: 'full',
-    redirectTo: 'admin-dashboard',  
+    component: DashboardComponent,
+    canActivate: [DashboardPermissionGuard],
   },
   {
     path: 'admin-dashboard',
-    component: AdminDashboardComponent, canActivate: [AuthGuard]
+    component: AdminDashboardComponent, canActivate: [DashboardPermissionGuard]
   },
   {
     path: 'sales-dashboard',
-    component: SalesDashboardComponent, canActivate: [AuthGuard]
+    component: SalesDashboardComponent, canActivate: [DashboardPermissionGuard]
   },
   {
     path: 'campaign-dashboard',
-    component: CampaignDashboardComponent
+    component: CampaignDashboardComponent, canActivate: [DashboardPermissionGuard]
   },
   {
     path: 'donation-dashboard',
-    component: DonationDashboardComponent
+    component: DonationDashboardComponent, canActivate: [DashboardPermissionGuard]
   },
   {
     path: 'school-dashboard',
     component: SchoolDashboardComponent,
-    canActivate: [AuthGuard]
+    canActivate: [DashboardPermissionGuard]
   }
 ]
 }];

@@ -1,3 +1,4 @@
+import { parsePermissions, hasMenuPermission } from '../../helpers/dashboard-permissions';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { routes } from '../../core.index';
@@ -51,34 +52,7 @@ export class SidebarService {
   }
 
   private getPermissions(): string[] {
-    const storedPermissions = localStorage.getItem('menuPermission');
-    if (!storedPermissions) {
-      return [];
-    }
-
-    try {
-      const permissions = JSON.parse(storedPermissions);
-
-      if (Array.isArray(permissions)) {
-        return permissions.filter((permission): permission is string =>
-          typeof permission === 'string'
-        );
-      }
-
-      // Supports sessions created before permissions were stored as an array.
-      if (typeof permissions === 'string') {
-        const parsed = JSON.parse(permissions.replace(/'/g, '"'));
-        return Array.isArray(parsed)
-          ? parsed.filter((permission): permission is string =>
-              typeof permission === 'string'
-            )
-          : [];
-      }
-    } catch {
-      return [];
-    }
-
-    return [];
+    return parsePermissions(localStorage.getItem('menuPermission'));
   }
 
   public getFilteredSidebarData() {
@@ -90,7 +64,7 @@ export class SidebarService {
           .map(menuItem => ({
             ...menuItem,
             subMenus: menuItem.subMenus.filter(subMenuItem =>
-              permissions.includes(subMenuItem.permission)
+              hasMenuPermission(permissions, subMenuItem.permission)
             ),
           }))
           .filter(menuItem => menuItem.subMenus.length > 0),

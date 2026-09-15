@@ -5,7 +5,7 @@ import { UserManagementService } from 'src/app/core-component/user-management/us
 import { MessageService } from 'primeng/api';
 import { CommonComponentService } from 'src/app/common-component/common-component.service';
 import { CookieService } from 'ngx-cookie-service';
-import { Constant } from 'src/app/core/constant/constants';
+import { parsePermissions, permittedDashboardRoutes } from 'src/app/core/helpers/dashboard-permissions';
 
 @Component({
   selector: 'app-signin',
@@ -55,7 +55,7 @@ export class SigninComponent {
             if (response['payload']['respCode'] == '200') {
               localStorage.clear();
               localStorage.setItem('authorized', 'true');
-              const permission = this.parsePermissions(response['payload']['permissions']);
+              const permission = parsePermissions(response['payload']['permissions']);
               localStorage.setItem('menuPermission', JSON.stringify(permission));
               localStorage.setItem('userPicture', (response['payload']['userPicture']));
 
@@ -80,7 +80,7 @@ export class SigninComponent {
                 detail: response['payload']['respMesg'],
                 styleClass: 'success-background-popover',
               });
-              this.router.navigateByUrl(this.resolveDashboardRoute(permission, response['payload']));
+              this.router.navigateByUrl(permittedDashboardRoutes(permission)[0] || routes.error404);
             } else {
               this.messageService.add({
                 summary: response['payload']['respCode'],
@@ -102,68 +102,6 @@ export class SigninComponent {
           styleClass: 'danger-background-popover',
         }),
       });
-  }
-
-  private parsePermissions(permissions: unknown): string[] {
-    if (Array.isArray(permissions)) {
-      return permissions.filter((permission): permission is string =>
-        typeof permission === 'string'
-      );
-    }
-
-    if (typeof permissions !== 'string') {
-      return [];
-    }
-
-    try {
-      const parsed = JSON.parse(permissions.replace(/'/g, '"'));
-      return Array.isArray(parsed)
-        ? parsed.filter((permission): permission is string =>
-            typeof permission === 'string'
-          )
-        : [];
-    } catch {
-      return [];
-    }
-  }
-
-  private resolveDashboardRoute(permissions: string[], payload: any): string {
-    const normalizedPermissions = permissions
-      .map((permission) => String(permission || '').trim().toLowerCase())
-      .filter(Boolean);
-
-    const dashboardPermissionRoutes: Record<string, string> = {
-      'dashboard': routes.salesDashboard,
-      'sales-dashboard': routes.salesDashboard,
-      'sale-dashboard': routes.donationDashboard,
-      'donation-dashboard': routes.donationDashboard,
-      'admin-dashboard': routes.adminDashboard,
-      'call-dashboard': routes.adminDashboard,
-      'campaign-dashboard': routes.campaignDashboard,
-      'school-dashboard': routes.schoolDashboard,
-    };
-
-    const dashboardPermission = normalizedPermissions.find((permission) =>
-      Boolean(dashboardPermissionRoutes[permission])
-    );
-
-    if (dashboardPermission) {
-      return dashboardPermissionRoutes[dashboardPermission];
-    }
-
-    if (this.isSchoolService(payload?.service)) {
-      return routes.schoolDashboard;
-    }
-
-    if (payload?.roleType === Constant.donorExecutive) {
-      return routes.adminDashboard;
-    }
-
-    return routes.donationDashboard;
-  }
-
-  private isSchoolService(service: unknown): boolean {
-    return this.serviceValues(service).includes('SCHOOL');
   }
 
   private serviceName(service: unknown): string {
