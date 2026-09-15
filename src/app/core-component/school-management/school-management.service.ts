@@ -214,11 +214,24 @@ export class SchoolManagementService {
     return this.tenantMediaUrl.studentPicture(service, superadminId, picture) || fallback;
   }
 
+  getStudentAcademicByStudentId(studentId: number): Observable<any> {
+    const token = this.cookieService.get('token');
+    const currentUser = this.authenticationService.getLoginUser();
+    const request = { payload: {
+      studentId,
+      superadminId: currentUser?.superadminId || this.cookieService.get('superadminId')
+    } };
+    const options = token ? { headers: new HttpHeaders({ Authorization: `Bearer ${token}` }) } : {};
+    return this.http.post<any>(Constant.Site_Url + 'getStudentAcademicByStudentId', request, options);
+  }
+
   updateStudentAcademic(academicDetails: any): Observable<any> {
     const token = this.cookieService.get('token');
     const currentUser = this.authenticationService.getLoginUser();
     const request = {
       payload: {
+        id: academicDetails.id,
+        gradeId: academicDetails.gradeId,
         studentId: academicDetails.studentId,
         sessionName: academicDetails.sessionName,
         grade: academicDetails.grade,

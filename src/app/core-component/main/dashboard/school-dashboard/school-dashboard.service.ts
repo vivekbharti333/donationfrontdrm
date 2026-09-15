@@ -22,6 +22,21 @@ export interface SchoolDashboardSummary {
   timeZone: string;
 }
 
+export interface SchoolEnrollment {
+  sessionName: string;
+  classes: { className: string; studentCount: number }[];
+}
+
+export interface SchoolAttendanceOverview {
+  attendanceDate: string;
+  timeZone: string;
+  present: number;
+  absent: number;
+  late: number;
+  halfDay: number;
+  leave: number;
+}
+
 @Injectable({ providedIn: 'root' })
 export class SchoolDashboardService {
   constructor(
@@ -32,6 +47,14 @@ export class SchoolDashboardService {
 
   getSchoolDashboard(): Observable<{ responseCode: number; responseMessage: string; payload?: SchoolDashboardSummary }> {
     return this.post('getSchoolDashboard', { superadminId: this.superadminId });
+  }
+
+  getSchoolAttendanceOverview(): Observable<{ responseCode: number; responseMessage: string; payload?: SchoolAttendanceOverview }> {
+    return this.post('getSchoolAttendanceOverview', { superadminId: this.superadminId });
+  }
+
+  getSchoolStudentEnrollment(sessionName: string): Observable<{ responseCode: number; responseMessage: string; payload?: SchoolEnrollment }> {
+    return this.post('getSchoolStudentEnrollment', { superadminId: this.superadminId, sessionName });
   }
 
   getSchoolDashboardDetails(filters: SchoolDashboardFilters = {}): Observable<any> {

@@ -13,7 +13,7 @@ import { routes } from 'src/app/core/helpers/routes';
 import { PaginationService, tablePageSize } from 'src/app/shared/shared.index';
 import { UserDetails } from '../../../interface/user-management';
 import { MatDialog } from '@angular/material/dialog';
-import { finalize } from 'rxjs';
+import { finalize, forkJoin, Subscription } from 'rxjs';
 
 import { Constant } from 'src/app/core/constant/constants';
 
@@ -37,6 +37,16 @@ export class StudentListComponent implements OnDestroy {
   public gradeOptions: any[] = [];
   public isGradesLoading = false;
   public isAssigningClass = false;
+  public isAcademicLoading = false;
+  public academicLoadError = '';
+  public academicRecords: any[] = [];
+  public selectedAcademic: any = null;
+  private academicLoadSubscription?: Subscription;
+
+  get assignAcademicYearOptions(): string[] {
+    return [...new Set([...this.academicYearOptions.map(year => year.value),
+      this.getCurrentAcademicYear(), ...this.academicRecords.map(row => row.sessionName)])].sort().reverse();
+  }
   public isUpdatingStudent = false;
   public fullData: any[] = [];
   public routes = routes;
@@ -207,6 +217,7 @@ export class StudentListComponent implements OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.academicLoadSubscription?.unsubscribe();
     this.stopEditCameraStream();
   }
 
@@ -341,13 +352,17 @@ export class StudentListComponent implements OnDestroy {
   }
 
   openAssignClassModal(templateRef: TemplateRef<any>, student: any): void {
+    this.academicLoadSubscription?.unsubscribe();
+    this.academicRecords = [];
+    this.selectedAcademic = null;
+    this.academicLoadError = '';
     this.selectedStudent = student;
     this.assignClassForm.reset({
       studentId: student?.id,
       sessionName: this.getCurrentAcademicYear(),
       gradeId: null,
       gradeSection: '',
-      rollNumber: student?.rollNumber || ''
+      rollNumber: ''
     });
     this.assignClassDialog = this.dialog.open(templateRef, {
       width: '620px',
@@ -356,10 +371,62 @@ export class StudentListComponent implements OnDestroy {
       disableClose: true,
       panelClass: 'custom-modal'
     });
+    this.assignClassDialog.afterClosed().subscribe(() => this.academicLoadSubscription?.unsubscribe());
+    this.loadStudentAcademics();
+  }
+
+  loadStudentAcademics(): void {
+    this.academicLoadSubscription?.unsubscribe();
+    this.isAcademicLoading = true;
+    this.academicLoadError = '';
+    this.assignClassForm.disable();
+    this.academicLoadSubscription = forkJoin({
+      academics: this.schoolManagementService.getStudentAcademicByStudentId(this.selectedStudent.id),
+      grades: this.schoolManagementService.getGradeDetails()
+    }).subscribe({
+      next: ({ academics, grades }) => {
+        const gradeRows = grades?.listPayload ?? grades?.payload ?? grades?.data;
+        if (Number(academics?.responseCode) !== 200 || !Array.isArray(academics?.listPayload)
+          || !Array.isArray(gradeRows) || !gradeRows.length) {
+          this.academicLoadError = Number(academics?.responseCode) !== 200
+            ? academics?.responseMessage || 'Unable to load academic details. Please retry.'
+            : 'Unable to load academic details or grades. Please retry.';
+          this.isAcademicLoading = false;
+          return;
+        }
+        this.gradeOptions = gradeRows;
+        this.academicRecords = academics.listPayload;
+        const current = this.academicRecords.find(row => row.sessionName === this.getCurrentAcademicYear());
+        this.assignClassForm.patchValue({ sessionName: current?.sessionName
+          || this.academicRecords[0]?.sessionName || this.getCurrentAcademicYear() });
+        this.onAcademicSessionChange();
+        this.assignClassForm.enable();
+        this.isAcademicLoading = false;
+      },
+      error: () => {
+        this.academicLoadError = 'Unable to load academic details. Please retry.';
+        this.isAcademicLoading = false;
+      }
+    });
+  }
+
+  onAcademicSessionChange(): void {
+    const session = this.assignClassForm.get('sessionName')?.value;
+    this.selectedAcademic = this.academicRecords.find(row => row.sessionName === session) || null;
+    const academic = this.selectedAcademic;
+    const grade = this.gradeOptions.find(row => String(row.gradeName || row.name).trim().toLowerCase()
+      === String(academic?.grade || '').trim().toLowerCase());
+    this.assignClassForm.patchValue({
+      gradeId: grade?.id ?? null,
+      gradeSection: academic?.gradeSection || '',
+      rollNumber: academic?.rollNumber || ''
+    });
+    this.assignClassForm.markAsPristine();
+    this.assignClassForm.markAsUntouched();
   }
 
   assignClass(): void {
-    if (this.isAssigningClass) return;
+    if (this.isAssigningClass || this.isAcademicLoading || this.academicLoadError) return;
     if (this.assignClassForm.invalid) {
       this.assignClassForm.markAllAsTouched();
       return;
@@ -374,17 +441,26 @@ export class StudentListComponent implements OnDestroy {
     }
     const request = {
       ...formValue,
+      id: this.selectedAcademic?.id,
+      status: this.selectedAcademic?.status,
       grade: selectedGrade.gradeName || selectedGrade.name || String(selectedGrade.id)
     };
 
     this.isAssigningClass = true;
-    this.schoolManagementService.addStudentAcademic(request).subscribe({
+    const save = this.selectedAcademic
+      ? this.schoolManagementService.updateStudentAcademic(request)
+      : this.schoolManagementService.addStudentAcademic(request);
+    this.assignClassForm.disable();
+    save.pipe(finalize(() => {
+      this.isAssigningClass = false;
+      this.assignClassForm.enable();
+    })).subscribe({
       next: (response: any) => {
         const success = Number(response?.responseCode) === 200
           && Number(response?.payload?.respCode) === 200;
         this.messageService.add({
-          summary: success ? 'Success' : 'Unable to assign class',
-          detail: response?.payload?.respMesg || response?.responseMessage || 'Class assignment could not be completed.',
+          summary: success ? 'Success' : 'Unable to save academic details',
+          detail: response?.payload?.respMesg || response?.responseMessage || 'Academic details could not be saved.',
           styleClass: success ? 'success-background-popover' : 'danger-background-popover'
         });
         if (success) {
@@ -397,7 +473,7 @@ export class StudentListComponent implements OnDestroy {
       error: (error: any) => {
         this.messageService.add({
           summary: 'Error',
-          detail: error?.error?.responseMessage || 'Unable to assign class.',
+          detail: error?.error?.responseMessage || 'Unable to save academic details.',
           styleClass: 'danger-background-popover'
         });
         this.isAssigningClass = false;

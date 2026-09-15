@@ -49,13 +49,21 @@
     <div class="dash-card">
       <div class="card-head">
         <h4><i class="feather icon-bar-chart-2"></i> Student Enrollment</h4>
-        <select class="form-select form-select-sm" aria-label="Enrollment period">
-          <option>This Academic Year</option>
-          <option>Last Academic Year</option>
+        <select class="form-select form-select-sm" aria-label="Enrollment period"
+          [value]="enrollmentPeriod" (change)="changeEnrollmentPeriod($event)">
+          <option value="current">This Academic Year</option>
+          <option value="previous">Last Academic Year</option>
         </select>
       </div>
       <div class="card-body">
-        <apx-chart
+        <small class="text-muted">Academic session: {{ enrollmentSession }}</small>
+        <p *ngIf="enrollmentLoading" role="status">Loading student enrollment...</p>
+        <div *ngIf="enrollmentError" role="alert">
+          {{ enrollmentError }}
+          <button type="button" class="btn btn-light btn-sm" (click)="loadEnrollment()">Retry</button>
+        </div>
+        <p *ngIf="enrollmentEmpty && !enrollmentLoading && !enrollmentError">No students assigned to classes for this academic session.</p>
+        <apx-chart *ngIf="!enrollmentLoading && !enrollmentError && !enrollmentEmpty"
           [series]="enrollmentChart.series"
           [chart]="enrollmentChart.chart"
           [xaxis]="enrollmentChart.xaxis"
@@ -75,7 +83,13 @@
         <span>Today</span>
       </div>
       <div class="card-body attendance-body">
-        <div class="donut-wrap">
+        <p *ngIf="attendanceLoading" role="status">Loading attendance overview...</p>
+        <div *ngIf="attendanceError" role="alert">
+          {{ attendanceError }}
+          <button type="button" class="btn btn-light btn-sm" (click)="loadAttendanceOverview()">Retry</button>
+        </div>
+        <p *ngIf="attendanceEmpty && attendanceOverview">No attendance marked today.</p>
+        <div class="donut-wrap" *ngIf="attendanceOverview && !attendanceEmpty">
           <apx-chart
             [series]="attendanceChart.series"
             [chart]="attendanceChart.chart"
@@ -89,11 +103,11 @@
             [responsive]="attendanceChart.responsive">
           </apx-chart>
           <div class="donut-center">
-            <strong>{{ summary ? (summary.todayPresent | number) : '-' }}</strong>
+            <strong>{{ attendanceOverview.present | number }}</strong>
             <span>Present today</span>
           </div>
         </div>
-        <ul class="attendance-legend">
+        <ul class="attendance-legend" *ngIf="attendanceOverview">
           <li *ngFor="let label of attendanceChart.labels">
             <i [ngStyle]="{ 'background-color': attendanceColor(label) }"></i>
             <span>{{ label }}</span>
@@ -103,7 +117,9 @@
       </div>
       <div class="attendance-note">
         <i class="feather icon-trending-up"></i>
-        <span>Only marked present and absent records are included.</span>
+        <span>Only marked attendance is included. Unmarked students are not counted as absent.
+          <ng-container *ngIf="attendanceOverview">{{ attendanceOverview.attendanceDate | date:'dd MMM yyyy' }} ({{ attendanceOverview.timeZone }})</ng-container>
+        </span>
       </div>
     </div>
 

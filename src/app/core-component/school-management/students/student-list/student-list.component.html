@@ -109,7 +109,7 @@
                   (click)="openEditModal(dialogTemplate, data)">
                   <i class="feather icon-edit feather-edit"></i></a>
 
-                <a class="student-action assign-action" href="javascript:void(0);" title="Assign grade / class"
+                <a class="student-action assign-action" href="javascript:void(0);" title="View / update academic details"
                   (click)="openAssignClassModal(assignClassTemplate, data)">
                   <i class="feather icon-book-open"></i></a>
 
@@ -183,7 +183,7 @@
           <button type="button" class="icon-btn" title="Edit student" (click)="openEditModal(dialogTemplate, student)">
             <i class="feather icon-edit edit-icon"></i>
           </button>
-          <button type="button" class="icon-btn" title="Assign grade / class" (click)="openAssignClassModal(assignClassTemplate, student)">
+          <button type="button" class="icon-btn" title="View / update academic details" (click)="openAssignClassModal(assignClassTemplate, student)">
             <i class="feather icon-book-open assign-icon"></i>
           </button>
           <button type="button" class="icon-btn" title="Download admission details" (click)="downloadAdmissionDetails(student.id)">
@@ -210,9 +210,9 @@
 
   <ng-template #assignClassTemplate>
     <div class="modalHeaderContainer">
-      <h2 mat-dialog-title class="p-0">Assign Grade / Class</h2>
-      <div mat-dialog-close class="closeBtn">
-        <button type="button" class="close" aria-label="Close" [disabled]="isAssigningClass">
+      <h2 mat-dialog-title class="p-0">Student Academic Details</h2>
+      <div class="closeBtn">
+        <button type="button" mat-dialog-close class="close" aria-label="Close" [disabled]="isAssigningClass">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
@@ -228,12 +228,20 @@
         </div>
       </div>
 
+      <p *ngIf="isAcademicLoading" role="status">Loading academic details...</p>
+      <div *ngIf="academicLoadError" class="alert alert-danger" role="alert">
+        {{ academicLoadError }}
+        <button type="button" class="btn btn-link" (click)="loadStudentAcademics()">Retry</button>
+      </div>
+      <p *ngIf="!isAcademicLoading && !academicLoadError" class="text-muted">
+        {{ selectedAcademic ? 'Saved academic details loaded. You can update them below.' : 'No academic details saved for this session. Assign a class below.' }}
+      </p>
       <form [formGroup]="assignClassForm" class="row g-3 mt-1">
         <div class="col-md-6">
           <label class="form-label">Academic Session *</label>
-          <select class="form-control" formControlName="sessionName">
+          <select class="form-control" formControlName="sessionName" (change)="onAcademicSessionChange()">
             <option value="">Select session</option>
-            <option *ngFor="let year of academicYearOptions" [value]="year.value">{{ year.name }}</option>
+            <option *ngFor="let year of assignAcademicYearOptions" [value]="year">{{ year }}</option>
           </select>
         </div>
         <div class="col-md-6">
@@ -261,9 +269,9 @@
     </mat-dialog-content>
     <mat-dialog-actions align="end" class="student-dialog-actions px-4 pb-4 gap-2">
       <button type="button" class="btn btn-light" mat-dialog-close [disabled]="isAssigningClass">Cancel</button>
-      <button type="button" class="btn btn-primary" (click)="assignClass()" [disabled]="isAssigningClass">
+      <button type="button" class="btn btn-primary" (click)="assignClass()" [disabled]="isAssigningClass || isAcademicLoading || !!academicLoadError || assignClassForm.invalid">
         <span *ngIf="isAssigningClass" class="spinner-border spinner-border-sm me-1"></span>
-        {{ isAssigningClass ? 'Assigning...' : 'Assign Class' }}
+        {{ isAssigningClass ? 'Saving...' : (selectedAcademic ? 'Update Academic Details' : 'Assign Class') }}
       </button>
     </mat-dialog-actions>
   </ng-template>

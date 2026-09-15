@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
-import { SchoolDashboardService, SchoolDashboardSummary } from './school-dashboard.service';
+import { SchoolDashboardService, SchoolDashboardSummary, SchoolAttendanceOverview } from './school-dashboard.service';
 import {
   ApexAxisChartSeries,
   ApexChart,
@@ -78,6 +78,17 @@ export class SchoolDashboardComponent implements OnInit, OnDestroy {
   loading = false;
   dashboardError = "";
   private dashboardRequest?: Subscription;
+  private attendanceRequest?: Subscription;
+  attendanceOverview: SchoolAttendanceOverview | null = null;
+  attendanceLoading = false;
+  attendanceError = '';
+  attendanceEmpty = false;
+  private enrollmentRequest?: Subscription;
+  enrollmentLoading = false;
+  enrollmentError = '';
+  enrollmentEmpty = false;
+  enrollmentSession = '';
+  enrollmentPeriod = 'current';
   userName = 'Priya Sharma';
   academicYear = '2026 - 2027';
 
@@ -96,13 +107,18 @@ export class SchoolDashboardComponent implements OnInit, OnDestroy {
     return value == null ? '-' : new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 2 }).format(Number(value));
   }
   ngOnInit(): void { this.loadDashboard(); }
-  ngOnDestroy(): void { this.dashboardRequest?.unsubscribe(); }
+  ngOnDestroy(): void {
+    this.attendanceRequest?.unsubscribe();
+    this.dashboardRequest?.unsubscribe();
+    this.enrollmentRequest?.unsubscribe();
+  }
   loadDashboard(): void {
+    this.loadAttendanceOverview();
+    this.loadEnrollment();
     this.dashboardRequest?.unsubscribe();
     this.loading = true;
     this.dashboardError = '';
     this.summary = null;
-    this.attendanceChart = { ...this.attendanceChart, series: [0, 0] };
     this.dashboardRequest = this.dashboardService.getSchoolDashboard().subscribe({
       next: response => {
         this.loading = false;
@@ -111,9 +127,77 @@ export class SchoolDashboardComponent implements OnInit, OnDestroy {
           return;
         }
         this.summary = response.payload;
-        this.attendanceChart = { ...this.attendanceChart, series: [Number(this.summary.todayPresent), Number(this.summary.todayAbsent)] };
       },
       error: () => { this.loading = false; this.dashboardError = 'Could not load school dashboard. Please try again.'; },
+    });
+  }
+
+  loadAttendanceOverview(): void {
+    this.attendanceRequest?.unsubscribe();
+    this.attendanceLoading = true;
+    this.attendanceError = '';
+    this.attendanceEmpty = false;
+    this.attendanceOverview = null;
+    this.attendanceChart = { ...this.attendanceChart, series: [0, 0, 0, 0, 0] };
+    this.attendanceRequest = this.dashboardService.getSchoolAttendanceOverview().subscribe({
+      next: response => {
+        this.attendanceLoading = false;
+        const data = response?.payload;
+        if (Number(response?.responseCode) !== 200 || !data) {
+          this.attendanceError = response?.responseMessage || 'Could not load attendance overview.';
+          return;
+        }
+        const counts = [data.present, data.absent, data.late, data.halfDay, data.leave].map(Number);
+        if (counts.some(count => !Number.isInteger(count) || count < 0)) {
+          this.attendanceError = 'Could not load attendance overview.';
+          return;
+        }
+        this.attendanceOverview = data;
+        this.attendanceEmpty = counts.every(count => count === 0);
+        this.attendanceChart = { ...this.attendanceChart, series: counts };
+      },
+      error: () => {
+        this.attendanceLoading = false;
+        this.attendanceError = 'Could not load attendance overview. Please try again.';
+      }
+    });
+  }
+
+  changeEnrollmentPeriod(event: Event): void {
+    this.enrollmentPeriod = (event.target as HTMLSelectElement).value;
+    this.loadEnrollment();
+  }
+
+  loadEnrollment(): void {
+    this.enrollmentRequest?.unsubscribe();
+    this.enrollmentLoading = true;
+    this.enrollmentError = '';
+    this.enrollmentEmpty = false;
+    this.enrollmentChart = { ...this.enrollmentChart, series: [{ name: 'Students', data: [] }],
+      xaxis: { ...this.enrollmentChart.xaxis, categories: [] } };
+    const today = new Date();
+    const startYear = today.getFullYear() - (today.getMonth() < 3 ? 1 : 0)
+      - (this.enrollmentPeriod === 'previous' ? 1 : 0);
+    this.enrollmentSession = `${startYear}-${String(startYear + 1).slice(-2)}`;
+    this.enrollmentRequest = this.dashboardService.getSchoolStudentEnrollment(this.enrollmentSession).subscribe({
+      next: response => {
+        this.enrollmentLoading = false;
+        if (Number(response?.responseCode) !== 200 || !Array.isArray(response.payload?.classes)) {
+          this.enrollmentError = response?.responseMessage || 'Could not load student enrollment.';
+          return;
+        }
+        const rows = [...response.payload.classes].sort((a, b) =>
+          a.className.localeCompare(b.className, undefined, { numeric: true, sensitivity: 'base' }));
+        this.enrollmentSession = response.payload.sessionName;
+        this.enrollmentEmpty = rows.length === 0;
+        this.enrollmentChart = { ...this.enrollmentChart,
+          series: [{ name: 'Students', data: rows.map(row => Number(row.studentCount)) }],
+          xaxis: { ...this.enrollmentChart.xaxis, categories: rows.map(row => row.className) } };
+      },
+      error: () => {
+        this.enrollmentLoading = false;
+        this.enrollmentError = 'Could not load student enrollment. Please try again.';
+      }
     });
   }
 
@@ -160,18 +244,18 @@ export class SchoolDashboardComponent implements OnInit, OnDestroy {
     }
 
     this.enrollmentChart = {
-      series: [{ name: 'Students', data: [78, 102, 125, 158, 182, 195, 210] }],
+      series: [{ name: 'Students', data: [] }],
       chart: { type: 'bar', height: 265, toolbar: { show: false }, fontFamily: 'inherit' },
       plotOptions: { bar: { columnWidth: '42%', borderRadius: 6, borderRadiusApplication: 'end' } },
       dataLabels: { enabled: true, offsetY: -22, style: { fontSize: '11px', fontWeight: 600, colors: ['#1e2a3b'] } },
       xaxis: {
-        categories: ['Nursery', 'LKG', 'UKG', 'Class 1', 'Class 5', 'Class 10', 'Class 12'],
+        categories: [],
         axisBorder: { show: false },
         axisTicks: { show: false },
         labels: { style: { colors: '#8a94a6', fontSize: '11px' } },
       },
       yaxis: {
-        min: 0, max: 250, tickAmount: 5,
+        min: 0, decimalsInFloat: 0,
         labels: { style: { colors: '#8a94a6', fontSize: '11px' } },
       },
       grid: { borderColor: '#f0ebe3', strokeDashArray: 4, padding: { top: 10 } },
@@ -180,10 +264,10 @@ export class SchoolDashboardComponent implements OnInit, OnDestroy {
     };
 
     this.attendanceChart = {
-      series: [0, 0],
+      series: [0, 0, 0, 0, 0],
       chart: { type: 'donut', height: 230, fontFamily: 'inherit' },
-      labels: ['Present', 'Absent'],
-      colors: ['#22c55e', '#f87171', '#fbbf24', '#cbd5e1'],
+      labels: ['Present', 'Absent', 'Late', 'Half Day', 'Leave'],
+      colors: ['#22c55e', '#f87171', '#fbbf24', '#8b5cf6', '#94a3b8'],
       legend: { show: false },
       dataLabels: { enabled: false },
       stroke: { width: 3, colors: ['#ffffff'] },
