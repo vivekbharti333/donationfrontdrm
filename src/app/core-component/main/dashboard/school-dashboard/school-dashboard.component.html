@@ -171,7 +171,7 @@
       </div>
       <div class="card-body quick-grid">
         <a class="quick-tile" *ngFor="let action of quickActions" [routerLink]="action.route">
-          <span class="quick-icon" [ngClass]="action.iconClass"><i class="feather" [ngClass]="action.icon"></i></span>
+          <span class="quick-icon" [ngClass]="action.iconClass"><i [class.feather]="action.icon.startsWith('icon-')" [ngClass]="action.icon" aria-hidden="true"></i></span>
           <span>{{ action.label }}</span>
         </a>
       </div>

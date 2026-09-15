@@ -220,11 +220,11 @@ export class SchoolDashboardComponent implements OnInit, OnDestroy {
   ];
 
   readonly admissions: Admission[] = [
-    { name: 'Aarav Mehta', className: 'Class 1', date: '10 Sep 2026', status: 'Confirmed' },
-    { name: 'Diya Patel', className: 'UKG', date: '09 Sep 2026', status: 'Confirmed' },
-    { name: 'Reyansh Kumar', className: 'Class 5', date: '08 Sep 2026', status: 'Pending' },
-    { name: 'Ananya Singh', className: 'Class 3', date: '07 Sep 2026', status: 'Confirmed' },
-    { name: 'Vihaan Reddy', className: 'LKG', date: '06 Sep 2026', status: 'Confirmed' },
+    // { name: 'Aarav Mehta', className: 'Class 1', date: '10 Sep 2026', status: 'Confirmed' },
+    // { name: 'Diya Patel', className: 'UKG', date: '09 Sep 2026', status: 'Confirmed' },
+    // { name: 'Reyansh Kumar', className: 'Class 5', date: '08 Sep 2026', status: 'Pending' },
+    // { name: 'Ananya Singh', className: 'Class 3', date: '07 Sep 2026', status: 'Confirmed' },
+    // { name: 'Vihaan Reddy', className: 'LKG', date: '06 Sep 2026', status: 'Confirmed' },
   ];
 
   readonly avatarColors = [
