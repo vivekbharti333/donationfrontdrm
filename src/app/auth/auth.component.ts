@@ -1,4 +1,5 @@
 import { Component, Renderer2 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationStart, Router, Event as RouterEvent } from '@angular/router';
 import { SettingsService } from '../core/core.index';
 import { url } from '../shared/model/sidebar.model';
@@ -19,15 +20,13 @@ export class AuthComponent {
     private settings: SettingsService,
     private renderer: Renderer2
   ) {
-    this.Router.events.subscribe((data: RouterEvent) => {
+    this.Router.events.pipe(takeUntilDestroyed()).subscribe((data: RouterEvent) => {
       if (data instanceof NavigationStart) {
         this.getRoutes(data);
       }
     });
-    this.settings.themeMode.subscribe((mode) => {
-      this.themeMode = mode;
-    });
-    this.settings.themeMode.subscribe((res: string) => {
+    this.settings.themeMode.pipe(takeUntilDestroyed()).subscribe((res: string) => {
+      this.themeMode = res;
       if (res == 'dark_mode') {
         this.renderer.addClass(document.body, 'dark-select');
       } else {

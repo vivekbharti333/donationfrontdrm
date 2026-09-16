@@ -8,7 +8,8 @@ import { ResetPassword3Component } from './reset-password/reset-password-3/reset
 import { ResetPasswordComponent } from './reset-password/reset-password/reset-password.component';
 import { Register2Component } from './register/register-2/register-2.component';
 import { Register3Component } from './register/register-3/register-3.component';
-import { sharedModule } from '../shared/shared.module';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { ToastModule } from 'primeng/toast';
 import { LockScreenComponent } from './lock-screen/lock-screen.component';
 import { Success2Component } from './successs/success-2/success-2.component';
 import { Success3Component } from './successs/success-3/success-3.component';
@@ -60,7 +61,9 @@ import { OtpVerificationComponent } from './otp-verification/otp-verification/ot
   imports: [
     CommonModule,
     AuthRoutingModule,
-    sharedModule
+    FormsModule,
+    ReactiveFormsModule,
+    ToastModule
   ]
 })
 export class AuthModule { }
