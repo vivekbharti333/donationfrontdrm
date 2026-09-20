@@ -129,8 +129,7 @@ getDonationPaymentModeCountAndAmountGroupByNameCustom(loginId: any, firstDate: a
       firstDate: firstDate,
       lastDate: lastDate,
       createdBy: createdBy,
-      roleType: Constant.fundraisingOfficer,
-      // roleType: this.cookieService.get('roleType'),
+      roleType: createdBy ? Constant.fundraisingOfficer : Constant.superAdmin,
       token: this.cookieService.get('token'),
       superadminId: this.cookieService.get('superadminId')
     }
