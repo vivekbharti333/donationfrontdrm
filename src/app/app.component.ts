@@ -15,7 +15,7 @@ import { SpinnerService } from './core/core.index';
   styleUrls: ['./app.component.scss'],
 })
 export class AppComponent {
-  title = 'template';
+  title = 'Donexia';
   public page = '';
 
   constructor(private router: Router, private spinner: SpinnerService) {

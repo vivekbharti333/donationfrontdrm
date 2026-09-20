@@ -13,8 +13,6 @@ export class SpinnerService {
   }
 
   hide() {
-    setTimeout(() => {
-      this._loading.next(false);
-    }, 400);
+    this._loading.next(false);
   }
 }

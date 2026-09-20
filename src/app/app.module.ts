@@ -4,19 +4,24 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 
 import { LoaderComponent } from './common-component/loader/loader.component';
-import { sharedModule } from './shared/shared.module';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { AuthInterceptor } from './core/interceptor/auth/auth.interceptor';
+import { SpinnerInterceptor } from './core/interceptor/spinner/spinner.interceptor';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { MatSelectModule } from '@angular/material/select';
-import { FormsModule } from '@angular/forms';
 import { CookieService } from 'ngx-cookie-service';
-import { HashLocationStrategy, LocationStrategy, PathLocationStrategy } from '@angular/common';
+import { HashLocationStrategy, LocationStrategy } from '@angular/common';
 
 
 @NgModule({
   declarations: [AppComponent, LoaderComponent],
-  imports: [BrowserModule, AppRoutingModule, sharedModule, BrowserAnimationsModule,MatSelectModule,FormsModule],
+  imports: [BrowserModule, AppRoutingModule, HttpClientModule, BrowserAnimationsModule],
   exports: [],
-  providers: [CookieService, { provide: LocationStrategy, useClass: HashLocationStrategy}],
+  providers: [
+    CookieService,
+    { provide: LocationStrategy, useClass: HashLocationStrategy },
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: SpinnerInterceptor, multi: true },
+  ],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

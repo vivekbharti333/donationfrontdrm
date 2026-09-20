@@ -1,9 +1,6 @@
 import { NgModule } from '@angular/core';
-import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { NgApexchartsModule } from 'ng-apexcharts';
 import { DataService } from '../core/core.index';
-import { SpinnerInterceptor } from '../core/interceptor/spinner/spinner.interceptor';
-import { AuthInterceptor } from '../core/interceptor/auth/auth.interceptor';
 import { MaterialModule } from './material/material.module';
 import { FeatherIconModule } from './feather/feather.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -44,7 +41,6 @@ const icons = {
   imports: [
     FeatherIconModule,
     MaterialModule,
-    HttpClientModule,
     NgApexchartsModule,
     FormsModule,
     CarouselModule,
@@ -80,7 +76,6 @@ const icons = {
   ],
   exports: [
     MaterialModule,
-    HttpClientModule,
     FeatherIconModule,
     NgApexchartsModule,
     FormsModule,
@@ -117,8 +112,6 @@ const icons = {
     DatePipe,
     TimepickerActions,
     BsDatepickerConfig,
-    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
-    { provide: HTTP_INTERCEPTORS, useClass: SpinnerInterceptor, multi: true },
   ],
   declarations: [MatSelectSearchComponent],
 })

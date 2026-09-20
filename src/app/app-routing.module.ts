@@ -9,12 +9,12 @@ const routes: Routes = [
   },
   {
     path: '',
-    loadChildren: () =>
-      import('./core-component/core-component.module').then((m) => m.CoreComponentModule),
+    loadChildren: () => import('./auth/auth.module').then((m) => m.AuthModule),
   },
   {
     path: '',
-    loadChildren: () => import('./auth/auth.module').then((m) => m.AuthModule),
+    loadChildren: () =>
+      import('./core-component/core-component.module').then((m) => m.CoreComponentModule),
   },
   {
     path: 'error-pages',
