@@ -1,321 +1,83 @@
-<p-toast></p-toast>
-
-<form [formGroup]="invoiceForm" (ngSubmit)="submitInvoice()" class="invoice-page">
-  <section class="invoice-card invoice-identity">
-    <div class="company-panel">
-      <div class="section-heading">
-        <span class="section-number">01</span>
-        <div>
-          <h2>Business details</h2>
-          <p>Select the company issuing this invoice.</p>
-        </div>
+﻿<p-toast></p-toast>
+<form [formGroup]="invoiceForm" (ngSubmit)="submitInvoice()" class="gi-invoice-page">
+  <header class="gi-page-heading">
+    <div class="gi-heading-title"><i class="feather icon-file-text" aria-hidden="true"></i><div><h1>Create Invoice</h1><nav aria-label="Breadcrumb">Home <span>›</span> Invoices <span>›</span> <strong>Create Invoice</strong></nav></div></div>
+    <a class="gi-button gi-outline" routerLink="../invoice-list"><i class="feather icon-list" aria-hidden="true"></i> View Invoice List</a>
+  </header>
+  <section class="gi-invoice-card gi-details-card">
+    <h2>Invoice Details</h2>
+    <div class="gi-details-grid">
+      <div class="gi-customer-field"><label for="customer-search">Customer / Donor <b>*</b></label>
+        <input id="customer-search" class="form-control" placeholder="Search customer, donor or NGO..." [ngModel]="customerSearch" (ngModelChange)="customerSearch = $event; clearCustomer()" [ngModelOptions]="{standalone: true}" [matAutocomplete]="customers" [class.is-invalid]="invoiceForm.get('customerId')?.touched && invoiceForm.get('customerId')?.invalid">
+        <mat-autocomplete #customers="matAutocomplete" (optionSelected)="selectCustomer($event.option.value)">
+          <mat-option *ngFor="let customer of filteredCustomers" [value]="customer"><span class="gi-option-content"><i class="feather icon-users"></i><span>{{ customer.customerName }}<small>{{ customer.email }} {{ customer.phone }}</small></span></span></mat-option>
+          <mat-option *ngIf="!filteredCustomers.length" disabled>No matching customers</mat-option>
+        </mat-autocomplete>
+        <a class="gi-add-link" routerLink="../customer-details">+ Add New Customer</a>
       </div>
-
-      <label class="field-label" for="companyId">Invoice company <span>*</span></label>
-      <select id="companyId" class="form-select" formControlName="companyId"
-        (change)="onCompanyChange($event)"
-        [class.is-invalid]="invoiceForm.get('companyId')?.touched && invoiceForm.get('companyId')?.invalid">
-        <option value="">Select a company</option>
-        <option *ngFor="let invoiceHeader of invoiceHeaderList" [value]="invoiceHeader.id">
-          {{ invoiceHeader.companyFirstName }} {{ invoiceHeader.companyLastName }}
-        </option>
-      </select>
-
-      <div class="company-preview" *ngIf="invoiceForm.get('companyId')?.value">
-        <div class="company-monogram">{{ (invoiceForm.get('companyName')?.value || 'C').charAt(0) }}</div>
-        <div class="company-copy">
-          <input type="text" formControlName="companyName" class="company-name" placeholder="Company name">
-          <div class="company-meta">
-            <span *ngIf="invoiceForm.get('gstNumber')?.value">GSTIN {{ invoiceForm.get('gstNumber')?.value }}</span>
-            <span *ngIf="invoiceForm.get('mobileNo')?.value">{{ invoiceForm.get('mobileNo')?.value }}</span>
-            <span *ngIf="invoiceForm.get('emailId')?.value">{{ invoiceForm.get('emailId')?.value }}</span>
-          </div>
-          <textarea rows="2" formControlName="officeAddress" class="company-address"
-            placeholder="Office address"></textarea>
-        </div>
-      </div>
-    </div>
-
-    <aside class="invoice-meta">
-      <span class="invoice-label">Tax invoice</span>
-      <label class="field-label" for="invoiceNumber">Invoice number <span>*</span></label>
-      <input id="invoiceNumber" type="text" formControlName="invoiceNumber" class="form-control invoice-number"
-        placeholder="INV-001">
-
-      <div class="date-grid">
-        <div>
-          <label class="field-label" for="invoiceDate">Issue date</label>
-          <input id="invoiceDate" type="date" class="form-control" formControlName="invoiceDate">
-        </div>
-        <div>
-          <label class="field-label" for="dueDate">Due date</label>
-          <input id="dueDate" type="date" class="form-control" formControlName="dueDate">
-        </div>
-      </div>
-    </aside>
-  </section>
-
-  <section class="invoice-card">
-    <div class="section-heading">
-      <span class="section-number">02</span>
-      <div>
-        <h2>Customer &amp; delivery</h2>
-        <p>Choose who is being billed and confirm the supply address.</p>
-      </div>
-    </div>
-
-    <div class="customer-selector">
-      <label class="field-label" for="customerId">Customer <span>*</span></label>
-      <select id="customerId" class="form-select" formControlName="customerId"
-        (change)="onCustomerChange($event)"
-        [class.is-invalid]="invoiceForm.get('customerId')?.touched && invoiceForm.get('customerId')?.invalid">
-        <option value="">Select a customer</option>
-        <option *ngFor="let customer of customerList" [value]="customer.id">{{ customer.customerName }}</option>
-      </select>
-    </div>
-
-    <div class="address-grid">
-      <div class="address-panel">
-        <h3>Bill to</h3>
-        <div class="field-grid">
-          <div class="field-full">
-            <label class="field-label">Customer name <span>*</span></label>
-            <input type="text" formControlName="customerName" class="form-control" placeholder="Customer name">
-          </div>
-          <div>
-            <label class="field-label">Email</label>
-            <input type="email" formControlName="customerEmail" class="form-control" placeholder="name@company.com">
-          </div>
-          <div>
-            <label class="field-label">Phone</label>
-            <input type="text" formControlName="customerPhone" class="form-control" placeholder="Phone number">
-          </div>
-          <div class="field-full">
-            <label class="field-label">GSTIN</label>
-            <input type="text" formControlName="customerGstNumber" class="form-control" placeholder="Customer GST number">
-          </div>
-          <div class="field-full">
-            <label class="field-label">Billing address</label>
-            <textarea rows="3" formControlName="billingAddress" class="form-control"
-              placeholder="Enter billing address"></textarea>
-          </div>
-        </div>
-      </div>
-
-      <div class="address-panel">
-        <div class="panel-title-row">
-          <h3>Place of supply</h3>
-          <label class="same-address">
-            <input class="form-check-input" type="checkbox" (change)="syncDeliveryAddress($event)">
-            Same as billing
-          </label>
-        </div>
-        <label class="field-label">Delivery address</label>
-        <textarea rows="8" formControlName="deliveryAddresses" class="form-control"
-          placeholder="Enter the place of supply or delivery address"></textarea>
-      </div>
+      <div><label for="invoice-number">Invoice Number <b>*</b></label><input id="invoice-number" class="form-control" formControlName="invoiceNumber" [class.is-invalid]="invoiceForm.get('invoiceNumber')?.touched && invoiceForm.get('invoiceNumber')?.invalid"></div>
+      <div><label for="invoice-date">Invoice Date <b>*</b></label><input id="invoice-date" type="date" class="form-control" formControlName="invoiceDate" required></div>
+      <div><label for="due-date">Due Date</label><input id="due-date" type="date" class="form-control" formControlName="dueDate"></div>
+      <div><label for="company">Invoice Company <b>*</b></label><select id="company" class="form-select" formControlName="companyId" (change)="onCompanyChange($event)" [class.is-invalid]="invoiceForm.get('companyId')?.touched && invoiceForm.get('companyId')?.invalid"><option value="">Select company</option><option *ngFor="let company of invoiceHeaderList" [value]="company.id">{{ company.companyFirstName }} {{ company.companyLastName }}</option></select></div>
+      <div><label for="currency">Currency</label><input id="currency" class="form-control" value="INR (₹)" readonly></div>
+      <div class="gi-supply-field"><label for="supply">Place of Supply</label><input id="supply" class="form-control" formControlName="deliveryAddresses" placeholder="Delivery address"></div>
     </div>
   </section>
-
-  <section class="invoice-card items-card">
-    <div class="section-heading items-heading">
-      <div class="heading-copy">
-        <span class="section-number">03</span>
-        <div>
-          <h2>Invoice items</h2>
-          <p>Add products or services and apply the relevant tax.</p>
-        </div>
-      </div>
-      <button type="button" class="btn-add" (click)="addItem()">
-        <span>+</span> Add item
-      </button>
-    </div>
-
-    <div formArrayName="items">
-      <div class="table-responsive d-none d-lg-block">
-        <table class="invoice-table">
-          <thead>
-            <tr>
-              <th class="index-cell">#</th>
-              <th>Item &amp; description</th>
-              <th>Qty</th>
-              <th>Rate</th>
-              <th>Tax type</th>
-              <th>Tax rate</th>
-              <th class="text-end">Tax</th>
-              <th class="text-end">Amount</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let item of items.controls; let i = index" [formGroupName]="i">
-              <td class="index-cell"><span class="row-number">{{ i + 1 }}</span></td>
-              <td class="item-description">
-                <select class="form-select" formControlName="productName" (change)="onProductSelect($event, i)">
-                  <option value="">Select item</option>
-                  <option *ngFor="let product of productList" [value]="product.productName">{{ product.productName }}</option>
-                </select>
-                <textarea rows="2" class="form-control" formControlName="description"
-                  placeholder="Item description"></textarea>
-              </td>
-              <td><input type="number" min="1" class="form-control text-end" formControlName="quantity"
-                  (input)="calculateTotals()"></td>
-              <td><input type="number" min="0" class="form-control text-end" formControlName="rate"
-                  (input)="calculateTotals()"></td>
-              <td>
-                <select class="form-select" formControlName="taxType" (change)="onTaxTypeChange(i)">
-                  <option value="">No tax</option>
-                  <option value="IGST">IGST</option>
-                  <option value="CGST_SGST">CGST + SGST</option>
-                </select>
-              </td>
-              <td>
-                <input *ngIf="item.get('taxType')?.value === 'IGST'" type="number" min="0"
-                  class="form-control text-end" formControlName="igstRate" placeholder="IGST %"
-                  (input)="calculateTotals()">
-                <div class="split-tax" *ngIf="item.get('taxType')?.value === 'CGST_SGST'">
-                  <input type="number" min="0" class="form-control text-end" formControlName="cgstRate"
-                    placeholder="CGST %" (input)="calculateTotals()">
-                  <input type="number" min="0" class="form-control text-end" formControlName="sgstRate"
-                    placeholder="SGST %" (input)="calculateTotals()">
-                </div>
-                <span class="tax-placeholder" *ngIf="!item.get('taxType')?.value">—</span>
-              </td>
-              <td class="money-cell">{{ item.get('taxAmount')?.value | number:'1.2-2' }}</td>
-              <td class="money-cell amount-cell">₹{{ item.get('amount')?.value | number:'1.2-2' }}</td>
-              <td>
-                <button *ngIf="items.length > 1" type="button" class="remove-button"
-                  (click)="removeItem(i)" aria-label="Remove item">×</button>
-              </td>
-            </tr>
-          </tbody>
+  <div class="gi-items-layout">
+    <section class="gi-invoice-card gi-items-card">
+      <div class="gi-section-toolbar"><h2>Invoice Items</h2><button type="button" class="gi-button gi-primary" (click)="addItem()"><i class="feather icon-plus"></i> Add Item</button></div>
+      <div class="table-responsive" formArrayName="items">
+        <table class="gi-items-table"><thead><tr><th>#</th><th>Item / Service <b>*</b></th><th>Description</th><th>Qty <b>*</b></th><th>Rate (₹) <b>*</b></th><th>GST</th><th>Amount (₹)</th><th><span class="visually-hidden">Remove</span></th></tr></thead>
+          <tbody><tr *ngFor="let item of items.controls; let i = index" [formGroupName]="i">
+            <td>{{ i + 1 }}</td>
+            <td class="gi-product-cell"><input class="form-control" formControlName="productName" [matAutocomplete]="products" placeholder="Search or select item..." [attr.aria-label]="'Item ' + (i + 1)" [class.is-invalid]="item.get('productName')?.touched && item.get('productName')?.invalid">
+              <mat-autocomplete #products="matAutocomplete" (optionSelected)="updateDescription($event.option.value, i)"><mat-option *ngFor="let product of filteredProducts(i)" [value]="product.productName"><span class="gi-option-content"><i class="feather icon-box"></i><span>{{ product.productName }}<small>{{ product.description }}</small></span><strong>₹{{ product.rate | number:'1.0-2' }}</strong></span></mat-option></mat-autocomplete>
+            </td>
+            <td><input class="form-control gi-description" formControlName="description" aria-label="Item description"></td>
+            <td><input type="number" min="1" step="1" class="form-control gi-quantity" formControlName="quantity" (input)="calculateTotals()" aria-label="Quantity"></td>
+            <td><input type="number" min="0" step="0.01" class="form-control gi-rate" formControlName="rate" (input)="calculateTotals()" aria-label="Rate"></td>
+            <td class="gi-tax-cell"><select class="form-select" formControlName="taxType" (change)="onTaxTypeChange(i)" aria-label="GST type"><option value="">No tax</option><option value="CGST_SGST">CGST + SGST</option><option value="IGST">IGST</option></select>
+              <div class="gi-tax-rates" *ngIf="item.get('taxType')?.value === 'CGST_SGST'"><label>CGST %<input type="number" min="0" max="100" class="form-control" formControlName="cgstRate" (input)="calculateTotals()"></label><label>SGST %<input type="number" min="0" max="100" class="form-control" formControlName="sgstRate" (input)="calculateTotals()"></label></div>
+              <div class="gi-tax-rates" *ngIf="item.get('taxType')?.value === 'IGST'"><label>IGST %<input type="number" min="0" max="100" class="form-control" formControlName="igstRate" (input)="calculateTotals()"></label></div>
+            </td>
+            <td><output class="gi-line-amount">{{ item.get('amount')?.value | number:'1.2-2' }}</output></td>
+            <td><button class="gi-remove-button" type="button" [disabled]="items.length === 1" (click)="removeItem(i)" [attr.aria-label]="'Remove item ' + (i + 1)"><i class="feather icon-trash-2"></i></button></td>
+          </tr></tbody>
         </table>
       </div>
-
-      <div class="d-lg-none mobile-items">
-        <article *ngFor="let item of items.controls; let i = index" [formGroupName]="i" class="mobile-item">
-          <div class="mobile-item-heading">
-            <span>Item {{ i + 1 }}</span>
-            <button *ngIf="items.length > 1" type="button" class="remove-button"
-              (click)="removeItem(i)" aria-label="Remove item">×</button>
-          </div>
-          <label class="field-label">Product</label>
-          <select class="form-select" formControlName="productName" (change)="onProductSelect($event, i)">
-            <option value="">Select product</option>
-            <option *ngFor="let product of productList" [value]="product.productName">{{ product.productName }}</option>
-          </select>
-          <label class="field-label">Description</label>
-          <textarea rows="2" class="form-control" formControlName="description" placeholder="Item description"></textarea>
-          <div class="field-grid">
-            <div>
-              <label class="field-label">Quantity</label>
-              <input type="number" min="1" class="form-control" formControlName="quantity" (input)="calculateTotals()">
-            </div>
-            <div>
-              <label class="field-label">Rate</label>
-              <input type="number" min="0" class="form-control" formControlName="rate" (input)="calculateTotals()">
-            </div>
-            <div>
-              <label class="field-label">Tax type</label>
-              <select class="form-select" formControlName="taxType" (change)="onTaxTypeChange(i)">
-                <option value="">No tax</option>
-                <option value="IGST">IGST</option>
-                <option value="CGST_SGST">CGST + SGST</option>
-              </select>
-            </div>
-            <div *ngIf="item.get('taxType')?.value === 'IGST'">
-              <label class="field-label">IGST %</label>
-              <input type="number" min="0" class="form-control" formControlName="igstRate" (input)="calculateTotals()">
-            </div>
-          </div>
-          <div class="field-grid" *ngIf="item.get('taxType')?.value === 'CGST_SGST'">
-            <div>
-              <label class="field-label">CGST %</label>
-              <input type="number" min="0" class="form-control" formControlName="cgstRate" (input)="calculateTotals()">
-            </div>
-            <div>
-              <label class="field-label">SGST %</label>
-              <input type="number" min="0" class="form-control" formControlName="sgstRate" (input)="calculateTotals()">
-            </div>
-          </div>
-          <div class="mobile-amount">
-            <span>Line total</span>
-            <strong>₹{{ item.get('amount')?.value | number:'1.2-2' }}</strong>
-          </div>
-        </article>
-      </div>
-    </div>
-  </section>
-
-  <div class="checkout-grid">
-    <section class="invoice-card">
-      <div class="section-heading">
-        <span class="section-number">04</span>
-        <div>
-          <h2>Payment details</h2>
-          <p>Record how this invoice will be paid.</p>
-        </div>
-      </div>
-      <div class="payment-grid">
-        <div>
-          <label class="field-label">Payment mode</label>
-          <select class="form-select" formControlName="paymentMode">
-            <option value="ONLINE">Online</option>
-            <option value="CASH">Cash</option>
-            <option value="CHEQUE">Cheque</option>
-            <option value="UPI">UPI</option>
-          </select>
-        </div>
-        <div>
-          <label class="field-label">Payment status</label>
-          <select class="form-select" formControlName="paymentStatus">
-            <option value="UNPAID">Unpaid</option>
-            <option value="PAID">Paid</option>
-            <option value="PARTIAL">Partially paid</option>
-          </select>
-        </div>
-        <div class="field-full">
-          <label class="field-label">Transaction ID</label>
-          <input type="text" class="form-control" formControlName="transactionId"
-            placeholder="Optional transaction reference">
-        </div>
-      </div>
-      <div class="bank-note">
-        <span class="bank-icon">₹</span>
-        <div>
-          <strong>HDFC Bank · 123456789012</strong>
-          <span>Datfuslab Technologies Pvt. Ltd. · IFSC HDFC0001234</span>
-        </div>
-      </div>
+      <a class="gi-add-link" routerLink="../item-details">+ Add New Item</a>
     </section>
-
-    <aside class="total-card">
-      <span class="summary-label">Invoice summary</span>
-      <div class="summary-row">
-        <span>Subtotal</span>
-        <strong>₹{{ invoiceForm.get('subtotal')?.value | number:'1.2-2' }}</strong>
-      </div>
-      <div class="summary-row">
-        <span>Total tax</span>
-        <strong>₹{{ invoiceForm.get('taxAmount')?.value | number:'1.2-2' }}</strong>
-      </div>
-      <div class="summary-row discount-row">
-        <label for="discount">Discount</label>
-        <div class="currency-input">
-          <span>₹</span>
-          <input id="discount" type="number" min="0" formControlName="discount" (input)="calculateTotals()">
-        </div>
-      </div>
-      <div class="grand-total">
-        <span>Total due</span>
-        <strong>₹{{ invoiceForm.get('totalAmount')?.value | number:'1.2-2' }}</strong>
-      </div>
-      <button class="generate-button" type="submit" [disabled]="isSubmitting">
-        <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm" aria-hidden="true"></span>
-        {{ isSubmitting ? 'Generating invoice...' : 'Generate invoice' }}
-        <span *ngIf="!isSubmitting" aria-hidden="true">→</span>
-      </button>
-      <p class="action-note">The invoice PDF will open in a new tab after it is created.</p>
+    <aside class="gi-invoice-card gi-summary-card"><h2>Invoice Summary</h2>
+      <div class="gi-summary-row"><span>Subtotal</span><strong>₹{{ invoiceForm.get('subtotal')?.value | number:'1.2-2' }}</strong></div>
+      <div class="gi-summary-row"><label for="discount">Discount (₹)</label><input id="discount" type="number" min="0" class="form-control gi-discount-input" formControlName="discount" (input)="calculateTotals()"></div>
+      <div class="gi-summary-taxes"><div class="gi-summary-row"><span>CGST</span><strong>₹{{ taxTotal('cgstAmount') | number:'1.2-2' }}</strong></div><div class="gi-summary-row"><span>SGST</span><strong>₹{{ taxTotal('sgstAmount') | number:'1.2-2' }}</strong></div><div class="gi-summary-row" *ngIf="taxTotal('igstAmount')"><span>IGST</span><strong>₹{{ taxTotal('igstAmount') | number:'1.2-2' }}</strong></div></div>
+      <div class="gi-grand-total"><span>Grand Total</span><strong>₹{{ invoiceForm.get('totalAmount')?.value | number:'1.2-2' }}</strong></div>
     </aside>
   </div>
+  <section class="gi-invoice-card gi-payment-card"><h2>Payment &amp; Billing Details</h2><div class="gi-payment-grid">
+    <div><label for="billing">Billing Address</label><textarea id="billing" class="form-control" rows="3" formControlName="billingAddress" placeholder="Customer billing address"></textarea></div>
+    <div>
+      <label for="payment-status">Payment Status</label>
+      <select id="payment-status" class="form-select" formControlName="paymentStatus">
+        <option value="UNPAID">UNPAID</option>
+        <option value="PAID">PAID</option>
+      </select>
+      <ng-container *ngIf="invoiceForm.get('paymentStatus')?.value === 'PAID'">
+        <label for="payment-mode" class="gi-second-label">Payment Mode</label>
+        <select id="payment-mode" class="form-select" formControlName="paymentMode">
+          <option value="ONLINE">ONLINE</option>
+          <option value="CASH">CASH</option>
+          <option value="CHEQUE">CHEQUE</option>
+          <option value="UPI">UPI</option>
+        </select>
+      </ng-container>
+    </div>
+    <div *ngIf="invoiceForm.get('paymentStatus')?.value === 'PAID' && invoiceForm.get('paymentMode')?.value !== 'CASH'"><label for="reference">Reference No. (Optional)</label><input id="reference" class="form-control" formControlName="transactionId" placeholder="UTR / Cheque No. / Transaction ID"></div>
+  </div></section>
+  <footer class="gi-page-actions"><button type="button" class="gi-button gi-outline" (click)="previewInvoice(preview)"><i class="feather icon-eye"></i> Preview Invoice</button><button type="submit" class="gi-button gi-primary gi-generate" [disabled]="isSubmitting"><i class="feather icon-file-text"></i>{{ isSubmitting ? 'Generating...' : 'Generate Invoice' }}</button></footer>
 </form>
+<ng-template #preview>
+  <h2 mat-dialog-title id="create-invoice-preview">Invoice Preview</h2>
+  <mat-dialog-content><div class="gi-preview-heading"><div><h3>{{ invoiceForm.get('companyName')?.value }}</h3><p>{{ invoiceForm.get('officeAddress')?.value }}</p></div><strong>{{ invoiceForm.get('invoiceNumber')?.value }}</strong></div><p><strong>Bill to:</strong> {{ invoiceForm.get('customerName')?.value }}</p><p>{{ invoiceForm.get('billingAddress')?.value }}</p><div class="table-responsive"><table class="gi-items-table"><thead><tr><th>Item</th><th>Quantity</th><th>Rate</th><th>Tax</th><th>Amount</th></tr></thead><tbody><tr *ngFor="let item of items.controls"><td>{{ item.get('productName')?.value }}<small class="gi-preview-description">{{ item.get('description')?.value }}</small></td><td>{{ item.get('quantity')?.value }}</td><td>₹{{ item.get('rate')?.value | number:'1.2-2' }}</td><td>₹{{ item.get('taxAmount')?.value | number:'1.2-2' }}</td><td>₹{{ item.get('amount')?.value | number:'1.2-2' }}</td></tr></tbody></table></div><div class="gi-preview-totals"><p>Subtotal: ₹{{ invoiceForm.get('subtotal')?.value | number:'1.2-2' }}</p><p>Discount: ₹{{ invoiceForm.get('discount')?.value | number:'1.2-2' }}</p><p>Total tax: ₹{{ invoiceForm.get('taxAmount')?.value | number:'1.2-2' }}</p><strong>Grand Total: ₹{{ invoiceForm.get('totalAmount')?.value | number:'1.2-2' }}</strong></div></mat-dialog-content>
+  <mat-dialog-actions align="end"><button class="gi-button gi-outline" mat-dialog-close>Close</button></mat-dialog-actions>
+</ng-template>

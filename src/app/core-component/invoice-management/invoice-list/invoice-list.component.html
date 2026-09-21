@@ -1,1 +1,105 @@
-<p>invoice-list works!</p>
+<div class="invoice-list">
+  <div class="content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div><h4>Invoices</h4><p class="text-muted mb-0">View invoice details and payment status</p></div>
+      <button type="button" class="btn btn-primary" (click)="loadInvoices()" [disabled]="isLoading">Refresh</button>
+    </div>
+    <div class="card">
+      <div class="card-body">
+        <label for="invoice-search" class="form-label">Search invoices</label>
+        <input id="invoice-search" type="search" class="form-control mb-3" placeholder="Invoice number, customer or phone"
+          [(ngModel)]="search" (ngModelChange)="currentPage = 1" [disabled]="isLoading">
+        <p *ngIf="isLoading" role="status">Loading invoices...</p>
+        <div *ngIf="loadError" class="alert alert-danger" role="alert">{{ loadError }}</div>
+        <ng-container *ngIf="!isLoading && !loadError">
+          <div class="table-responsive">
+            <table class="table table-striped align-middle">
+              <thead><tr><th>Invoice number</th><th>Customer</th><th>Invoice date</th><th>Due date</th><th class="text-end">Total amount</th><th>Payment status</th><th>Invoice status</th><th>Details</th></tr></thead>
+              <tbody>
+                <ng-container *ngFor="let invoice of filteredInvoices | paginate: { id: 'invoices', itemsPerPage: 10, currentPage: currentPage }">
+                  <tr>
+                    <td>{{ invoice.invoiceNumber }}</td>
+                    <td>{{ invoice.customerName || '—' }}<small class="d-block text-muted">{{ invoice.customerPhone }}</small></td>
+                    <td>{{ invoice.invoiceDate ? (invoice.invoiceDate | date:'dd MMM yyyy') : '—' }}</td>
+                    <td>{{ invoice.dueDate ? (invoice.dueDate | date:'dd MMM yyyy') : '—' }}</td>
+                    <td class="text-end">{{ invoice.totalAmount | number:'1.2-2' }}</td>
+                    <td>{{ invoice.paymentStatus || '—' }}</td>
+                    <td>{{ invoice.invoiceStatus || '—' }}</td>
+                    <td><button type="button" class="btn btn-sm btn-outline-primary" aria-haspopup="dialog" (click)="openInvoice(invoiceDialog, invoice)">View items</button></td>
+                  </tr>
+                </ng-container>
+                <tr *ngIf="!filteredInvoices.length"><td colspan="8" class="text-center py-4">{{ invoices.length ? 'No invoices match your search.' : 'No invoices found.' }}</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <pagination-controls *ngIf="filteredInvoices.length > 10" id="invoices" (pageChange)="currentPage = $event"></pagination-controls>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #invoiceDialog let-invoice>
+  <div class="invoice-dialog-header">
+    <h2 mat-dialog-title id="invoice-dialog-title">Invoice {{ invoice.invoiceNumber }}</h2>
+    <button type="button" mat-dialog-close class="invoice-close" aria-label="Close invoice">&times;</button>
+  </div>
+  <mat-dialog-content class="invoice-dialog-content">
+    <article class="invoice-paper">
+      <header class="invoice-heading">
+        <div><span class="invoice-label">INVOICE</span><h3>{{ invoice.companyName || 'Invoice details' }}</h3>
+          <p *ngIf="invoice.officeAddress" class="invoice-address">{{ invoice.officeAddress }}</p>
+          <p *ngIf="invoice.gstNumber">GSTIN: {{ invoice.gstNumber }}</p>
+        </div>
+        <dl class="invoice-metadata">
+          <div><dt>Invoice no.</dt><dd>{{ invoice.invoiceNumber }}</dd></div>
+          <div><dt>Invoice date</dt><dd>{{ invoice.invoiceDate ? (invoice.invoiceDate | date:'dd MMM yyyy') : '—' }}</dd></div>
+          <div><dt>Due date</dt><dd>{{ invoice.dueDate ? (invoice.dueDate | date:'dd MMM yyyy') : '—' }}</dd></div>
+        </dl>
+      </header>
+      <section class="invoice-parties">
+        <div><h4>Bill to</h4><strong>{{ invoice.customerName || '—' }}</strong>
+          <p *ngIf="invoice.billingAddress" class="invoice-address">{{ invoice.billingAddress }}</p>
+          <p *ngIf="invoice.customerPhone">{{ invoice.customerPhone }}</p>
+          <p *ngIf="invoice.customerEmail">{{ invoice.customerEmail }}</p>
+          <p *ngIf="invoice.customerGstNumber">GSTIN: {{ invoice.customerGstNumber }}</p>
+        </div>
+        <div *ngIf="invoice.deliveryAddresses"><h4>Ship to</h4><p class="invoice-address">{{ invoice.deliveryAddresses }}</p></div>
+      </section>
+      <div class="table-responsive">
+        <table class="table invoice-items">
+          <caption class="visually-hidden">Items for invoice {{ invoice.invoiceNumber }}</caption>
+          <thead><tr><th>#</th><th>Item / Description</th><th class="text-end">Qty</th><th class="text-end">Rate</th><th class="text-end">Tax</th><th class="text-end">Amount</th></tr></thead>
+          <tbody>
+            <tr *ngFor="let item of invoice.items; let i = index">
+              <td>{{ i + 1 }}</td><td><strong>{{ item.productName }}</strong><p *ngIf="item.description" class="item-description">{{ item.description }}</p></td>
+              <td class="text-end">{{ item.quantity }}</td><td class="text-end">{{ item.rate | number:'1.2-2' }}</td>
+              <td class="text-end invoice-tax">
+                <div *ngIf="item.cgstRate || item.cgstAmount">CGST {{ item.cgstRate || 0 }}%: {{ (item.cgstAmount || 0) | number:'1.2-2' }}</div>
+                <div *ngIf="item.sgstRate || item.sgstAmount">SGST {{ item.sgstRate || 0 }}%: {{ (item.sgstAmount || 0) | number:'1.2-2' }}</div>
+                <div *ngIf="item.igstRate || item.igstAmount">IGST {{ item.igstRate || 0 }}%: {{ (item.igstAmount || 0) | number:'1.2-2' }}</div>
+                <span *ngIf="!item.cgstRate && !item.cgstAmount && !item.sgstRate && !item.sgstAmount && !item.igstRate && !item.igstAmount">—</span>
+              </td><td class="text-end">{{ item.amount | number:'1.2-2' }}</td>
+            </tr>
+            <tr *ngIf="!invoice.items?.length"><td colspan="6" class="text-center">No items available.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <footer class="invoice-footer">
+        <div class="invoice-payment"><h4>Payment details</h4>
+          <p>Status: <strong>{{ invoice.paymentStatus || '—' }}</strong></p>
+          <p *ngIf="invoice.paymentMode">Mode: {{ invoice.paymentMode }}</p>
+          <p *ngIf="invoice.transactionId">Transaction: {{ invoice.transactionId }}</p>
+          <p *ngIf="invoice.invoiceStatus">Invoice status: {{ invoice.invoiceStatus }}</p>
+        </div>
+        <dl class="invoice-totals">
+          <div *ngIf="invoice.subtotal != null"><dt>Subtotal</dt><dd>{{ invoice.subtotal | number:'1.2-2' }}</dd></div>
+          <div *ngIf="invoice.discount != null"><dt>Discount</dt><dd>{{ invoice.discount | number:'1.2-2' }}</dd></div>
+          <div *ngIf="invoice.totalTaxAmount != null"><dt>Total tax</dt><dd>{{ invoice.totalTaxAmount | number:'1.2-2' }}</dd></div>
+          <div class="invoice-grand-total"><dt>Total amount</dt><dd>{{ invoice.totalAmount | number:'1.2-2' }}</dd></div>
+        </dl>
+      </footer>
+    </article>
+  </mat-dialog-content>
+  <mat-dialog-actions align="end"><button type="button" mat-dialog-close class="btn btn-secondary">Close</button></mat-dialog-actions>
+</ng-template>

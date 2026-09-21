@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, TemplateRef } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
 import { MessageService } from 'primeng/api';
 import { GenerateInvoiceService } from './generate-invoice.service';
@@ -41,15 +42,17 @@ export interface Product {
 export class GenerateInvoiceComponent implements OnInit {
 
   invoiceForm!: FormGroup;
-  customerList: any;
-  invoiceHeaderList: any;
+  customerList: any[] = [];
+  invoiceHeaderList: any[] = [];
+  customerSearch = '';
   productList: Product[] = [];
   isSubmitting = false;
 
   constructor(
     private fb: FormBuilder,
     private messageService: MessageService,
-    private invoiceService: GenerateInvoiceService
+    private invoiceService: GenerateInvoiceService,
+    private dialog: MatDialog
   ) { }
 
   ngOnInit(): void {
@@ -89,11 +92,11 @@ export class GenerateInvoiceComponent implements OnInit {
       deliveryAddresses: [''],
 
       invoiceNumber: ['INV-001', Validators.required],
-      invoiceDate: [today],
+      invoiceDate: [today, Validators.required],
       dueDate: [today],
 
       subtotal: [0],
-      discount: [0],
+      discount: [0, Validators.min(0)],
       taxAmount: [0],
       totalAmount: [0],
 
@@ -109,6 +112,37 @@ export class GenerateInvoiceComponent implements OnInit {
 
   get items(): FormArray {
     return this.invoiceForm.get('items') as FormArray;
+  }
+
+  get filteredCustomers(): any[] {
+    const query = this.customerSearch.toLowerCase();
+    return this.customerList.filter(customer =>
+      [customer.customerName, customer.email, customer.phone].some(value => String(value || '').toLowerCase().includes(query)));
+  }
+
+  filteredProducts(index: number): Product[] {
+    const query = String(this.items.at(index).get('productName')?.value || '').toLowerCase();
+    return this.productList.filter(product => product.productName.toLowerCase().includes(query));
+  }
+
+  clearCustomer(): void {
+    this.invoiceForm.patchValue({ customerId: '', customerName: '', customerEmail: '', customerPhone: '', customerGstNumber: '', billingAddress: '', deliveryAddresses: '' });
+  }
+
+  selectCustomer(customer: any): void {
+    this.customerSearch = customer.customerName;
+    this.invoiceForm.patchValue({ customerId: customer.id, customerName: customer.customerName,
+      customerEmail: customer.email, customerPhone: customer.phone, customerGstNumber: customer.gstNumber,
+      billingAddress: customer.billingAddress, deliveryAddresses: customer.deliveryAddresses || customer.billingAddress });
+  }
+
+  taxTotal(field: string): number {
+    return this.items.controls.reduce((sum, item) => sum + Number(item.get(field)?.value || 0), 0);
+  }
+
+  previewInvoice(template: TemplateRef<unknown>): void {
+    this.calculateTotals();
+    this.dialog.open(template, { width: '900px', maxWidth: '95vw', maxHeight: '90vh', ariaLabelledBy: 'create-invoice-preview' });
   }
 
   addItem(): void {
@@ -358,6 +392,8 @@ calculateTotals(): void {
   // ================= SUBMIT INVOICE =================
   submitInvoice(): void {
 
+    if (this.isSubmitting) return;
+
     this.calculateTotals();
 
     if (this.invoiceForm.invalid) {
@@ -419,8 +455,8 @@ calculateTotals(): void {
           console.error('SERVER ERROR:', err);
           this.messageService.add({
             severity: 'error',
-            summary: '500',
-            detail: 'Internal Server Error'
+            summary: String(err?.error?.responseCode || err?.status || 'Error'),
+            detail: err?.error?.responseMessage || 'Request failed'
           });
         }
       });
