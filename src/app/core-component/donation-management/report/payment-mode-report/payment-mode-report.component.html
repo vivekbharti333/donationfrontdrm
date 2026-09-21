@@ -48,7 +48,6 @@
       </div>
 
       <button type="button" class="search-button"
-        [disabled]="!selectedUserId || !selectedFromDate || !selectedToDate"
         (click)="getDonationPaymentModeCountAndAmountGroupByNameCustom(selectedUserId, selectedFromDate, selectedToDate)">
         <i class="feather icon-search"></i>
         Generate report
