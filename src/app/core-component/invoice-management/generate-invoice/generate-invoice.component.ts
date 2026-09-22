@@ -278,6 +278,10 @@ calculateTotals(): void {
           if (response['responseCode'] == '200') {
             this.invoiceHeaderList = JSON.parse(JSON.stringify(response['listPayload']));
             console.log(this.invoiceHeaderList)
+            const defaultCompany = this.invoiceHeaderList[0];
+            if (defaultCompany) {
+              this.applyCompany(defaultCompany);
+            }
             // this.toastr.success(response['responseMessage'], response['responseCode']);
           } else {
             //this.toastr.error(response['responseMessage'], response['responseCode']);
@@ -339,6 +343,10 @@ calculateTotals(): void {
 
     if (!company) return;
 
+    this.applyCompany(company);
+  }
+
+  private applyCompany(company: any): void {
     this.invoiceForm.patchValue({
       invoiceNumber: (company.invoiceInitial + company.serialNumber),
 

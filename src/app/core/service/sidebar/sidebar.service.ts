@@ -500,6 +500,12 @@ export class SidebarService {
               route: routes.invoiceList,
               permission: 'invoice-list',
             }, 
+             {
+              menuValue: 'Item Details',
+              route: routes.itemDetails,
+              // permission: 'item-details',
+               permission: 'invoice-list',
+            },
           ],
         },
         {
@@ -528,7 +534,7 @@ export class SidebarService {
               menuValue: 'Item Details',
               route: routes.itemDetails,
               permission: 'item-details',
-            }, 
+            },
            
           ],
         },

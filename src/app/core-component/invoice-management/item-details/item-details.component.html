@@ -1,1 +1,113 @@
-<p>item-details works!</p>
+<p-toast></p-toast>
+<section class="item-page">
+  <header class="item-header">
+    <div>
+      <span class="eyebrow">INVOICE CATALOG</span>
+      <h1>Items &amp; Services <span class="count-badge">{{ products.length }}</span></h1>
+      <p>View the products and services available while creating invoices.</p>
+    </div>
+    <div class="header-actions">
+      <button type="button" class="icon-button" aria-label="Refresh products" title="Refresh products" [disabled]="isLoading" (click)="getProductDetails()">
+        <i class="feather icon-refresh-cw" [class.spinning]="isLoading" aria-hidden="true"></i>
+      </button>
+      <button type="button" class="primary-button" (click)="openAddProduct(addProductDialog)"><i class="feather icon-plus" aria-hidden="true"></i> Add item</button>
+      <a class="back-button" routerLink="../generate-invoice"><i class="feather icon-arrow-left" aria-hidden="true"></i> Back to invoice</a>
+    </div>
+  </header>
+
+  <div class="item-panel" [attr.aria-busy]="isLoading">
+    <div class="item-toolbar">
+      <div><h2>Product directory</h2><p>Rates, available quantity and units at a glance.</p></div>
+      <label class="item-search">
+        <i class="feather icon-search" aria-hidden="true"></i>
+        <span class="visually-hidden">Search products</span>
+        <input type="search" placeholder="Search products or services" [ngModel]="searchTerm" (ngModelChange)="filterProducts($event)">
+      </label>
+    </div>
+
+    <div *ngIf="isLoading" class="state-panel" role="status">
+      <span class="spinner-border text-secondary" aria-hidden="true"></span>
+      <h3>Loading products...</h3>
+      <p>Your product directory will be ready in a moment.</p>
+    </div>
+
+    <div *ngIf="!isLoading && loadError" class="state-panel" role="alert">
+      <span class="state-icon"><i class="feather icon-alert-circle" aria-hidden="true"></i></span>
+      <h3>Could not load products</h3>
+      <p>{{ loadError }}</p>
+      <button type="button" class="primary-button" (click)="getProductDetails()">Try again</button>
+    </div>
+
+    <ng-container *ngIf="!isLoading && !loadError">
+      <div *ngIf="!filteredProducts.length" class="state-panel">
+        <span class="state-icon"><i class="feather icon-box" aria-hidden="true"></i></span>
+        <h3>{{ searchTerm ? 'No matching products' : 'No products available' }}</h3>
+        <p>{{ searchTerm ? 'Try a different product name, description or unit.' : 'Products added to your account will appear here.' }}</p>
+        <button *ngIf="searchTerm" type="button" class="secondary-button" (click)="filterProducts('')">Clear search</button>
+      </div>
+
+      <div class="item-table-wrap" *ngIf="filteredProducts.length">
+        <table class="item-table">
+          <thead><tr><th>Item / Service</th><th>Description</th><th>Unit</th><th class="number-column">Available quantity</th><th class="number-column">Rate</th><th>Added on</th><th class="action-column">Action</th></tr></thead>
+          <tbody>
+            <tr *ngFor="let product of filteredProducts">
+              <td><div class="product-name"><span class="product-icon"><i class="feather icon-box" aria-hidden="true"></i></span><strong>{{ product.productName }}</strong></div></td>
+              <td class="description-cell">{{ product.description || 'No description' }}</td>
+              <td><span class="unit-tag">{{ product.quantityType || '—' }}</span></td>
+              <td class="number-column">{{ product.quantity | number:'1.0-2' }}</td>
+              <td class="number-column rate">{{ product.rate | currency:'INR':'symbol':'1.2-2' }}</td>
+              <td class="date-cell">{{ product.createdAt ? (product.createdAt | date:'dd MMM yyyy') : '—' }}</td>
+              <td class="action-column"><button type="button" class="edit-button" [attr.aria-label]="'Edit ' + product.productName" title="Edit item" (click)="openAddProduct(addProductDialog, product)"><i class="feather icon-edit-2" aria-hidden="true"></i></button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </ng-container>
+  </div>
+</section>
+
+<ng-template #addProductDialog>
+  <div class="dialog-heading">
+    <div><span class="eyebrow">INVOICE CATALOG</span><h2 id="add-product-title">{{ editingProduct ? 'Edit item' : 'Add item' }}</h2><p>{{ editingProduct ? 'Review the selected product or service details.' : 'Create a product or service for future invoices.' }}</p></div>
+    <button type="button" class="icon-button" aria-label="Close item form" [disabled]="isSaving" (click)="closeAddProduct()"><i class="feather icon-x" aria-hidden="true"></i></button>
+  </div>
+  <form class="product-form" [formGroup]="productForm" (ngSubmit)="saveProduct()">
+    <mat-dialog-content>
+      <p class="required-note">Fields marked * are required.</p>
+      <div *ngIf="editingProduct" class="edit-notice" role="status"><i class="feather icon-info" aria-hidden="true"></i><span>Update support is not connected yet. You can review and edit these values, but saving will remain disabled until the update API is available.</span></div>
+      <div *ngIf="formError" class="alert alert-danger" role="alert">{{ formError }}</div>
+      <fieldset [disabled]="isSaving" class="row">
+        <div class="col-12 mb-3">
+          <label for="product-name" class="form-label">Item / Service name *</label>
+          <input id="product-name" class="form-control" maxlength="200" formControlName="productName" [class.is-invalid]="invalid('productName')" placeholder="e.g. Website design">
+          <div class="invalid-feedback">Enter an item or service name.</div>
+        </div>
+        <div class="col-12 mb-3">
+          <label for="product-description" class="form-label">Description</label>
+          <textarea id="product-description" class="form-control" rows="3" formControlName="description" placeholder="Describe the item or service"></textarea>
+        </div>
+        <div class="col-md-4 mb-3">
+          <label for="product-rate" class="form-label">Rate (₹) *</label>
+          <input id="product-rate" type="number" min="0" step="0.01" class="form-control" formControlName="rate" [class.is-invalid]="invalid('rate')" placeholder="0.00">
+          <div class="invalid-feedback">Enter a valid non-negative rate.</div>
+        </div>
+        <div class="col-md-4 mb-3">
+          <label for="product-quantity" class="form-label">Available quantity *</label>
+          <input id="product-quantity" type="number" min="0" step="1" class="form-control" formControlName="quantity" [class.is-invalid]="invalid('quantity')">
+          <div class="invalid-feedback">Enter a valid whole-number quantity.</div>
+        </div>
+        <div class="col-md-4 mb-3">
+          <label for="product-unit" class="form-label">Unit *</label>
+          <select id="product-unit" class="form-select" formControlName="quantityType" [class.is-invalid]="invalid('quantityType')">
+            <option *ngFor="let unit of unitOptions" [value]="unit.value">{{ unit.label }}</option>
+          </select>
+          <div class="invalid-feedback">Select a unit.</div>
+        </div>
+      </fieldset>
+    </mat-dialog-content>
+    <mat-dialog-actions align="end" class="dialog-footer">
+      <button type="button" class="secondary-button" [disabled]="isSaving" (click)="closeAddProduct()">Cancel</button>
+      <button type="submit" class="primary-button" [disabled]="!!editingProduct || isSaving">{{ editingProduct ? 'Update item' : (isSaving ? 'Saving...' : 'Add item') }}</button>
+    </mat-dialog-actions>
+  </form>
+</ng-template>

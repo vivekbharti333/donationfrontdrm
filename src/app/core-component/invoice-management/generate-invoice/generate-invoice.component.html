@@ -7,6 +7,10 @@
   <section class="gi-invoice-card gi-details-card">
     <h2>Invoice Details</h2>
     <div class="gi-details-grid">
+      <div><label for="company">Invoice Company <b>*</b></label><select id="company" class="form-select" formControlName="companyId" (change)="onCompanyChange($event)" [class.is-invalid]="invoiceForm.get('companyId')?.touched && invoiceForm.get('companyId')?.invalid"><option value="">Select company</option><option *ngFor="let company of invoiceHeaderList" [value]="company.id">{{ company.companyFirstName }} {{ company.companyLastName }}</option></select></div>
+      <div><label for="invoice-number">Invoice Number <b>*</b></label><input id="invoice-number" class="form-control" formControlName="invoiceNumber" [class.is-invalid]="invoiceForm.get('invoiceNumber')?.touched && invoiceForm.get('invoiceNumber')?.invalid"></div>
+      <div><label for="invoice-date">Invoice Date <b>*</b></label><input id="invoice-date" type="date" class="form-control" formControlName="invoiceDate" required></div>
+      <div><label for="due-date">Due Date</label><input id="due-date" type="date" class="form-control" formControlName="dueDate"></div>
       <div class="gi-customer-field"><label for="customer-search">Customer / Donor <b>*</b></label>
         <input id="customer-search" class="form-control" placeholder="Search customer, donor or NGO..." [ngModel]="customerSearch" (ngModelChange)="customerSearch = $event; clearCustomer()" [ngModelOptions]="{standalone: true}" [matAutocomplete]="customers" [class.is-invalid]="invoiceForm.get('customerId')?.touched && invoiceForm.get('customerId')?.invalid">
         <mat-autocomplete #customers="matAutocomplete" (optionSelected)="selectCustomer($event.option.value)">
@@ -15,12 +19,10 @@
         </mat-autocomplete>
         <a class="gi-add-link" routerLink="../customer-details">+ Add New Customer</a>
       </div>
-      <div><label for="invoice-number">Invoice Number <b>*</b></label><input id="invoice-number" class="form-control" formControlName="invoiceNumber" [class.is-invalid]="invoiceForm.get('invoiceNumber')?.touched && invoiceForm.get('invoiceNumber')?.invalid"></div>
-      <div><label for="invoice-date">Invoice Date <b>*</b></label><input id="invoice-date" type="date" class="form-control" formControlName="invoiceDate" required></div>
-      <div><label for="due-date">Due Date</label><input id="due-date" type="date" class="form-control" formControlName="dueDate"></div>
-      <div><label for="company">Invoice Company <b>*</b></label><select id="company" class="form-select" formControlName="companyId" (change)="onCompanyChange($event)" [class.is-invalid]="invoiceForm.get('companyId')?.touched && invoiceForm.get('companyId')?.invalid"><option value="">Select company</option><option *ngFor="let company of invoiceHeaderList" [value]="company.id">{{ company.companyFirstName }} {{ company.companyLastName }}</option></select></div>
-      <div><label for="currency">Currency</label><input id="currency" class="form-control" value="INR (₹)" readonly></div>
-      <div class="gi-supply-field"><label for="supply">Place of Supply</label><input id="supply" class="form-control" formControlName="deliveryAddresses" placeholder="Delivery address"></div>
+      <div class="gi-address-fields">
+        <div><label for="billing">Billing Address</label><textarea id="billing" class="form-control" rows="3" formControlName="billingAddress" placeholder="Customer billing address"></textarea></div>
+        <div><label for="supply">Place of Supply</label><textarea id="supply" class="form-control" rows="3" formControlName="deliveryAddresses" placeholder="Delivery address"></textarea></div>
+      </div>
     </div>
   </section>
   <div class="gi-items-layout">
@@ -55,22 +57,22 @@
     </aside>
   </div>
   <section class="gi-invoice-card gi-payment-card"><h2>Payment &amp; Billing Details</h2><div class="gi-payment-grid">
-    <div><label for="billing">Billing Address</label><textarea id="billing" class="form-control" rows="3" formControlName="billingAddress" placeholder="Customer billing address"></textarea></div>
+    <div><label for="currency">Currency</label><input id="currency" class="form-control" value="INR (₹)" readonly></div>
     <div>
       <label for="payment-status">Payment Status</label>
       <select id="payment-status" class="form-select" formControlName="paymentStatus">
         <option value="UNPAID">UNPAID</option>
         <option value="PAID">PAID</option>
       </select>
-      <ng-container *ngIf="invoiceForm.get('paymentStatus')?.value === 'PAID'">
-        <label for="payment-mode" class="gi-second-label">Payment Mode</label>
-        <select id="payment-mode" class="form-select" formControlName="paymentMode">
-          <option value="ONLINE">ONLINE</option>
-          <option value="CASH">CASH</option>
-          <option value="CHEQUE">CHEQUE</option>
-          <option value="UPI">UPI</option>
-        </select>
-      </ng-container>
+    </div>
+    <div *ngIf="invoiceForm.get('paymentStatus')?.value === 'PAID'">
+      <label for="payment-mode">Payment Mode</label>
+      <select id="payment-mode" class="form-select" formControlName="paymentMode">
+        <option value="ONLINE">ONLINE</option>
+        <option value="CASH">CASH</option>
+        <option value="CHEQUE">CHEQUE</option>
+        <option value="UPI">UPI</option>
+      </select>
     </div>
     <div *ngIf="invoiceForm.get('paymentStatus')?.value === 'PAID' && invoiceForm.get('paymentMode')?.value !== 'CASH'"><label for="reference">Reference No. (Optional)</label><input id="reference" class="form-control" formControlName="transactionId" placeholder="UTR / Cheque No. / Transaction ID"></div>
   </div></section>
