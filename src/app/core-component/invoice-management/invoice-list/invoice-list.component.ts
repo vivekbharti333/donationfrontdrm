@@ -14,7 +14,9 @@ export class InvoiceListComponent implements OnInit, OnDestroy {
   isLoading = false;
   loadError = '';
   search = '';
+  paymentFilter: 'ALL' | 'PAID' | 'UNPAID' = 'ALL';
   currentPage = 1;
+  readonly pageSize = 10;
   private invoiceDialog?: MatDialogRef<unknown>;
   private readonly destroyed = new Subject<void>();
 
@@ -37,9 +39,39 @@ export class InvoiceListComponent implements OnInit, OnDestroy {
 
   get filteredInvoices(): InvoiceListEntry[] {
     const query = this.search.trim().toLowerCase();
-    return this.invoices.filter(invoice =>
-      [invoice.invoiceNumber, invoice.customerName, invoice.customerPhone]
-        .some(value => (value || '').toLowerCase().includes(query)));
+    return this.invoices.filter(invoice => {
+      const matchesPayment = this.paymentFilter === 'ALL' ||
+        (invoice.paymentStatus || '').toUpperCase() === this.paymentFilter;
+      const matchesSearch = [invoice.invoiceNumber, invoice.customerName, invoice.customerPhone]
+        .some(value => (value || '').toLowerCase().includes(query));
+      return matchesPayment && matchesSearch;
+    });
+  }
+
+  get pagedInvoices(): InvoiceListEntry[] {
+    const start = (this.currentPage - 1) * this.pageSize;
+    return this.filteredInvoices.slice(start, start + this.pageSize);
+  }
+
+  get totalPages(): number {
+    return Math.ceil(this.filteredInvoices.length / this.pageSize);
+  }
+
+  get paidCount(): number {
+    return this.invoices.filter(invoice => (invoice.paymentStatus || '').toUpperCase() === 'PAID').length;
+  }
+
+  get unpaidCount(): number {
+    return this.invoices.filter(invoice => (invoice.paymentStatus || '').toUpperCase() === 'UNPAID').length;
+  }
+
+  setPaymentFilter(filter: 'ALL' | 'PAID' | 'UNPAID'): void {
+    this.paymentFilter = filter;
+    this.currentPage = 1;
+  }
+
+  setPage(page: number): void {
+    if (page >= 1 && page <= this.totalPages) this.currentPage = page;
   }
 
   loadInvoices(): void {

@@ -31,18 +31,18 @@
       <div class="table-responsive" formArrayName="items">
         <table class="gi-items-table"><thead><tr><th>#</th><th>Item / Service <b>*</b></th><th>Description</th><th>Qty <b>*</b></th><th>Rate (₹) <b>*</b></th><th>GST</th><th>Amount (₹)</th><th><span class="visually-hidden">Remove</span></th></tr></thead>
           <tbody><tr *ngFor="let item of items.controls; let i = index" [formGroupName]="i">
-            <td>{{ i + 1 }}</td>
-            <td class="gi-product-cell"><input class="form-control" formControlName="productName" [matAutocomplete]="products" placeholder="Search or select item..." [attr.aria-label]="'Item ' + (i + 1)" [class.is-invalid]="item.get('productName')?.touched && item.get('productName')?.invalid">
+            <td class="gi-item-number">Item {{ i + 1 }}</td>
+            <td class="gi-product-cell" data-label="Item / Service"><input class="form-control" formControlName="productName" [matAutocomplete]="products" placeholder="Search or select item..." [attr.aria-label]="'Item ' + (i + 1)" [class.is-invalid]="item.get('productName')?.touched && item.get('productName')?.invalid">
               <mat-autocomplete #products="matAutocomplete" (optionSelected)="updateDescription($event.option.value, i)"><mat-option *ngFor="let product of filteredProducts(i)" [value]="product.productName"><span class="gi-option-content"><i class="feather icon-box"></i><span>{{ product.productName }}<small>{{ product.description }}</small></span><strong>₹{{ product.rate | number:'1.0-2' }}</strong></span></mat-option></mat-autocomplete>
             </td>
-            <td><input class="form-control gi-description" formControlName="description" aria-label="Item description"></td>
-            <td><input type="number" min="1" step="1" class="form-control gi-quantity" formControlName="quantity" (input)="calculateTotals()" aria-label="Quantity"></td>
-            <td><input type="number" min="0" step="0.01" class="form-control gi-rate" formControlName="rate" (input)="calculateTotals()" aria-label="Rate"></td>
-            <td class="gi-tax-cell"><select class="form-select" formControlName="taxType" (change)="onTaxTypeChange(i)" aria-label="GST type"><option value="">No tax</option><option value="CGST_SGST">CGST + SGST</option><option value="IGST">IGST</option></select>
+            <td data-label="Description"><input class="form-control gi-description" formControlName="description" aria-label="Item description"></td>
+            <td data-label="Qty"><input type="number" min="1" step="1" class="form-control gi-quantity" formControlName="quantity" (input)="calculateTotals()" aria-label="Quantity"></td>
+            <td data-label="Rate (₹)"><input type="number" min="0" step="0.01" class="form-control gi-rate" formControlName="rate" (input)="calculateTotals()" aria-label="Rate"></td>
+            <td class="gi-tax-cell" data-label="GST"><select class="form-select" formControlName="taxType" (change)="onTaxTypeChange(i)" aria-label="GST type"><option value="">No tax</option><option value="CGST_SGST">CGST + SGST</option><option value="IGST">IGST</option></select>
               <div class="gi-tax-rates" *ngIf="item.get('taxType')?.value === 'CGST_SGST'"><label>CGST %<input type="number" min="0" max="100" class="form-control" formControlName="cgstRate" (input)="calculateTotals()"></label><label>SGST %<input type="number" min="0" max="100" class="form-control" formControlName="sgstRate" (input)="calculateTotals()"></label></div>
               <div class="gi-tax-rates" *ngIf="item.get('taxType')?.value === 'IGST'"><label>IGST %<input type="number" min="0" max="100" class="form-control" formControlName="igstRate" (input)="calculateTotals()"></label></div>
             </td>
-            <td><output class="gi-line-amount">{{ item.get('amount')?.value | number:'1.2-2' }}</output></td>
+            <td data-label="Amount (₹)"><output class="gi-line-amount">{{ item.get('amount')?.value | number:'1.2-2' }}</output></td>
             <td><button class="gi-remove-button" type="button" [disabled]="items.length === 1" (click)="removeItem(i)" [attr.aria-label]="'Remove item ' + (i + 1)"><i class="feather icon-trash-2"></i></button></td>
           </tr></tbody>
         </table>

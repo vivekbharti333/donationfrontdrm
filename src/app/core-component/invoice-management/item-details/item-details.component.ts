@@ -76,6 +76,7 @@ export class ItemDetailsComponent implements OnInit, OnDestroy {
     this.dialogRef = this.dialog.open(template, {
       width: '680px',
       maxWidth: '95vw',
+      maxHeight: '92vh',
       disableClose: true,
       ariaLabelledBy: 'add-product-title'
     });

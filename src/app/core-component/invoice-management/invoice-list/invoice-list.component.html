@@ -1,42 +1,84 @@
 <div class="invoice-list">
-  <div class="content">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-      <div><h4>Invoices</h4><p class="text-muted mb-0">View invoice details and payment status</p></div>
-      <button type="button" class="btn btn-primary" (click)="loadInvoices()" [disabled]="isLoading">Refresh</button>
+  <header class="page-header invoice-page-header">
+    <div class="page-title">
+      <h4>Invoice List</h4>
+      <h6>Manage invoices and payment status</h6>
     </div>
-    <div class="card">
-      <div class="card-body">
-        <label for="invoice-search" class="form-label">Search invoices</label>
-        <input id="invoice-search" type="search" class="form-control mb-3" placeholder="Invoice number, customer or phone"
-          [(ngModel)]="search" (ngModelChange)="currentPage = 1" [disabled]="isLoading">
-        <p *ngIf="isLoading" role="status">Loading invoices...</p>
-        <div *ngIf="loadError" class="alert alert-danger" role="alert">{{ loadError }}</div>
-        <ng-container *ngIf="!isLoading && !loadError">
-          <div class="table-responsive">
-            <table class="table table-striped align-middle">
-              <thead><tr><th>Invoice number</th><th>Customer</th><th>Invoice date</th><th>Due date</th><th class="text-end">Total amount</th><th>Payment status</th><th>Invoice status</th><th>Details</th></tr></thead>
+    <a class="create-invoice-button" routerLink="../generate-invoice"><i class="feather icon-plus" aria-hidden="true"></i> Create Invoice</a>
+  </header>
+
+  <section class="card invoice-list-card" aria-labelledby="invoice-list-title">
+    <div class="card-body invoice-workspace">
+      <div class="invoice-workspace-heading">
+        <div>
+          <span class="invoice-eyebrow">Invoice management</span>
+          <h5 id="invoice-list-title">Your invoices</h5>
+          <p>Find an invoice, check its payment, and view its items.</p>
+        </div>
+        <div class="invoice-heading-actions">
+          <label class="invoice-search" for="invoice-search">
+            <i class="feather icon-search" aria-hidden="true"></i>
+            <input id="invoice-search" type="search" class="form-control" placeholder="Search number, customer, phone…"
+              [(ngModel)]="search" (ngModelChange)="currentPage = 1" [disabled]="isLoading">
+            <span class="visually-hidden">Search invoices</span>
+          </label>
+          <span class="invoice-count" *ngIf="!isLoading"><strong>{{ filteredInvoices.length }}</strong> {{ filteredInvoices.length === 1 ? 'record' : 'records' }}</span>
+          <button type="button" class="invoice-refresh" (click)="loadInvoices()" [disabled]="isLoading" aria-label="Refresh invoices" title="Refresh invoices"><i class="feather icon-refresh-cw" aria-hidden="true"></i></button>
+        </div>
+      </div>
+
+      <div class="invoice-filter-tabs" role="group" aria-label="Filter invoices by payment status">
+        <button type="button" class="invoice-filter-tab" [class.active]="paymentFilter === 'ALL'" [attr.aria-pressed]="paymentFilter === 'ALL'" (click)="setPaymentFilter('ALL')"><i class="feather icon-file-text" aria-hidden="true"></i><span><strong>All invoices</strong><small>{{ invoices.length }} total</small></span></button>
+        <button type="button" class="invoice-filter-tab" [class.active]="paymentFilter === 'PAID'" [attr.aria-pressed]="paymentFilter === 'PAID'" (click)="setPaymentFilter('PAID')"><i class="feather icon-check-circle" aria-hidden="true"></i><span><strong>Paid</strong><small>{{ paidCount }} invoices</small></span></button>
+        <button type="button" class="invoice-filter-tab" [class.active]="paymentFilter === 'UNPAID'" [attr.aria-pressed]="paymentFilter === 'UNPAID'" (click)="setPaymentFilter('UNPAID')"><i class="feather icon-clock" aria-hidden="true"></i><span><strong>Unpaid</strong><small>{{ unpaidCount }} invoices</small></span></button>
+      </div>
+
+      <div *ngIf="isLoading" class="invoice-state" role="status"><span class="spinner-border spinner-border-sm" aria-hidden="true"></span> Loading invoices…</div>
+      <div *ngIf="loadError" class="invoice-state invoice-error" role="alert"><i class="feather icon-alert-circle" aria-hidden="true"></i><span>{{ loadError }}</span><button type="button" (click)="loadInvoices()">Try again</button></div>
+
+      <ng-container *ngIf="!isLoading && !loadError">
+        <div *ngIf="!filteredInvoices.length" class="invoice-state invoice-empty">
+          <span class="invoice-empty-icon"><i class="feather icon-inbox" aria-hidden="true"></i></span>
+          <strong>{{ invoices.length ? 'No matching invoices' : 'No invoices found' }}</strong>
+          <span>{{ invoices.length ? 'Try another search or payment filter.' : 'Create your first invoice to see it here.' }}</span>
+        </div>
+
+        <ng-container *ngIf="filteredInvoices.length">
+          <div class="invoice-desktop-table table-responsive">
+            <table class="table invoice-table">
+              <thead><tr><th scope="col">Invoice number</th><th scope="col">Customer</th><th scope="col">Invoice date</th><th scope="col">Due date</th><th scope="col" class="text-end">Total amount</th><th scope="col" class="text-center">Item</th><th scope="col">Payment</th><th scope="col">Invoice status</th><th scope="col" class="text-center">Action</th></tr></thead>
               <tbody>
-                <ng-container *ngFor="let invoice of filteredInvoices | paginate: { id: 'invoices', itemsPerPage: 10, currentPage: currentPage }">
-                  <tr>
-                    <td>{{ invoice.invoiceNumber }}</td>
-                    <td>{{ invoice.customerName || '—' }}<small class="d-block text-muted">{{ invoice.customerPhone }}</small></td>
-                    <td>{{ invoice.invoiceDate ? (invoice.invoiceDate | date:'dd MMM yyyy') : '—' }}</td>
-                    <td>{{ invoice.dueDate ? (invoice.dueDate | date:'dd MMM yyyy') : '—' }}</td>
-                    <td class="text-end">{{ invoice.totalAmount | number:'1.2-2' }}</td>
-                    <td>{{ invoice.paymentStatus || '—' }}</td>
-                    <td>{{ invoice.invoiceStatus || '—' }}</td>
-                    <td><button type="button" class="btn btn-sm btn-outline-primary" aria-haspopup="dialog" (click)="openInvoice(invoiceDialog, invoice)">View items</button></td>
-                  </tr>
-                </ng-container>
-                <tr *ngIf="!filteredInvoices.length"><td colspan="8" class="text-center py-4">{{ invoices.length ? 'No invoices match your search.' : 'No invoices found.' }}</td></tr>
+                <tr *ngFor="let invoice of pagedInvoices">
+                  <td><strong class="invoice-number">{{ invoice.invoiceNumber }}</strong></td>
+                  <td><strong class="invoice-customer">{{ invoice.customerName || '—' }}</strong><small *ngIf="invoice.customerPhone">{{ invoice.customerPhone }}</small></td>
+                  <td>{{ invoice.invoiceDate ? (invoice.invoiceDate | date:'dd MMM yyyy') : '—' }}</td>
+                  <td>{{ invoice.dueDate ? (invoice.dueDate | date:'dd MMM yyyy') : '—' }}</td>
+                  <td class="text-end"><strong class="invoice-amount">₹{{ invoice.totalAmount | number:'1.2-2' }}</strong></td>
+                  <td class="text-center">{{ invoice.items?.length || 0 }}</td>
+                  <td><span class="invoice-badge" [class.is-paid]="invoice.paymentStatus === 'PAID'" [class.is-unpaid]="invoice.paymentStatus === 'UNPAID'">{{ invoice.paymentStatus || '—' }}</span></td>
+                  <td><span class="invoice-status">{{ invoice.invoiceStatus || '—' }}</span></td>
+                  <td class="text-center"><button type="button" class="invoice-view-button" aria-haspopup="dialog" [attr.aria-label]="'View invoice ' + invoice.invoiceNumber" (click)="openInvoice(invoiceDialog, invoice)"><i class="feather icon-eye" aria-hidden="true"></i></button></td>
+                </tr>
               </tbody>
             </table>
           </div>
-          <pagination-controls *ngIf="filteredInvoices.length > 10" id="invoices" (pageChange)="currentPage = $event"></pagination-controls>
+
+          <div class="invoice-mobile-cards">
+            <article class="invoice-mobile-card" *ngFor="let invoice of pagedInvoices">
+              <div class="invoice-mobile-heading"><div><span class="invoice-mobile-number">{{ invoice.invoiceNumber }}</span><h3>{{ invoice.customerName || 'Customer not specified' }}</h3></div><strong class="invoice-amount">₹{{ invoice.totalAmount | number:'1.2-2' }}</strong></div>
+              <div class="invoice-mobile-details"><div><span>Invoice date</span><strong>{{ invoice.invoiceDate ? (invoice.invoiceDate | date:'dd MMM yyyy') : '—' }}</strong></div><div><span>Due date</span><strong>{{ invoice.dueDate ? (invoice.dueDate | date:'dd MMM yyyy') : '—' }}</strong></div><div><span>Item</span><strong>{{ invoice.items?.length || 0 }}</strong></div><div *ngIf="invoice.customerPhone"><span>Phone</span><strong>{{ invoice.customerPhone }}</strong></div></div>
+              <div class="invoice-mobile-footer"><div><span class="invoice-badge" [class.is-paid]="invoice.paymentStatus === 'PAID'" [class.is-unpaid]="invoice.paymentStatus === 'UNPAID'">{{ invoice.paymentStatus || '—' }}</span><span class="invoice-status">{{ invoice.invoiceStatus || '—' }}</span></div><button type="button" class="invoice-view-button" aria-haspopup="dialog" [attr.aria-label]="'View invoice ' + invoice.invoiceNumber" (click)="openInvoice(invoiceDialog, invoice)"><i class="feather icon-eye" aria-hidden="true"></i></button></div>
+            </article>
+          </div>
+
+          <nav *ngIf="totalPages > 1" class="invoice-pagination" aria-label="Invoice pages">
+            <span>Showing {{ (currentPage - 1) * pageSize + 1 }}–{{ currentPage * pageSize > filteredInvoices.length ? filteredInvoices.length : currentPage * pageSize }} of {{ filteredInvoices.length }}</span>
+            <div><button type="button" (click)="setPage(currentPage - 1)" [disabled]="currentPage === 1" aria-label="Previous page"><i class="feather icon-chevron-left" aria-hidden="true"></i></button><span>Page {{ currentPage }} of {{ totalPages }}</span><button type="button" (click)="setPage(currentPage + 1)" [disabled]="currentPage === totalPages" aria-label="Next page"><i class="feather icon-chevron-right" aria-hidden="true"></i></button></div>
+          </nav>
         </ng-container>
-      </div>
+      </ng-container>
     </div>
-  </div>
+  </section>
 </div>
 
 <ng-template #invoiceDialog let-invoice>

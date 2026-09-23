@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { AuthenticationService } from 'src/app/auth/authentication.service';
 import { Constant } from 'src/app/core/constant/constants';
@@ -57,7 +57,9 @@ export class InvoiceListService {
     if (superadminId == null || !String(superadminId).trim()) {
       return throwError(() => new Error('Your account is missing a superadmin ID. Please sign in again.'));
     }
-    const params = new HttpParams().set('superadminId', String(superadminId).trim());
-    return this.http.get<InvoiceListResponse>(`${Constant.Site_Url}getInvoiceDetailsBySuperadminId`, { params });
+    return this.http.post<InvoiceListResponse>(
+      `${Constant.Site_Url}getInvoiceDetailsBySuperadminId`,
+      { payload: { superadminId: String(superadminId).trim() } }
+    );
   }
 }

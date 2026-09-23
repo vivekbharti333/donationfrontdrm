@@ -46,7 +46,7 @@
         <button *ngIf="searchTerm" type="button" class="secondary-button" (click)="filterProducts('')">Clear search</button>
       </div>
 
-      <div class="item-table-wrap" *ngIf="filteredProducts.length">
+      <div class="item-table-wrap item-desktop-table" *ngIf="filteredProducts.length">
         <table class="item-table">
           <thead><tr><th>Item / Service</th><th>Description</th><th>Unit</th><th class="number-column">Available quantity</th><th class="number-column">Rate</th><th>Added on</th><th class="action-column">Action</th></tr></thead>
           <tbody>
@@ -61,6 +61,21 @@
             </tr>
           </tbody>
         </table>
+      </div>
+      <div class="item-mobile-cards" *ngIf="filteredProducts.length">
+        <article class="item-mobile-card" *ngFor="let product of filteredProducts">
+          <div class="item-mobile-heading">
+            <span class="product-icon"><i class="feather icon-box" aria-hidden="true"></i></span>
+            <div class="item-mobile-title"><h3>{{ product.productName }}</h3><span class="rate">{{ product.rate | currency:'INR':'symbol':'1.2-2' }}</span></div>
+          </div>
+          <p class="item-mobile-description">{{ product.description || 'No description' }}</p>
+          <dl class="item-mobile-details">
+            <div><dt>Unit</dt><dd><span class="unit-tag">{{ product.quantityType || '—' }}</span></dd></div>
+            <div><dt>Available</dt><dd>{{ product.quantity | number:'1.0-2' }}</dd></div>
+            <div><dt>Added on</dt><dd>{{ product.createdAt ? (product.createdAt | date:'dd MMM yyyy') : '—' }}</dd></div>
+          </dl>
+          <div class="item-mobile-actions"><button type="button" class="edit-button" [attr.aria-label]="'Edit ' + product.productName" (click)="openAddProduct(addProductDialog, product)"><i class="feather icon-edit-2" aria-hidden="true"></i> Edit item</button></div>
+        </article>
       </div>
     </ng-container>
   </div>
