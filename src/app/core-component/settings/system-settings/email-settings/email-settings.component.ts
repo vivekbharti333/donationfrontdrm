@@ -1,8 +1,13 @@
 import { Component } from '@angular/core';
-import { FormGroup, FormArray, FormBuilder, Validators} from '@angular/forms';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { finalize } from 'rxjs';
 import { EmailSettingsService } from './email-settings.service';
-import { AuthenticationService } from 'src/app/auth/authentication.service';
-import { SidebarService } from 'src/app/core/core.index';
+
+interface EmailProvider {
+  name: string;
+  code: string;
+  aliases: string[];
+}
 
 @Component({
   selector: 'app-email-settings',
@@ -10,102 +15,110 @@ import { SidebarService } from 'src/app/core/core.index';
   styleUrl: './email-settings.component.scss',
 })
 export class EmailSettingsComponent {
-  // constructor(private sidebar: SidebarService) {}
-
-  // isCollapsed: boolean = false;
-  // toggleCollapse() {
-  //   this.sidebar.toggleCollapse();
-  //   this.isCollapsed = !this.isCollapsed;
-  // }
-
-
   public addEmailForm!: FormGroup;
   public isLoading = false;
-  public loginUser: any;
-  public emailDetailsList: any;
+  public isFetching = false;
+  public errorMessage = '';
+  public emailDetailsList: any[] = [];
+  public selectedProvider: EmailProvider | null = null;
+  public providers: EmailProvider[] = [
+    { name: 'SMTP', code: 'NIMBUZ', aliases: ['NIMBUZ', 'SMTP'] },
+    { name: 'Brevo Mailer', code: 'PHP', aliases: ['PHP', 'BREVO'] },
+    { name: 'Zoho Mail', code: 'ZOHO', aliases: ['ZOHO'] },
+    { name: 'SendGrid', code: 'SENDGRID', aliases: ['SENDGRID'] },
+  ];
+  public fields = [
+    { name: 'emailType', label: 'Email Type', type: 'text' },
+    { name: 'host', label: 'Host', type: 'text' },
+    { name: 'port', label: 'Port', type: 'text' },
+    { name: 'emailUserid', label: 'User Id', type: 'text' },
+    { name: 'emailPassword', label: 'Password', type: 'password' },
+    { name: 'emailFrom', label: 'Email From', type: 'email' },
+    { name: 'subject', label: 'Subject', type: 'text' },
+    { name: 'emailBody', label: 'Message / Template Id', type: 'text' },
+  ];
 
   constructor(
     private fb: FormBuilder,
     private emailSettingsService: EmailSettingsService,
-    private authenticationService: AuthenticationService,
-  ) {
-    this.loginUser = this.authenticationService.getLoginUser();
-  }
+  ) {}
 
   ngOnInit() {
     this.createForms();
     this.getEmailServiceDetailsList();
   }
 
-  emailTypeOption: any = ['DONATION_RECEIPT'];
-  
-
   createForms() {
     this.addEmailForm = this.fb.group({
-      serviceProvider:[],
-      emailType: ['', [Validators.required, Validators.pattern("[0-9A-Za-z ]{3,150}")]],
-      host: ['', [Validators.required, Validators.pattern("[0-9A-Za-z ]{3,150}")]],
-      port: ['', [Validators.required, Validators.pattern("[0-9A-Za-z ]{3,150}")]],
-      emailUserid: ['', [Validators.required, Validators.pattern("[0-9A-Za-z ]{3,150}")]],
-      emailPassword: ['', [Validators.required, Validators.pattern("[0-9A-Za-z ]{3,150}")]],
-      emailFrom: ['', [Validators.required, Validators.pattern("[0-9A-Za-z ]{3,150}")]],
-      subject: ['', [Validators.required, Validators.pattern("[0-9A-Za-z ]{3,150}")]],
-      emailBody: ['', [Validators.required, Validators.pattern("[0-9A-Za-z ]{3,150}")]],
+      serviceProvider: [''],
+      status: [''],
+      emailType: ['DONATION_RECEIPT', Validators.required],
+      host: ['', Validators.required],
+      port: ['', Validators.required],
+      emailUserid: ['', Validators.required],
+      emailPassword: ['', Validators.required],
+      emailFrom: ['', [Validators.required, Validators.email]],
+      subject: ['', Validators.required],
+      emailBody: ['', Validators.required],
     });
   }
 
-  addUpdateEmailServiceDetails(){
-    this.isLoading = true;
-    this.emailSettingsService.addUpdateEmailServiceDetails(this.addEmailForm.value)
-      .subscribe({
-        next: (response: any) => {
-          if (response['responseCode'] == '200') {
-            if (response['payload']['respCode'] == '200') {
-
-              this.addEmailForm.reset();
-              this.isLoading = false;
-            } else {
-              
-            }
-          } else {
-           
-          }
-        },
-        // error: (error: any) => this.toastr.error('Server Error', '500'),
-
-      });
+  getProviderDetails(provider: EmailProvider): any | undefined {
+    return this.emailDetailsList.find(details =>
+      provider.aliases.includes(String(details?.serviceProvider ?? '').trim().toUpperCase())
+    );
   }
 
+  openProvider(provider: EmailProvider) {
+    this.selectedProvider = provider;
+    this.errorMessage = '';
+    // Reset first so a new connection never displays another provider's values.
+    this.addEmailForm.reset({
+      serviceProvider: provider.code,
+      emailType: 'DONATION_RECEIPT',
+      status: '',
+    });
+    const details = this.getProviderDetails(provider);
+    if (details) {
+      this.addEmailForm.patchValue(details);
+    }
+  }
+
+  addUpdateEmailServiceDetails() {
+    if (this.isLoading) return;
+    if (this.addEmailForm.invalid) {
+      this.addEmailForm.markAllAsTouched();
+      return;
+    }
+    this.isLoading = true;
+    this.errorMessage = '';
+    this.emailSettingsService.addUpdateEmailServiceDetails(this.addEmailForm.getRawValue())
+      .pipe(finalize(() => this.isLoading = false))
+      .subscribe({
+        next: (response: any) => {
+          if (String(response?.responseCode) === '200' && String(response?.payload?.respCode) === '200') {
+            this.getEmailServiceDetailsList();
+          } else {
+            this.errorMessage = 'Unable to save email settings. Please try again.';
+          }
+        },
+        error: () => this.errorMessage = 'Unable to save email settings. Please try again.',
+      });
+  }
 
   public getEmailServiceDetailsList() {
+    this.isFetching = true;
     this.emailSettingsService.getEmailServiceDetailsList()
+      .pipe(finalize(() => this.isFetching = false))
       .subscribe({
         next: (response: any) => {
-          if (response['responseCode'] == '200') {
-            this.emailDetailsList = JSON.parse(JSON.stringify(response['listPayload']));
-            this.emailDetailsList = this.emailDetailsList[0];
-
-            this.emailDetailsList['serviceProvider'] = "NIMBUZ";
-
-            this.setEmailDetails();
+          if (String(response?.responseCode) === '200') {
+            this.emailDetailsList = Array.isArray(response.listPayload) ? response.listPayload : [];
           } else {
+            this.errorMessage = 'Unable to load email settings. Please try again.';
           }
         },
+        error: () => this.errorMessage = 'Unable to load email settings. Please try again.',
       });
   }
-
-  setEmailDetails() {
-    this.addEmailForm.patchValue({
-      serviceProvider: this.emailDetailsList['serviceProvider'],
-      emailType: this.emailDetailsList['emailType'],
-      host: this.emailDetailsList['host'],
-      port: this.emailDetailsList['port'],
-      emailUserid: this.emailDetailsList['emailUserid'],
-      emailPassword: this.emailDetailsList['emailPassword'],
-      emailFrom: this.emailDetailsList['emailFrom'],
-      subject: this.emailDetailsList['subject'],
-      emailBody: this.emailDetailsList['emailBody'],
-    });
-  }
-
 }

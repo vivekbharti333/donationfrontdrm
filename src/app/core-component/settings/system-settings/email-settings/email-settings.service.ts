@@ -22,6 +22,7 @@ export class EmailSettingsService {
     this.loginUser = this.authenticationService.getLoginUser();
     let request: any = {
       payload: {
+        serviceProvider: emailDetails.serviceProvider,
         emailType: emailDetails.emailType,
         host: emailDetails.host,
         port: emailDetails.port,

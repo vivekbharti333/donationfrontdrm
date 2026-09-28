@@ -1,0 +1,244 @@
+:host {
+  display: block;
+}
+
+.email-settings-panel {
+  padding: 12px 0 28px;
+}
+
+.email-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 22px;
+}
+
+.test-email-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 20px;
+  border: 1px solid #ff9b38;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #ffa83d, #ff9234);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  box-shadow: 0 6px 15px rgba(234, 139, 43, .15);
+
+  i { font-size: 21px; }
+  &:hover { background: #f68a24; }
+}
+
+.email-provider-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 22px;
+}
+
+.email-provider-card {
+  --provider-color: #0878e5;
+  --provider-tint: #e7f2ff;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 28px;
+  border: 1px solid rgba(235, 239, 245, .65);
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 12px 38px rgba(24, 45, 77, .055);
+
+  &[data-provider='PHP'] {
+    --provider-color: #0caa76;
+    --provider-tint: #e3f7ef;
+  }
+
+  &[data-provider='ZOHO'] {
+    --provider-color: #e65a43;
+    --provider-tint: #fff0eb;
+  }
+}
+
+.provider-summary {
+  display: flex;
+  align-items: flex-start;
+  gap: 22px;
+  flex: 1;
+}
+
+.provider-icon {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--provider-tint);
+  color: var(--provider-color);
+
+  &::before {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    inset: -17px 28px -12px -18px;
+    border-radius: 65% 20% 45% 55%;
+    background: var(--provider-tint);
+    opacity: .3;
+    transform: rotate(-28deg);
+  }
+
+  i { font-size: 32px; }
+}
+
+.provider-copy {
+  flex: 1;
+  min-width: 0;
+  padding-top: 8px;
+  padding-bottom: 23px;
+  border-bottom: 1px solid #e8edf3;
+
+  p {
+    margin: 13px 0 0;
+    color: #7a8292;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.65;
+  }
+}
+
+.provider-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+
+  h5 {
+    margin: 0;
+    color: #122448;
+    font-size: 21px;
+    font-weight: 700;
+    line-height: 1.3;
+  }
+}
+
+.default-badge {
+  padding: 4px 13px;
+  border-radius: 20px;
+  background: #e7f1ff;
+  color: #0878e5;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.provider-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-top: 20px;
+}
+
+.provider-connect-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 46px;
+  padding: 9px 19px;
+  border: 1px solid var(--provider-color);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--provider-color);
+  font-size: 16px;
+  font-weight: 600;
+  transition: background-color .15s, box-shadow .15s;
+
+  i { font-size: 20px; }
+  &:hover { background: var(--provider-tint); }
+  &:disabled { cursor: wait; opacity: .65; }
+}
+
+.email-provider-card[data-provider='NIMBUZ'] .provider-connect-button {
+  background: #0878e5;
+  color: #fff;
+  &:hover { background: #0666c5; }
+}
+
+.email-provider-card .provider-connect-button.is-connected {
+  border-color: #198754;
+  background: #198754;
+  color: #fff;
+  &:hover { background: #157347; }
+}
+
+.provider-connect-button:focus-visible,
+.test-email-button:focus-visible {
+  outline: 3px solid #9dcaff;
+  outline-offset: 3px;
+}
+
+.provider-status {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  width: 48px;
+  height: 24px;
+  padding: 3px;
+  border-radius: 20px;
+  background: #b3bac6;
+  box-shadow: inset 0 1px 3px rgba(24, 45, 77, .1);
+
+  span {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(24, 45, 77, .12);
+  }
+
+  &.is-connected {
+    background: #198754;
+    span { transform: translateX(24px); }
+  }
+}
+
+.sendgrid-mark {
+  display: grid;
+  grid-template-columns: repeat(3, 11px);
+  grid-template-rows: repeat(3, 11px);
+
+  span { background: #159bd7; }
+  span:nth-child(1) { grid-column: 2; background: #28bce8; }
+  span:nth-child(2) { grid-column: 3; background: #0787d5; }
+  span:nth-child(3) { background: #5dceec; }
+  span:nth-child(4) { background: #0894d6; }
+  span:nth-child(5) { background: #23b1e2; }
+  span:nth-child(6) { background: #0b93cf; }
+  span:nth-child(7) { background: #41c2e6; }
+}
+
+@media (max-width: 1399px) {
+  .email-provider-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 767px) {
+  .email-provider-grid { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  .email-provider-card { padding: 22px; }
+  .provider-summary { gap: 16px; }
+  .provider-icon { flex-basis: 60px; height: 60px; }
+  .provider-heading h5 { font-size: 19px; }
+}
+.email-provider-card[data-provider='ZOHO'] .provider-icon {
+  background: #fff;
+
+  &::before { display: none; }
+}
+
+.zoho-logo {
+  display: block;
+  width: 100%;
+  height: auto;
+}

@@ -5,232 +5,83 @@
       <h6>Manage your email settings on portal</h6>
     </div>
   </div>
-  <!-- <ul class="table-top-head">
-    <li>
-      <a data-bs-toggle="tooltip" data-bs-placement="top" matTooltip="Refresh" matTooltipPosition="above"><i
-      class="feather icon-rotate-ccw feather-rotate-ccw"></i></a>
-    </li>
-    <li>
-      <a (click)="toggleCollapse()" data-bs-toggle="tooltip" data-bs-placement="top" matTooltip="Collapse" matTooltipPosition="above" id="collapse-header"> @if (!isCollapsed) {
-        <i class="feather icon-chevron-up feather-chevron-up"></i>
-      }
-      @if (isCollapsed) {
-        <i class="feather icon-chevron-down feather-chevron-down"></i>
-      }</a>
-    </li>
-  </ul> -->
 </div>
-<div class="row">
-  <div class="col-xl-12">
-    <div class="settings-wrapper d-flex">
-      <!-- <app-settings-sidebar></app-settings-sidebar> -->
-      <div class="settings-page-wrap">
-        <!-- <div class="setting-title">
-          <h4>Email Settings</h4>
-        </div> -->
-        <div class="page-header text-end justify-content-end">
-          <a href="javascript:void(0);" class="btn-added btn-primary"><i
-          class="feather icon-mail me-2"></i>Send test email</a>
+<section class="email-settings-panel">
+  <div class="email-toolbar">
+    <button type="button" class="test-email-button">
+      <i class="feather icon-mail" aria-hidden="true"></i>Send test email
+    </button>
+  </div>
+  <div *ngIf="errorMessage" class="alert alert-danger" role="alert">{{ errorMessage }}</div>
+  <p *ngIf="isFetching" role="status">Loading email settings...</p>
+  <div class="email-provider-grid">
+    <article *ngFor="let provider of providers" class="email-provider-card" [attr.data-provider]="provider.code">
+      <div class="provider-summary">
+        <div class="provider-icon" aria-hidden="true">
+          <i *ngIf="provider.code === 'NIMBUZ'" class="feather icon-mail"></i>
+          <i *ngIf="provider.code === 'PHP'" class="feather icon-send"></i>
+          <img *ngIf="provider.code === 'ZOHO'" class="zoho-logo" src="assets/img/zoho-mail.svg" alt="">
+          <span *ngIf="provider.code === 'SENDGRID'" class="sendgrid-mark">
+            <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+          </span>
         </div>
-        <div class="row">
-          <div class="col-xxl-4 col-xl-6 col-lg-12 col-md-6 d-flex">
-            <div class="connected-app-card email-setting d-flex w-100">
-              <ul class="w-100">
-                <li class="flex-column align-items-start">
-                  <div class="d-flex align-items-center justify-content-between w-100 mb-2">
-                    <div class="security-type d-flex align-items-center">
-                      <div class="security-title">
-                        <h5>SMTP</h5>
-                      </div>
-                    </div>
-                    <div class="connect-btn">
-                      <a *ngIf="emailDetailsList?.serviceProvider === 'NIMBUZ' && emailDetailsList?.status === 'ACTIVE'" href="javascript:void(0);">
-                        Connected
-                      </a>
-                    </div>
-                  </div>
-                  <p>Mailer is used to send receipt from a mail client.</p>
-                </li>
-                <li>
-                  <div class="integration-btn" *ngIf="emailDetailsList?.serviceProvider === 'NIMBUZ' && emailDetailsList?.status === 'ACTIVE'">
-                    <a href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#smtp-mail">
-                      <i class="feather icon-tool me-2"></i>View Integration
-                    </a>
-                  </div>
-                  
-                  <div class="integration-btn" *ngIf="!(emailDetailsList?.serviceProvider === 'NIMBUZ' && emailDetailsList?.status === 'ACTIVE')">
-                    <a href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#smtp-mail">
-                      <i class="feather icon-tool me-2"></i>Connect
-                    </a>
-                  </div>
-                  <div class="status-toggle modal-status d-flex justify-content-between align-items-center ms-2">
-                    <input type="checkbox" id="user1" class="check" [checked]="emailDetailsList?.serviceProvider === 'NIMBUZ' && emailDetailsList?.status === 'ACTIVE'">
-                    <label for="user1" class="checktoggle"></label>
-                  </div>
-
-                </li>
-              </ul>
-            </div>
+        <div class="provider-copy">
+          <div class="provider-heading">
+            <h5>{{ provider.name }}</h5>
+            <span *ngIf="provider.code === 'NIMBUZ'" class="default-badge">Default</span>
           </div>
-          <div class="col-xxl-4 col-xl-6 col-lg-12 col-md-6 d-flex">
-            <div class="connected-app-card email-setting d-flex w-100">
-              <ul class="w-100">
-                <li class="flex-column align-items-start">
-                  <div class="d-flex align-items-center justify-content-between w-100 mb-2">
-                    <div class="security-type d-flex align-items-center">
-                      <div class="security-title">
-                        <h5>Brevo Mailer</h5>
-                      </div>
-                    </div>
-                    <div class="connect-btn">
-                      <a *ngIf="emailDetailsList?.serviceProvider === 'PHP' && emailDetailsList?.status === 'ACTIVE'" href="javascript:void(0);">
-                        Connected
-                      </a>
-                    </div>
-                  </div>
-                  <p>Brevo Mailer is used to send receipt from a mail client.</p>
-                </li>
-                <li>
-                  <div class="integration-btn" *ngIf="emailDetailsList?.serviceProvider === 'PHP' && emailDetailsList?.status === 'ACTIVE'">
-                    <a href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#brevo-mail">
-                      <i class="feather icon-tool me-2"></i>View Integration
-                    </a>
-                  </div>
-                  
-                  <div class="integration-btn" *ngIf="!(emailDetailsList?.serviceProvider === 'PHP' && emailDetailsList?.status === 'ACTIVE')">
-                    <a href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#brevo-mail">
-                      <i class="feather icon-tool me-2"></i>Connect
-                    </a>
-                  </div>
-                  <div
-                    class="status-toggle modal-status d-flex justify-content-between align-items-center ms-2">
-                    <input type="checkbox" id="user2" class="check" [checked]="emailDetailsList?.serviceProvider === 'PHP' && emailDetailsList?.status === 'ACTIVE'">
-                    <label for="user2" class="checktoggle"> </label>
-                  </div>
-                </li>
-              </ul>
-            </div>
-          </div>
-          <div class="col-xxl-4 col-xl-6 col-lg-12 col-md-6 d-flex">
-            <div class="connected-app-card email-setting d-flex w-100">
-              <ul class="w-100">
-                <li class="flex-column align-items-start">
-                  <div class="d-flex align-items-center justify-content-between w-100 mb-2">
-                    <div class="security-type d-flex align-items-center">
-                      <div class="security-title">
-                        <h5>SendGrid </h5>
-                      </div>
-                    </div>
-                    <div class="connect-btn">
-                      <a *ngIf="emailDetailsList?.serviceProvider === 'SENDGRID' && emailDetailsList?.status === 'ACTIVE'" href="javascript:void(0);">
-                        Connected
-                      </a>
-                    </div>
-                  </div>
-                  <p>Mailer is used to send receipt from a mail client.
-                  </p>
-                </li>
-                <li>
-                  <div class="integration-btn" *ngIf="emailDetailsList?.serviceProvider === 'SENDGRID' && emailDetailsList?.status === 'ACTIVE'">
-                    <a href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#send-grid-mail">
-                      <i class="feather icon-tool me-2"></i>View Integration
-                    </a>
-                  </div>
-                  
-                  <div class="integration-btn" *ngIf="!(emailDetailsList?.serviceProvider === 'SENDGRID' && emailDetailsList?.status === 'ACTIVE')">
-                    <a href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#send-grid-mail">
-                      <i class="feather icon-tool me-2"></i>Connect
-                    </a>
-                  </div>
-                  <div
-                    class="status-toggle modal-status d-flex justify-content-between align-items-center ms-2">
-                    <input type="checkbox" id="user3" class="check" [checked]="emailDetailsList?.serviceProvider === 'SENDGRID' && emailDetailsList?.status === 'ACTIVE'">
-                    <label for="user3" class="checktoggle"> </label>
-                  </div>
-                </li>
-              </ul>
-            </div>
-          </div>
+          <p>{{ provider.code === 'PHP' ? 'Brevo Mailer' : 'Mailer' }} is used to send receipt from a mail client.</p>
         </div>
       </div>
-    </div>
+      <div class="provider-actions">
+        <button type="button" class="provider-connect-button" [class.is-connected]="!!getProviderDetails(provider)"
+          [disabled]="isFetching || isLoading" (click)="openProvider(provider)"
+          data-bs-toggle="modal" data-bs-target="#email-provider-modal">
+          <i class="feather" [ngClass]="getProviderDetails(provider) ? 'icon-check-circle' : 'icon-link'" aria-hidden="true"></i>
+          {{ getProviderDetails(provider) ? 'Connected' : 'Connect' }}
+        </button>
+        <span class="provider-status" [class.is-connected]="!!getProviderDetails(provider)" role="img"
+          [attr.aria-label]="provider.name + (getProviderDetails(provider) ? ' connected' : ' not connected')">
+          <span></span>
+        </span>
+      </div>
+    </article>
   </div>
-</div>
-<!-- Brevo Mail -->
-<div class="modal fade" id="smtp-mail">
+</section>
+<div class="modal fade" id="email-provider-modal" tabindex="-1" aria-labelledby="email-provider-title" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered custom-modal-two">
     <div class="modal-content">
       <div class="page-wrapper-new p-0">
         <div class="content">
           <div class="modal-header border-0 custom-modal-header">
-            <div class="page-title">
-              <h4>SMTP Mailer</h4>
-            </div>
-            <!-- <div
-              class="status-toggle modal-status d-flex justify-content-between align-items-center ms-auto me-2">
-              <input type="checkbox" id="user4" class="check" checked>
-              <label for="user4" class="checktoggle"> </label>
-            </div> -->
+            <div class="page-title"><h4 id="email-provider-title">{{ selectedProvider?.name }}</h4></div>
             <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
           <div class="modal-body custom-modal-body">
+            <div *ngIf="errorMessage" class="alert alert-danger" role="alert">{{ errorMessage }}</div>
             <form [formGroup]="addEmailForm" (ngSubmit)="addUpdateEmailServiceDetails()">
               <div class="row">
-                <!-- <div class="col-lg-12">
-                  <div class="mb-3">
-                    <label class="form-label">Service Provider <span> *</span></label>
-                    <input class="form-control" type="text" pInputText formControlName="serviceProvider" maxlength="100">
-                  </div>
-                </div> -->
-                <div class="col-lg-12">
-                  <div class="mb-3">
-                    <label class="form-label">Host <span> *</span></label>
-                    <input class="form-control" type="text" pInputText formControlName="host" maxlength="100">
-                  </div>
+                <div class="col-lg-12 mb-3">
+                  <label for="email-service-provider" class="form-label">Service Provider</label>
+                  <input id="email-service-provider" class="form-control" formControlName="serviceProvider" readonly>
                 </div>
-                <div class="col-lg-12">
-                  <div class="mb-3">
-                    <label class="form-label">Port <span> *</span></label>
-                    <input class="form-control" type="text" pInputText formControlName="port" maxlength="100">
-                  </div>
+                <div class="col-lg-12 mb-3" *ngIf="addEmailForm.get('status')?.value">
+                  <label for="email-service-status" class="form-label">Status</label>
+                  <input id="email-service-status" class="form-control" formControlName="status" readonly>
                 </div>
-                <div class="col-lg-12">
-                  <div class="mb-3">
-                    <label class="form-label">User Id <span> *</span></label>
-                    <input class="form-control" type="text" pInputText formControlName="emailUserid" maxlength="100">
-                  </div>
-                </div>
-                <div class="col-lg-12">
-                  <div class="mb-3">
-                    <label class="form-label">Password <span> *</span></label>
-                    <input class="form-control" type="text" pInputText formControlName="emailPassword"maxlength="100">
-                  </div>
-                </div>
-                <div class="col-lg-12">
-                  <div class="mb-3">
-                    <label class="form-label">Email From <span> *</span></label>
-                    <input class="form-control" type="text" pInputText formControlName="emailFrom" maxlength="100">
-                  </div>
-                </div>
-                <div class="col-lg-12">
-                  <div class="mb-3">
-                    <label class="form-label">Subject <span> *</span></label>
-                    <input class="form-control" type="text" pInputText formControlName="subject" maxlength="100">
-                  </div>
-                </div>
-                <div class="col-lg-12">
-                  <div class="mb-3">
-                    <label class="form-label">Message / Templete id <span> *</span></label>
-                    <input class="form-control" type="text" pInputText formControlName="emailBody" maxlength="100">
-                  </div>
+                <div *ngFor="let field of fields" class="col-lg-12 mb-3">
+                  <label [for]="'email-' + field.name" class="form-label">{{ field.label }} <span> *</span></label>
+                  <input [id]="'email-' + field.name" class="form-control" [type]="field.type" [formControlName]="field.name">
+                  <small class="text-danger" *ngIf="addEmailForm.get(field.name)?.touched && addEmailForm.get(field.name)?.invalid">
+                    Please enter a valid {{ field.label.toLowerCase() }}.
+                  </small>
                 </div>
               </div>
               <div class="modal-footer-btn">
-                <button type="button" class="btn btn-cancel me-2"
-                data-bs-dismiss="modal">Cancel</button>
-                <button type="submit" class="btn btn-submit">Submit</button>
+                <button type="button" class="btn btn-cancel me-2" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-submit" [disabled]="isLoading">{{ isLoading ? 'Saving...' : 'Submit' }}</button>
               </div>
             </form>
           </div>
@@ -239,108 +90,3 @@
     </div>
   </div>
 </div>
-<!-- Smtp Mail -->
-
-<!-- Brevo Mail -->
-<div class="modal fade" id="brevo-mail">
-  <div class="modal-dialog modal-dialog-centered custom-modal-two">
-    <div class="modal-content">
-      <div class="page-wrapper-new p-0">
-        <div class="content">
-          <div class="modal-header border-0 custom-modal-header">
-            <div class="page-title">
-              <h4>Brevo</h4>
-            </div>
-            <div
-              class="status-toggle modal-status d-flex justify-content-between align-items-center ms-auto me-2">
-              <input type="checkbox" id="user5" class="check" checked>
-              <label for="user5" class="checktoggle"> </label>
-            </div>
-            <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body custom-modal-body">
-            <form>
-              <div class="row">
-                <div class="col-lg-12">
-                  <div class="mb-3">
-                    <label class="form-label">From Email Address <span> *</span></label>
-                    <input type="email" class="form-control">
-                  </div>
-                </div>
-                <div class="col-lg-12">
-                  <div class="mb-3">
-                    <label class="form-label">Email Password <span> *</span></label>
-                    <input type="password" class="form-control">
-                  </div>
-                </div>
-                <div class="col-lg-12">
-                  <div class="mb-3">
-                    <label class="form-label"> Email Host <span> *</span></label>
-                    <input type="text" class="form-control">
-                  </div>
-                </div>
-                <div class="col-lg-12">
-                  <div class="mb-0">
-                    <label class="form-label"> Port <span> *</span></label>
-                    <input type="text" class="form-control">
-                  </div>
-                </div>
-              </div>
-              <div class="modal-footer-btn">
-                <button type="button" class="btn btn-cancel me-2"
-                data-bs-dismiss="modal">Cancel</button>
-                <button type="submit" class="btn btn-submit">Submit</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-<!-- /Brevo Mail -->
-
-<!-- SendGrid Mail -->
-<div class="modal fade" id="send-grid-mail">
-  <div class="modal-dialog modal-dialog-centered custom-modal-two">
-    <div class="modal-content">
-      <div class="page-wrapper-new p-0">
-        <div class="content">
-          <div class="modal-header border-0 custom-modal-header">
-            <div class="page-title">
-              <h4>Test Mail</h4>
-            </div>
-            <div
-              class="status-toggle modal-status d-flex justify-content-between align-items-center ms-auto me-2">
-              <input type="checkbox" id="user6" class="check" checked>
-              <label for="user6" class="checktoggle"> </label>
-            </div>
-            <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body custom-modal-body">
-            <form>
-              <div class="row">
-                <div class="col-lg-12">
-                  <div class="mb-0">
-                    <label class="form-label">Enter Email Address <span> *</span></label>
-                    <input type="email" class="form-control">
-                  </div>
-                </div>
-              </div>
-              <div class="modal-footer-btn">
-                <button type="button" class="btn btn-cancel me-2"
-                data-bs-dismiss="modal">Cancel</button>
-                <button type="submit" class="btn btn-submit">Submit</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-<!-- /Test Mail -->
