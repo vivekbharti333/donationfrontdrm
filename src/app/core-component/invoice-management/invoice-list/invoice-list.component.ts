@@ -3,6 +3,7 @@ import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { finalize, Subject, takeUntil } from 'rxjs';
 import { Constant } from 'src/app/core/constant/constants';
 import { InvoiceListEntry, InvoiceListService } from './invoice-list.service';
+import { GenerateInvoiceService } from '../generate-invoice/generate-invoice.service';
 
 @Component({
   selector: 'app-invoice-list',
@@ -20,7 +21,16 @@ export class InvoiceListComponent implements OnInit, OnDestroy {
   private invoiceDialog?: MatDialogRef<unknown>;
   private readonly destroyed = new Subject<void>();
 
-  constructor(private invoiceListService: InvoiceListService, private dialog: MatDialog) {}
+  constructor(
+    private invoiceListService: InvoiceListService,
+    private dialog: MatDialog,
+    private generateInvoiceService: GenerateInvoiceService
+  ) {}
+
+  downloadInvoice(invoice: InvoiceListEntry): void {
+    if (!invoice.invoiceNumber) return;
+    window.open(this.generateInvoiceService.getInvoiceDownloadUrl(invoice.invoiceNumber), '_blank', 'noopener');
+  }
 
   openInvoice(template: TemplateRef<unknown>, invoice: InvoiceListEntry): void {
     this.invoiceDialog?.close();
