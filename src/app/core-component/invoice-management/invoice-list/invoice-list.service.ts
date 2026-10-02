@@ -52,6 +52,17 @@ export interface InvoiceListResponse {
 export class InvoiceListService {
   constructor(private http: HttpClient, private authenticationService: AuthenticationService) {}
 
+  downloadInvoice(invoiceNumber: string): Observable<Blob> {
+    const superadminId = this.authenticationService.getLoginUser()?.superadminId;
+    if (superadminId == null || !String(superadminId).trim()) {
+      return throwError(() => new Error('Your account is missing a superadmin ID. Please sign in again.'));
+    }
+    return this.http.get(`${Constant.Site_Url}download/invoice`, {
+      params: { invoiceNumber, superadminId: String(superadminId).trim() },
+      responseType: 'blob'
+    });
+  }
+
   getInvoices(): Observable<InvoiceListResponse> {
     const superadminId = this.authenticationService.getLoginUser()?.superadminId;
     if (superadminId == null || !String(superadminId).trim()) {

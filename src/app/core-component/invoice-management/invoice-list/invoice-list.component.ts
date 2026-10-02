@@ -3,7 +3,6 @@ import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { finalize, Subject, takeUntil } from 'rxjs';
 import { Constant } from 'src/app/core/constant/constants';
 import { InvoiceListEntry, InvoiceListService } from './invoice-list.service';
-import { GenerateInvoiceService } from '../generate-invoice/generate-invoice.service';
 
 @Component({
   selector: 'app-invoice-list',
@@ -14,6 +13,8 @@ export class InvoiceListComponent implements OnInit, OnDestroy {
   invoices: InvoiceListEntry[] = [];
   isLoading = false;
   loadError = '';
+  downloadError = '';
+  readonly downloadingInvoices = new Set<string>();
   search = '';
   paymentFilter: 'ALL' | 'PAID' | 'UNPAID' = 'ALL';
   currentPage = 1;
@@ -23,13 +24,38 @@ export class InvoiceListComponent implements OnInit, OnDestroy {
 
   constructor(
     private invoiceListService: InvoiceListService,
-    private dialog: MatDialog,
-    private generateInvoiceService: GenerateInvoiceService
+    private dialog: MatDialog
   ) {}
 
   downloadInvoice(invoice: InvoiceListEntry): void {
-    if (!invoice.invoiceNumber) return;
-    window.open(this.generateInvoiceService.getInvoiceDownloadUrl(invoice.invoiceNumber), '_blank', 'noopener');
+    const invoiceNumber = invoice.invoiceNumber;
+    if (!invoiceNumber || this.downloadingInvoices.has(invoiceNumber)) return;
+    this.downloadError = '';
+    this.downloadingInvoices.add(invoiceNumber);
+    this.invoiceListService.downloadInvoice(invoiceNumber).pipe(
+      takeUntil(this.destroyed),
+      finalize(() => this.downloadingInvoices.delete(invoiceNumber))
+    ).subscribe({
+      next: blob => {
+        if (!blob.size || (blob.type && !blob.type.toLowerCase().startsWith('application/pdf'))) {
+          this.downloadError = 'The server did not return an invoice PDF. Please try again.';
+          return;
+        }
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `Invoice_${invoiceNumber.replace(/[\\/:*?"<>|]/g, '_')}.pdf`;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+      },
+      error: error => {
+        this.downloadError = error.status === 401 || error.status === 403
+          ? 'Your session cannot download this invoice. Please sign in again.'
+          : error.status == null ? error.message : 'Unable to download invoice. Please try again.';
+      }
+    });
   }
 
   openInvoice(template: TemplateRef<unknown>, invoice: InvoiceListEntry): void {
