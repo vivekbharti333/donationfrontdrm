@@ -935,6 +935,14 @@ export class routes {
     return this.usersManagement + '/delete-account';
   }
 
+  //Common Management
+  public static get commonManagement(): string {
+    return this.core + '/common-management';
+  }
+   public static get usesLimit(): string {
+    return this.commonManagement + '/uses-limit';
+  }
+
   //Donation Management
   public static get donationManagement(): string {
     return this.core + '/donation-management';

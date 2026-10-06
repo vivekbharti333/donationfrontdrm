@@ -1,0 +1,46 @@
+﻿<p-toast></p-toast>
+<section class="limits-page">
+  <header class="page-heading"><h1>Manage Service Limits</h1><p>Set and manage service limits for each NGO. Track usage and update limits as per plan or custom requirements.</p></header>
+  <section class="panel ngo-panel">
+    <div class="ngo-picker">
+      <h2>Select NGO</h2>
+      <p>Choose an NGO to view or update service limits</p>
+      <div class="select-with-icon">
+        <i class="fas fa-building" aria-hidden="true"></i>
+        <select aria-label="Select NGO" [(ngModel)]="superadminId" (ngModelChange)="loadUsageLimits()" [disabled]="savingLimit || loadingNgos || !superadminList.length">
+          <option value="" disabled>{{ loadingNgos ? 'Loading NGOs...' : 'Select NGO' }}</option>
+          <option *ngFor="let user of superadminList" [value]="user.loginId">{{ getSuperadminName(user) }}</option>
+        </select>
+      </div>
+      <p *ngIf="ngoError" role="alert">{{ ngoError }}</p>
+      <p *ngIf="!loadingNgos && !ngoError && !superadminList.length" role="status">No NGOs available.</p>
+    </div>
+    <div class="ngo-summary">
+      <div class="ngo-emblem" aria-hidden="true"><svg viewBox="0 0 72 72" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M36 61V23M36 46L23 34M36 39l12-12M36 54l15-10M36 51L21 44"/><path d="M36 25c-10-8-5-15 0-19 5 4 10 11 0 19ZM24 35c-11 0-14-7-12-13 7 0 14 4 12 13ZM48 29c-2-10 3-16 10-16 2 7-1 14-10 16ZM22 46c-10 4-16-1-16-7 7-3 14-2 16 7ZM50 45c2-9 9-11 15-8-2 7-7 11-15 8Z"/><path d="M29 30c-7-4-8-10-4-14M42 36c6 0 9-3 10-7M29 56c-6 3-11 1-13-3"/></svg></div>
+      <div class="ngo-info"><h2>{{ ngo }}</h2><p>Plan: <span class="badge plan-badge">Professional</span></p><p>Subscription: <span>01 Oct 2026 - 30 Sep 2027</span></p><p>Status: <span class="badge active-badge">Active</span></p></div>
+      <button class="button details-button" type="button" (click)="showDetails = !showDetails" [attr.aria-expanded]="showDetails"><i class="far fa-eye" aria-hidden="true"></i>{{ showDetails ? 'Hide Details' : 'View Details' }}</button>
+      <p *ngIf="showDetails" class="subscription-details">Professional plan · Yearly billing · {{ limits.length }} services enabled</p>
+    </div>
+  </section>
+  <section class="panel limits-panel">
+    <div class="panel-heading"><h2>Current Service Limits</h2><button type="button" class="button primary-button" (click)="addLimit(); serviceSelect.focus()"><i class="fas fa-plus" aria-hidden="true"></i>Add New Limit</button></div>
+    <div class="table-scroll"><table><thead><tr><th>#</th><th>Service</th><th>Unit</th><th>Limit</th><th>Consumed</th><th>Remaining</th><th>Period</th><th>Status</th><th>Action</th></tr></thead><tbody>
+      <tr *ngFor="let row of limits; let index = index" class="selectable-row" [class.selected-row]="selectedService === row.service" tabindex="0" (click)="editLimit(row)" (keydown.enter)="$event.target === $event.currentTarget && editLimit(row)" [attr.aria-label]="'Select ' + row.service"><td>{{ index + 1 }}</td><td><span class="service-name"><i [class]="row.icon + ' service-icon ' + row.color" aria-hidden="true"></i>{{ row.service }}</span></td><td class="muted">{{ row.unit }}</td><td>{{ row.limit | number }}</td><td class="muted">{{ row.consumed | number }}</td><td class="remaining">{{ getRemaining(row) | number }}</td><td class="period">{{ row.start | date:'dd MMM yyyy' }}{{ row.start && row.end ? ' - ' : '' }}{{ row.end | date:'dd MMM yyyy' }}</td><td><span class="badge" [class.active-badge]="row.active" [class.inactive-badge]="row.active === false">{{ row.active === null ? '' : (row.active ? 'Active' : 'Inactive') }}</span></td><td><div class="row-actions"><button class="button edit-button" type="button" (click)="$event.stopPropagation(); editLimit(row); serviceSelect.focus()"><i class="fas fa-pencil-alt" aria-hidden="true"></i>Edit</button><button class="more-button" type="button" (click)="$event.stopPropagation(); row.active = !row.active" [attr.aria-label]="(row.active ? 'Deactivate ' : 'Activate ') + row.service" [title]="row.active ? 'Deactivate service' : 'Activate service'"><i class="fas fa-ellipsis-v" aria-hidden="true"></i></button></div></td></tr>
+      <tr *ngIf="loadingLimits || limitsError"><td colspan="9" class="empty-state" [attr.role]="limitsError ? 'alert' : 'status'">{{ loadingLimits ? 'Loading service limits...' : (limitsError || 'No service limits found for this NGO.') }}</td></tr>
+    </tbody></table></div>
+  </section>
+  <section class="panel form-panel"><h2>Add / Update Service Limit</h2><form #limitForm="ngForm" (ngSubmit)="saveLimit()">
+    <div class="form-top">
+      <div class="field"><label for="service">Service <span>*</span></label><div class="select-with-icon"><i [class]="selectedIcon" aria-hidden="true"></i><select #serviceSelect id="service" name="service" [(ngModel)]="selectedService" required><option *ngFor="let service of services" [value]="service.service">{{ service.service }}</option></select></div></div>
+      <div class="field"><label for="unit">Unit</label><input id="unit" [value]="selectedUnit" disabled></div>
+      <div class="field period-field"><label for="start">Period <span>*</span></label><div class="date-range"><input id="start" name="start" type="date" [(ngModel)]="start" required><span>to</span><input aria-label="Period end" name="end" type="date" [(ngModel)]="end" [min]="start" required></div></div>
+    </div>
+    <div class="form-bottom"><div class="field"><label for="limit">Limit <span>*</span></label><input id="limit" name="limit" type="number" [(ngModel)]="limit" min="0" step="1" required></div><div class="field"><label for="cycle">Billing Cycle <span>*</span></label><select id="cycle" name="cycle" [(ngModel)]="cycle" required><option>Yearly</option><option>Monthly</option><option>Quarterly</option></select></div><div class="form-actions"><button class="button" type="button" (click)="resetForm()">Cancel</button><button class="button primary-button" type="submit" [disabled]="limitForm.invalid || savingLimit || loadingLimits || !superadminId"><i class="fas fa-save" aria-hidden="true"></i>{{ savingLimit ? 'Saving...' : 'Save Limit' }}</button></div></div>
+    <p *ngIf="message" class="form-message" role="status">{{ message }}</p>
+  </form></section>
+</section>
+
+
+
+
+

@@ -78,6 +78,13 @@ const routes: Routes = [
       },
 
       {
+        path: 'common-management',
+        loadChildren: () =>
+          import('./common-management/common-management.module').then((m) => m.CommonManagementModule),
+        // canActivate: [AuthGuard],
+      },
+
+      {
         path: 'receipt-management',
         loadChildren: () =>
           import('./receipt-management/receipt-management.module').then((m) => m.ReceiptManagementModule),
