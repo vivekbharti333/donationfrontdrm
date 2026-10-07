@@ -1,0 +1,4 @@
+{
+  "extends": "./tsconfig.spec.json",
+  "include": ["src/app/core-component/whats-app-management/whats-app-integration/*.spec.ts", "src/**/*.d.ts"]
+}

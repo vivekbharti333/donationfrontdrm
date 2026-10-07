@@ -11,7 +11,7 @@
       </div>
       <div class="status-pill" [class.connected]="isConnected">
         <span class="status-dot"></span>
-        {{ isConnected ? 'Connected' : 'Not connected' }}
+        {{ isLoading ? 'Checking connection' : !statusKnown ? 'Status unavailable' : isConnected ? 'Connected' : 'Not connected' }}
       </div>
     </section>
 
@@ -21,17 +21,26 @@
       <button type="button" class="btn-close ms-auto" aria-label="Close" (click)="errorMessage = ''"></button>
     </div>
 
+    <div *ngIf="successMessage" class="alert alert-success" role="status">{{ successMessage }}</div>
+
     <section class="content-card">
       <div *ngIf="isLoading" class="loading-state">
         <div class="spinner-border text-success" role="status"><span class="visually-hidden">Loading</span></div>
         <p>Checking your connection…</p>
       </div>
 
-      <ng-container *ngIf="!isLoading">
+      <div *ngIf="!isLoading && !statusKnown" class="loading-state">
+        <p>Confirm your saved connection before making changes.</p>
+        <button class="btn btn-outline-success" [disabled]="isConnecting" (click)="loadExistingConnection()">Check connection status</button>
+        <p class="mt-2">If your saved authorization has expired, disconnect it before signing in with Meta again.</p>
+        <button class="btn btn-light text-danger" [disabled]="isConnecting" (click)="disconnectWhatsApp()">Disconnect saved account</button>
+      </div>
+
+      <ng-container *ngIf="!isLoading && statusKnown">
         <div class="section-heading">
           <div>
             <h4>{{ isConnected ? 'Business account details' : 'Connect your account' }}</h4>
-            <p>{{ isConnected ? 'Your approved WhatsApp Business connection is ready to use.' : 'Complete Meta’s secure embedded signup to start sending messages.' }}</p>
+            <p>{{ isConnected ? 'Your WhatsApp account is connected. Send a test receipt to verify messaging.' : 'Complete Meta secure embedded signup to connect your business account.' }}</p>
           </div>
           <span *ngIf="isConnected && whatsappData.displayNameStatus" class="approval-badge"
                 [class.approved]="whatsappData.displayNameStatus === 'APPROVED'">
@@ -49,10 +58,15 @@
 
         <ng-template #connectState>
           <div class="connect-panel">
+            <label for="whatsapp-registration-pin">Existing two-step verification PIN (optional)</label>
+            <input id="whatsapp-registration-pin" type="password" inputmode="numeric" maxlength="6" autocomplete="off"
+                   class="form-control mb-2" [value]="registrationPin" (input)="registrationPin = $any($event.target).value" [disabled]="isConnecting" />
+            <small>Enter the six-digit PIN only if this phone number already has two-step verification. A new number is secured automatically.</small>
+            <p class="mt-2">Numbers already used in the WhatsApp Business app may require Meta coexistence or migration setup.</p>
             <div class="steps">
               <div><span>1</span><p><strong>Sign in with Meta</strong><small>Use an account that manages your business.</small></p></div>
               <div><span>2</span><p><strong>Select your WhatsApp account</strong><small>Choose or create a business and phone number.</small></p></div>
-              <div><span>3</span><p><strong>Start sending</strong><small>Use your NGO identity for donor communication.</small></p></div>
+              <div><span>3</span><p><strong>Verify messaging</strong><small>Send a test receipt after your connection is saved.</small></p></div>
             </div>
           </div>
         </ng-template>
@@ -64,11 +78,11 @@
               <i class="fab fa-facebook"></i> {{ isSdkReady ? 'Connect WhatsApp Business' : 'Loading Meta…' }}
             </button>
             <ng-container *ngIf="isConnected">
-              <button class="btn btn-outline-success" (click)="sendTestMessage()"><i class="fas fa-paper-plane me-2"></i>Send test receipt</button>
-              <button class="btn btn-light text-danger" (click)="disconnectWhatsApp()"><i class="fas fa-link-slash me-2"></i>Disconnect</button>
+              <button class="btn btn-outline-success" [disabled]="isSendingTest" (click)="sendTestMessage()"><i class="fas fa-paper-plane me-2"></i>{{ isSendingTest ? 'Sending…' : 'Send test receipt' }}</button>
+              <button class="btn btn-light text-danger" [disabled]="isSendingTest" (click)="disconnectWhatsApp()"><i class="fas fa-link-slash me-2"></i>Disconnect</button>
             </ng-container>
           </div>
-          <div *ngIf="isConnecting" class="connecting"><span class="spinner-border spinner-border-sm"></span>Saving your WhatsApp connection…</div>
+          <div *ngIf="isConnecting" class="connecting"><span class="spinner-border spinner-border-sm"></span>Completing your WhatsApp connection…</div>
         </div>
       </ng-container>
     </section>
