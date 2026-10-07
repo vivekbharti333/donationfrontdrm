@@ -24,8 +24,7 @@ interface SignupDetails { phoneNumberId: string; wabaId: string; businessId: str
 })
 export class WhatsAppIntegrationComponent implements OnInit, OnDestroy {
   private readonly CONFIG_ID = '4471781046413650';
-  private readonly apiUrl = window.location.hostname === 'localhost'
-    ? '/mycrm/api/whatsapp' : `${Constant.Site_Url}api/whatsapp`;
+  private readonly apiUrl = `${Constant.Site_Url}api/whatsapp`;
   private readonly destroyed$ = new Subject<void>();
   private destroyed = false;
   private attempt = 0;
@@ -88,7 +87,15 @@ export class WhatsAppIntegrationComponent implements OnInit, OnDestroy {
         this.isConnected = res.connected;
         this.whatsappData = res.connected ? connection : this.emptyConnection();
       },
-      error: (err) => this.errorMessage = this.getErrorMessage(err, 'Unable to check the WhatsApp connection. Please check again before connecting.')
+      error: (err) => {
+        const reasons: Record<number, string> = {
+          0: 'The WhatsApp status API could not be reached. Check the backend URL, network and CORS configuration.',
+          401: 'Your session has expired. Sign in again to check WhatsApp status.',
+          403: 'The backend denied access to WhatsApp status. Check this user\'s account permissions.',
+          404: 'The WhatsApp status API was not found. Deploy the updated backend and verify its URL.'
+        };
+        this.errorMessage = reasons[err.status] || this.getErrorMessage(err, 'The WhatsApp status API failed. Check backend logs and the onboarding database migration.');
+      }
     });
   }
 

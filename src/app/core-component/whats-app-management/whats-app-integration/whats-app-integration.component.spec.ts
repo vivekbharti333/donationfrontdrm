@@ -1,6 +1,7 @@
 import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { CommonModule } from '@angular/common';
+import { Constant } from 'src/app/core/constant/constants';
 import { CookieService } from 'ngx-cookie-service';
 import { WhatsAppIntegrationComponent } from './whats-app-integration.component';
 import { FacebookSdkService } from './facebook-sdk.service';
@@ -34,6 +35,19 @@ describe('WhatsApp onboarding', () => {
     component.isSdkReady = true;
   });
   afterEach(() => { component.ngOnDestroy(); http.verify(); (window as any).FB = previousFB; });
+  it('uses the configured backend for status and onboarding', () => {
+    component.loadExistingConnection();
+    http.expectOne(`${Constant.Site_Url}api/whatsapp/status`).flush({ connected: false });
+    component.connectWhatsApp(); finish(); authorize();
+    http.expectOne(`${Constant.Site_Url}api/whatsapp/exchange-code`).flush(saved);
+    expect(component.isConnected).toBeTrue();
+  });
+  it('explains a missing status route without treating the account as disconnected', () => {
+    component.loadExistingConnection();
+    http.expectOne(`${Constant.Site_Url}api/whatsapp/status`).flush({}, { status: 404, statusText: 'Not Found' });
+    expect(component.errorMessage).toContain('status API was not found');
+    expect(component.statusKnown).toBeFalse();
+  });
   it('waits for signup details after authorization and sends all IDs', () => {
     component.connectWhatsApp(); authorize(); http.expectNone(req => req.url.endsWith('/exchange-code')); finish();
     const req = exchange(); expect(req.request.headers.get('Authorization')).toBe('Bearer tenant-auth-token');
