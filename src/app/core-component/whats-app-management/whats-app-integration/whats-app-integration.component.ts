@@ -23,7 +23,7 @@ interface SignupDetails { phoneNumberId: string; wabaId: string; businessId: str
   styleUrls: ['./whats-app-integration.component.scss']
 })
 export class WhatsAppIntegrationComponent implements OnInit, OnDestroy {
-  private readonly CONFIG_ID = '4471781046413650';
+  private readonly CONFIG_ID = '1222137563317496';
   private readonly apiUrl = `${Constant.Site_Url}api/whatsapp`;
   private readonly destroyed$ = new Subject<void>();
   private destroyed = false;
