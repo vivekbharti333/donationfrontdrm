@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
+import { finalize } from 'rxjs/operators';
 import { routes } from 'src/app/core/helpers/routes';
 import { UserManagementService } from 'src/app/core-component/user-management/user-management.service';
 import { MessageService } from 'primeng/api';
@@ -26,6 +27,7 @@ export class SigninComponent {
 
 
   public password: boolean[] = [false];  // Ensure sufficient elements in the array
+  public loading = false;
 
   public togglePassword(index: number) {
     this.password[index] = !this.password[index];
@@ -44,11 +46,17 @@ export class SigninComponent {
   }
 
   validateUser() {
+    if (this.loading) {
+      return;
+    }
+
     // Sanitize once more before submission to cover browser autofill and pasted text.
     this.login.loginId = String(this.login.loginId || '').replace(/\s+/g, '');
     this.login.password = String(this.login.password || '').replace(/\s+/g, '');
 
+    this.loading = true;
     this.userManagementService.doLogin(this.login)
+      .pipe(finalize(() => this.loading = false))
       .subscribe({
         next: (response: any) => {
           if (response['responseCode'] == '200') {
