@@ -162,6 +162,7 @@
 }
 
 .student-photo-column {
+  overflow: visible;
   text-align: center;
   width: 72px;
 }
@@ -186,8 +187,9 @@
   max-width: 48px !important;
   min-height: 48px !important;
   min-width: 48px !important;
-  overflow: hidden;
+  overflow: visible;
   padding: 0 !important;
+  position: relative;
   width: 48px !important;
 }
 
@@ -228,19 +230,10 @@
   white-space: nowrap;
 }
 
-.badge-button {
-  border-radius: 16px;
-  font-size: 14px;
-  font-weight: 600;
-  min-width: 88px;
-  min-height: 40px;
-  padding: 8px 16px;
-}
-
-.badge-button.status-new, .status-btn.status-new {
-  background: #218838;
-  border: 1px solid #218838;
-  color: #fff;
+.badge {
+  background: transparent;
+  cursor: pointer;
+  font-family: inherit;
 }
 
 .edit-delete-action {
@@ -414,25 +407,6 @@
   justify-content: flex-end;
 }
 
-.status-btn {
-  border: 0;
-  border-radius: 6px;
-  color: #fff;
-  font-size: 14px;
-  font-weight: 600;
-  min-width: 88px;
-  min-height: 44px;
-  padding: 8px 16px;
-}
-
-.btn-green {
-  background: #28a745 !important;
-}
-
-.btn-red {
-  background: #dc3545 !important;
-}
-
 .icon-btn {
   background: #fff;
   border: 1px solid #e3e7ed;
@@ -511,9 +485,9 @@
 .userslist-img img:hover,
 .assign-student-summary img:hover,
 .edit-student-photo img:hover {
-  z-index: 100;
-  transform: scale(2.35);
-  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.28);
+  z-index: 30;
+  transform: scale(1.8);
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.28);
 }
 
 .assign-student-summary span,
@@ -808,6 +782,51 @@
   font-weight: 700;
   line-height: 1.25;
   margin: 0;
+}
+
+.academic-modal-header .closeBtn {
+  align-items: center;
+  background: transparent;
+  border-radius: 0;
+  display: inline-flex;
+  height: auto;
+  justify-content: center;
+  width: auto;
+}
+
+.academic-modal-header .academic-close-btn {
+  align-items: center;
+  background: #f8fafc;
+  border: 1px solid #e4e7ec;
+  border-radius: 8px;
+  color: #475467 !important;
+  cursor: pointer;
+  display: inline-flex;
+  font-size: 26px;
+  font-weight: 300;
+  height: 38px;
+  justify-content: center;
+  line-height: 1;
+  padding: 0;
+  transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease, transform 160ms ease;
+  width: 38px;
+}
+
+.academic-modal-header .academic-close-btn:hover:not(:disabled) {
+  background: #fff5eb;
+  border-color: #ff9f43;
+  color: #e8750a !important;
+  transform: rotate(90deg);
+}
+
+.academic-modal-header .academic-close-btn:focus-visible:not(:disabled) {
+  box-shadow: 0 0 0 3px rgba(255, 159, 67, 0.25);
+  outline: none;
+}
+
+.academic-modal-header .academic-close-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
 }
 
 .dialog-content {

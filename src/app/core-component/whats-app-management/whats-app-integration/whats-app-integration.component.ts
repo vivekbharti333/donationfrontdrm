@@ -28,7 +28,7 @@ export class WhatsAppIntegrationComponent implements OnInit, OnDestroy {
   private readonly apiUrl = `${Constant.Site_Url}api/whatsapp`;
   private readonly destroyed$ = new Subject<void>();
   private destroyed = false;
-  private attempt = 0;
+  private attempt = 0; 
   private signupTimer?: number;
   private code: string | null = null;
   private signup: SignupDetails | null = null;
@@ -40,7 +40,7 @@ export class WhatsAppIntegrationComponent implements OnInit, OnDestroy {
   isConnected = false;
   isLoading = true;
   isSdkReady = false;
-  statusKnown = false;
+  statusKnown = false;  
   errorMessage = '';
   successMessage = '';
   registrationPin = '';

@@ -37,7 +37,7 @@ export class GradeSubjectService {
   }
 
   getGradeDetails(): Observable<any> {
-    return this.post('getGradeDetails', {});
+    return this.post('getGradeDetails', { superadminId: this.superadminId });
   }
 
   addExamGradeSubject(mapping: any): Observable<any> {

@@ -25,7 +25,7 @@ export class StudentExamResultService {
   getExamSchedule():Observable<any>{return this.post('getExamSchedule',{superadminId:this.superadminId,status:'ACTIVE'});}
   getExamGradeSubject():Observable<any>{return this.post('getExamGradeSubject',{superadminId:this.superadminId,status:'ACTIVE'});}
   getExamSubject():Observable<any>{return this.post('getExamSubject',{superadminId:this.superadminId,status:'ACTIVE'});}
-  getGradeDetails():Observable<any>{return this.post('getGradeDetails',{});}
+  getGradeDetails():Observable<any>{return this.post('getGradeDetails',{superadminId:this.superadminId});}
   getStudentAcademicDetails():Observable<any>{return this.post('getStudentAcademicDetails',{superadminId:this.superadminId});}
   private post(endpoint:string,payload:any):Observable<any>{const token=this.authentication.getLoginUser()?.token||this.cookies.get('token');const options=token?{headers:new HttpHeaders({Authorization:`Bearer ${token}`})}:{};return this.http.post<any>(Constant.Site_Url+endpoint,{payload},options);}
   private get superadminId():string{return this.authentication.getLoginUser()?.superadminId||this.cookies.get('superadminId');}

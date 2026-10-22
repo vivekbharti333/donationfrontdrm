@@ -53,7 +53,7 @@ export class ExamScheduleService {
     return this.post('getExamSubject', { superadminId: this.superadminId, status: 'ACTIVE' });
   }
 
-  getGradeDetails(): Observable<any> { return this.post('getGradeDetails', {}); }
+  getGradeDetails(): Observable<any> { return this.post('getGradeDetails', { superadminId: this.superadminId }); }
 
   private schedulePayload(schedule: any): any {
     return {

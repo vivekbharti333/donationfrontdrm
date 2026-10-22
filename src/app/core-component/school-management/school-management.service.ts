@@ -440,7 +440,12 @@ export class SchoolManagementService {
 
   getGradeDetails(): Observable<any> {
     const token = this.cookieService.get('token');
-    const request = { payload: {} };
+    const currentUser = this.authenticationService.getLoginUser();
+    const request = {
+      payload: {
+        superadminId: currentUser?.superadminId || this.cookieService.get('superadminId')
+      }
+    };
     const options = token
       ? { headers: new HttpHeaders({ Authorization: `Bearer ${token}` }) }
       : {};
@@ -449,10 +454,12 @@ export class SchoolManagementService {
 
   addGrade(grade: any): Observable<any> {
     const token = this.cookieService.get('token');
+    const currentUser = this.authenticationService.getLoginUser();
     const request = {
       payload: {
         gradeName: grade.gradeName?.trim(),
-        gradeCode: grade.gradeCode?.trim()
+        gradeCode: grade.gradeCode?.trim(),
+        superadminId: currentUser?.superadminId || this.cookieService.get('superadminId')
       }
     };
     const options = token

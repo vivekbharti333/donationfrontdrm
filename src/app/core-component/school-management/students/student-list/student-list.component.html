@@ -98,10 +98,10 @@
             <td>{{ (data.admissionDate | date : "dd-MM-yyyy") || '—' }}</td>
             <td>{{ data.createdAt | date : "dd-MM-yyyy | HH:mm" }}</td>
             <td>
-              <button class="badge-button"
-                [ngClass]="{'badge-linesuccess': data.status === 'ACTIVE','badge-linedanger': data.status === 'INACTIVE', 'status-new': data.status?.toUpperCase() === 'NEW'}"
+              <button class="badge"
+                [ngClass]="(data.status === 'ACTIVE' || data.status === 'ASSIGNED') ? 'badge-linesuccess' : 'badge-linedanger'"
                 (click)="changeUserStatus(data)">
-                {{ data.status }}
+                {{ data.status || '—' }}
               </button>
             </td>
             <td class="action-table-data">
@@ -175,10 +175,10 @@
 
       <div class="card-actions">
         <div class="left-actions">
-          <button class="status-btn"
-            [ngClass]="{'btn-green': student.status === 'ACTIVE','btn-red': student.status === 'INACTIVE', 'status-new': student.status?.toUpperCase() === 'NEW'}"
+          <button class="badge"
+            [ngClass]="(student.status === 'ACTIVE' || student.status === 'ASSIGNED') ? 'badge-linesuccess' : 'badge-linedanger'"
             (click)="changeUserStatus(student)">
-            {{ student.status }}
+            {{ student.status || '—' }}
           </button>
         </div>
 
@@ -212,10 +212,10 @@
   <app-custom-pagination></app-custom-pagination>
 
   <ng-template #assignClassTemplate>
-    <div class="modalHeaderContainer">
+    <div class="modalHeaderContainer academic-modal-header">
       <h2 mat-dialog-title class="p-0">Student Academic Details</h2>
       <div class="closeBtn">
-        <button type="button" mat-dialog-close class="close" aria-label="Close" [disabled]="isAssigningClass">
+        <button type="button" mat-dialog-close class="close academic-close-btn" aria-label="Close" [disabled]="isAssigningClass">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
@@ -236,8 +236,8 @@
         {{ academicLoadError }}
         <button type="button" class="btn btn-link" (click)="loadStudentAcademics()">Retry</button>
       </div>
-      <p *ngIf="!isAcademicLoading && !academicLoadError" class="text-muted">
-        {{ selectedAcademic ? 'Saved academic details loaded. You can update them below.' : 'No academic details saved for this session. Assign a class below.' }}
+      <p *ngIf="!isAcademicLoading && !academicLoadError && !selectedAcademic" class="text-muted">
+        No academic details saved for this session. Assign a class below.
       </p>
       <form [formGroup]="assignClassForm" class="row g-3 mt-1">
         <div class="col-md-6">

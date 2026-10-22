@@ -42,7 +42,7 @@ export class StudentExamMarksService {
   getExamDetails(): Observable<any> { return this.post('getExamDetails', { superadminId: this.superadminId, status: 'ACTIVE' }); }
   getExamGradeSubject(): Observable<any> { return this.post('getExamGradeSubject', { superadminId: this.superadminId, status: 'ACTIVE' }); }
   getExamSubject(): Observable<any> { return this.post('getExamSubject', { superadminId: this.superadminId, status: 'ACTIVE' }); }
-  getGradeDetails(): Observable<any> { return this.post('getGradeDetails', {}); }
+  getGradeDetails(): Observable<any> { return this.post('getGradeDetails', { superadminId: this.superadminId }); }
   getStudentAcademicDetails(): Observable<any> { return this.post('getStudentAcademicDetails', { superadminId: this.superadminId }); }
 
   private marksPayload(value: any): any {
