@@ -1,5 +1,6 @@
 import { Component, HostListener, OnInit, TemplateRef } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { forkJoin, of } from 'rxjs';
 import { Constant } from 'src/app/core/constant/constants';
 import { SchoolManagementService } from '../../school-management.service';
 
@@ -35,7 +36,10 @@ export class FeeAssignmentComponent implements OnInit {
   isGradesLoading = false;
   selectedStudent: any = null;
   isLoading = false;
+  isSaving = false;
   isAssignedFeesLoading = false;
+  feeAssignmentStatus: 'Assigned' | 'Not assigned' | null = null;
+  private savedFeeStructureIds = new Set<number>();
   assignedFeesError = '';
   feeUpdateMessage = '';
   errorMessage = '';
@@ -45,8 +49,10 @@ export class FeeAssignmentComponent implements OnInit {
   isResizing = false;
   private resizeContainer?: DOMRect;
   private assignedFeesRequestId = 0;
+  private excludedFeeStructureIds = new Set<number>();
   readonly academicYearOptions = Constant.ACADEMIC_YEAR_OPTIONS;
   feeComponents: AssignmentFeeComponent[] = [];
+  pendingRemovals: AssignmentFeeComponent[] = [];
 
   constructor(
     private schoolManagementService: SchoolManagementService,
@@ -112,6 +118,8 @@ export class FeeAssignmentComponent implements OnInit {
   }
 
   getStudentAcademicDetails(): void {
+    this.pendingRemovals = [];
+    this.excludedFeeStructureIds.clear();
     this.isLoading = true;
     this.errorMessage = '';
     this.schoolManagementService.getStudentAcademicDetails({
@@ -144,17 +152,24 @@ export class FeeAssignmentComponent implements OnInit {
   }
   searchStudents(): void { this.page = 1; }
   selectStudent(student: any): void {
+    this.pendingRemovals = [];
+    this.excludedFeeStructureIds.clear();
     this.selectedStudent = student;
     this.loadAssignedFees(student);
   }
   clearSelection(): void {
+    this.pendingRemovals = [];
+    this.excludedFeeStructureIds.clear();
     this.assignedFeesRequestId++;
     this.selectedStudent = null;
     this.feeComponents = [];
     this.assignedFeesError = '';
   }
 
-  loadAssignedFees(student: any): void {
+  loadAssignedFees(student: any, message = ''): void {
+    this.feeAssignmentStatus = null;
+    this.savedFeeStructureIds.clear();
+    this.feeUpdateMessage = message;
     const studentId = Number(student?.studentId ?? student?.id);
     const sessionName = String(student?.sessionName || this.sessionName || '').trim();
     const selectedGrade = this.normalizeGrade(student?.grade);
@@ -172,13 +187,26 @@ export class FeeAssignmentComponent implements OnInit {
       next: (response: any) => {
         if (requestId !== this.assignedFeesRequestId || this.selectedStudent !== student) return;
         const rows = response?.listPayload ?? response?.payload ?? response?.data;
+        if (Number(response?.responseCode) >= 400) {
+          this.assignedFeesError = response?.responseMessage || 'Unable to load assigned fees.';
+          this.isAssignedFeesLoading = false;
+          return;
+        }
         const matchingRows = (Array.isArray(rows) ? rows : []).filter((fee: any) => {
           const sameStudent = Number(fee?.studentId) === studentId;
           const sameSession = String(fee?.sessionName ?? '').trim() === sessionName;
           const sameGrade = !selectedGrade || this.normalizeGrade(fee?.grade) === selectedGrade;
           return sameStudent && sameSession && sameGrade;
         });
-        const assignedFees = [...new Map<string, any>(matchingRows.map((fee: any) => [
+        matchingRows.filter((fee: any) => fee.status === 'CANCELLED').forEach((fee: any) =>
+          this.excludedFeeStructureIds.add(Number(fee.feeStructureId)));
+        this.savedFeeStructureIds = new Set<number>(matchingRows
+          .filter((fee: any) => fee.status !== 'CANCELLED')
+          .map((fee: any) => Number(fee.feeStructureId)));
+        this.refreshAssignmentStatus();
+        const activeRows = matchingRows.filter((fee: any) => fee.status !== 'CANCELLED' &&
+          !this.pendingRemovals.some(removed => Number(removed.id) === Number(fee.id)));
+        const assignedFees = [...new Map<string, any>(activeRows.map((fee: any) => [
           String(fee?.feeStructureId ?? fee?.id), fee
         ] as [string, any])).values()];
         this.feeComponents = assignedFees.map((fee: any) => ({
@@ -193,10 +221,9 @@ export class FeeAssignmentComponent implements OnInit {
           paid: Number(fee.paidAmount || 0),
           balance: Number(fee.balanceAmount || 0),
           status: fee.status || 'PENDING',
-          removable: false
+          removable: Number(fee.paidAmount || 0) === 0
         }));
-        this.assignedFeesError = this.feeComponents.length ? '' : 'No fee structure is assigned to this student.';
-        this.isAssignedFeesLoading = false;
+        this.loadAvailableFees(student, requestId);
       },
       error: (error: any) => {
         if (requestId !== this.assignedFeesRequestId || this.selectedStudent !== student) return;
@@ -207,35 +234,158 @@ export class FeeAssignmentComponent implements OnInit {
     });
   }
 
-  updateDiscount(fee: AssignmentFeeComponent): void {
-    if (fee.isUpdating) return;
-    const discount = Number(fee.discount || 0);
-    if (discount < 0 || discount > Number(fee.amount || 0) + Number(fee.fine || 0)) {
-      this.assignedFeesError = 'Discount must be between zero and the assigned amount.';
+  private loadAvailableFees(student: any, requestId: number): void {
+    const sessionName = String(student.sessionName || this.sessionName).trim();
+    forkJoin({
+      academics: this.schoolManagementService.getStudentAcademicByStudentId(Number(student.studentId ?? student.id)),
+      grades: this.gradeOptions.length ? of({ listPayload: this.gradeOptions }) : this.schoolManagementService.getGradeDetails(),
+      structures: this.schoolManagementService.getFeeStructure({ academicYearId: sessionName }),
+      types: this.schoolManagementService.getFeeTypeDetails()
+    }).subscribe({
+      next: ({ academics, grades, structures, types }: any) => {
+        if (requestId !== this.assignedFeesRequestId || this.selectedStudent !== student) return;
+        const responses = [academics, grades, structures, types];
+        const failed = responses.find(response => Number(response?.responseCode) >= 400);
+        const rows = (response: any): any[] => {
+          const data = response?.listPayload ?? response?.payload ?? response?.data;
+          return Array.isArray(data) ? data : [];
+        };
+        const academic = rows(academics).find(item =>
+          String(item.sessionName).trim() === sessionName &&
+          this.normalizeGrade(item.grade) === this.normalizeGrade(student.grade));
+        const grade = rows(grades).find(item =>
+          this.normalizeGrade(item.gradeName ?? item.name) === this.normalizeGrade(student.grade) ||
+          String(item.id) === String(student.grade));
+        if (failed || !academic?.id || !grade?.id) {
+          this.assignedFeesError = failed?.responseMessage || 'Unable to match the student academic record and grade. Check the student academic details.';
+          this.isAssignedFeesLoading = false;
+          return;
+        }
+        const assignedIds = new Set(this.feeComponents.map(fee => Number(fee.feeStructureId)));
+        const availableFees: AssignmentFeeComponent[] = rows(structures)
+          .filter(item => Number(item.gradeId) === Number(grade.id) &&
+            !assignedIds.has(Number(item.id)) &&
+            !this.excludedFeeStructureIds.has(Number(item.id)) &&
+            String(item.academicYearId).trim() === sessionName &&
+            (!item.status || String(item.status).toUpperCase() === 'ACTIVE'))
+          .map(item => ({
+            studentAcademicId: Number(academic.id), feeStructureId: Number(item.id),
+            name: rows(types).find(type => Number(type.id) === Number(item.feeTypeId))?.feeTypeName || `Fee Structure ${item.id}`,
+            amount: Number(item.amount || 0), discount: 0, fine: 0, paid: 0,
+            status: 'PENDING', removable: true
+          }));
+        this.feeComponents = [...this.feeComponents, ...availableFees];
+        this.assignedFeesError = this.feeComponents.length ? '' :
+          this.excludedFeeStructureIds.size ? 'No fees selected for this student.' :
+            `No active fee structure exists for ${student.grade} in ${sessionName}. Create one in Fee Structure first.`;
+        if (availableFees.length && !this.feeUpdateMessage) {
+          this.feeUpdateMessage = 'Class fees are ready to assign. Click Save Assignment to assign them to this student.';
+        }
+        this.isAssignedFeesLoading = false;
+      },
+      error: (error: any) => {
+        if (requestId !== this.assignedFeesRequestId || this.selectedStudent !== student) return;
+        this.assignedFeesError = error?.error?.responseMessage || 'Unable to load available class fees.';
+        this.isAssignedFeesLoading = false;
+      }
+    });
+  }
+
+  async saveAssignment(): Promise<void> {
+    if (!this.selectedStudent || this.isLoading || this.isAssignedFeesLoading || this.isSaving ||
+        this.feeComponents.some(fee => fee.isUpdating)) return;
+    this.feeUpdateMessage = '';
+    this.assignedFeesError = '';
+    if (!this.feeComponents.length && !this.pendingRemovals.length) {
+      this.assignedFeesError = 'No assigned fees to save.';
       return;
+    }
+    if (this.feeComponents.some(fee => !this.isValidDiscount(fee))) {
+      this.assignedFeesError = 'Discounts must be valid non-negative numbers and cannot reduce payable below the amount already paid.';
+      return;
+    }
+    const student = this.selectedStudent;
+    const fees = [...this.feeComponents, ...this.pendingRemovals];
+    const hasNewFees = fees.some(fee => !fee.id);
+    this.isSaving = true;
+    try {
+      const results = await Promise.all(fees.map(fee => this.updateDiscount(fee)));
+      if (this.selectedStudent !== student) return;
+      this.pendingRemovals = this.pendingRemovals.filter(fee => !results[fees.indexOf(fee)]);
+      this.feeUpdateMessage = results.every(Boolean) ? 'Assignment saved successfully.' : '';
+      if (hasNewFees && results.some(Boolean)) {
+        this.loadAssignedFees(student, results.every(Boolean) ? 'Assignment saved successfully.' :
+          'Some fees could not be saved. Reloaded assignments show the fees that were saved.');
+      }
+    } finally {
+      this.isSaving = false;
+    }
+  }
+
+  private isValidDiscount(fee: AssignmentFeeComponent): boolean {
+    const discount = Number(fee.discount ?? 0);
+    return Number.isFinite(discount) && discount >= 0 &&
+      discount <= Number(fee.amount || 0) + Number(fee.fine || 0) - Number(fee.paid || 0);
+  }
+
+  updateDiscount(fee: AssignmentFeeComponent): Promise<boolean> {
+    if (fee.isUpdating) return Promise.resolve(false);
+    if (fee.status !== 'CANCELLED' && !this.isValidDiscount(fee)) {
+      this.assignedFeesError = 'Discount must be a valid non-negative number and cannot reduce payable below the amount already paid.';
+      return Promise.resolve(false);
     }
 
     fee.isUpdating = true;
-    this.assignedFeesError = '';
-    this.feeUpdateMessage = '';
-    this.schoolManagementService.updateAssignedFeeToStudent(fee).subscribe({
-      next: (response: any) => {
-        const payload = response?.payload;
-        const success = Number(response?.responseCode) === 200 && Number(payload?.respCode) === 200;
-        if (success) {
-          fee.payable = Number(payload?.payableAmount ?? this.calculatePayable(fee));
-          fee.balance = Number(payload?.balanceAmount ?? this.calculateBalance(fee));
-          fee.status = payload?.status || this.calculatedStatus(fee);
-          this.feeUpdateMessage = `${fee.name} discount updated successfully.`;
-        } else {
-          this.assignedFeesError = payload?.respMesg || response?.responseMessage || 'Unable to update discount.';
+    const student = this.selectedStudent;
+    if (!this.isSaving) {
+      this.assignedFeesError = '';
+      this.feeUpdateMessage = '';
+    }
+    return new Promise<boolean>(resolve => {
+      const request = fee.id
+        ? this.schoolManagementService.updateAssignedFeeToStudent(fee)
+        : this.schoolManagementService.assignFeeToStudent(fee);
+      request.subscribe({
+        next: (response: any) => {
+          const payload = response?.payload;
+          const removal = fee.status === 'CANCELLED';
+          const removalConfirmed = !removal || String(payload?.status ?? '').trim().toUpperCase() === 'CANCELLED';
+          const success = Number(response?.responseCode) === 200 && Number(payload?.respCode) === 200 && removalConfirmed;
+          if (this.selectedStudent !== student) {
+            fee.isUpdating = false;
+            resolve(success);
+            return;
+          }
+          if (success) {
+            if (removal) this.savedFeeStructureIds.delete(Number(fee.feeStructureId));
+            else this.savedFeeStructureIds.add(Number(fee.feeStructureId));
+            this.refreshAssignmentStatus();
+            if (fee.status === 'CANCELLED') {
+              fee.isUpdating = false;
+              resolve(true);
+              return;
+            }
+            if (!fee.id && !this.isSaving) this.loadAssignedFees(student, `${fee.name} assigned successfully.`);
+            fee.payable = Number(payload?.payableAmount ?? this.calculatePayable(fee));
+            fee.balance = Number(payload?.balanceAmount ?? this.calculateBalance(fee));
+            fee.status = payload?.status || this.calculatedStatus(fee);
+            if (!this.isSaving) this.feeUpdateMessage = `${fee.name} discount updated successfully.`;
+          } else {
+            this.assignedFeesError = !removalConfirmed && Number(payload?.respCode) === 200
+              ? 'The server did not save the fee removal. The backend must be updated before retrying.'
+              : payload?.respMesg || response?.responseMessage || 'Unable to save fee changes.';
+          }
+          fee.isUpdating = false;
+          resolve(success);
+        },
+        error: (error: any) => {
+          if (this.selectedStudent === student) {
+            this.assignedFeesError = error?.error?.responseMessage || 'Unable to update discount.';
+          }
+          fee.isUpdating = false;
+          resolve(false);
         }
-        fee.isUpdating = false;
-      },
-      error: (error: any) => {
-        this.assignedFeesError = error?.error?.responseMessage || 'Unable to update discount.';
-        fee.isUpdating = false;
-      }
+      });
     });
   }
 
@@ -247,12 +397,36 @@ export class FeeAssignmentComponent implements OnInit {
     });
   }
 
+  private refreshAssignmentStatus(): void {
+    this.feeAssignmentStatus = this.savedFeeStructureIds.size ? 'Assigned' : 'Not assigned';
+  }
+
   private normalizeGrade(value: any): string {
     return String(value ?? '').trim().toLowerCase().replace(/^(grade|class)\s*/i, '');
   }
   setPage(page: number): void { if (page >= 1 && page <= this.totalPages) this.page = page; }
-  resetAssignment(): void { this.feeComponents.forEach(item => item.discount = 0); }
-  removeFee(index: number): void { if (this.feeComponents[index]?.removable) this.feeComponents.splice(index, 1); }
+  resetAssignment(): void {
+    this.pendingRemovals.forEach(fee => {
+      this.excludedFeeStructureIds.delete(Number(fee.feeStructureId));
+      fee.status = this.calculatedStatus(fee);
+    });
+    this.feeComponents.push(...this.pendingRemovals);
+    this.pendingRemovals = [];
+    this.feeComponents.forEach(item => item.discount = 0);
+    this.feeUpdateMessage = '';
+  }
+  removeFee(index: number): void {
+    const fee = this.feeComponents[index];
+    if (!fee || this.isSaving || fee.isUpdating) return;
+    if (Number(fee.paid || 0) > 0) {
+      this.assignedFeesError = 'Fees with recorded payments cannot be removed.';
+      return;
+    }
+    if (fee.feeStructureId) this.excludedFeeStructureIds.add(Number(fee.feeStructureId));
+    this.pendingRemovals.push({ ...fee, status: 'CANCELLED' });
+    this.feeComponents.splice(index, 1);
+    this.feeUpdateMessage = 'Fee removed from the list. Click Save Assignment to save your changes.';
+  }
   addOtherFee(): void { this.feeComponents.push({ name: 'Additional Fee', amount: 0, discount: 0, removable: true }); }
   studentName(student: any): string {
     return [student?.firstName, student?.middleName, student?.lastName].filter(Boolean).join(' ') || student?.studentName || 'Student';

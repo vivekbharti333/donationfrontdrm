@@ -924,3 +924,58 @@ label em {
     width: 100%;
   }
 }
+.optional-charge-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.optional-charge-actions .quick-add-button { width: auto; margin: 0; padding: 8px 12px; }
+.fee-description > small { display: block; margin-top: 4px; }
+.fee-installment-field { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+.fee-installment-field label { margin: 0; white-space: nowrap; }
+.fee-installment-field select { min-width: 150px; width: auto; }
+.fee-items-card > .card-title-row { flex-wrap: wrap; gap: 12px; }
+.footer-payment-mode { display: flex; flex-direction: column; align-items: stretch; gap: 6px; grid-column: 1 / -1; grid-row: 1; padding-bottom: 0; border: 0; }
+.footer-payment-mode label { margin: 0; color: #344054; font-size: 13px; font-weight: 600; }
+.footer-payment-mode select { width: 100%; min-width: 0; height: 38px; padding: 6px 12px; border-color: #d0d5dd; border-radius: 6px; background-color: #fff; }
+.receipt-footer-actions { position: static; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr); align-items: end; width: min(100%, 320px); box-sizing: border-box; gap: 10px; padding: 14px 0 2px; margin: 0 0 0 auto; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
+.receipt-footer-actions .btn { width: 100%; min-width: 0 !important; height: 36px; padding: 6px 12px; border-radius: 5px; font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; }
+.receipt-footer-actions .footer-cancel { background: #fff; border-color: #d0d5dd; color: #344054; }
+.receipt-footer-actions .footer-cancel:hover { background: #f9fafb; }
+.receipt-footer-actions .footer-cancel { grid-column: 1; grid-row: 2; }
+.receipt-footer-actions .footer-primary { grid-column: 2; grid-row: 2; }
+.session-fee-summary { margin-top: 18px; padding-top: 16px; border-top: 1px solid #e4e7ec; }
+.session-fee-summary h3 { font-size: 15px; margin: 0 0 6px; }
+.session-fee-summary p, .session-fee-summary > small { color: #667085; font-size: 12px; }
+.session-fee-summary > small { display: block; margin-top: 8px; }
+.session-summary-table { overflow-x: auto; }
+.session-summary-table table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.session-summary-table th, .session-summary-table td { padding: 9px 5px; border-bottom: 1px solid #eaecf0; text-align: right; white-space: nowrap; }
+.session-summary-table th:first-child, .session-summary-table td:first-child { text-align: left; white-space: normal; }
+.session-summary-table thead, .session-summary-table tfoot { background: #f8fafc; font-weight: 600; }
+.session-summary-state { padding: 10px 0; color: #667085; font-size: 12px; }
+.session-summary-table tbody tr.session-fee-paid > td { background-color: #ecfdf3; color: #067647; }
+.session-summary-table tbody tr.session-fee-unpaid > td { background-color: #fef3f2; color: #b42318; }
+.receipt-payment-card { grid-column: 1 / -1; }
+.receipt-payment-fields { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px; align-items: end; }
+.receipt-payment-fields label { display: block; margin-bottom: 8px; font-weight: 600; }
+.receipt-payment-fields .form-control { width: 100%; height: 34px; min-height: 34px; padding: 4px 10px; }
+.session-summary-card .session-fee-summary { margin-top: 0; padding-top: 0; border-top: 0; }
+@media (max-width: 991px) { .receipt-payment-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 575px) { .receipt-payment-fields { grid-template-columns: 1fr; gap: 16px; } }
+.selected-fees-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.selected-fees-heading h3 { margin: 0; }
+.selected-fees-toggle { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; padding: 0; border: 1px solid #fed7aa; border-radius: 6px; background: #fff7ed; color: #ea580c; font-size: 22px; cursor: pointer; }
+.selected-fees-toggle:hover { background: #ffedd5; }
+#selected-fees-content { margin-top: 12px; }
+.total-card { padding: 10px 14px; }
+.total-card .summary-line { padding: 4px 0; line-height: 1.3; }
+.total-card .summary-input { height: 24px; }
+.total-card .remaining-balance { margin-top: 8px; padding: 7px 10px; }
+@media (max-width: 991px) {
+  .receipt-workspace > .student-column {
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+}

@@ -79,8 +79,9 @@
 .list-receipt-meta dt,.list-info-panel dt { font-weight:700; }.list-receipt-meta dd,.list-info-panel dd { margin:0; overflow-wrap:anywhere; }
 .list-info-grid { border-bottom:1px solid #aebbd0; display:grid; grid-template-columns:1fr 1fr; margin-top:18px; padding-bottom:18px; }
 .list-info-panel { padding:0 20px 0 8px; }.list-info-panel + .list-info-panel { border-left:1px solid #aebbd0; padding:0 8px 0 28px; }
+.list-info-panel dl div { font-size: 13px; }
 .list-info-panel h3,.list-fee-section h3 { background:#082b61; border-radius:5px; color:#fff; display:inline-flex; font-size:13px; gap:7px; margin:0 0 10px; padding:8px 13px; text-transform:uppercase; }
-.list-fee-section { margin-top:15px; }.list-fee-section table { border-collapse:collapse; font-size:11px; width:100%; }
+.list-fee-section { margin-top:15px; }.list-fee-section table { border-collapse:collapse; font-size:13px; width:100%; }
 .list-fee-section th { background:#082b61; color:#fff; }.list-fee-section th,.list-fee-section td { border:1px solid #cdd5df; padding:8px 10px; }
 .list-fee-section th:first-child,.list-fee-section td:first-child { text-align:center; width:8%; }.list-fee-section th:nth-child(n+3),.list-fee-section td:nth-child(n+3) { text-align:right; width:23%; }
 .list-fee-section tfoot td { font-size:12px; font-weight:800; text-transform:uppercase; }.list-fee-section tfoot td:last-child { color:#087d22; }
@@ -93,4 +94,40 @@
 .list-contact-footer { align-items:center; border-top:1px solid #aebbd0; color:#082b61; display:flex; font-size:9px; gap:20px; justify-content:space-between; padding-top:12px; }.list-contact-footer em { color:#f06417; font-family:Georgia,serif; font-size:13px; }
 @media (max-width:700px) { .list-receipt-dialog { padding:10px !important; }.list-print-receipt { padding:14px; }.list-print-header,.list-info-grid,.list-total-grid,.list-approval { grid-template-columns:1fr; }.list-school-brand { border-right:0; padding-right:0; }.list-info-panel + .list-info-panel { border-left:0; border-top:1px solid #d8dee8; margin-top:12px; padding:14px 8px 0; }.list-contact-footer { align-items:flex-start; flex-direction:column; gap:5px; } }
 @media (max-width:575px) { .receipt-dialog-header { padding:13px 14px; }.receipt-dialog-icon { display:none; }.receipt-dialog-actions { display:grid; grid-template-columns:1fr 1fr; padding:10px 14px !important; }.receipt-dialog-actions button { padding:0 10px; }.list-receipt-dialog { max-height:calc(100vh - 126px); } }
-@media print { @page { size:A4 portrait; margin:8mm; }.list-print-receipt { border-radius:0; max-width:none; padding:7mm; print-color-adjust:exact; -webkit-print-color-adjust:exact; } }
+@media print {
+  @page { size: A4 portrait; margin: 5mm; }
+  .list-print-receipt { box-sizing: border-box; width: 100%; max-width: none; padding: 3mm; border-radius: 0; box-shadow: none; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  .list-print-header { grid-template-columns: 1.6fr 1fr; gap: 3mm; padding-bottom: 2mm; }
+  .list-school-brand { grid-template-columns: auto minmax(0, 1fr); gap: 2mm; padding-right: 3mm; border-right: 1px solid #aebbd0; }
+  .list-school-brand img { width: 14mm; height: 14mm; }
+  .list-school-brand h1 { font-size: 14px; line-height: 1.2; margin-bottom: 4px; overflow-wrap: anywhere; }
+  .list-school-brand p { font-size: 8px; line-height: 1.35; margin: 2px 0; overflow-wrap: anywhere; }
+  .list-receipt-meta h2 { font-size: 12px; padding: 4px 6px; margin-bottom: 4px; }
+  .list-receipt-meta dl div, .list-info-panel dl div { font-size: 8px; gap: 4px; margin: 2px 0; }
+  .list-info-panel dl div { font-size: 11px; }
+  .list-info-grid { grid-template-columns: 1fr 1fr; margin-top: 2mm; padding-bottom: 2mm; }
+  .list-info-panel { padding: 0 2mm 0 0; }
+  .list-info-panel + .list-info-panel { border-top: 0; border-left: 1px solid #aebbd0; padding: 0 0 0 3mm; margin-top: 0; }
+  .list-info-panel h3, .list-fee-section h3 { font-size: 9px; margin-bottom: 3px; padding: 3px 7px; }
+  .list-fee-section { margin-top: 2mm; }
+  .list-fee-section table { font-size: 11px; }
+  .list-fee-section th, .list-fee-section td { padding: 3px 6px; overflow-wrap: anywhere; }
+  .list-fee-section tfoot td { font-size: 11px; }
+  .list-fee-section thead { display: table-header-group; }
+  .list-fee-section tr { break-inside: avoid; }
+  .list-total-grid { grid-template-columns: 1.5fr 1fr; gap: 3mm; margin-top: 2mm; }
+  .list-amount-words, .list-received-total { min-height: 10mm; padding: 4px 8px; }
+  .list-amount-words b, .list-received-total b { font-size: 8px; }
+  .list-amount-words span { font-size: 10px; margin-top: 4px; }
+  .list-received-total strong { font-size: 16px; margin-top: 3px; }
+  .list-approval { grid-template-columns: 1.5fr 1fr; gap: 4mm; min-height: 18mm; padding: 2mm 0; }
+  .list-notes { font-size: 8px; line-height: 1.4; padding: 3px 0; }
+  .list-notes b { font-size: 9px; }
+  .list-notes p { margin: 3px 0; }
+  .list-signature { min-height: 14mm; padding: 0; }
+  .list-signature img { height: 12mm; max-width: 28mm; margin-bottom: 3px; }
+  .list-signature span { font-size: 8px; min-width: 28mm; margin-top: 3px; padding-top: 4px; }
+  .list-contact-footer { flex-direction: row; flex-wrap: wrap; align-items: center; gap: 4px 8px; font-size: 7px; padding-top: 2mm; }
+  .list-contact-footer em { font-size: 9px; }
+  .list-print-header, .list-info-grid, .list-total-grid, .list-approval, .list-contact-footer { break-inside: avoid; }
+}

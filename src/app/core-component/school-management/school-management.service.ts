@@ -402,24 +402,46 @@ export class SchoolManagementService {
     return this.http.post<any>(Constant.Site_Url + 'getAssignedFeeToStudentDetails', request, options);
   }
 
+
+  assignFeeToStudent(fee: any): Observable<any> {
+    return this.saveStudentFee(fee, 'assignFeeToStudent');
+  }
+
+  getStudentFeesForReceipt(studentId: number, sessionName: string, installmentName: string): Observable<any> {
+    const token = this.getAuthenticationToken();
+    const currentUser = this.authenticationService.getLoginUser();
+    const request = { payload: {
+      studentId: Number(studentId), sessionName: sessionName.trim(), installmentName,
+      superadminId: currentUser?.superadminId || this.cookieService.get('superadminId')
+    } };
+    const options = token ? { headers: new HttpHeaders({ Authorization: `Bearer ${token}` }) } : {};
+    return this.http.post<any>(Constant.Site_Url + 'getStudentFeesForReceipt', request, options);
+  }
+
   updateAssignedFeeToStudent(fee: any): Observable<any> {
+    return this.saveStudentFee(fee, 'updateAssignedFeeToStudent');
+  }
+
+  private saveStudentFee(fee: any, endpoint: string): Observable<any> {
     const token = this.getAuthenticationToken();
     const currentUser = this.authenticationService.getLoginUser();
     const request = {
       payload: {
-        id: Number(fee.id),
+        ...(fee.id ? { id: Number(fee.id) } : {}),
         studentAcademicId: Number(fee.studentAcademicId),
         feeStructureId: Number(fee.feeStructureId),
         assignedAmount: Number(fee.amount || 0),
         discountAmount: Number(fee.discount || 0),
         fineAmount: Number(fee.fine || 0),
+        ...(fee.status === 'CANCELLED' ? { status: 'CANCELLED' } : {}),
+        createdBy: currentUser?.loginId || this.cookieService.get('loginId'),
         superadminId: currentUser?.superadminId || this.cookieService.get('superadminId')
       }
     };
     const options = token
       ? { headers: new HttpHeaders({ Authorization: `Bearer ${token}` }) }
       : {};
-    return this.http.post<any>(Constant.Site_Url + 'updateAssignedFeeToStudent', request, options);
+    return this.http.post<any>(Constant.Site_Url + endpoint, request, options);
   }
 
   deleteFeeStructure(id: number): Observable<any> {

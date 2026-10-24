@@ -258,8 +258,8 @@ export class SchoolReceiptListComponent implements OnInit, OnDestroy {
     printFrame.style.position = 'fixed';
     printFrame.style.right = '0';
     printFrame.style.bottom = '0';
-    printFrame.style.width = '0';
-    printFrame.style.height = '0';
+    printFrame.style.width = '210mm';
+    printFrame.style.height = '297mm';
     printFrame.style.border = '0';
     printFrame.style.opacity = '0';
     printFrame.style.pointerEvents = 'none';
@@ -272,13 +272,21 @@ export class SchoolReceiptListComponent implements OnInit, OnDestroy {
       return;
     }
 
-    printFrame.onload = () => {
+    printFrame.onload = async () => {
+      await frameDocument.fonts.ready;
+      await Promise.all(Array.from(frameDocument.images).map(image =>
+        image.decode().catch(() => undefined)));
       frameWindow.focus();
       frameWindow.print();
       window.setTimeout(() => printFrame.remove(), 1000);
     };
     frameDocument.open();
-    frameDocument.write(`<!doctype html><html><head><title>${this.receiptForm.value.receiptNumber || 'Fee Receipt'}</title>${styles}<style>@page{size:A4 portrait;margin:8mm}body{margin:0;background:#fff}.list-print-receipt{margin:0 auto!important;max-width:none!important}</style></head><body>${receipt.outerHTML}</body></html>`);
+    frameDocument.write(`<!doctype html><html><head><title>${this.receiptForm.value.receiptNumber || 'Fee Receipt'}</title>${styles}<style>
+      @page{size:A4 portrait;margin:5mm}
+      html,body{margin:0!important;padding:0!important;background:#fff;width:200mm}
+      .receipt-half-sheet{position:relative;width:200mm;height:143mm;margin:0;padding:0}
+      #receiptListPrintArea.list-print-receipt{position:static!important;box-sizing:border-box;width:200mm!important;margin:0!important;max-width:none!important;box-shadow:none!important}
+    </style></head><body><div class="receipt-half-sheet">${receipt.outerHTML}</div></body></html>`);
     frameDocument.close();
   }
 }

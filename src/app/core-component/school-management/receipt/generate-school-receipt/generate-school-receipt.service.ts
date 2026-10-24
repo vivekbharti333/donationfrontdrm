@@ -70,7 +70,8 @@ export class GenerateSchoolReceiptService {
       netAmount: receiptDetasils.netAmount,
 
       // ===== System Fields =====
-      createdBy: this.cookieService.get('userId'),
+      createdBy: this.cookieService.get('userId') || this.loginUser?.loginId || this.cookieService.get('loginId'),
+      createdByName: this.loginUser?.name || this.cookieService.get('superadminName'),
       token: this.cookieService.get('token'),
       superadminId: this.cookieService.get('superadminId'),
     }
@@ -123,6 +124,10 @@ getStudentDetailsForFee( grade: string, gradeSection: string): Observable<any> {
 
   getAssignedFeeToStudentDetails(studentId: number, sessionName: string): Observable<any> {
     return this.schoolManagementService.getAssignedFeeToStudentDetails(studentId, sessionName);
+  }
+
+  getStudentFeesForReceipt(studentId: number, sessionName: string, installmentName: string): Observable<any> {
+    return this.schoolManagementService.getStudentFeesForReceipt(studentId, sessionName, installmentName);
   }
 
 }

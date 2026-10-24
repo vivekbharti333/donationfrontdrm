@@ -1,3 +1,9 @@
+.fee-actions { display: flex; gap: 6px; align-items: center; }
+.assignment-status { display: inline-block; flex-shrink: 0; margin-left: auto; margin-right: 5%; padding: 5px 12px; border: 1px solid #fedf89; border-radius: 16px; background: #fffaeb; color: #b54708; font-size: 12px; font-weight: 600; white-space: nowrap; }
+.assignment-status.assigned { border-color: #abefc6; background: #ecfdf3; color: #067647; }
+.assignment-page .remove-fee-btn { color: #d92d20; border-color: #fda29b; width: 30px; height: 30px; min-height: 30px; padding: 0; }
+.assignment-page .remove-fee-btn:hover { background: #fef3f2; }
+.assignment-page .remove-fee-btn:disabled { cursor: not-allowed; opacity: .55; }
 :host { display: block; color: #15213b; font-family: inherit; font-size: 14px; } * { box-sizing: border-box; }
 .assignment-page { padding: 8px 2px 22px; }.breadcrumbs { align-items: center; color: #667085; display: flex; font-size: 12px; gap: 8px; margin-bottom: 14px; }.breadcrumbs i { font-size: 11px; } h1 { font-size: 21px; margin: 0 0 20px; }
 button, input, select, textarea { font: inherit; }.assignment-page button { align-items: center; background: #fff; border: 1px solid #ced5df; border-radius: 5px; color: #17213a; cursor: pointer; display: inline-flex; gap: 8px; justify-content: center; min-height: 36px; padding: 0 14px; }.assignment-page button:hover { background: #fafafa; }

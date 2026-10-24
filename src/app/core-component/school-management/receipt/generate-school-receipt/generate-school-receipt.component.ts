@@ -8,6 +8,12 @@ import { AuthenticationService } from 'src/app/auth/authentication.service';
 import { SchoolManagementService } from '../../school-management.service';
 import { TenantMediaUrlService } from 'src/app/core/service/tenant-media-url.service';
 
+interface SessionFeeSummary {
+  feeType: string;
+  totalAmount: number;
+  balanceAmount: number;
+}
+
 @Component({
   selector: 'app-generate-school-receipt',
   templateUrl: './generate-school-receipt.component.html',
@@ -29,13 +35,50 @@ export class GenerateSchoolReceiptComponent implements OnInit {
   gradeOptions: any[] = [];
   readonly academicYearOptions = Constant.ACADEMIC_YEAR_OPTIONS;
   readonly sectionOptions = Constant.SECTION_OPTIONS;
+  readonly installmentMonths = ['January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'];
   isGradesLoading = false;
   isAssignedFeesLoading = false;
+  private assignedFeesRequestId = 0;
   assignedFeesError = '';
+  sessionFeeSummary: SessionFeeSummary[] = [];
+  sessionFeeSummaryLoaded = false;
+
+  get sessionFeeTotal(): number {
+    return this.sessionFeeSummary.reduce((total, fee) => total + Math.round(fee.totalAmount * 100), 0) / 100;
+  }
+
+  get sessionFeeBalance(): number {
+    return this.sessionFeeSummary.reduce((total, fee) => total + Math.round(fee.balanceAmount * 100), 0) / 100;
+  }
+
+  private updateSessionFeeSummary(fees: any[]): void {
+    const grouped = new Map<string, SessionFeeSummary>();
+    const cents = (value: any): number => Math.round(Number(value || 0) * 100);
+    fees.forEach(fee => {
+      const name = String(fee.feeTypeName || `Fee Structure ${fee.feeStructureId ?? ''}`).trim();
+      const key = name.toLowerCase();
+      const frequency = String(fee.frequency || '').trim().toUpperCase();
+      const periods = ({ MONTHLY: 12, QUARTERLY: 4, HALF_YEARLY: 2 } as Record<string, number>)[frequency] || 1;
+      const recurring = periods > 1;
+      const payable = Math.max(0, cents(fee.assignedAmount) - cents(fee.discountAmount) + cents(fee.fineAmount));
+      const total = recurring ? payable * periods : cents(fee.payableAmount ?? payable / 100);
+      const paid = Math.max(0, cents(fee.paidAmount));
+      const balance = recurring ? Math.max(0, total - paid)
+        : Math.max(0, cents(fee.balanceAmount ?? Math.max(0, total - paid) / 100));
+      const row = grouped.get(key) || { feeType: name, totalAmount: 0, balanceAmount: 0 };
+      row.totalAmount = (Math.round(row.totalAmount * 100) + total) / 100;
+      row.balanceAmount = (Math.round(row.balanceAmount * 100) + balance) / 100;
+      grouped.set(key, row);
+    });
+    this.sessionFeeSummary = [...grouped.values()];
+    this.sessionFeeSummaryLoaded = true;
+  }
   invoiceHeader: any = null;
   isLoading = false;
   isSubmitting = false;
   isReceiptPreviewVisible = false;
+  isSelectedFeeDetailsVisible = false;
   loginUser: any;
 
 
@@ -56,12 +99,16 @@ export class GenerateSchoolReceiptComponent implements OnInit {
     this.createSearchForm();
     this.getGradeDetails();
     this.getInvoiceHeaderDetails();
-    this.addFeeRow(); // at least one fee row by default
 
   }
 
   toggleReceiptPreview(): void {
     this.isReceiptPreviewVisible = !this.isReceiptPreviewVisible;
+  }
+
+  get legacyInstallmentName(): string {
+    const value = this.receiptForm?.get('installmentName')?.value;
+    return typeof value === 'string' && value && !this.installmentMonths.includes(value) ? value : '';
   }
 
   createSearchForm(): void {
@@ -93,7 +140,7 @@ export class GenerateSchoolReceiptComponent implements OnInit {
 
       // Receipt Info
       receiptNumber: ['', Validators.required],
-      installmentName: ['', Validators.required],
+      installmentName: [this.installmentMonths[new Date().getMonth()], Validators.required],
       paymentMode: ['', Validators.required],
       paymentDate: [this.currentDateTimeLocal(), Validators.required],
 
@@ -117,23 +164,39 @@ export class GenerateSchoolReceiptComponent implements OnInit {
 
   get selectedFeeDetails(): any[] {
     return this.receiptDetails.controls.filter(control =>
-      control.get('selected')?.value && !this.isZeroBalanceFee(control)
+      control.get('selected')?.value && !this.isFeeUnavailable(control)
     );
   }
 
   isZeroBalanceFee(control: any): boolean {
-    return Number(control?.get('balance')?.value) <= 0;
+    if (control?.get('chargeType')?.value) return false;
+    return !control?.get('installmentError')?.value && Number(control?.get('balance')?.value) <= 0;
+  }
+
+  isFeeUnavailable(control: any): boolean {
+    return this.isAssignedFeesLoading || !!control?.get('installmentError')?.value || this.isZeroBalanceFee(control);
+  }
+
+  onInstallmentChange(): void {
+    if (this.selectedStudent) this.loadAssignedFees(this.selectedStudent);
   }
 
   // ================= ADD FEE ROW =================
   addFeeRow(): void {
+    this.addOptionalCharge('MISCELLANEOUS');
+  }
+
+  addOptionalCharge(chargeType: 'LATE_FEE' | 'MISCELLANEOUS'): void {
+    if (!this.selectedStudent || this.isSubmitting || this.isAssignedFeesLoading) return;
     const feeGroup = this.fb.group({
       selected: [true],
       studentFeeId: [null],
       studentAcademicId: [null],
-      feeType: ['', Validators.required],
-      amount: [0, [Validators.required, Validators.min(1)]],
-      balance: [0]
+      feeType: [chargeType === 'LATE_FEE' ? 'Late Fee' : 'Miscellaneous Fee', Validators.required],
+      chargeType: [chargeType],
+      reason: ['', [Validators.required, Validators.pattern(/\S/), Validators.maxLength(200)]],
+      amount: [null, [Validators.required, Validators.min(0.01), Validators.max(9999999.99), Validators.pattern(/^\d+(\.\d{1,2})?$/)]],
+      balance: [null]
     });
 
     this.receiptDetails.push(feeGroup);
@@ -141,7 +204,7 @@ export class GenerateSchoolReceiptComponent implements OnInit {
 
   // ================= REMOVE FEE ROW =================
   removeFeeRow(index: number): void {
-    if (this.receiptDetails.length === 1) {
+    if (this.isSubmitting) {
       return;
     }
     this.receiptDetails.removeAt(index);
@@ -153,7 +216,7 @@ export class GenerateSchoolReceiptComponent implements OnInit {
     let total = 0;
 
     this.receiptDetails.controls.forEach(control => {
-      if (control.get('selected')?.value && !this.isZeroBalanceFee(control)) {
+      if (control.get('selected')?.value && !this.isFeeUnavailable(control)) {
         const amount = Number(control.get('amount')?.value) || 0;
         total += amount;
       }
@@ -173,6 +236,7 @@ export class GenerateSchoolReceiptComponent implements OnInit {
   // ================= SUBMIT RECEIPT =================
 
   submitReceipt(): void {
+    if (this.isAssignedFeesLoading) return;
     if (this.receiptForm.invalid || this.isSubmitting) {
       this.receiptForm.markAllAsTouched();
 
@@ -193,7 +257,7 @@ export class GenerateSchoolReceiptComponent implements OnInit {
         });
 
         if (this.receiptDetails.invalid) {
-          missingFields.push('valid fee type and amount');
+          missingFields.push('valid fee amounts and a reason for each optional charge');
         }
 
         this.messageService.add({
@@ -207,10 +271,12 @@ export class GenerateSchoolReceiptComponent implements OnInit {
 
     this.calculateTotals();
     const selectedReceiptDetails = this.receiptDetails.controls
-      .filter(control => control.get('selected')?.value && !this.isZeroBalanceFee(control))
+      .filter(control => control.get('selected')?.value && !this.isFeeUnavailable(control))
       .map(control => ({
         studentFeeId: control.get('studentFeeId')?.value,
         feeType: control.get('feeType')?.value,
+        chargeType: control.get('chargeType')?.value || undefined,
+        reason: control.get('reason')?.value?.trim() || undefined,
         amount: Number(control.get('amount')?.value) || 0
       }));
     if (!selectedReceiptDetails.length) {
@@ -221,7 +287,7 @@ export class GenerateSchoolReceiptComponent implements OnInit {
       });
       return;
     }
-    if (selectedReceiptDetails.some(detail => !detail.studentFeeId)) {
+    if (selectedReceiptDetails.some(detail => !detail.studentFeeId && !detail.chargeType)) {
       this.messageService.add({
         summary: 'Invalid fee item',
         detail: 'Only fees assigned to the selected student can be added to this receipt.',
@@ -271,12 +337,16 @@ export class GenerateSchoolReceiptComponent implements OnInit {
 
   // ================= RESET FORM =================
   resetForm(): void {
+    this.sessionFeeSummary = [];
+    this.sessionFeeSummaryLoaded = false;
+    this.assignedFeesRequestId++;
+    this.isAssignedFeesLoading = false;
     this.receiptForm.reset({
       admissionNo: '', studentName: '', academicSession: '2026-27', totalAmount: 0, discountAmount: 0,
-      fineAmount: 0, netAmount: 0, status: 'PAID', paymentDate: this.currentDateTimeLocal()
+      fineAmount: 0, netAmount: 0, status: 'PAID', paymentDate: this.currentDateTimeLocal(),
+      installmentName: this.installmentMonths[new Date().getMonth()]
     });
     this.receiptDetails.clear();
-    this.addFeeRow();
     this.selectedStudent = null;
   }
 
@@ -425,6 +495,7 @@ export class GenerateSchoolReceiptComponent implements OnInit {
 
 
   onStudentChange(student: any): void {
+    if (this.selectedStudent !== student) this.receiptDetails.clear();
     this.selectedStudent = student || null;
 
 
@@ -458,6 +529,9 @@ export class GenerateSchoolReceiptComponent implements OnInit {
   }
 
   loadAssignedFees(student: any): void {
+    this.sessionFeeSummary = [];
+    this.sessionFeeSummaryLoaded = false;
+    const requestId = ++this.assignedFeesRequestId;
     const studentId = Number(student?.studentId ?? student?.id);
     const sessionName = String(student?.sessionName || this.studentSearchForm.get('academicSession')?.value || '').trim();
     if (!studentId || !sessionName) {
@@ -469,10 +543,18 @@ export class GenerateSchoolReceiptComponent implements OnInit {
 
     this.isAssignedFeesLoading = true;
     this.assignedFeesError = '';
+    const optionalCharges = this.receiptDetails.controls.filter(row => row.get('chargeType')?.value);
     this.receiptDetails.clear();
     this.calculateTotals();
-    this.generateSchoolReceiptService.getAssignedFeeToStudentDetails(studentId, sessionName).subscribe({
+    const installmentName = String(this.receiptForm.get('installmentName')?.value || '');
+    this.generateSchoolReceiptService.getStudentFeesForReceipt(studentId, sessionName, installmentName).subscribe({
       next: (response: any) => {
+        if (requestId !== this.assignedFeesRequestId || this.selectedStudent !== student) return;
+        if (Number(response?.responseCode) >= 400) {
+          this.assignedFeesError = response?.responseMessage || 'Unable to load installment balances.';
+          this.isAssignedFeesLoading = false;
+          return;
+        }
         const rows = response?.listPayload ?? response?.payload ?? response?.data;
         const selectedGrade = String(student?.grade ?? '').trim();
         const selectedSection = String(student?.gradeSection ?? '').trim();
@@ -481,32 +563,49 @@ export class GenerateSchoolReceiptComponent implements OnInit {
           && String(fee?.sessionName ?? '').trim() === sessionName
           && (!selectedGrade || String(fee?.grade ?? '').trim() === selectedGrade)
           && (!selectedSection || !fee?.gradeSection || String(fee.gradeSection).trim() === selectedSection)
+          && String(fee?.status ?? '').toUpperCase() !== 'CANCELLED'
         );
-        const uniqueFees = [...new Map<string, any>(matchingFees.map((fee: any) => [
+        const optionalChargeSummary = matchingFees.filter((fee: any) => fee.optionalChargeSummary === true);
+        const uniqueFees = [...new Map<string, any>(matchingFees.filter((fee: any) => fee.optionalChargeSummary !== true).map((fee: any) => [
           String(fee?.feeStructureId ?? fee?.id), fee
         ] as [string, any])).values()];
+        this.updateSessionFeeSummary([...uniqueFees, ...optionalChargeSummary]);
 
         uniqueFees.forEach((fee: any) => {
-          const amount = Number(fee?.balanceAmount ?? fee?.payableAmount ?? fee?.assignedAmount ?? 0);
-          const balance = Number(fee?.balanceAmount ?? amount);
+          const frequency = String(fee?.frequency || '').trim().toUpperCase();
+          const recurring = ['MONTHLY', 'QUARTERLY', 'HALF_YEARLY'].includes(frequency);
+          const installmentError = fee?.installmentError || (recurring && fee?.installmentBalanceAmount == null
+            ? 'Select an installment month to load its period balance.' : '');
+          const balance = recurring ? Number(fee?.installmentBalanceAmount ?? 0)
+            : Number(fee?.balanceAmount ?? fee?.payableAmount ?? fee?.assignedAmount ?? 0);
           this.receiptDetails.push(this.fb.group({
             selected: [false],
             studentFeeId: [fee?.id],
             studentAcademicId: [fee?.studentAcademicId],
             feeType: [fee?.feeTypeName || `Fee Structure ${fee?.feeStructureId ?? ''}`, Validators.required],
-            amount: [balance > 0 ? Math.min(amount, balance) : 0,
-              balance > 0 ? [Validators.required, Validators.min(1)] : []],
-            balance: [balance]
+            amount: [balance > 0 ? balance : 0,
+              balance > 0 && !installmentError ? [Validators.required, Validators.min(1), Validators.max(balance)] : []],
+            balance: [balance],
+            frequency: [fee?.frequency || ''],
+            installmentPeriod: [fee?.installmentPeriod || (frequency === 'MONTHLY' ? installmentName : '')],
+            installmentError: [installmentError]
           }));
+          if (balance <= 0 || installmentError) {
+            const row = this.receiptDetails.at(this.receiptDetails.length - 1);
+            row.get('selected')?.disable({ emitEvent: false });
+            row.get('amount')?.disable({ emitEvent: false });
+          }
         });
+        optionalCharges.forEach(row => this.receiptDetails.push(row));
         this.receiptForm.patchValue({
-          studentAcademicId: uniqueFees[0]?.studentAcademicId || null
+          studentAcademicId: uniqueFees[0]?.studentAcademicId || optionalChargeSummary[0]?.studentAcademicId || null
         });
         this.assignedFeesError = uniqueFees.length ? '' : 'No assigned fees found for this student.';
-        this.calculateTotals();
         this.isAssignedFeesLoading = false;
+        this.calculateTotals();
       },
       error: (error: any) => {
+        if (requestId !== this.assignedFeesRequestId || this.selectedStudent !== student) return;
         this.receiptDetails.clear();
         this.calculateTotals();
         this.assignedFeesError = error?.error?.responseMessage || 'Unable to load the student assigned fees.';
@@ -516,6 +615,9 @@ export class GenerateSchoolReceiptComponent implements OnInit {
   }
 
   private clearSelectedStudent(): void {
+    this.sessionFeeSummary = [];
+    this.sessionFeeSummaryLoaded = false;
+    this.assignedFeesRequestId++;
     this.selectedStudent = null;
     this.assignedFeesError = '';
     this.isAssignedFeesLoading = false;
@@ -593,7 +695,10 @@ openEditModal(rawData: any): void {
       panelClass: 'custom-modal'
     }
   );
-  this.receiptDialog.afterClosed().subscribe(() => this.getInvoiceHeaderDetails());
+  this.receiptDialog.afterClosed().subscribe(() => {
+    this.getInvoiceHeaderDetails();
+    if (this.selectedStudent) this.loadAssignedFees(this.selectedStudent);
+  });
 
 }
 
@@ -604,6 +709,8 @@ createReceiptDetailGroup(data?: any): FormGroup {
     studentFeeId: [data?.studentFeeId || null],
     studentAcademicId: [data?.studentAcademicId || null],
     feeType: [data?.feeType || ''],
+    chargeType: [data?.chargeType || ''],
+    reason: [data?.reason || ''],
     amount: [data?.amount || 0],
     balance: [data?.balanceAmount ?? data?.balance ?? data?.amount ?? 0]
   });
