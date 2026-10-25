@@ -32,6 +32,7 @@ export class FeeAssignmentComponent implements OnInit {
   gradeSection = '';
   searchTerm = '';
   students: any[] = [];
+  hasSearchedStudents = false;
   gradeOptions: any[] = [];
   isGradesLoading = false;
   selectedStudent: any = null;
@@ -61,7 +62,6 @@ export class FeeAssignmentComponent implements OnInit {
 
   ngOnInit(): void {
     this.getGradeDetails();
-    this.getStudentAcademicDetails();
   }
 
   get filteredStudents(): any[] {
@@ -148,6 +148,7 @@ export class FeeAssignmentComponent implements OnInit {
   }
 
   applyFilters(): void {
+    this.hasSearchedStudents = true;
     this.getStudentAcademicDetails();
   }
   searchStudents(): void { this.page = 1; }

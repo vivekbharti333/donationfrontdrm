@@ -1,0 +1,100 @@
+<section class="due-report-page">
+  <header class="page-heading">
+    <div><h1>Fee Due Report</h1><p>View outstanding installments by student and fee type.</p></div>
+    <span class="school-scope"><i class="feather icon-home" aria-hidden="true"></i> Your school</span>
+  </header>
+
+  <form class="filter-card" (ngSubmit)="loadReport()">
+    <div class="filter-field"><label for="due-session">Academic Year <em>*</em></label>
+      <select id="due-session" name="sessionName" [(ngModel)]="sessionName" (ngModelChange)="filtersChanged(true)">
+        <option *ngFor="let year of academicYears" [value]="year.value">{{ year.name }}</option>
+      </select>
+    </div>
+    <div class="filter-field"><label for="due-grade">Class</label>
+      <select id="due-grade" name="grade" [(ngModel)]="grade" (ngModelChange)="filtersChanged(true)">
+        <option value="">All classes</option><option *ngFor="let item of grades" [value]="item.value">{{ item.label }}</option>
+      </select>
+    </div>
+    <div class="filter-field"><label for="due-section">Section</label>
+      <select id="due-section" name="gradeSection" [(ngModel)]="gradeSection" (ngModelChange)="filtersChanged(true)">
+        <option value="">All sections</option><option *ngFor="let section of sections" [value]="section.value">{{ section.name }}</option>
+      </select>
+    </div>
+    <div class="filter-field"><label for="due-student">Student</label>
+      <p-dropdown inputId="due-student" name="studentId" styleClass="due-student-dropdown" panelStyleClass="due-student-panel"
+        [options]="students" optionLabel="label" optionValue="id" [(ngModel)]="studentId" (ngModelChange)="filtersChanged()"
+        [filter]="true" filterBy="label" filterPlaceholder="Search name or admission no." ariaFilterLabel="Search students"
+        [showClear]="true" [autoDisplayFirst]="false" [resetFilterOnHide]="true" [loading]="isStudentsLoading" [disabled]="isStudentsLoading"
+        [placeholder]="isStudentsLoading ? 'Loading students…' : 'All students'" emptyFilterMessage="No matching students"
+        emptyMessage="No students available" appendTo="body" [style]="{ width: '100%' }"></p-dropdown>
+      <small class="field-error" *ngIf="studentsError">{{ studentsError }}</small>
+    </div>
+    <div class="filter-field fee-type-filter"><label id="due-fee-types-label">Fee Type</label>
+      <mat-select class="fee-type-select" panelClass="due-fee-type-panel" name="feeTypeIds" aria-labelledby="due-fee-types-label" placeholder="All fee types" multiple
+        [(ngModel)]="feeTypeIds" (ngModelChange)="filtersChanged()">
+        <mat-option *ngFor="let fee of feeTypes" [value]="fee.id">{{ fee.label }}</mat-option>
+      </mat-select>
+    </div>
+    <div class="filter-field"><label for="due-month">Dues Period <em>*</em></label>
+      <select id="due-month" name="dueThroughMonth" [(ngModel)]="dueThroughMonth" (ngModelChange)="filtersChanged()">
+        <option value="ALL_PREVIOUS">All previous dues (up to today)</option>
+        <option *ngFor="let month of months" [value]="month">Through {{ month }}</option>
+      </select>
+    </div>
+    <div class="filter-actions"><button type="button" class="reset-button" (click)="reset()">Reset</button>
+      <button type="submit" class="report-button" [disabled]="isLoading"><i class="feather icon-search" aria-hidden="true" *ngIf="!isLoading"></i>
+        <span *ngIf="isLoading" class="spinner-border spinner-border-sm" aria-hidden="true"></span>{{ isLoading ? 'Loading…' : 'View Report' }}</button>
+    </div>
+    <p class="filter-note">All previous dues includes the selected academic year and earlier years, up to today. A month option shows dues through that month in the selected year only. Class and section use the selected year's student records.</p>
+    <p class="field-error option-error" *ngFor="let message of optionMessages">{{ message }}</p>
+  </form>
+
+  <div class="report-state error-state" *ngIf="errorMessage" role="alert"><i class="feather icon-alert-circle" aria-hidden="true"></i><span>{{ errorMessage }}</span></div>
+  <div class="report-state" *ngIf="isLoading" role="status"><span class="spinner-border spinner-border-sm" aria-hidden="true"></span> Loading fee dues…</div>
+  <div class="report-state initial-state" *ngIf="!hasSearched && !isLoading"><i class="feather icon-file-text" aria-hidden="true"></i><h2>Find outstanding fees</h2><p>Choose your filters and click View Report.</p></div>
+  <div class="report-state initial-state" *ngIf="hasSearched && !isLoading && !errorMessage && studentGroups.length === 0"><i class="feather icon-check-circle" aria-hidden="true"></i><h2>No outstanding fees found</h2><p>No dues were returned for the selected filters.</p></div>
+
+  <ng-container *ngIf="!isLoading && !errorMessage && studentGroups.length > 0">
+    <div class="report-summary">
+      <article><span>Students with dues</span><strong>{{ studentGroups.length | number }}</strong></article>
+      <article><span>Fee entries</span><strong>{{ feeCount | number }}</strong></article>
+      <article class="balance-summary"><span>{{ reviewCount ? 'Confirmed due amount' : 'Total due amount' }}</span><strong>₹ {{ totalDue | number:'1.2-2' }}</strong></article>
+    </div>
+    <p *ngIf="reviewCount" class="review-notice" role="status"><i class="feather icon-alert-triangle" aria-hidden="true"></i>
+      {{ reviewCount }} fee {{ reviewCount === 1 ? 'entry needs' : 'entries need' }} review. These balances are excluded from the total.</p>
+    <article class="results-card">
+      <header class="results-heading"><div><div class="school-brand" *ngIf="schoolHeader.name"><img *ngIf="schoolHeader.logo" [src]="schoolHeader.logo" [alt]="schoolHeader.name + ' logo'" (error)="onSchoolLogoError()"><strong>{{ schoolHeader.name }}</strong></div><h2>Student Fee Dues</h2><p>{{ resultDescription }}</p></div><div class="report-tools"><span>{{ studentGroups.length }} {{ studentGroups.length === 1 ? 'student' : 'students' }}</span><button type="button" class="print-report-button" (click)="printReport()" [disabled]="isSchoolHeaderLoading"><i class="feather icon-printer" aria-hidden="true"></i> Print / Save PDF</button></div></header>
+      <p *ngIf="schoolLogoError" class="print-error" role="status">{{ schoolLogoError }}</p>
+      <p class="print-help">Print creates a separate due slip for each matching student, with cut lines between slips. Choose “Save as PDF” to download.</p>
+      <p *ngIf="printError" class="print-error" role="alert">{{ printError }}</p>
+      <div class="table-scroll" role="region" aria-label="Student fee dues" tabindex="0">
+        <ng-container *ngTemplateOutlet="dueReportTable; context: { $implicit: visibleStudents, total: totalDue, reviews: reviewCount, slip: false }"></ng-container>
+      </div>
+      <footer class="report-pagination"><span>Showing {{ firstStudent }}–{{ lastStudent }} of {{ studentGroups.length }} students</span>
+        <div class="pagination-actions"><label for="due-page-size">Students per page</label><select id="due-page-size" [(ngModel)]="pageSize" (ngModelChange)="page = 1"><option [ngValue]="10">10</option><option [ngValue]="25">25</option><option [ngValue]="50">50</option></select>
+          <button type="button" (click)="setPage(page - 1)" [disabled]="page === 1" aria-label="Previous page"><i class="feather icon-chevron-left" aria-hidden="true"></i></button><span>{{ page }} / {{ totalPages }}</span><button type="button" (click)="setPage(page + 1)" [disabled]="page === totalPages" aria-label="Next page"><i class="feather icon-chevron-right" aria-hidden="true"></i></button>
+        </div>
+      </footer>
+    </article>
+  </ng-container>
+</section>
+
+<ng-template #dueReportTable let-students let-reportTotal="total" let-reviews="reviews" let-slip="slip">
+<table class="due-table">
+          <thead><tr><th scope="col">Student</th><th scope="col">Fee Type</th><th scope="col">Due Installments</th><th scope="col" class="amount-cell">Total Due</th></tr></thead>
+          <tbody *ngFor="let student of students; trackBy: trackStudent">
+            <tr *ngFor="let fee of student.fees; let first = first; let last = last" [class.student-last-row]="last">
+              <th *ngIf="first" scope="rowgroup" [attr.rowspan]="student.fees.length" class="student-cell">
+                <strong>{{ student.studentName || '—' }}</strong>
+                <small>Father: {{ student.fatherName || '—' }}</small>
+                <span class="student-class">{{ student.grade || '—' }}<ng-container *ngIf="student.gradeSection"> / {{ student.gradeSection }}</ng-container></span>
+                <small>Admission: {{ student.admissionNo || '—' }}<ng-container *ngIf="student.rollNumber"> · Roll: {{ student.rollNumber }}</ng-container></small>
+              </th>
+              <td class="fee-name">{{ fee.feeTypeName || '—' }}<small class="fee-session" *ngIf="dueThroughMonth === 'ALL_PREVIOUS'">{{ fee.sessionName }}</small></td>
+              <td class="installments-cell"><span>{{ fee.installmentNames || '—' }}</span><small *ngIf="fee.requiresReview" class="review-message">{{ fee.reviewMessage || 'Review this fee balance.' }}</small></td>
+              <td class="amount-cell"><span *ngIf="!fee.requiresReview">₹ {{ fee.totalDue | number:'1.2-2' }}</span><span *ngIf="fee.requiresReview" class="review-label">Needs review</span></td>
+            </tr>
+          </tbody>
+          <tfoot><tr><td colspan="3">{{ reviews ? (slip ? 'Confirmed total (review entries excluded)' : 'Confirmed total · all results (review entries excluded)') : (slip ? 'Total due' : 'Total due · all results') }}</td><td class="amount-cell">₹ {{ reportTotal | number:'1.2-2' }}</td></tr></tfoot>
+        </table>
+</ng-template>

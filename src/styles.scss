@@ -247,6 +247,68 @@ body {
   background: #fff;
 }
 
+// The fee report supplies its own field border and height.
+mat-select.fee-type-select.mat-mdc-select .mat-mdc-select-trigger {
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  line-height: normal;
+  background: transparent;
+}
+
+mat-select.fee-type-select .mat-mdc-select-value {
+  min-width: 0;
+  font-size: 13px;
+}
+
+mat-select.fee-type-select .mat-mdc-select-value-text {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.due-fee-type-panel.mat-mdc-select-panel {
+  max-height: 260px;
+}
+
+.due-fee-type-panel mat-option.mat-mdc-option .mdc-list-item__primary-text {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  line-height: 1.4;
+  padding: 8px 0;
+}
+
+.due-fee-type-panel mat-option mat-pseudo-checkbox.mat-pseudo-checkbox {
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.due-student-dropdown.p-dropdown {
+  height: 32px;
+  border: 1px solid #d5deea;
+  border-radius: 5px;
+  align-items: center;
+  font-family: Inter, Arial, sans-serif;
+}
+
+.due-student-dropdown.p-dropdown .p-dropdown-label {
+  padding: 0 10px;
+  line-height: 30px;
+  font-size: 13px;
+  color: #17345b;
+}
+
+.due-student-dropdown.p-dropdown .p-dropdown-trigger { width: 30px; }
+.due-student-dropdown.p-dropdown.p-dropdown-clearable .p-dropdown-label { padding-right: 26px; }
+.due-student-dropdown.p-dropdown .p-dropdown-clear-icon { right: 32px; }
+.due-student-panel .p-dropdown-filter { font-size: 13px; }
+.due-student-panel .p-dropdown-item { font-size: 13px; padding: 9px 12px; }
+
 .mat-mdc-option:hover:not(.mdc-list-item--disabled),
 .mat-mdc-option:focus:not(.mdc-list-item--disabled),
 .mat-mdc-option.mat-mdc-option-active,

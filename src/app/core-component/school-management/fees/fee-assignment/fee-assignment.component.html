@@ -8,8 +8,8 @@
     <button class="outline-orange" (click)="applyFilters()"><i class="feather icon-search"></i>Search Students</button>
   </div>
 
-  <div class="assignment-grid" [class.resizing]="isResizing" [style.grid-template-columns]="splitPercent + '% 10px minmax(0, 1fr)'">
-    <article class="panel students-panel">
+  <div class="assignment-grid" [class.resizing]="isResizing" [style.grid-template-columns]="hasSearchedStudents ? splitPercent + '% 10px minmax(0, 1fr)' : 'minmax(0, 1fr)'">
+    <article *ngIf="hasSearchedStudents" class="panel students-panel">
       <h2>Students ({{ filteredStudents.length }})</h2>
       <div class="student-toolbar"><div class="search-box"><input [(ngModel)]="searchTerm" (ngModelChange)="searchStudents()" placeholder="Search by Name or Roll No."><i class="feather icon-search"></i></div><button><i class="feather icon-download"></i>Export</button></div>
       <div *ngIf="errorMessage" class="api-error">{{ errorMessage }}</div>
@@ -19,7 +19,7 @@
       <div class="list-footer"><span>Showing {{ filteredStudents.length ? (page - 1) * pageSize + 1 : 0 }} to {{ page * pageSize < filteredStudents.length ? page * pageSize : filteredStudents.length }} of {{ filteredStudents.length }} entries</span><div><button (click)="setPage(page - 1)" [disabled]="page === 1"><i class="feather icon-chevron-left"></i></button><button *ngFor="let number of [1,2,3,4,5]" [hidden]="number > totalPages" [class.current]="number === page" (click)="setPage(number)">{{ number }}</button><button (click)="setPage(page + 1)" [disabled]="page === totalPages"><i class="feather icon-chevron-right"></i></button></div></div>
     </article>
 
-    <div class="panel-resizer" role="separator" aria-label="Resize student and selected student panels" (pointerdown)="startResize($event)"><span></span></div>
+    <div *ngIf="hasSearchedStudents" class="panel-resizer" role="separator" aria-label="Resize student and selected student panels" (pointerdown)="startResize($event)"><span></span></div>
 
     <article class="panel details-panel">
       <header><h2>Selected Student</h2></header>

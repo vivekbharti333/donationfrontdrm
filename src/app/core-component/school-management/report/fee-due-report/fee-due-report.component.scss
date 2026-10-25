@@ -1,0 +1,77 @@
+:host { display: block; }
+.due-report-page { max-width: 1440px; margin: auto; color: #17233d; font-family: Inter, Arial, sans-serif; font-size: 14px; }
+.page-heading { display: flex; justify-content: space-between; align-items: end; gap: 20px; margin: 8px 0 16px; }
+.page-heading h1 { color: #212b36; font-size: 18px; font-weight: 700; line-height: 1.25; margin: 0 0 5px; }
+.page-heading p { color: #646b72; font-size: 14px; font-weight: 400; line-height: 1.4; margin: 0; }
+.results-heading p { color: #718096; font-size: 13px; margin: 0; }
+.school-scope { display: inline-flex; gap: 8px; align-items: center; border: 1px solid #e0e6ee; border-radius: 20px; padding: 7px 12px; font-size: 12px; background: #fff; white-space: nowrap; }
+.filter-card, .results-card { background: #fff; border: 1px solid #dfe5ee; border-radius: 6px; }
+.filter-card { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); align-items: start; gap: 12px 20px; padding: 12px 15px; margin-bottom: 14px; }
+.filter-field { min-width: 0; }
+.filter-field label { display: block; font-size: 13px; font-weight: 700; line-height: 1.3; margin-bottom: 4px; color: #536078; }
+.filter-field em { color: #ef4444; font-style: normal; }
+.filter-field select, .fee-type-select { background: #fff; border: 1px solid #d5deea; border-radius: 5px; width: 100%; height: 32px; padding: 0 10px; color: #17345b; font-size: 13px; }
+.fee-type-select { display: inline-flex; align-items: center; box-sizing: border-box; min-width: 0; }
+.filter-field select:focus, button:focus-visible, .table-scroll:focus-visible { outline: 2px solid #ff9c61; outline-offset: 2px; }
+.filter-field select:disabled { background: #f4f6fa; }
+.filter-actions { display: flex; gap: 9px; align-self: start; margin-top: 21px; grid-column: span 2; justify-content: flex-end; }
+.filter-actions button { height: 32px; padding: 0 16px; font-size: 13px; font-weight: 600; border-radius: 5px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+.reset-button { border: 1px solid #ccd8e7; background: #fff; color: #17345b; }
+.report-button { border: 1px solid #ff6b00; background: #ff6b00; color: #fff; }
+.report-button:hover:not(:disabled) { background: #eb6200; }
+button:disabled { opacity: .55; cursor: not-allowed; }
+.filter-note { grid-column: 1 / -1; font-size: 12px; color: #718096; margin: 0; }
+.field-error { display: block; color: #bd3d2f; font-size: 12px; margin-top: 6px; }
+.option-error { grid-column: 1 / -1; margin: 0; }
+.report-state { display: flex; justify-content: center; align-items: center; gap: 10px; background: #fff; border: 1px solid #dce4ef; padding: 30px 20px; border-radius: 8px; color: #61738c; }
+.initial-state { flex-direction: column; min-height: 220px; text-align: center; }
+.initial-state > i { font-size: 30px; color: #ffa261; }
+.initial-state h2 { font-size: 17px; color: #17345b; margin: 4px 0 0; }
+.initial-state p { font-size: 13px; margin: 0; }
+.error-state { justify-content: flex-start; color: #b9382b; background: #fff4f2; border-color: #f4d2cd; }
+.report-summary { display: grid; grid-template-columns: 1fr 1fr 1.4fr; gap: 12px; margin-bottom: 12px; }
+.report-summary article { padding: 9px 14px; border-radius: 6px; border: 1px solid #e1e7ef; background: #fff; box-shadow: 0 2px 9px rgba(29,45,75,.035); }
+.report-summary span { display: block; color: #718096; font-size: 12px; line-height: 1.3; margin-bottom: 3px; }
+.report-summary strong { font-size: 20px; line-height: 1.2; color: #17345b; }
+.report-summary .balance-summary { background: #fff8f1; border-color: #ffdfbd; }
+.balance-summary strong { color: #c9560c; }
+.review-notice { display: flex; align-items: center; gap: 8px; padding: 12px 15px; background: #fffbeb; border: 1px solid #f2d68d; color: #8d621b; border-radius: 6px; font-size: 13px; }
+.results-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px; }
+.results-heading h2 { font-size: 16px; font-weight: 600; margin: 0 0 6px; }
+.school-brand { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.school-brand img { width: 40px; height: 40px; object-fit: contain; flex-shrink: 0; }
+.school-brand strong { font-size: 16px; line-height: 1.3; color: #17345b; }
+.results-heading > span { color: #718096; font-size: 12px; white-space: nowrap; }
+.report-tools { display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: 12px; }
+.report-tools > span { color: #718096; font-size: 12px; }
+.print-report-button { display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; border: 1px solid #ff6b00; border-radius: 5px; background: #fff; color: #e65e00; font-size: 12px; font-weight: 600; white-space: nowrap; }
+.print-report-button:hover { background: #fff8f1; }
+.print-help { padding: 0 20px 12px; margin: 0; font-size: 11px; color: #718096; }
+.print-error { margin: 0; padding: 0 20px 12px; font-size: 12px; color: #b9382b; }
+.table-scroll { overflow-x: auto; }
+.due-table { width: 100%; min-width: 740px; border-collapse: collapse; font-size: 13px; }
+.due-table thead th { background: #f5f7fb; color: #243c5c; text-align: left; font-size: 12px; font-weight: 700; padding: 13px 20px; border-top: 1px solid #e0e6ef; border-bottom: 1px solid #dce4ef; }
+.due-table td, .due-table tbody th { padding: 8px 20px; border-bottom: 1px solid #e4e9f1; vertical-align: middle; }
+.due-table tbody .student-cell { width: 27%; text-align: left; font-weight: 400; border-right: 1px solid #e4e9f1; border-bottom: 2px solid #ced8e6; background: #fcfdff; }
+.student-cell strong { display: block; font-size: 14px; color: #17345b; font-weight: 600; }
+.student-class { display: block; color: #52647d; font-size: 12px; margin-top: 2px; }
+.student-cell small { display: block; font-size: 11px; color: #8290a4; margin-top: 2px; }
+.fee-name { width: 22%; font-weight: 500; }
+.fee-session { display: block; font-size: 11px; font-weight: 400; color: #718096; margin-top: 2px; }
+.installments-cell { line-height: 1.4; }
+.due-table .amount-cell { text-align: right; white-space: nowrap; }
+.due-table tbody td.amount-cell { color: #c34b30; font-weight: 600; }
+.due-table .student-last-row td { border-bottom: 2px solid #ced8e6; }
+.due-table tfoot td { background: #f5f7fb; font-weight: 700; padding: 15px 20px; }
+.review-message { display: block; color: #a86c12; font-size: 11px; margin-top: 5px; max-width: 360px; }
+.review-label { color: #a86c12; background: #fff6dc; border-radius: 4px; padding: 4px 7px; font-size: 11px; }
+.report-pagination, .pagination-actions { display: flex; align-items: center; gap: 10px; }
+.report-pagination { justify-content: space-between; padding: 15px 20px; color: #718096; font-size: 12px; }
+.pagination-actions select, .pagination-actions button { height: 30px; border: 1px solid #d5deea; background: #fff; border-radius: 4px; color: #17345b; }
+.pagination-actions select { padding: 0 6px; }
+.pagination-actions button { width: 30px; }
+@media (max-width: 1100px) { .filter-card { grid-template-columns: repeat(3, minmax(0, 1fr)); } .filter-actions { grid-column: 1 / -1; margin-top: 0; } }
+@media (max-width: 991px) { .due-report-page { max-width: none; } .page-heading { align-items: flex-start; } }
+@media (max-width: 767px) { .filter-card { grid-template-columns: repeat(2, minmax(0, 1fr)); } .school-scope { display: none; } .report-summary { grid-template-columns: 1fr 1fr; } .report-summary .balance-summary { grid-column: 1 / -1; } .report-pagination { align-items: flex-start; flex-direction: column; } .results-heading { align-items: flex-start; flex-wrap: wrap; } }
+@media (max-width: 575px) { .due-report-page { padding: 0 12px; } .page-heading { margin-top: 0; } .page-heading p { line-height: 1.5; } }
+@media (max-width: 420px) { .filter-card { grid-template-columns: minmax(0, 1fr); } .filter-actions button { flex: 1; } .pagination-actions { flex-wrap: wrap; } }

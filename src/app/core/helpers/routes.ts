@@ -1145,6 +1145,9 @@ export class routes {
   public static get schoolReceiptList(): string {
     return this.schoolManagement + '/school-receipt-list';
   }
+  public static get feeDueReport(): string {
+    return this.schoolManagement + '/fee-due-report';
+  }
   public static get studentAcademic(): string {
     return this.schoolManagement + '/student-academic';
   }

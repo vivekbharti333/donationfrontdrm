@@ -735,14 +735,42 @@ private currentDateTimeLocal(): string {
   printReceipt(): void {
     const receipt = document.getElementById('printArea');
     if (!receipt) return;
-    const printWindow = window.open('', '_blank', 'width=1000,height=900');
-    if (!printWindow) return;
-    const documentStyles = Array.from(document.querySelectorAll('link[rel="stylesheet"], style'))
-      .map(node => node.outerHTML).join('');
-    printWindow.document.open();
-    printWindow.document.write(`<!doctype html><html><head><title>${this.receiptForm.value.receiptNumber || 'Fee Receipt'}</title>${documentStyles}<style>@page{size:A4 portrait;margin:8mm}body{margin:0;background:#fff}.print-receipt{box-shadow:none!important;margin:0 auto!important;max-width:none!important}</style></head><body>${receipt.outerHTML}</body></html>`);
-    printWindow.document.close();
-    printWindow.onload = () => { printWindow.focus(); printWindow.print(); printWindow.close(); };
+    const styles = Array.from(document.querySelectorAll('link[rel="stylesheet"], style')).map(node => node.outerHTML).join('');
+    const printFrame = document.createElement('iframe');
+    printFrame.setAttribute('title', 'Fee receipt print frame');
+    printFrame.style.position = 'fixed';
+    printFrame.style.right = '0';
+    printFrame.style.bottom = '0';
+    printFrame.style.width = '210mm';
+    printFrame.style.height = '297mm';
+    printFrame.style.border = '0';
+    printFrame.style.opacity = '0';
+    printFrame.style.pointerEvents = 'none';
+    document.body.appendChild(printFrame);
+
+    const frameWindow = printFrame.contentWindow;
+    const frameDocument = printFrame.contentDocument;
+    if (!frameWindow || !frameDocument) {
+      printFrame.remove();
+      return;
+    }
+
+    printFrame.onload = async () => {
+      await frameDocument.fonts.ready;
+      await Promise.all(Array.from(frameDocument.images).map(image =>
+        image.decode().catch(() => undefined)));
+      frameWindow.focus();
+      frameWindow.print();
+      window.setTimeout(() => printFrame.remove(), 1000);
+    };
+    frameDocument.open();
+    frameDocument.write(`<!doctype html><html><head><title>${this.receiptForm.value.receiptNumber || 'Fee Receipt'}</title>${styles}<style>
+      @page{size:A4 portrait;margin:5mm}
+      html,body{margin:0!important;padding:0!important;background:#fff;width:200mm}
+      .receipt-half-sheet{position:relative;width:200mm;height:143mm;margin:0;padding:0}
+      #printArea.print-receipt{position:static!important;box-sizing:border-box;width:200mm!important;margin:0!important;max-width:none!important;box-shadow:none!important}
+    </style></head><body><div class="receipt-half-sheet">${receipt.outerHTML}</div></body></html>`);
+    frameDocument.close();
   }
 
   asFormGroup(control: any): FormGroup {
