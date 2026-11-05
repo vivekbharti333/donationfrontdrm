@@ -228,6 +228,10 @@ export class SchoolManagementService {
 
   changeStudentAcademicStatus(id:number,status:string):Observable<any>{return this.academicAction('changeStudentAcademicStatus',{id,status});}
   deleteStudentAcademic(id:number):Observable<any>{return this.academicAction('deleteStudentAcademic',{id});}
+  removeStudent(id: number): Observable<any> {
+    return this.academicAction('removeStudent', { id });
+  }
+
   private academicAction(endpoint:string,value:any):Observable<any>{
     const user=this.authenticationService.getLoginUser();const token=user?.token||this.cookieService.get('token');
     const options=token?{headers:new HttpHeaders({Authorization:'Bearer '+token})}:{};

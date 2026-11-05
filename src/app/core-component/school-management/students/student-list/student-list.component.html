@@ -120,7 +120,7 @@
                       <i class="feather icon-download feather-download"></i>
                     </a>
 
-                <a class="student-action delete-action confirm-text" href="javascript:void(0);" title="Delete student" (click)="confirmColor(data.loginId)">
+                <a class="student-action delete-action confirm-text" href="javascript:void(0);" title="Delete student" (click)="removeStudent(data)">
                   <i class="feather icon-trash-2 feather-trash-2"></i></a>
               </div>
             </td>
@@ -192,7 +192,7 @@
           <button type="button" class="icon-btn" title="Download admission details" (click)="downloadAdmissionDetails(student.id)">
             <i class="feather icon-download download-icon"></i>
           </button>
-          <button type="button" class="icon-btn" title="Delete student" (click)="confirmColor(student.loginId)">
+          <button type="button" class="icon-btn" title="Delete student" (click)="removeStudent(student)">
             <i class="feather icon-trash-2 delete-icon"></i>
           </button>
         </div>

@@ -492,14 +492,15 @@ export class StudentListComponent implements OnDestroy {
     this.serialNumberArray = []; // Clear serial number array before fetching new data
 
     this.schoolManagementService.getStudentDetails().subscribe((apiRes: any) => {
-      this.totalData = apiRes.totalNumber; // Set total data count
-      this.fullData = apiRes.listPayload;  // Store the full dataset
+      this.totalData = Number(apiRes.totalNumber ?? 0); // Set total data count
+      this.fullData = apiRes.listPayload ?? [];  // Store the full dataset
 
       this.pagination.tablePageSize.subscribe((res: tablePageSize) => {
         if (this.router.url === this.routes.studentsList) {
           this.pageSize = res.pageSize;
           // Use the full dataset for pagination
-          this.prepareTableData(this.fullData, { skip: res.skip, limit: res.skip + res.pageSize });
+          const skip = res.skip < this.fullData.length ? res.skip : 0;
+          this.prepareTableData(this.fullData, { skip, limit: skip + res.pageSize });
           this.pageSize = res.pageSize;
         }
       });
@@ -581,8 +582,29 @@ export class StudentListComponent implements OnDestroy {
     };
   }
 
-  confirmColor(userId: string) {
+  private removingStudent = false;
 
+  removeStudent(student: any): void {
+    if (this.removingStudent || !student?.id) return;
+    const name = [student.firstName, student.lastName].filter(Boolean).join(' ') || 'this student';
+    if (!window.confirm('Remove ' + name + ' from Student List? Linked academic and fee records will be kept.')) return;
+
+    this.removingStudent = true;
+    this.schoolManagementService.removeStudent(student.id).subscribe({
+      next: response => {
+        this.removingStudent = false;
+        if (Number(response?.responseCode) !== 200 || Number(response?.payload?.respCode) !== 200) {
+          this.messageService.add({ severity: 'error', summary: 'Unable to remove student', detail: response?.responseMessage });
+          return;
+        }
+        this.messageService.add({ severity: 'success', summary: 'Student removed' });
+        this.getStudentDetails();
+      },
+      error: () => {
+        this.removingStudent = false;
+        this.messageService.add({ severity: 'error', summary: 'Unable to remove student' });
+      }
+    });
   }
 
   openEditModal(templateRef: TemplateRef<any>, rawData: any): void {
