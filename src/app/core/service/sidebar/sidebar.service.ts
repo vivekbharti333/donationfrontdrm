@@ -439,6 +439,11 @@ export class SidebarService {
               permission: 'fee-assignment',
             },
             {
+              menuValue: 'Grading Scale',
+              route: routes.gradingScale,
+              permission: 'fee-assignment',
+            },
+            {
               menuValue: 'Exam Schedule',
               route: routes.examSchedule,
               permission: 'fee-assignment',
@@ -446,11 +451,6 @@ export class SidebarService {
             {
               menuValue: 'Student Exam Marks',
               route: routes.studentExamMarks,
-              permission: 'fee-assignment',
-            },
-            {
-              menuValue: 'Grading Scale',
-              route: routes.gradingScale,
               permission: 'fee-assignment',
             },
             {

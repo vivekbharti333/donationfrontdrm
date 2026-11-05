@@ -34,6 +34,11 @@ export class StudentExamMarksService {
     return this.post('addStudentExamMarks', { ...this.marksPayload(value), evaluatedBy: this.loginId });
   }
 
+  addStudentExamMarksBatch(examId:number,studentAcademicId:number,marks:any[]):Observable<any>{
+    return this.post('addStudentExamMarksBatch',{examId:Number(examId),studentAcademicId:Number(studentAcademicId),
+      superadminId:this.superadminId,evaluatedBy:this.loginId,marks:marks.map(row=>this.marksPayload({...row,studentAcademicId}))});
+  }
+
   updateStudentExamMarks(value: any): Observable<any> {
     return this.post('updateStudentExamMarks', { id: Number(value?.id), ...this.marksPayload(value), evaluatedBy: this.loginId });
   }

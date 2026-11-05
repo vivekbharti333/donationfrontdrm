@@ -226,6 +226,14 @@ export class SchoolManagementService {
     return this.http.post<any>(Constant.Site_Url + 'getStudentAcademicByStudentId', request, options);
   }
 
+  changeStudentAcademicStatus(id:number,status:string):Observable<any>{return this.academicAction('changeStudentAcademicStatus',{id,status});}
+  deleteStudentAcademic(id:number):Observable<any>{return this.academicAction('deleteStudentAcademic',{id});}
+  private academicAction(endpoint:string,value:any):Observable<any>{
+    const user=this.authenticationService.getLoginUser();const token=user?.token||this.cookieService.get('token');
+    const options=token?{headers:new HttpHeaders({Authorization:'Bearer '+token})}:{};
+    return this.http.post<any>(Constant.Site_Url+endpoint,{payload:{...value,superadminId:user?.superadminId||this.cookieService.get('superadminId'),createdBy:user?.loginId||this.cookieService.get('loginId')}},options);
+  }
+
   updateStudentAcademic(academicDetails: any): Observable<any> {
     const token = this.cookieService.get('token');
     const currentUser = this.authenticationService.getLoginUser();

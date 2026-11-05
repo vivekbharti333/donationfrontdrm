@@ -33,6 +33,12 @@ export class StudentAcademicComponent implements OnInit, OnDestroy {
   public promoteAcademicForm!: FormGroup;
   public isUpdating = false;
   public isPromoting = false;
+  public actionStudent:any=null;
+  public academicAction:'status'|'delete'='status';
+  public actionStatus='INACTIVE';
+  public isActionSaving=false;
+  public actionError='';
+  private actionDialog?:MatDialogRef<any>;
   public selectedStudentName = '';
   public selectedStudentPicture = '';
   public selectedStudentSuperadminId = '';
@@ -101,7 +107,7 @@ export class StudentAcademicComponent implements OnInit, OnDestroy {
           this.errorMessage = '';
         } else {
           this.fullData = [];
-          this.errorMessage = response?.responseMessage || 'No student academic details were returned.';
+          this.errorMessage = Number(response?.responseCode)===204?'':response?.responseMessage || 'No student academic details were returned.';
         }
         this.currentSkip = 0;
         this.applySearchAndPagination();
@@ -187,11 +193,33 @@ export class StudentAcademicComponent implements OnInit, OnDestroy {
     image.src = 'assets/img/profiles/avatar-02.jpg';
   }
 
+  public openAcademicAction(template:TemplateRef<any>,student:any,action:'status'|'delete'):void{
+    if(!student?.studentAcademicId){this.messageService.add({severity:'error',summary:'Unable to continue',detail:'Academic record ID is missing. Refresh after updating the backend.'});return;}
+    this.actionStudent=student;this.academicAction=action;this.actionStatus='INACTIVE';this.actionError='';
+    this.actionDialog=this.dialog.open(template,{width:'520px',maxWidth:'96vw',disableClose:true,panelClass:'custom-modal'});
+  }
+  public saveAcademicAction():void{
+    if(this.isActionSaving||!this.actionStudent?.studentAcademicId)return;
+    this.isActionSaving=true;this.actionError='';
+    const request=this.academicAction==='delete'
+      ?this.schoolManagementService.deleteStudentAcademic(this.actionStudent.studentAcademicId)
+      :this.schoolManagementService.changeStudentAcademicStatus(this.actionStudent.studentAcademicId,this.actionStatus);
+    request.pipe(takeUntil(this.destroy$)).subscribe({next:(response:any)=>{
+      this.isActionSaving=false;
+      if(Number(response?.responseCode)!==200||Number(response?.payload?.respCode)!==200){
+        this.actionError=response?.payload?.respMesg||response?.responseMessage||'The action could not be completed.';return;
+      }
+      this.actionDialog?.close();this.messageService.add({severity:'success',summary:this.academicAction==='delete'?'Enrollment deleted':'Status updated',detail:response.payload.respMesg});
+      this.getStudentAcademicDetails();
+    },error:(error:any)=>{this.isActionSaving=false;this.actionError=error?.error?.responseMessage||'The action could not be completed. Please refresh and try again.';}});
+  }
+
   public openEditAcademic(template: TemplateRef<any>, student: any): void {
     this.selectedStudentName = this.studentName(student);
     this.selectedStudentPicture = student?.studentPicture || '';
     this.selectedStudentSuperadminId = String(student?.superadminId || '');
     this.editAcademicForm.reset({
+      id:student.studentAcademicId,
       studentId: student.studentId,
       sessionName: student.sessionName,
       grade: student.grade,
@@ -312,6 +340,7 @@ export class StudentAcademicComponent implements OnInit, OnDestroy {
 
   private createEditForm(): void {
     this.editAcademicForm = this.fb.group({
+      id:[null,Validators.required],
       studentId: [{ value: null, disabled: true }, Validators.required],
       sessionName: [{ value: '', disabled: true }, Validators.required],
       grade: ['', Validators.required],
