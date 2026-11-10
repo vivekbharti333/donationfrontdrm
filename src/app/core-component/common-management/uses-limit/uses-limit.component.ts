@@ -30,6 +30,11 @@ export class UsesLimitComponent implements OnInit {
     return [user.firstName, user.lastName].filter(Boolean).join(' ').trim() || user.loginId;
   }
 
+  getSuperadminLabel(user: SuperadminOption): string {
+    const name = this.getSuperadminName(user);
+    return name === user.loginId ? name : `${name} (${user.loginId})`;
+  }
+
   getSuperadminList(): void {
     this.loadingNgos = true;
     this.ngoError = '';

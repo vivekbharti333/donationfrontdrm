@@ -120,7 +120,7 @@
                       <i class="feather icon-download feather-download"></i>
                     </a>
 
-                <a class="student-action delete-action confirm-text" href="javascript:void(0);" title="Delete student" (click)="removeStudent(data)">
+                <a class="student-action delete-action confirm-text" href="javascript:void(0);" title="Delete student" (click)="openRemoveStudentDialog(removeStudentConfirmation, data)">
                   <i class="feather icon-trash-2 feather-trash-2"></i></a>
               </div>
             </td>
@@ -192,7 +192,7 @@
           <button type="button" class="icon-btn" title="Download admission details" (click)="downloadAdmissionDetails(student.id)">
             <i class="feather icon-download download-icon"></i>
           </button>
-          <button type="button" class="icon-btn" title="Delete student" (click)="removeStudent(student)">
+          <button type="button" class="icon-btn" title="Delete student" (click)="openRemoveStudentDialog(removeStudentConfirmation, student)">
             <i class="feather icon-trash-2 delete-icon"></i>
           </button>
         </div>
@@ -587,4 +587,21 @@
       </div>
 
     </mat-dialog-content>
+  </ng-template>
+
+  <ng-template #removeStudentConfirmation>
+    <h2 mat-dialog-title class="enrollment-title">Remove Student</h2>
+    <mat-dialog-content class="dialog-content">
+      <div class="enrollment-summary" *ngIf="selectedStudentForRemoval as student">
+        <strong>{{ student.firstName }} {{ student.middleName }} {{ student.lastName }}</strong>
+        <small>Admission No: {{ student.admissionNo || '—' }}</small>
+      </div>
+      <p>Remove this student from the Student List? Linked academic and fee records will be kept.</p>
+    </mat-dialog-content>
+    <mat-dialog-actions align="end" class="student-dialog-actions px-4 pb-4 gap-2">
+      <button type="button" class="btn btn-light" mat-dialog-close [disabled]="removingStudent">Cancel</button>
+      <button type="button" class="btn btn-danger" [disabled]="removingStudent" (click)="confirmRemoveStudent()">
+        {{ removingStudent ? 'Removing...' : 'Remove Student' }}
+      </button>
+    </mat-dialog-actions>
   </ng-template>

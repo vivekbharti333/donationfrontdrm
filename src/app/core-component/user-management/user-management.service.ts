@@ -138,6 +138,20 @@ export class UserManagementService {
     return  this.http.post<any>(Constant.Site_Url+"changeUserStatus",request);
   }
 
+  updateUserValidity(loginId: string, validityExpireOnDate: string): Observable<any> {
+    const loginUser = this.authenticationService.getLoginUser() || {};
+    const request = {
+      payload: {
+        loginId,
+        validityExpireOnDate,
+        token: loginUser['token'] || this.cookieService.get('token'),
+        createdBy: loginUser['loginId'] || this.cookieService.get('loginId'),
+        superadminId: loginUser['superadminId'] || this.cookieService.get('superadminId')
+      }
+    };
+    return this.http.post<any>(Constant.Site_Url + 'updateUserValidity', request);
+  }
+
 
   getAddressListByUserId(userId:any): Observable<any> {
     let request: any = {
@@ -170,10 +184,7 @@ export class UserManagementService {
         firstName: userDetails.firstName,
         lastName: userDetails.lastName,
         roleType: userDetails.roleType,
-        permissions: '[' + (userDetails.permissions || [])
-          .map((permission: string) => "'" + JSON.stringify(permission).slice(1, -1)
-            .replace(/'/g, '\\u0027') + "'")
-          .join(',') + ']',
+        permissions: JSON.stringify(userDetails.permissions || []),
         mobileNo: userDetails.mobileNo,
         alternateMobile: userDetails.alternateMobile,
         emailId: userDetails.emailId,
@@ -201,6 +212,7 @@ export class UserManagementService {
         alternateMobile: userDetails.alternateMobile,
         emailId: userDetails.emailId,
         dob: userDetails.dob,
+        permissions: JSON.stringify(userDetails.permissions || []),
         addressList: userDetails.addressList,
         requestedFor: 'WEB',
         token: this.loginUser['token'],

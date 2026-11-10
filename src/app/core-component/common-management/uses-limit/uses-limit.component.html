@@ -13,7 +13,7 @@
         <select aria-label="Select NGO" [(ngModel)]="superadminId" (ngModelChange)="loadUsageLimits()"
           [disabled]="savingLimit || loadingNgos || !superadminList.length">
           <option value="" disabled>{{ loadingNgos ? 'Loading NGOs...' : 'Select NGO' }}</option>
-          <option *ngFor="let user of superadminList" [value]="user.loginId">{{ getSuperadminName(user) }}</option>
+          <option *ngFor="let user of superadminList" [value]="user.loginId">{{ getSuperadminLabel(user) }}</option>
         </select>
       </div>
       <p *ngIf="ngoError" role="alert">{{ ngoError }}</p>

@@ -37,6 +37,9 @@ export class StudentListComponent implements OnDestroy {
   public gradeOptions: any[] = [];
   public isGradesLoading = false;
   public isAssigningClass = false;
+  public removingStudent = false;
+  public selectedStudentForRemoval: any = null;
+  public removeStudentDialog: any;
   public isAcademicLoading = false;
   public academicLoadError = '';
   public academicRecords: any[] = [];
@@ -582,13 +585,21 @@ export class StudentListComponent implements OnDestroy {
     };
   }
 
-  private removingStudent = false;
-
-  removeStudent(student: any): void {
+  openRemoveStudentDialog(templateRef: TemplateRef<any>, student: any): void {
     if (this.removingStudent || !student?.id) return;
-    const name = [student.firstName, student.lastName].filter(Boolean).join(' ') || 'this student';
-    if (!window.confirm('Remove ' + name + ' from Student List? Linked academic and fee records will be kept.')) return;
+    this.selectedStudentForRemoval = student;
+    this.removeStudentDialog = this.dialog.open(templateRef, {
+      width: '520px',
+      maxWidth: '96vw',
+      disableClose: true,
+      panelClass: 'custom-modal'
+    });
+    this.removeStudentDialog.afterClosed().subscribe(() => this.selectedStudentForRemoval = null);
+  }
 
+  confirmRemoveStudent(): void {
+    const student = this.selectedStudentForRemoval;
+    if (this.removingStudent || !student?.id) return;
     this.removingStudent = true;
     this.schoolManagementService.removeStudent(student.id).subscribe({
       next: response => {
@@ -599,6 +610,7 @@ export class StudentListComponent implements OnDestroy {
         }
         this.messageService.add({ severity: 'success', summary: 'Student removed' });
         this.getStudentDetails();
+        this.removeStudentDialog?.close();
       },
       error: () => {
         this.removingStudent = false;

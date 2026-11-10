@@ -21,6 +21,7 @@ import { CookieService } from 'ngx-cookie-service';
 import { Constant } from 'src/app/core/constant/constants';
 import { FormGroup, FormArray, FormBuilder, Validators} from '@angular/forms';
 import { AuthenticationService } from 'src/app/auth/authentication.service'; 
+import { parsePermissions } from 'src/app/core/helpers/dashboard-permissions';
 
 interface data {
   value: string;
@@ -44,6 +45,10 @@ export class UsersComponent {
   public teamLeaderForm!: FormGroup;
 
   public userUpdateDialog: any;
+  public validityDialog: any;
+  public validityUser: any = null;
+  public validityExpireOnDate = '';
+  public isUpdatingValidity = false;
 
   public fullData: any[] = [];
   public teamLeaderList: any;
@@ -129,15 +134,33 @@ export class UsersComponent {
     }
   }
 
-  permissionsList: data[] =[
-    { value: 'admin-dashboard', name: 'Lead Dashboard' },
-    { value: 'sale-dashboard', name: 'Donation Dashboard' },
+  public permissionsList: data[] = [];
+  private readonly donationPermissionOptions: data[] = [
+    { value: 'donation-dashboard', name: 'Donation Dashboard' },
     { value: 'create-user', name: 'Create User' },
     { value: 'user-list', name: 'User List' },
-    { value: 'create-lead', name: 'Create Lead' },
-    { value: 'lead-list', name: 'Lead List' },
+    { value: 'add-donation', name: 'Add Donation' },
+    { value: 'all-donation-list', name: 'Donation List' },
+    { value: 'payment-mode', name: 'Payment Mode' },
+    { value: 'payment-report', name: 'Payment Report' },
+    { value: 'program', name: 'Donation Program' },
+    { value: 'admin-dashboard', name: 'Donation Lead Dashboard' },
+    { value: 'create-lead', name: 'Create Donation Lead' },
+    { value: 'lead-list', name: 'Donation Lead List' },
     { value: 'general-setting', name: 'General Setting' },
-    { value: 'company-setting', name: 'Company Setting' }
+    { value: 'company-setting', name: 'NGO Invoice Setting' }
+  ];
+  private readonly schoolPermissionOptions: data[] = [
+    { value: 'school-dashboard', name: 'School Dashboard' },
+    { value: 'add-student', name: 'Add Student' },
+    { value: 'student-list', name: 'Student List' },
+    { value: 'generate-school-receipt', name: 'Generate School Receipt' },
+    { value: 'school-receipt-list', name: 'School Receipt List' },
+    { value: 'student-academic', name: 'Student Academic' },
+    { value: 'fee-type', name: 'Fee Type' },
+    { value: 'fee-structure', name: 'Fee Structure' },
+    { value: 'fee-assignment', name: 'Fee Assignment' },
+    { value: 'grade', name: 'Grade' }
   ];
 
 
@@ -220,31 +243,43 @@ export class UsersComponent {
   }
 
   openEditModal(templateRef: TemplateRef<any>, user: any): void {
+    this.permissionsList = String(user?.service || '').toUpperCase().includes('SCHOOL')
+      ? this.schoolPermissionOptions
+      : this.donationPermissionOptions;
     this.editUserSuperadminId = String(
       user?.superadminId || this.loginUser?.superadminId || this.loginUser?.loginId || ''
     );
     this.getAddressDetailsByUserId(user, () => {
-      const addressListCopy = Array.isArray(this.userAddressList) ? [...this.userAddressList] : [];
-  
+      const addressMap = new Map<string, any>();
+      if (Array.isArray(this.userAddressList)) {
+        this.userAddressList.forEach(addr => {
+          if (addr?.addressType) {
+            addressMap.set(String(addr.addressType).toUpperCase(), addr);
+          }
+        });
+      }
+
       // Clear existing addressList FormArray
       this.addressList.clear();
-  
-      // Re-populate FormArray based on addressListCopy
-      for (let i = 0; i < addressListCopy.length; i++) {
+
+      // Always provide Current and Permanent address forms
+      const addressTypes = ['CURRENT', 'PERMANENT'];
+      addressTypes.forEach(type => {
+        const existing = addressMap.get(type);
         const addressGroup = this.addressForm();
         addressGroup.patchValue({
-          addressType: addressListCopy[i].addressType,
-          addressLine: addressListCopy[i].addressLine,
-          landmark: addressListCopy[i].landmark,
-          district: addressListCopy[i].district,
-          city: addressListCopy[i].city,
-          state: addressListCopy[i].state,
-          country: addressListCopy[i].country || 'INDIA',
-          pincode: addressListCopy[i].pincode,
+          addressType: type,
+          addressLine: existing?.addressLine || '',
+          landmark: existing?.landmark || '',
+          district: existing?.district || '',
+          city: existing?.city || '',
+          state: existing?.state || '',
+          country: existing?.country || 'INDIA',
+          pincode: existing?.pincode || '',
         });
         this.addressList.push(addressGroup);
-      }
-  
+      });
+
       const formattedDob = user['dob']
         ? new Date(user['dob']).toISOString().split('T')[0]
         : '';
@@ -260,7 +295,7 @@ export class UsersComponent {
         dob: formattedDob,
         userPicture: user['userPicture'],
         createdBy: user['createdBy'],
-        permissions: user['permissions'] || ''
+        permissions: parsePermissions(user['permissions'])
       });
   
       this.userPhoto = this.userImageUrl(user);
@@ -273,6 +308,67 @@ export class UsersComponent {
         panelClass: ['custom-modal', 'user-edit-dialog'],
       });
     });
+  }
+
+  openValidityModal(templateRef: TemplateRef<any>, user: any): void {
+    if (!this.canUpdateValidity(user) || !user?.loginId) return;
+    this.validityUser = user;
+    this.validityExpireOnDate = this.formatValidityDateForInput(user.validityExpireOn);
+    this.validityDialog = this.dialog.open(templateRef, {
+      width: '480px',
+      maxWidth: '95vw',
+      disableClose: true,
+      panelClass: 'custom-modal'
+    });
+    this.validityDialog.afterClosed().subscribe(() => {
+      this.validityUser = null;
+      this.validityExpireOnDate = '';
+    });
+  }
+
+  saveUserValidity(): void {
+    if (!this.canUpdateValidity(this.validityUser) || this.isUpdatingValidity || !this.validityUser?.loginId || !this.validityExpireOnDate) return;
+    this.isUpdatingValidity = true;
+    this.userManagementService.updateUserValidity(this.validityUser.loginId, this.validityExpireOnDate).subscribe({
+      next: (response: any) => {
+        this.isUpdatingValidity = false;
+        if (Number(response?.responseCode) !== 200 || Number(response?.payload?.respCode) !== 200) {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Unable to update validity',
+            detail: response?.responseMessage || response?.payload?.respMesg
+          });
+          return;
+        }
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Validity updated',
+          detail: response?.payload?.respMesg
+        });
+        this.validityDialog?.close();
+        this.getUserDetails();
+      },
+      error: () => {
+        this.isUpdatingValidity = false;
+        this.messageService.add({ severity: 'error', summary: 'Unable to update validity' });
+      }
+    });
+  }
+
+  private formatValidityDateForInput(value: any): string {
+    if (!value) return '';
+    const datePrefix = /^(\d{4}-\d{2}-\d{2})/.exec(String(value));
+    if (datePrefix) return datePrefix[1];
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return '';
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  canUpdateValidity(user: any): boolean {
+    return this.isMainAdmin && String(user?.roleType || '').toUpperCase() === Constant.superAdmin;
   }
   
   

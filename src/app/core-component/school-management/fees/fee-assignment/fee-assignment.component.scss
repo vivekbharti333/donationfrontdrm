@@ -21,4 +21,36 @@ button, input, select, textarea { font: inherit; }.assignment-page button { alig
 .summary { background: #fff8f1; border: 1px solid #f2d9c3; border-radius: 5px; padding: 9px 12px; }.summary h4 { font-size: 14px; margin: 0 0 8px; }.summary p { display: flex; font-size: 12px; justify-content: space-between; line-height: 1.2; margin: 0 0 7px; }.summary .discount strong { color: #009b72; }.summary hr { border: 0; border-top: 1px solid #ead8c8; margin: 7px 0; }.summary .payable { margin: 0 0 7px; }.summary .payable strong { color: #e96500; font-size: 13px; }.summary .balance { margin-bottom: 0; }.summary .balance strong { color: #d92d20; font-size: 13px; }.fee-area aside label span { color: #697386; display: block; font-size: 11px; margin: 12px 0 6px; }.fee-area textarea { border: 1px solid #ccd4e0; border-radius: 4px; font-size: 12px; min-height: 82px; padding: 9px; resize: vertical; width: 100%; }.select-prompt { color: #7b8496; padding: 150px 20px; text-align: center; }.select-prompt i { font-size: 32px; }
 .page-actions { display: flex; gap: 12px; justify-content: flex-end; padding-top: 16px; }.page-actions button { min-width: 98px; }.assignment-page .save-btn { background: #ff7300; border-color: #ff7300; color: #fff; min-width: 140px; }.save-btn:disabled { opacity: .5; }
 @media (max-width: 1200px) { .assignment-grid { grid-template-columns: 1fr !important; }.panel-resizer { display: none; }.top-filters { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 700px) { .top-filters { grid-template-columns: 1fr; }.student-toolbar { grid-template-columns: 1fr 1fr; }.search-box { grid-column: 1 / -1; }.fee-area { grid-template-columns: 1fr; }.list-footer { align-items: flex-start; flex-direction: column; gap: 10px; }.page-actions { flex-wrap: wrap; } }
+@media (max-width: 700px) {
+	.top-filters { grid-template-columns: 1fr; }
+	.student-toolbar { grid-template-columns: 1fr 1fr; }
+	.search-box { grid-column: 1 / -1; }
+	.fee-area { grid-template-columns: 1fr; }
+	.fee-table table { border: 0; display: block; overflow: visible; }
+	.fee-table thead { display: none; }
+	.fee-table tbody { display: grid; gap: 10px; }
+	.fee-table tbody tr:not(.empty-row) { background: #fff; border: 1px solid #dfe4ea; border-radius: 5px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); min-width: 0; }
+	.fee-table tbody tr:not(.empty-row) td { border-bottom: 1px solid #eef0f3; display: block; min-width: 0; overflow-wrap: anywhere; padding: 8px; }
+	.fee-table tbody tr:not(.empty-row) td::before { color: #667085; content: attr(data-label); display: block; font-size: 10px; font-weight: 600; margin-bottom: 4px; }
+	.fee-table tbody tr:not(.empty-row) td:first-child { grid-column: 1 / -1; }
+	.fee-table tbody tr.empty-row { display: block; }
+	.fee-table tbody tr.empty-row td { display: block; text-align: center; }
+	.discount-editor { flex-wrap: wrap; min-width: 0; }
+	.fee-table .discount-editor input { flex: 1 1 60px; max-width: 100%; min-width: 0; width: auto; }
+	.fee-table .discount-editor button { flex: 0 0 30px; }
+	.fee-actions { flex-wrap: wrap; }
+	.list-footer { align-items: flex-start; flex-direction: column; gap: 10px; }
+	.summary { padding: 12px 14px; width: 100%; }
+	.summary h4 { font-size: 15px; margin-bottom: 10px; }
+	.summary p { font-size: 13px; line-height: 1.35; margin-bottom: 8px; }
+	.page-actions { display: grid; gap: 8px; grid-template-columns: repeat(2, minmax(0, 1fr)); padding-top: 14px; width: 100%; }
+	.page-actions button { min-height: 42px; min-width: 0; width: 100%; }
+	.page-actions .save-btn { grid-column: 1 / -1; }
+	.student-card { align-items: flex-start; flex-wrap: wrap; gap: 12px; padding: 12px; }
+	.student-card img { flex-basis: 56px; height: 56px; width: 56px; }
+	.student-info { flex: 1 1 calc(100% - 68px); min-width: 0; }
+	.student-info h3, .student-info p { overflow-wrap: anywhere; }
+	.student-info p { line-height: 1.45; }
+	.student-info p i { display: none; }
+	.student-card .assignment-status { flex: 1 1 100%; margin: 0; width: 100%; }
+}

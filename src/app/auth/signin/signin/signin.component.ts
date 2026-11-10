@@ -6,7 +6,7 @@ import { UserManagementService } from 'src/app/core-component/user-management/us
 import { MessageService } from 'primeng/api';
 import { CommonComponentService } from 'src/app/common-component/common-component.service';
 import { CookieService } from 'ngx-cookie-service';
-import { parsePermissions, permittedDashboardRoutes } from 'src/app/core/helpers/dashboard-permissions';
+import { parsePermissions, permissionsWithDashboardFallback, permittedDashboardRoutes } from 'src/app/core/helpers/dashboard-permissions';
 
 @Component({
   selector: 'app-signin',
@@ -63,7 +63,10 @@ export class SigninComponent {
             if (response['payload']['respCode'] == '200') {
               localStorage.clear();
               localStorage.setItem('authorized', 'true');
-              const permission = parsePermissions(response['payload']['permissions']);
+              const permission = permissionsWithDashboardFallback(
+                parsePermissions(response['payload']['permissions']),
+                response['payload']['roleType']
+              );
               localStorage.setItem('menuPermission', JSON.stringify(permission));
               localStorage.setItem('userPicture', (response['payload']['userPicture']));
 

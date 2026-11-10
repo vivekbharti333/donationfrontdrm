@@ -175,6 +175,14 @@
 .user-action-btn:hover { transform: translateY(-1px); }
 .user-action-btn.edit-action:hover { border-color: #93c5fd; background: #eff6ff; }
 .user-action-btn.delete-action:hover { border-color: #fca5a5; background: #fef2f2; }
+.validity-cell { white-space: nowrap; }
+.user-validity-edit { display: inline-grid; place-items: center; width: 30px; height: 30px; margin-left: 8px; padding: 0; border: 1px solid #fed7aa; border-radius: 7px; background: #fff7ed; color: #c2410c; }
+.user-validity-edit:hover { border-color: #fdba74; background: #ffedd5; }
+.user-validity-content { padding: 20px 24px 12px; }
+.user-validity-content .form-label { display: block; margin-bottom: 7px; color: #475467; font-size: 13px; font-weight: 700; }
+.user-validity-content .form-control { min-height: 42px; border: 1px solid #dfe3e9; border-radius: 8px; }
+.user-validity-content p { margin: 8px 0 0; color: #697386; font-size: 12px; }
+.user-validity-actions { display: flex; justify-content: flex-end; gap: 10px; padding: 10px 24px 18px; }
 
 /* -----------------------------------------
    BADGE BUTTONS (Desktop Status)

@@ -127,6 +127,7 @@
             <th mat-sort-header="userCode">User Code</th>
             <th mat-sort-header="role">Role</th>
             <th mat-sort-header="createdOn">Created On</th>
+            <th>Validity Expires On</th>
             <th mat-sort-header="status">Status</th>
             <th *ngIf="canManageUsers" class="no-sort">Action</th>
           </tr>
@@ -150,6 +151,13 @@
             <td>{{ data.userCode }}</td>
             <td><span class="role-pill">{{ data.roleType }}</span></td>
             <td>{{ data.createdAt | date : "dd-MM-yyyy | HH:mm" }}</td>
+            <td class="validity-cell">
+              <span>{{ data.validityExpireOn ? (data.validityExpireOn | date : 'dd-MM-yyyy') : '—' }}</span>
+              <button *ngIf="canUpdateValidity(data)" type="button" class="user-validity-edit" title="Update validity expiry"
+                aria-label="Update validity expiry" (click)="openValidityModal(validityDialogTemplate, data)">
+                <i class="feather icon-calendar" aria-hidden="true"></i>
+              </button>
+            </td>
             <td>
               <button
                 class="badge-button"
@@ -218,6 +226,7 @@
       <p><span class="label">User Code:</span> {{ u.userCode }}</p>
       <p><span class="label">User Role:</span> {{ u.roleType }}</p>
       <p><span class="label">Date:</span> {{ u.createdAt | date:'dd/MM/yyyy | HH:mm' }}</p>
+      <p><span class="label">Validity Expires On:</span> {{ u.validityExpireOn ? (u.validityExpireOn | date:'dd/MM/yyyy') : '—' }}</p>
     </div>
 
     <!-- ACTIONS -->
@@ -243,6 +252,11 @@
       </div>
 
       <div *ngIf="canManageUsers" class="right-actions">
+
+        <button *ngIf="canUpdateValidity(u)" type="button" class="icon-btn user-validity-edit" title="Update validity expiry"
+          aria-label="Update validity expiry" (click)="openValidityModal(validityDialogTemplate, u)">
+          <i class="feather icon-calendar"></i>
+        </button>
 
         <button class="icon-btn" (click)="openEditModal(dialogTemplate, u)">
           <i class="feather icon-edit edit-icon"></i>
@@ -418,8 +432,8 @@
                         </div>
 
                         <div class="row">
-                          <input class="form-control" *ngIf="i === 0" type="text" pInputText [value]="'BILLING'"formControlName="addressType" hidden>
-                          <input class="form-control" *ngIf="i === 1" type="text" pInputText [value]="'DELIVERY'" formControlName="addressType" hidden>
+                          <input class="form-control" *ngIf="i === 0" type="text" pInputText value="CURRENT" formControlName="addressType" hidden>
+                          <input class="form-control" *ngIf="i === 1" type="text" pInputText value="PERMANENT" formControlName="addressType" hidden>
                         </div>
 
                         <div class="row">
@@ -483,4 +497,31 @@
       <!-- <button mat-button (click)="dialog.close()">Close</button> -->
     </mat-dialog-actions>
   </form>
+</ng-template>
+
+<ng-template #validityDialogTemplate>
+  <div class="modalHeaderContainer user-edit-header">
+    <div>
+      <span class="edit-dialog-eyebrow">Account validity</span>
+      <h2 mat-dialog-title class="p-0">Update Expiry Date</h2>
+      <p>{{ validityUser?.firstName }} {{ validityUser?.lastName }} · {{ validityUser?.loginId }}</p>
+    </div>
+    <button type="button" mat-dialog-close class="user-edit-close" aria-label="Close validity dialog"
+      [disabled]="isUpdatingValidity">
+      <i class="feather icon-x" aria-hidden="true"></i>
+    </button>
+  </div>
+  <mat-dialog-content class="user-validity-content">
+    <label class="form-label" for="user-validity-expiry">Validity expires on</label>
+    <input id="user-validity-expiry" type="date" class="form-control" [(ngModel)]="validityExpireOnDate"
+      [ngModelOptions]="{ standalone: true }" [disabled]="isUpdatingValidity">
+    <p>Choose a past date to mark this account as expired.</p>
+  </mat-dialog-content>
+  <mat-dialog-actions class="user-validity-actions">
+    <button type="button" class="btn user-cancel-btn" mat-dialog-close [disabled]="isUpdatingValidity">Cancel</button>
+    <button type="button" class="btn btn-submit" (click)="saveUserValidity()"
+      [disabled]="!validityExpireOnDate || isUpdatingValidity">
+      {{ isUpdatingValidity ? 'Saving...' : 'Save Expiry Date' }}
+    </button>
+  </mat-dialog-actions>
 </ng-template>

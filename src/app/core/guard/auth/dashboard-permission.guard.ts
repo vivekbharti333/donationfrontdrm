@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, Router, UrlTree } from '@angular/router';
 import { AuthenticationService } from 'src/app/auth/authentication.service';
-import { parsePermissions, permittedDashboardRoutes } from '../../helpers/dashboard-permissions';
+import { parsePermissions, permissionsWithDashboardFallback, permittedDashboardRoutes } from '../../helpers/dashboard-permissions';
 import { routes } from '../../helpers/routes';
 
 @Injectable({ providedIn: 'root' })
@@ -12,7 +12,12 @@ export class DashboardPermissionGuard {
     if (!this.authentication.getLoginUser()) {
       return this.router.parseUrl(routes.signIn);
     }
-    const allowed = permittedDashboardRoutes(parsePermissions(localStorage.getItem('menuPermission')));
+    const user = this.authentication.getLoginUser();
+    const permissions = permissionsWithDashboardFallback(
+      parsePermissions(localStorage.getItem('menuPermission')),
+      user?.roleType
+    );
+    const allowed = permittedDashboardRoutes(permissions);
     const requested = `${routes.dashboard}/${route.routeConfig?.path || ''}`;
     return allowed.includes(requested)
       ? true
