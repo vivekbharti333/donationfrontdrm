@@ -596,7 +596,7 @@ export class GenerateSchoolReceiptComponent implements OnInit {
           const balance = recurring ? Number(fee?.installmentBalanceAmount ?? 0)
             : Number(fee?.balanceAmount ?? fee?.payableAmount ?? fee?.assignedAmount ?? 0);
           this.receiptDetails.push(this.fb.group({
-            selected: [fee.previousDue === true && balance > 0 && !installmentError],
+            selected: [balance > 0 && !installmentError],
             previousDue: [fee.previousDue === true],
             installmentName: [fee.installmentName || installmentName],
             studentFeeId: [fee?.id],
@@ -615,7 +615,13 @@ export class GenerateSchoolReceiptComponent implements OnInit {
             row.get('amount')?.disable({ emitEvent: false });
           }
         });
-        optionalCharges.forEach(row => this.receiptDetails.push(row));
+        const assignedRows = [...this.receiptDetails.controls];
+        this.receiptDetails.clear({ emitEvent: false });
+        [
+          ...assignedRows.filter(row => !this.isZeroBalanceFee(row)),
+          ...optionalCharges,
+          ...assignedRows.filter(row => this.isZeroBalanceFee(row))
+        ].forEach(row => this.receiptDetails.push(row, { emitEvent: false }));
         this.receiptForm.patchValue({
           studentAcademicId: uniqueFees[0]?.studentAcademicId || optionalChargeSummary[0]?.studentAcademicId || null
         });
