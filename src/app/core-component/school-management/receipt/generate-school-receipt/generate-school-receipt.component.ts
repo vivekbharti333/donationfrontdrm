@@ -43,6 +43,20 @@ export class GenerateSchoolReceiptComponent implements OnInit {
   assignedFeesError = '';
   sessionFeeSummary: SessionFeeSummary[] = [];
   sessionFeeSummaryLoaded = false;
+  modifyPreviousDues = false;
+
+  get previousDueTotal(): number {
+    return this.receiptDetails.controls.filter(row => row.get("previousDue")?.value)
+      .reduce((sum, row) => sum + Number(row.get("balance")?.value || 0), 0);
+  }
+
+  continueWithPreviousDues(): void {
+    this.modifyPreviousDues = false;
+    this.receiptDetails.controls.filter(row => row.get("previousDue")?.value).forEach(row => {
+      row.patchValue({ selected: true, amount: row.get("balance")?.value });
+    });
+    this.calculateTotals();
+  }
 
   get sessionFeeTotal(): number {
     return this.sessionFeeSummary.reduce((total, fee) => total + Math.round(fee.totalAmount * 100), 0) / 100;
@@ -274,7 +288,10 @@ export class GenerateSchoolReceiptComponent implements OnInit {
       .filter(control => control.get('selected')?.value && !this.isFeeUnavailable(control))
       .map(control => ({
         studentFeeId: control.get('studentFeeId')?.value,
-        feeType: control.get('feeType')?.value,
+        installmentName: control.get('installmentName')?.value || undefined,
+        feeType: control.get('previousDue')?.value
+          ? `${control.get('feeType')?.value} - Previous due (${control.get('installmentPeriod')?.value})`
+          : control.get('feeType')?.value,
         chargeType: control.get('chargeType')?.value || undefined,
         reason: control.get('reason')?.value?.trim() || undefined,
         amount: Number(control.get('amount')?.value) || 0
@@ -567,9 +584,9 @@ export class GenerateSchoolReceiptComponent implements OnInit {
         );
         const optionalChargeSummary = matchingFees.filter((fee: any) => fee.optionalChargeSummary === true);
         const uniqueFees = [...new Map<string, any>(matchingFees.filter((fee: any) => fee.optionalChargeSummary !== true).map((fee: any) => [
-          String(fee?.feeStructureId ?? fee?.id), fee
+          `${fee?.feeStructureId ?? fee?.id}:${fee?.installmentName || ''}`, fee
         ] as [string, any])).values()];
-        this.updateSessionFeeSummary([...uniqueFees, ...optionalChargeSummary]);
+        this.updateSessionFeeSummary([...uniqueFees.filter(fee => !fee.previousDue), ...optionalChargeSummary]);
 
         uniqueFees.forEach((fee: any) => {
           const frequency = String(fee?.frequency || '').trim().toUpperCase();
@@ -579,12 +596,14 @@ export class GenerateSchoolReceiptComponent implements OnInit {
           const balance = recurring ? Number(fee?.installmentBalanceAmount ?? 0)
             : Number(fee?.balanceAmount ?? fee?.payableAmount ?? fee?.assignedAmount ?? 0);
           this.receiptDetails.push(this.fb.group({
-            selected: [false],
+            selected: [fee.previousDue === true && balance > 0 && !installmentError],
+            previousDue: [fee.previousDue === true],
+            installmentName: [fee.installmentName || installmentName],
             studentFeeId: [fee?.id],
             studentAcademicId: [fee?.studentAcademicId],
             feeType: [fee?.feeTypeName || `Fee Structure ${fee?.feeStructureId ?? ''}`, Validators.required],
             amount: [balance > 0 ? balance : 0,
-              balance > 0 && !installmentError ? [Validators.required, Validators.min(1), Validators.max(balance)] : []],
+              balance > 0 && !installmentError ? [Validators.required, Validators.min(0.01), Validators.max(balance)] : []],
             balance: [balance],
             frequency: [fee?.frequency || ''],
             installmentPeriod: [fee?.installmentPeriod || (frequency === 'MONTHLY' ? installmentName : '')],
