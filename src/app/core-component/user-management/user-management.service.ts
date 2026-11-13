@@ -288,7 +288,7 @@ export class UserManagementService {
         token: this.loginUser['token'],
         roleType: this.loginUser['roleType'],
         createdBy: this.loginUser['loginId'],
-        superadminId: this.loginUser['superadminId'],
+        superadminId: user.superadminId || this.loginUser['superadminId'],
       }
     };
     return this.http.post<UserDetailsRequest>(Constant.Site_Url + "getAddressDetails", request);

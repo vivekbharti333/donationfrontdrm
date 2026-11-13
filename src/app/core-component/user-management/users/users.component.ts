@@ -21,6 +21,8 @@ import { CookieService } from 'ngx-cookie-service';
 import { Constant } from 'src/app/core/constant/constants';
 import { FormGroup, FormArray, FormBuilder, Validators} from '@angular/forms';
 import { AuthenticationService } from 'src/app/auth/authentication.service'; 
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { parsePermissions } from 'src/app/core/helpers/dashboard-permissions';
 
 interface data {
@@ -35,6 +37,12 @@ interface data {
   providers: [MessageService, ToastModule],
 })
 export class UsersComponent {
+  private readonly destroyed$ = new Subject<void>();
+  private filteredData: any[] = [];
+  private listRequestId = 0;
+  private selectedRoleType = '';
+  private addressRequestId = 0;
+  public isUpdatingUser = false;
   public loginUser: any;
   public isMainAdmin: boolean = false;
   public isSuperadmin: boolean = false;
@@ -107,11 +115,23 @@ export class UsersComponent {
 
 
   ngOnInit() {
-    this.getUserDetails();
     this.createForms();
+    this.pagination.tablePageSize.pipe(takeUntil(this.destroyed$)).subscribe(res => {
+      this.pageSize = res.pageSize;
+      const skip = res.skip < this.filteredData.length ? res.skip : 0;
+      this.prepareTableData(this.filteredData, { skip, limit: skip + res.pageSize });
+    });
+    this.getUserDetails();
     this.checkRoleType();
     this.getUserRoleType();
     this.getTeamleaderList();
+  }
+
+  ngOnDestroy(): void {
+    this.listRequestId++;
+    this.addressRequestId++;
+    this.destroyed$.next();
+    this.destroyed$.complete();
   }
 
   genderType: data[] = [
@@ -204,9 +224,9 @@ export class UsersComponent {
   createForms() {
     this.editUserForm = this.fb.group({
       loginId: [''],
-      firstName: ['', [Validators.required, Validators.pattern("[0-9A-Za-z ]{3,150}")]],
-      lastName: ['', [Validators.required, Validators.pattern("[1-9]{1}[0-9]{9}")]],
-      roleType: [''],
+      firstName: ['', [Validators.required, Validators.pattern('^[A-Za-z]+(?:[ .][A-Za-z]+)*$')]],
+      lastName: ['', [Validators.required, Validators.pattern('^[A-Za-z]+(?:[ .][A-Za-z]+)*$')]],
+      roleType: ['', Validators.required],
       mobileNo: ['', [Validators.required, Validators.pattern('^[0-9]*$')]],
       alternateMobile: ['', [Validators.required, Validators.pattern('^[0-9]*$')]],
       emailId: ['', [Validators.required, Validators.email]],
@@ -254,7 +274,8 @@ export class UsersComponent {
       if (Array.isArray(this.userAddressList)) {
         this.userAddressList.forEach(addr => {
           if (addr?.addressType) {
-            addressMap.set(String(addr.addressType).toUpperCase(), addr);
+            const type = String(addr.addressType).trim().toUpperCase();
+            if (!addressMap.has(type)) addressMap.set(type, addr);
           }
         });
       }
@@ -280,9 +301,7 @@ export class UsersComponent {
         this.addressList.push(addressGroup);
       });
 
-      const formattedDob = user['dob']
-        ? new Date(user['dob']).toISOString().split('T')[0]
-        : '';
+      const formattedDob = this.formatValidityDateForInput(user['dob']);
   
       this.editUserForm.patchValue({
         loginId: user['loginId'],
@@ -375,43 +394,39 @@ export class UsersComponent {
 
  
   public getUserDetailsByRoleType(roleType: any): void {
-    this.serialNumberArray = []; // Clear serial number array before fetching new data
-  
-    this.userManagementService.getUserDetailsByRoleType(roleType).subscribe((apiRes: any) => {
-      this.totalData = apiRes.totalNumber; // Set total data count
-      this.fullData = apiRes.listPayload;  // Store the full dataset
-      this.updateUserStatusCounts(this.fullData);
-  
-      this.pagination.tablePageSize.subscribe((res: tablePageSize) => {
-        if (this.router.url === this.routes.users) {
-          this.pageSize = res.pageSize;
-          // Use the full dataset for pagination
-          this.prepareTableData(this.fullData, { skip: res.skip, limit: res.skip + res.pageSize });
-          this.pageSize = res.pageSize;
-        }
-      });
-    });
+    this.selectedRoleType = String(roleType || '');
+    this.getUserDetails();
   }
 
   public getUserDetails(): void {
-    this.serialNumberArray = []; // Clear serial number array before fetching new data
-  
-    this.userManagementService.getUserDetailsList().subscribe((apiRes: any) => {
-      this.totalData = apiRes.totalNumber; // Set total data count
-      this.fullData = apiRes.listPayload;  // Store the full dataset
-      this.updateUserStatusCounts(this.fullData);
-  
-      this.pagination.tablePageSize.subscribe((res: tablePageSize) => {
-        if (this.router.url === this.routes.users) {
-          this.pageSize = res.pageSize;
-          // Use the full dataset for pagination
-          this.prepareTableData(this.fullData, { skip: res.skip, limit: res.skip + res.pageSize });
-          this.pageSize = res.pageSize;
+    this.loadUsers(this.selectedRoleType
+      ? this.userManagementService.getUserDetailsByRoleType(this.selectedRoleType)
+      : this.userManagementService.getUserDetailsList());
+  }
+
+  private loadUsers(request: import('rxjs').Observable<any>): void {
+    const requestId = ++this.listRequestId;
+    request.pipe(takeUntil(this.destroyed$)).subscribe({
+      next: response => {
+        if (requestId !== this.listRequestId) return;
+        if (Number(response?.responseCode) !== 200 || !Array.isArray(response?.listPayload)) {
+          this.fullData = [];
+          this.searchData(this.searchDataValue);
+          this.messageService.add({ severity: 'error', summary: 'Unable to load users', detail: response?.responseMessage || 'Please try again.' });
+          return;
         }
-      });
+        this.fullData = response.listPayload;
+        this.searchData(this.searchDataValue);
+      },
+      error: () => {
+        if (requestId !== this.listRequestId) return;
+        this.fullData = [];
+        this.searchData(this.searchDataValue);
+        this.messageService.add({ severity: 'error', summary: 'Unable to load users', detail: 'Please try again.' });
+      }
     });
   }
-  
+
     prepareTableData(apiRes: any[], pageOption: pageSelection): void {
       this.tableData = []; // Reset table data
       this.serialNumberArray = []; // Reset serial numbers
@@ -421,7 +436,7 @@ export class UsersComponent {
     
       // Add serial numbers and prepare table data
       dataToDisplay.forEach((res: any, index: number) => {
-        const serialNumber = index + 1;
+        const serialNumber = pageOption.skip + index + 1;
         this.tableData.push(res);
         this.serialNumberArray.push(serialNumber);
       });
@@ -453,34 +468,14 @@ export class UsersComponent {
   }
 
   public searchData(value: string): void {
-      const searchTerm = value.trim().toLowerCase();
-  
-      if (searchTerm) {
-        // Filter the full dataset based on the search term
-        const filteredData = this.fullData.filter((donation: UserDetails) =>
-          Object.values(donation).some((field) =>
-            String(field).toLowerCase().includes(searchTerm)
-          )
-        );
-  
-        this.prepareTableData(filteredData, { skip: 0, limit: this.pageSize });
-        this.totalData = filteredData.length; // Update total data count for pagination
-        this.updateUserStatusCounts(filteredData);
-      } else {
-        // Reset to the full dataset when the search term is cleared
-        this.prepareTableData(this.fullData, { skip: 0, limit: this.pageSize });
-        this.totalData = this.fullData.length; // Reset the total data count
-        this.updateUserStatusCounts(this.fullData);
-      }
-  
-      // Reset to the first page after a search or clearing search
-      this.pagination.calculatePageSize.next({
-        totalData: this.totalData,
-        pageSize: this.pageSize,
-        tableData: this.tableData,
-        serialNumberArray: this.serialNumberArray,
-      });
-    }
+    this.searchDataValue = value;
+    const term = value.trim().toLowerCase();
+    this.filteredData = term ? this.fullData.filter(user => Object.values(user)
+      .some(field => String(field ?? '').toLowerCase().includes(term))) : [...this.fullData];
+    this.totalData = this.filteredData.length;
+    this.updateUserStatusCounts(this.filteredData);
+    this.prepareTableData(this.filteredData, { skip: 0, limit: this.pageSize });
+  }
 
   private updateUserStatusCounts(users: any[] = []): void {
     const rows = Array.isArray(users) ? users : [];
@@ -619,23 +614,24 @@ export class UsersComponent {
   // }
 
   public getAddressDetailsByUserId(user: any, callback: () => void): void {
-    this.userManagementService.getAddressDetailsByUserId(user).subscribe({
+    const requestId = ++this.addressRequestId;
+    this.userAddressList = [];
+    this.userManagementService.getAddressDetailsByUserId(user).pipe(takeUntil(this.destroyed$)).subscribe({
       next: (response: any) => {
-        if (response['responseCode'] === '200') {
-          this.userAddressList = response['listPayload'] || [];
-        } else {
-          this.userAddressList = [];
+        if (requestId !== this.addressRequestId) return;
+        if (Number(response?.responseCode) !== 200 || !Array.isArray(response?.listPayload)) {
+          this.messageService.add({ severity: 'error', summary: 'Unable to load addresses', detail: 'Please retry opening this user. No changes have been saved.' });
+          return;
         }
-        callback(); // Proceed after data is loaded
+        this.userAddressList = response.listPayload;
+        callback();
       },
-      error: (error) => {
-        console.error('Error fetching address list:', error);
-        this.userAddressList = [];
-        callback(); // Still proceed with empty list
+      error: () => {
+        if (requestId !== this.addressRequestId) return;
+        this.messageService.add({ severity: 'error', summary: 'Unable to load addresses', detail: 'Please retry opening this user. No changes have been saved.' });
       }
     });
   }
-  
 
   changeUserStatus(rowData: any) {
     this.userManagementService.changeUserStatus(rowData).subscribe({
@@ -762,45 +758,29 @@ export class UsersComponent {
       + encodeURIComponent(imageValue);
   }
 
-  updateUserDetails() {
-    this.userManagementService.updateUserDetails(this.editUserForm.value).subscribe({
-      next: (response: any) => {
-        if (response['responseCode'] == '200') {
-          if (response['payload']['respCode'] == '200') {
-
-            this.messageService.add({
-              summary: response['payload']['respCode'],
-              detail: response['payload']['respMesg'],
-              styleClass: 'success-background-popover',
-            });
-
-            this.userUpdateDialog.close();
-            this.getUserDetails();
-
-          } else {
-            this.messageService.add({
-                summary: response['payload']['respCode'],
-                detail: response['payload']['respMesg'],
-                styleClass: 'danger-background-popover',
-              });
-
-              this.userUpdateDialog.close();
-          }
-        } else {
-          this.messageService.add({
-            summary: response['payload']['respCode'],
-            detail: response['payload']['respMesg'],
-            styleClass: 'danger-background-popover',
-          });
-          this.userUpdateDialog.close();
+  updateUserDetails(): void {
+    if (this.isUpdatingUser) return;
+    if (this.editUserForm.invalid) {
+      this.editUserForm.markAllAsTouched();
+      this.messageService.add({ severity: 'error', summary: 'Check user details', detail: 'Enter valid names, mobile numbers, email and role before saving.' });
+      return;
+    }
+    this.isUpdatingUser = true;
+    this.userManagementService.updateUserDetails(this.editUserForm.getRawValue()).subscribe({
+      next: response => {
+        this.isUpdatingUser = false;
+        const success = Number(response?.responseCode) === 200 && Number(response?.payload?.respCode) === 200;
+        this.messageService.add({ severity: success ? 'success' : 'error', summary: success ? 'User updated' : 'Unable to update user',
+          detail: response?.payload?.respMesg || response?.responseMessage || 'Please try again.' });
+        if (success) {
+          this.userUpdateDialog?.close();
+          this.getUserDetails();
         }
       },
-      error: () =>
-        this.messageService.add({
-          summary: '500',
-          detail: 'Server Error',
-        }),
+      error: () => {
+        this.isUpdatingUser = false;
+        this.messageService.add({ severity: 'error', summary: 'Unable to update user', detail: 'Your changes are still available. Please try again.' });
+      }
     });
-    // this.isLoading = false;
   }
 }

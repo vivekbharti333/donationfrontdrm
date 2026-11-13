@@ -490,7 +490,7 @@
       <div class="user-edit-action-buttons">
         <button type="button" class="btn user-cancel-btn" mat-dialog-close>Cancel</button>
         <!-- <button type="submit" class="btn btn-submit" [disabled]="!userForm.form.valid"> Update User </button> -->
-        <button type="submit" class="btn btn-submit user-save-btn">
+        <button type="submit" class="btn btn-submit user-save-btn" [disabled]="isUpdatingUser">
           <i class="feather icon-check me-1"></i>Update User
         </button>
       </div>
