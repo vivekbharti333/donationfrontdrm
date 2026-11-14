@@ -60,7 +60,7 @@ describe('AdmitCardComponent', () => {
     expect(html).toContain('&lt;script&gt;'); expect(html).not.toContain('<script>');
     expect(html).toContain('School Road'); expect(html).toContain('English'); expect(html).toContain('20-11-2026'); expect(html).toContain('09:00');
     expect(html).not.toContain('<th>Day</th>'); expect(html).not.toContain('Friday');
-    expect(html).toContain('<th>Duration</th>'); expect(html).toContain('1 Hour');
+    expect(html).not.toContain('<th>Duration</th>');
     expect(html).toContain('09:00 AM'); expect(html).toContain('10:00 AM');
     expect(html).not.toContain('subjectCode');
   });

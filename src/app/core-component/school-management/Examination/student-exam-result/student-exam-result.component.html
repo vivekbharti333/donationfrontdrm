@@ -6,11 +6,11 @@
     <button type="button" class="btn btn-light mt-2" (click)="loadMasters()" [disabled]="isMastersLoading">Retry loading lists</button>
   </div>
   <p class="text-muted" *ngIf="isMastersLoading">Loading exams and students…</p>
-  <p class="text-muted" *ngIf="!isMastersLoading && !masterErrors.length">Select an exam to generate results. When only one exam is available in the selected year, it is used automatically. Present and absent subjects are both included.</p>
+  <p class="text-muted" *ngIf="!isMastersLoading && !masterErrors.length">Select an exam before generating results. Present and absent subjects are both included.</p>
   <div class="control-card">
     <div class="result-filters">
       <select class="form-select" aria-label="Filter by academic year" [(ngModel)]="selectedAcademicYear" (ngModelChange)="onListAcademicYearChange()"><option value="">All academic years</option><option *ngFor="let year of academicYearOptions" [value]="year.value">{{year.name}}</option></select>
-      <select class="form-select" aria-label="Filter by exam" [(ngModel)]="selectedExamId" (ngModelChange)="onListExamChange()"><option [ngValue]="null">All exams</option><option *ngFor="let exam of listExams()" [ngValue]="exam.id">{{exam.examName}}</option></select>
+      <select class="form-select" aria-label="Filter by exam" [(ngModel)]="selectedExamId" (ngModelChange)="onListExamChange()"><option [ngValue]="null" disabled>Select exam</option><option *ngFor="let exam of listExams()" [ngValue]="exam.id">{{exam.examName}}</option></select>
       <select class="form-select" aria-label="Filter by grade" [(ngModel)]="selectedGradeId" (ngModelChange)="onListGradeChange()"><option [ngValue]="null">All grades</option><option *ngFor="let grade of listGrades()" [ngValue]="grade.id">{{grade.gradeName}}</option></select>
       <select class="form-select" aria-label="Filter by section" [(ngModel)]="selectedSection" (ngModelChange)="onListSectionChange()"><option value="">All sections</option><option *ngFor="let section of listSections()" [value]="section">{{section}}</option></select>
       <select class="form-select" aria-label="Filter by student" [(ngModel)]="selectedStudentId" (ngModelChange)="getResults()"><option [ngValue]="null">All students</option><option *ngFor="let student of listStudents()" [ngValue]="student.studentAcademicId">{{studentName(student.studentAcademicId)}} · {{student.rollNumber || 'No roll'}}</option></select>

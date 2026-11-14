@@ -107,12 +107,15 @@ describe('StudentExamResultComponent loading', () => {
     expect(component.selectedExamId).toBeNull();
     expect(component.selectedGradeId).toBeNull();
   });
-  it('enables generation for a single filtered exam while retaining all-exam list filtering', () => {
+  it('requires explicit exam selection even when only one exam is available', () => {
     component.selectedAcademicYear = '2026-27';
     component.exams = [{id: 7, academicYear: '2026-27'}];
     expect(component.selectedExamId).toBeNull();
-    expect(component.generationExamId).toBe(7);
+    expect(component.generationExamId).toBeNull();
     service.generateExamResults = jasmine.createSpy().and.returnValue(of({responseCode: 200}));
+    component.generateAll();
+    expect(service.generateExamResults).not.toHaveBeenCalled();
+    component.selectedExamId = 7;
     component.generateAll();
     expect(service.generateExamResults).toHaveBeenCalledWith(7);
     component.selectedExamId = null;
