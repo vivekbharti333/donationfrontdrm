@@ -1184,6 +1184,9 @@ export class routes {
   public static get studentExamResult(): string {
     return this.schoolManagement + '/student-exam-result';
   }
+  public static get admitCard(): string {
+    return this.schoolManagement + '/admit-card';
+  }
   public static get attendanceList(): string {
     return this.schoolManagement + '/attendance-list';
   }

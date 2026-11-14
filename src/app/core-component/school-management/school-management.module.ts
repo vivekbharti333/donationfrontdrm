@@ -33,6 +33,7 @@ import { ExamScheduleComponent } from './Examination/exam-schedule/exam-schedule
 import { GradingScaleComponent } from './Examination/grading-scale/grading-scale.component';
 import { StudentExamMarksComponent } from './Examination/student-exam-marks/student-exam-marks.component';
 import { StudentExamResultComponent } from './Examination/student-exam-result/student-exam-result.component';
+import { AdmitCardComponent } from './Examination/admit-card/admit-card.component';
 
 import { MessageService } from 'primeng/api';
 
@@ -57,7 +58,8 @@ import { MessageService } from 'primeng/api';
     ExamScheduleComponent,
     GradingScaleComponent,
     StudentExamMarksComponent,
-    StudentExamResultComponent
+    StudentExamResultComponent,
+    AdmitCardComponent
   ],
   imports: [
     SchoolManagementRoutingModule,

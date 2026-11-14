@@ -18,7 +18,16 @@
       <button class="btn theme-btn" (click)="getResults()" [disabled]="isLoading"><i class="feather icon-search"></i> Search</button>
       <button class="btn btn-light" (click)="clearFilters()">Clear</button>
     </div>
-    <div class="generate-actions"><button class="btn outline-btn" (click)="generateSelected()" [disabled]="isGenerating||!generationExamId||!selectedStudentId"><i class="feather icon-user-check"></i> Generate Selected</button><button class="btn theme-btn" (click)="generateAll()" [disabled]="isGenerating||!generationExamId"><span *ngIf="isGenerating" class="spinner-border spinner-border-sm"></span><i *ngIf="!isGenerating" class="feather icon-users"></i> Generate All</button></div>
+    <div class="generate-actions"><button class="btn outline-btn" (click)="generateSelected()" [disabled]="isBulkDownloading||isGenerating||!generationExamId||!selectedStudentId"><i class="feather icon-user-check"></i> Generate Selected</button><button class="btn theme-btn" (click)="generateAll()" [disabled]="isBulkDownloading||isGenerating||!generationExamId"><span *ngIf="isGenerating" class="spinner-border spinner-border-sm"></span><i *ngIf="!isGenerating" class="feather icon-users"></i> Generate All</button></div>
+  </div>
+  <div class="bulk-download-actions">
+    <p class="text-muted">Download generated results for the selected grade and section. All sections includes the whole grade. One student per PDF page.</p>
+    <button type="button" class="btn outline-btn mb-3" (click)="downloadBulkResults()" [disabled]="isBulkDownloading || isGenerating || isMastersLoading || isResultOptionsLoading || masterErrors.length > 0 || !generationExamId || !selectedGradeId">
+      <span *ngIf="isBulkDownloading" class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+      <i *ngIf="!isBulkDownloading" class="feather icon-download" aria-hidden="true"></i>
+      {{isBulkDownloading ? bulkDownloadProgress : 'Bulk Download PDF'}}
+    </button>
+    <span class="visually-hidden" role="status" aria-live="polite">{{bulkDownloadProgress}}</span>
   </div>
   <div class="result-card">
     <div class="table-responsive"><table class="table datanew"><thead><tr><th>#</th><th>Exam</th><th>Roll No.</th><th>Student</th><th>Maximum</th><th>Obtained</th><th>Percentage</th><th>Grade</th><th>Failed Subjects</th><th>Result</th><th>Rank</th><th>Publication</th><th>Action</th></tr></thead><tbody>

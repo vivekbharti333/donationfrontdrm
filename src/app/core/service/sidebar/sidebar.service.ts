@@ -449,6 +449,11 @@ export class SidebarService {
               permission: 'fee-assignment',
             },
             {
+              menuValue: 'Admit Cards',
+              route: routes.admitCard,
+              permission: 'fee-assignment',
+            },
+            {
               menuValue: 'Student Exam Marks',
               route: routes.studentExamMarks,
               permission: 'fee-assignment',

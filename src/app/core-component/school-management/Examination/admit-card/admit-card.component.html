@@ -1,0 +1,44 @@
+<p-toast></p-toast>
+<div class="admit-page">
+  <div class="page-heading"><h3>Admit Cards</h3><p>Select a session, exam and grade to view students and download their examination admit cards.</p></div>
+  <div class="alert alert-danger" role="alert" *ngIf="masterErrors.length"><div *ngFor="let error of masterErrors">{{error}}</div><button type="button" class="btn btn-light mt-2" (click)="loadMasters()" [disabled]="isMastersLoading || isDownloading">Retry loading lists</button></div>
+  <p *ngIf="isMastersLoading" role="status">Loading exams, students and school details…</p>
+  <div class="control-card">
+    <div class="filters">
+      <label>Session<select class="form-select" [(ngModel)]="selectedAcademicYear" (ngModelChange)="onSessionChange()" [disabled]="isDownloading"><option value="">Select session</option><option *ngFor="let year of academicYearOptions" [value]="year.value">{{year.name}}</option></select></label>
+      <label>Exam<select class="form-select" [(ngModel)]="selectedExamId" (ngModelChange)="invalidate()" [disabled]="isDownloading || isMastersLoading"><option [ngValue]="null">Select exam</option><option *ngFor="let exam of listExams()" [ngValue]="exam.id">{{exam.examName}}</option></select></label>
+      <label>Grade<select class="form-select" [(ngModel)]="selectedGradeId" (ngModelChange)="onGradeChange()" [disabled]="isDownloading || isMastersLoading"><option [ngValue]="null">Select grade</option><option *ngFor="let grade of grades" [ngValue]="grade.id">{{grade.gradeName}}</option></select></label>
+      <label>Section<select class="form-select" [(ngModel)]="selectedSection" (ngModelChange)="onSectionChange()" [disabled]="isDownloading || !selectedGradeId"><option value="">All sections</option><option *ngFor="let section of listSections()" [value]="section">{{section}}</option></select></label>
+      <label>Student<select class="form-select" [(ngModel)]="selectedStudentId" (ngModelChange)="invalidate()" [disabled]="isDownloading || !selectedGradeId"><option [ngValue]="null">All students</option><option *ngFor="let student of listStudents()" [ngValue]="student.studentAcademicId">{{studentName(student)}} · {{student.rollNumber || 'No roll'}}</option></select></label>
+      <button type="button" class="btn theme-btn" (click)="getAdmitCards()" [disabled]="!canSearch || isLoading || isDownloading"><i class="feather icon-search"></i> View List</button>
+      <button type="button" class="btn btn-light" (click)="clearFilters()" [disabled]="isDownloading">Clear</button>
+    </div>
+    <div class="download-actions"><span class="text-muted">{{totalData}} student(s) · One student per A4 page</span><button type="button" class="btn outline-btn" (click)="downloadCards()" [disabled]="!fullData.length || isDownloading || isLoading"><span *ngIf="isDownloading" class="spinner-border spinner-border-sm" aria-hidden="true"></span><i *ngIf="!isDownloading" class="feather icon-download"></i>{{isDownloading ? downloadProgress : 'Bulk Download PDF'}}</button><span class="visually-hidden" role="status" aria-live="polite">{{downloadProgress}}</span></div>
+  </div>
+  <div class="result-card student-list-shell"><div class="list-heading"><h4>Student admit cards</h4><span class="student-count"><i class="feather icon-users" aria-hidden="true"></i> {{totalData}} students</span></div><div class="table-responsive desktop-table"><table class="table"><thead><tr><th>#</th><th>Roll No.</th><th>Student</th><th>Admission No.</th><th>Grade / Section</th><th>Exam</th><th>Subjects</th><th>Action</th></tr></thead><tbody>
+    <tr *ngFor="let card of tableData; let i=index"><td>{{serialNumberArray[i]}}</td><td>{{card.rollNumber || '—'}}</td><td class="student-name">{{card.studentName}}</td><td>{{card.admissionNo || '—'}}</td><td>{{card.grade}} / {{card.section || '—'}}</td><td>{{card.examName}}</td><td>{{card.subjects?.length || 0}}</td><td><div class="edit-delete-action row-actions"><button type="button" class="admit-action view-action" title="View timetable" aria-label="View timetable" (click)="showTimetable(card)"><i class="feather icon-eye" aria-hidden="true"></i></button><button type="button" class="admit-action download-action" title="Download admit card PDF" aria-label="Download admit card PDF" (click)="downloadCards(card)" [disabled]="isDownloading || isLoading"><i class="feather icon-download" aria-hidden="true"></i></button></div></td></tr>
+    <tr *ngIf="isLoading"><td colspan="8" class="state">Loading admit cards…</td></tr>
+    <tr *ngIf="!isLoading && !tableData.length"><td colspan="8" class="state" [attr.role]="errorMessage ? 'alert' : null">{{emptyStateMessage}}</td></tr>
+  </tbody></table></div>  <div class="mobile-cards">
+    <article class="student-card" *ngFor="let card of tableData">
+      <div class="student-card-header">
+        <img class="student-avatar" [src]="studentPhoto(card)" alt="Student photo" (error)="useDefaultStudentImage($event)" loading="lazy">
+        <div class="student-identity"><h4>{{card.studentName}}</h4><p>Admission No. {{card.admissionNo || '—'}}</p></div>
+      </div>
+      <dl class="student-card-details">
+        <div><dt>Class / Section</dt><dd>{{card.grade}} / {{card.section || '—'}}</dd></div>
+        <div><dt>Roll No.</dt><dd>{{card.rollNumber || '—'}}</dd></div>
+        <div class="exam-detail"><dt>Examination</dt><dd>{{card.examName}}</dd></div>
+        <div><dt>Session</dt><dd>{{card.academicYear}}</dd></div>
+        <div><dt>Subjects</dt><dd>{{card.subjects?.length || 0}}</dd></div>
+      </dl>
+      <div class="student-card-actions"><span class="class-chip">{{card.grade}}<ng-container *ngIf="card.section"> · {{card.section}}</ng-container></span>
+        <div class="row-actions"><button type="button" class="admit-action view-action" title="View timetable" [attr.aria-label]="'View timetable for ' + card.studentName" (click)="showTimetable(card)"><i class="feather icon-eye" aria-hidden="true"></i></button><button type="button" class="admit-action download-action" title="Download admit card PDF" [attr.aria-label]="'Download admit card for ' + card.studentName" (click)="downloadCards(card)" [disabled]="isDownloading || isLoading"><i class="feather icon-download" aria-hidden="true"></i></button></div>
+      </div>
+    </article>
+    <div *ngIf="isLoading" class="mobile-state" role="status"><span class="spinner-border spinner-border-sm" aria-hidden="true"></span><strong>Loading admit cards…</strong></div>
+    <div *ngIf="!isLoading && !tableData.length" class="mobile-state" [attr.role]="errorMessage ? 'alert' : 'status'"><span class="empty-icon"><i class="feather" [ngClass]="errorMessage ? 'icon-alert-circle' : 'icon-users'" aria-hidden="true"></i></span><strong>{{errorMessage ? 'Unable to load admit cards' : hasSearched ? 'No students found' : 'Find student admit cards'}}</strong><p>{{emptyStateMessage}}</p><button *ngIf="errorMessage" type="button" class="btn outline-btn" (click)="getAdmitCards()" [disabled]="!canSearch || isDownloading">Try again</button></div>
+  </div>
+<app-custom-pagination *ngIf="totalData > 0"></app-custom-pagination></div>
+  <section *ngIf="previewCard" id="admit-timetable-preview" tabindex="-1" class="result-card timetable-preview mt-3" aria-label="Student examination timetable"><div class="preview-heading"><div><h4>{{previewCard.studentName}} · {{previewCard.examName}}</h4><p>{{previewCard.academicYear}} · {{previewCard.grade}} / {{previewCard.section || '—'}}</p></div><button type="button" class="btn btn-light" (click)="previewCard=null">Close</button></div><div class="table-responsive"><table class="table"><thead><tr><th>Subject</th><th>Date</th><th>Time</th><th>Room</th><th>Instructions</th></tr></thead><tbody><tr *ngFor="let subject of previewCard.subjects"><td data-label="Subject">{{subject.subjectName}}</td><td data-label="Date">{{dateLabel(subject.examDate)}}</td><td data-label="Time">{{subject.startTime}} – {{subject.endTime}}</td><td data-label="Room">{{subject.roomNumber || '—'}}</td><td data-label="Instructions">{{subject.instructions || '—'}}</td></tr></tbody></table></div></section>
+</div>

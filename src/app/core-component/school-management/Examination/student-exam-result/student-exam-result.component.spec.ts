@@ -135,4 +135,75 @@ describe('StudentExamResultComponent loading', () => {
     expect(component.errorMessage).toBe('Result query failed');
     expect(component.isLoading).toBeFalse();
   });
+  it('requires a grade before requesting a bulk PDF', async () => {
+    component.selectedExamId = 7;
+    await component.downloadBulkResults();
+    expect(service.getStudentExamResult).not.toHaveBeenCalled();
+    expect(component.isBulkDownloading).toBeFalse();
+  });
+  it('requests all exam results and excludes other grades, sections and exams from a bulk download', async () => {
+    component.isResultOptionsLoading = false;
+    component.selectedExamId = 7;
+    component.selectedGradeId = 3;
+    component.selectedSection = 'A';
+    component.selectedStudentId = 99;
+    component.selectedPublished = true;
+    component.selectedAcademicYear = '2026-27';
+    component.students = [
+      {studentAcademicId: 11, gradeId: 3, gradeSection: 'A', sessionName: '2026-27'},
+      {studentAcademicId: 12, gradeId: 3, gradeSection: 'B', sessionName: '2026-27'},
+      {studentAcademicId: 13, gradeId: 4, gradeSection: 'A', sessionName: '2026-27'}
+    ];
+    service.getStudentExamResult.and.returnValue(of({responseCode: 200, listPayload: [
+      {examId: 8, studentAcademicId: 11}, {examId: 7, studentAcademicId: 12}, {examId: 7, studentAcademicId: 13}
+    ]}));
+    const toast = spyOn<any>(component, 'toast');
+    await component.downloadBulkResults();
+    expect(service.getStudentExamResult).toHaveBeenCalledWith({examId: 7});
+    expect(toast).toHaveBeenCalledWith('Unable to download results', jasmine.stringMatching('No generated results'), 'error');
+    expect(component.isBulkDownloading).toBeFalse();
+    expect(component.bulkDownloadProgress).toBe('');
+  });
+  it('creates one PDF page per matching student across the full grade without duplicate results', async () => {
+    let pageCount = 0;
+    const save = spyOn<any>(component, 'saveBulkPdf').and.callFake((pdf: any) => {
+      pageCount = pdf.getNumberOfPages();
+    });
+    component.isResultOptionsLoading = false;
+    component.selectedAcademicYear = '2026-27';
+    component.selectedExamId = 7;
+    component.selectedGradeId = 3;
+    component.selectedStudentId = 11;
+    component.selectedPublished = true;
+    component.exams = [{id: 7, examName: 'Annual', academicYear: '2026-27'}];
+    component.students = [
+      {studentAcademicId: 11, gradeId: 3, gradeSection: 'A', sessionName: '2026-27'},
+      {studentAcademicId: 12, gradeId: 3, gradeSection: 'B', sessionName: '2026-27'},
+      {studentAcademicId: 13, gradeId: 4, gradeSection: 'A', sessionName: '2026-27'}
+    ];
+    service.getStudentExamResult.and.returnValue(of({responseCode: 200, listPayload: [
+      {examId: 7, studentAcademicId: 11}, {examId: 7, studentAcademicId: 12},
+      {examId: 7, studentAcademicId: 11}, {examId: 7, studentAcademicId: 13}
+    ]}));
+    service.getStudentExamMarks = jasmine.createSpy().and.returnValue(of({responseCode: 200,
+      listPayload: [{examScheduleId: 1, marksObtained: 80, attendanceStatus: 'PRESENT'}]}));
+    await component.downloadBulkResults();
+    expect(save).toHaveBeenCalledTimes(1);
+    expect(pageCount).toBe(2);
+    expect(service.getStudentExamMarks).toHaveBeenCalledTimes(2);
+    expect(component.isBulkDownloading).toBeFalse();
+    expect(document.querySelector('iframe[aria-hidden="true"]')).toBeNull();
+  }, 30000);
+  it('prevents duplicate bulk requests and clears progress after server failure', async () => {
+    component.isBulkDownloading = true;
+    await component.downloadBulkResults();
+    expect(service.getStudentExamResult).not.toHaveBeenCalled();
+    component.isBulkDownloading = false;
+    component.isResultOptionsLoading = false;
+    component.selectedExamId = 7;
+    component.selectedGradeId = 3;
+    await component.downloadBulkResults();
+    expect(component.isBulkDownloading).toBeFalse();
+    expect(component.bulkDownloadProgress).toBe('');
+  });
 });

@@ -21,6 +21,7 @@ import { ExamScheduleComponent } from './Examination/exam-schedule/exam-schedule
 import { GradingScaleComponent } from './Examination/grading-scale/grading-scale.component';
 import { StudentExamMarksComponent } from './Examination/student-exam-marks/student-exam-marks.component';
 import { StudentExamResultComponent } from './Examination/student-exam-result/student-exam-result.component';
+import { AdmitCardComponent } from './Examination/admit-card/admit-card.component';
 import { FeeDueReportComponent } from './report/fee-due-report/fee-due-report.component';
  
 
@@ -100,6 +101,10 @@ const routes: Routes = [
       {
         path: 'student-exam-marks',
         component: StudentExamMarksComponent,
+      },
+      {
+        path: 'admit-card',
+        component: AdmitCardComponent,
       },
       {
         path: 'student-exam-result',
