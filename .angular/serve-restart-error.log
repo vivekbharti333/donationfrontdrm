@@ -1,0 +1,126 @@
+- Generating browser application bundles (phase: setup)...
+√ Browser application bundle generation complete.
+
+./src/styles.scss - Warning: Module Warning (from ./node_modules/postcss-loader/dist/cjs.js):
+(12431:3) from "autoprefixer" plugin: end value has mixed support, consider using flex-end instead
+
+Code:
+  justify-content: end
+
+
+./src/styles.scss - Warning: Module Warning (from ./node_modules/postcss-loader/dist/cjs.js):
+(22054:3) from "autoprefixer" plugin: end value has mixed support, consider using flex-end instead
+
+Code:
+  justify-content: end
+
+
+./src/styles.scss - Warning: Module Warning (from ./node_modules/postcss-loader/dist/cjs.js):
+(25310:3) from "autoprefixer" plugin: end value has mixed support, consider using flex-end instead
+
+Code:
+  justify-content: end
+
+
+./src/styles.scss - Warning: Module Warning (from ./node_modules/postcss-loader/dist/cjs.js):
+(28465:3) from "autoprefixer" plugin: start value has mixed support, consider using flex-start instead
+
+Code:
+  justify-content: start
+
+
+./src/styles.scss - Warning: Module Warning (from ./node_modules/postcss-loader/dist/cjs.js):
+(28780:3) from "autoprefixer" plugin: end value has mixed support, consider using flex-end instead
+
+Code:
+  justify-content: end
+
+
+./src/styles.scss - Warning: Module Warning (from ./node_modules/postcss-loader/dist/cjs.js):
+(35877:3) from "autoprefixer" plugin: end value has mixed support, consider using flex-end instead
+
+Code:
+  justify-content: end
+
+
+./src/app/core-component/school-management/receipt/generate-school-receipt/generate-school-receipt.component.scss?ngResource - Warning: Module Warning (from ./node_modules/postcss-loader/dist/cjs.js):
+(67:3) from "autoprefixer" plugin: end value has mixed support, consider using flex-end instead
+
+Code:
+  align-items: end
+
+
+./src/app/core-component/school-management/report/fee-due-report/fee-due-report.component.scss?ngResource - Warning: Module Warning (from ./node_modules/postcss-loader/dist/cjs.js):
+(16:3) from "autoprefixer" plugin: end value has mixed support, consider using flex-end instead
+
+Code:
+  align-items: end
+
+
+Warning: D:\Angular\donationfrontdrm\node_modules\canvg\lib\index.es.js depends on 'core-js/modules/es.array.index-of.js'. CommonJS or AMD dependencies can cause optimization bailouts.
+For more info see: https://angular.io/guide/build#configuring-commonjs-dependencies
+
+Warning: D:\Angular\donationfrontdrm\node_modules\canvg\lib\index.es.js depends on 'core-js/modules/es.array.iterator.js'. CommonJS or AMD dependencies can cause optimization bailouts.
+For more info see: https://angular.io/guide/build#configuring-commonjs-dependencies
+
+Warning: D:\Angular\donationfrontdrm\node_modules\canvg\lib\index.es.js depends on 'core-js/modules/es.array.reduce.js'. CommonJS or AMD dependencies can cause optimization bailouts.
+For more info see: https://angular.io/guide/build#configuring-commonjs-dependencies
+
+Warning: D:\Angular\donationfrontdrm\node_modules\canvg\lib\index.es.js depends on 'core-js/modules/es.array.reverse.js'. CommonJS or AMD dependencies can cause optimization bailouts.
+For more info see: https://angular.io/guide/build#configuring-commonjs-dependencies
+
+Warning: D:\Angular\donationfrontdrm\node_modules\canvg\lib\index.es.js depends on 'core-js/modules/es.promise.js'. CommonJS or AMD dependencies can cause optimization bailouts.
+For more info see: https://angular.io/guide/build#configuring-commonjs-dependencies
+
+Warning: D:\Angular\donationfrontdrm\node_modules\canvg\lib\index.es.js depends on 'core-js/modules/es.regexp.to-string.js'. CommonJS or AMD dependencies can cause optimization bailouts.
+For more info see: https://angular.io/guide/build#configuring-commonjs-dependencies
+
+Warning: D:\Angular\donationfrontdrm\node_modules\canvg\lib\index.es.js depends on 'core-js/modules/es.string.ends-with.js'. CommonJS or AMD dependencies can cause optimization bailouts.
+For more info see: https://angular.io/guide/build#configuring-commonjs-dependencies
+
+Warning: D:\Angular\donationfrontdrm\node_modules\canvg\lib\index.es.js depends on 'core-js/modules/es.string.includes.js'. CommonJS or AMD dependencies can cause optimization bailouts.
+For more info see: https://angular.io/guide/build#configuring-commonjs-dependencies
+
+Warning: D:\Angular\donationfrontdrm\node_modules\canvg\lib\index.es.js depends on 'core-js/modules/es.string.match.js'. CommonJS or AMD dependencies can cause optimization bailouts.
+For more info see: https://angular.io/guide/build#configuring-commonjs-dependencies
+
+Warning: D:\Angular\donationfrontdrm\node_modules\canvg\lib\index.es.js depends on 'core-js/modules/es.string.replace.js'. CommonJS or AMD dependencies can cause optimization bailouts.
+For more info see: https://angular.io/guide/build#configuring-commonjs-dependencies
+
+Warning: D:\Angular\donationfrontdrm\node_modules\canvg\lib\index.es.js depends on 'core-js/modules/es.string.split.js'. CommonJS or AMD dependencies can cause optimization bailouts.
+For more info see: https://angular.io/guide/build#configuring-commonjs-dependencies
+
+Warning: D:\Angular\donationfrontdrm\node_modules\canvg\lib\index.es.js depends on 'core-js/modules/es.string.starts-with.js'. CommonJS or AMD dependencies can cause optimization bailouts.
+For more info see: https://angular.io/guide/build#configuring-commonjs-dependencies
+
+Warning: D:\Angular\donationfrontdrm\node_modules\canvg\lib\index.es.js depends on 'core-js/modules/es.string.trim.js'. CommonJS or AMD dependencies can cause optimization bailouts.
+For more info see: https://angular.io/guide/build#configuring-commonjs-dependencies
+
+Warning: D:\Angular\donationfrontdrm\node_modules\canvg\lib\index.es.js depends on 'core-js/modules/web.dom-collections.iterator.js'. CommonJS or AMD dependencies can cause optimization bailouts.
+For more info see: https://angular.io/guide/build#configuring-commonjs-dependencies
+
+Warning: D:\Angular\donationfrontdrm\node_modules\canvg\lib\index.es.js depends on 'raf'. CommonJS or AMD dependencies can cause optimization bailouts.
+For more info see: https://angular.io/guide/build#configuring-commonjs-dependencies
+
+Warning: D:\Angular\donationfrontdrm\node_modules\canvg\lib\index.es.js depends on 'rgbcolor'. CommonJS or AMD dependencies can cause optimization bailouts.
+For more info see: https://angular.io/guide/build#configuring-commonjs-dependencies
+
+Warning: D:\Angular\donationfrontdrm\node_modules\ng-apexcharts\fesm2020\ng-apexcharts.mjs depends on 'apexcharts'. CommonJS or AMD dependencies can cause optimization bailouts.
+For more info see: https://angular.io/guide/build#configuring-commonjs-dependencies
+
+Warning: D:\Angular\donationfrontdrm\src\app\core-component\donation-management\donation\all-donation-list\all-donation-list.component.ts depends on 'file-saver'. CommonJS or AMD dependencies can cause optimization bailouts.
+For more info see: https://angular.io/guide/build#configuring-commonjs-dependencies
+
+Warning: D:\Angular\donationfrontdrm\src\app\core-component\donation-management\donation\all-donation-list\all-donation-list.component.ts depends on 'xlsx-js-style'. CommonJS or AMD dependencies can cause optimization bailouts.
+For more info see: https://angular.io/guide/build#configuring-commonjs-dependencies
+
+Warning: D:\Angular\donationfrontdrm\src\app\core-component\inventory\barcode\barcode.component.ts depends on 'sweetalert2'. CommonJS or AMD dependencies can cause optimization bailouts.
+For more info see: https://angular.io/guide/build#configuring-commonjs-dependencies
+
+Warning: D:\Angular\donationfrontdrm\src\app\core-component\main\application\file\file-manager\file-manager.component.ts depends on 'plyr'. CommonJS or AMD dependencies can cause optimization bailouts.
+For more info see: https://angular.io/guide/build#configuring-commonjs-dependencies
+
+Warning: D:\Angular\donationfrontdrm\src\app\core-component\school-management\Examination\admit-card\admit-card.component.ts depends on 'html2canvas'. CommonJS or AMD dependencies can cause optimization bailouts.
+For more info see: https://angular.io/guide/build#configuring-commonjs-dependencies
+
+

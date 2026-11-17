@@ -1,0 +1,144 @@
+
+Initial chunk files                                                                                     | Names                                                        |  Raw size
+vendor.js                                                                                               | vendor                                                       |   2.82 MB | 
+styles.css, styles.js                                                                                   | styles                                                       |   2.53 MB | 
+scripts.js                                                                                              | scripts                                                      | 371.11 kB | 
+polyfills.js                                                                                            | polyfills                                                    | 336.33 kB | 
+main.js                                                                                                 | main                                                         | 202.79 kB | 
+runtime.js                                                                                              | runtime                                                      |  14.12 kB | 
+
+                                                                                                        | Initial total                                                |   6.25 MB
+
+Lazy chunk files                                                                                        | Names                                                        |  Raw size
+src_app_core-component_core-component_module_ts.js                                                      | core-component-core-component-module                         |   7.22 MB | 
+src_app_core-component_school-management_school-management_module_ts.js                                 | school-management-school-management-module                   |   2.37 MB | 
+src_app_core-component_whats-app-management_whats-app-management_module_ts.js                           | whats-app-management-whats-app-management-module             |   1.58 MB | 
+src_app_core-component_donation-management_donation-management_module_ts.js                             | donation-management-donation-management-module               |   1.42 MB | 
+src_app_core-component_main_application_application_module_ts.js                                        | main-application-application-module                          |   1.32 MB | 
+node_modules_jspdf_dist_jspdf_es_min_js.js                                                              | jspdf                                                        | 860.68 kB | 
+src_app_core-component_lead-management_lead-management_module_ts.js                                     | lead-management-lead-management-module                       | 734.52 kB | 
+src_app_core-component_advanced-ui_ui-rating_ui-rating_module_ts.js                                     | ui-rating-ui-rating-module                                   | 700.66 kB | 
+src_app_core-component_campaign-management_campaign-management_module_ts.js                             | campaign-management-campaign-management-module               | 645.57 kB | 
+src_app_core-component_sales_sales_module_ts.js                                                         | sales-sales-module                                           | 515.20 kB | 
+default-src_app_common-component_common-component_service_ts-src_app_core-component_user-mana-bb5483.js | auth-auth-module                                             | 486.17 kB | 
+src_app_core-component_invoice-management_invoice-management_module_ts.js                               | invoice-management-invoice-management-module                 | 441.54 kB | 
+node_modules_canvg_lib_index_es_js.js                                                                   | canvg                                                        | 429.85 kB | 
+src_app_core-component_main_dashboard_dashboard_module_ts.js                                            | main-dashboard-dashboard-module                              | 406.04 kB | 
+src_app_core-component_reports_reports_module_ts.js                                                     | reports-reports-module                                       | 384.58 kB | 
+node_modules_html2canvas_dist_html2canvas_js.js                                                         | html2canvas                                                  | 377.59 kB | 
+src_app_core-component_forms_forms_module_ts.js                                                         | forms-forms-module                                           | 357.94 kB | 
+src_app_core-component_user-management_user-management_module_ts.js                                     | user-management-user-management-module                       | 353.22 kB | 
+src_app_core-component_inventory_product_product_module_ts.js                                           | product-product-module                                       | 351.99 kB | 
+default-node_modules_primeng_fesm2022_primeng-multiselect_mjs.js                                        | common-management-common-management-module                   | 332.23 kB | 
+src_app_core-component_settings_financial-settings_financial-settings_module_ts.js                      | financial-settings-financial-settings-module                 | 325.32 kB | 
+default-node_modules_primeng_fesm2022_primeng-calendar_mjs.js                                           | receipt-management-receipt-management-module                 | 308.48 kB | 
+src_app_core-component_inventory_inventory_module_ts.js                                                 | inventory-inventory-module                                   | 281.00 kB | 
+src_app_core-component_settings_website-settings_website-settings_module_ts.js                          | website-settings-website-settings-module                     | 272.78 kB | 
+src_app_core-component_main_application_calendar_calendar_module_ts.js                                  | calendar-calendar-module                                     | 256.09 kB | 
+src_app_auth_auth_module_ts.js                                                                          | auth-auth-module                                             | 249.71 kB | 
+src_app_core-component_people_people_module_ts.js                                                       | people-people-module                                         | 221.97 kB | 
+src_app_core-component_stock_stock_module_ts.js                                                         | stock-stock-module                                           | 218.62 kB | 
+src_app_core-component_hrm_hrm_module_ts.js                                                             | hrm-hrm-module                                               | 217.74 kB | 
+src_app_core-component_categories-management_categories-management_module_ts.js                         | categories-management-categories-management-module           | 207.55 kB | 
+default-node_modules_angular_material_fesm2022_tabs_mjs.js                                              | payment-gateway-management-payment-gateway-management-module | 198.45 kB | 
+src_app_core-component_purchase_purchase_module_ts.js                                                   | purchase-purchase-module                                     | 192.20 kB | 
+src_app_core-component_base-ui_ui-nav-tabs_ui-nav-tabs_module_ts.js                                     | ui-nav-tabs-ui-nav-tabs-module                               | 181.76 kB | 
+default-node_modules_sweetalert2_dist_sweetalert2_all_js.js                                             | main-application-application-module                          | 168.60 kB | 
+src_app_core-component_hrm_employee_employee_module_ts.js                                               | employee-employee-module                                     | 164.33 kB | 
+src_app_core-component_hrm_leaves_leaves_module_ts.js                                                   | leaves-leaves-module                                         | 155.91 kB | 
+src_app_core-component_settings_app-settings_app-settings_module_ts.js                                  | app-settings-app-settings-module                             | 148.27 kB | 
+src_app_core-component_base-ui_ui-dropdowns_ui-dropdowns_module_ts.js                                   | ui-dropdowns-ui-dropdowns-module                             | 143.87 kB | 
+src_app_core-component_base-ui_ui-accordion_ui-accordion_module_ts.js                                   | ui-accordion-ui-accordion-module                             | 143.25 kB | 
+src_app_core-component_table_tables-basic_tables-basic_module_ts.js                                     | tables-basic-tables-basic-module                             | 129.08 kB | 
+src_app_core-component_base-ui_ui-rangeslider_ui-rangeslider_module_ts.js                               | ui-rangeslider-ui-rangeslider-module                         | 124.00 kB | 
+src_app_core-component_receipt-management_receipt-management_module_ts.js                               | receipt-management-receipt-management-module                 | 119.13 kB | 
+default-node_modules_popperjs_core_lib_modifiers_arrow_js-node_modules_popperjs_core_lib_modi-665070.js | ui-rating-ui-rating-module                                   | 117.15 kB | 
+default-node_modules_angular_material_fesm2022_dialog_mjs.js                                            | whats-app-management-whats-app-management-module             | 116.26 kB | 
+src_app_core-component_base-ui_ui-cards_ui-cards_module_ts.js                                           | ui-cards-ui-cards-module                                     | 113.73 kB | 
+src_app_core-component_hrm_department_department_module_ts.js                                           | department-department-module                                 | 112.52 kB | 
+src_app_core-component_hrm_attendence_attendence_module_ts.js                                           | attendence-attendence-module                                 | 108.62 kB | 
+src_app_core-component_payment-mode-management_payment-mode-management_module_ts.js                     | payment-mode-management-payment-mode-management-module       | 101.94 kB | 
+src_app_core-component_settings_system-settings_system-settings_module_ts.js                            | system-settings-system-settings-module                       | 101.27 kB | 
+src_app_core-component_base-ui_ui-modals_ui-modals_module_ts.js                                         | ui-modals-ui-modals-module                                   | 101.13 kB | 
+src_app_core-component_pages_pages_module_ts.js                                                         | pages-pages-module                                           | 100.17 kB | 
+src_app_core-component_icons_icon-ionic_icon-ionic_module_ts.js                                         | icon-ionic-icon-ionic-module                                 |  98.54 kB | 
+src_app_core-component_icons_icon-feather_icon-feather_module_ts.js                                     | icon-feather-icon-feather-module                             |  93.23 kB | 
+src_app_core-component_pages_places_places_module_ts.js                                                 | places-places-module                                         |  88.99 kB | 
+node_modules_dompurify_dist_purify_es_mjs.js                                                            | dompurify                                                    |  86.79 kB | 
+src_app_core-component_expense_expense_module_ts.js                                                     | expense-expense-module                                       |  85.97 kB | 
+src_app_core-component_hrm_payroll_payroll_module_ts.js                                                 | payroll-payroll-module                                       |  85.45 kB | 
+src_app_core-component_icons_icon-flag_icon-flag_module_ts.js                                           | icon-flag-icon-flag-module                                   |  82.39 kB | 
+src_app_core-component_common-management_common-management_module_ts.js                                 | common-management-common-management-module                   |  80.70 kB | 
+src_app_core-component_base-ui_ui-alerts_ui-alerts_module_ts.js                                         | ui-alerts-ui-alerts-module                                   |  77.76 kB | 
+src_app_core-component_icons_icon-fontawesome_icon-fontawesome_module_ts.js                             | icon-fontawesome-icon-fontawesome-module                     |  76.27 kB | 
+src_app_core-component_icons_icon-typicon_icon-typicon_module_ts.js                                     | icon-typicon-icon-typicon-module                             |  75.25 kB | 
+src_app_core-component_icons_icon-themify_icon-themify_module_ts.js                                     | icon-themify-icon-themify-module                             |  75.08 kB | 
+src_app_core-component_icons_icon-material_icon-material_module_ts.js                                   | icon-material-icon-material-module                           |  73.20 kB | 
+src_app_core-component_base-ui_ui-buttons-group_ui-buttons-group_module_ts.js                           | ui-buttons-group-ui-buttons-group-module                     |  72.59 kB | 
+src_app_core-component_inventory_stock_stock_module_ts.js                                               | stock-stock-module                                           |  72.44 kB | 
+src_app_core-component_settings_general-settings_general-settings_module_ts.js                          | general-settings-general-settings-module                     |  71.26 kB | 
+src_app_core-component_icons_icon-pe7_icon-pe7_module_ts.js                                             | icon-pe7-icon-pe7-module                                     |  68.98 kB | 
+src_app_core-component_promo_coupons_coupons_module_ts.js                                               | coupons-coupons-module                                       |  67.64 kB | 
+src_app_core-component_icons_icon-simpleline_icon-simpleline_module_ts.js                               | icon-simpleline-icon-simpleline-module                       |  66.27 kB | 
+src_app_core-component_currency-management_currency-management_module_ts.js                             | currency-management-currency-management-module               |  62.26 kB | 
+src_app_core-component_program-management_program-management_module_ts.js                               | program-management-program-management-module                 |  61.99 kB | 
+src_app_core-component_base-ui_ui-typography_ui-typography_module_ts.js                                 | ui-typography-ui-typography-module                           |  60.59 kB | 
+src_app_core-component_icons_icon-weather_icon-weather_module_ts.js                                     | icon-weather-icon-weather-module                             |  55.15 kB | 
+src_app_core-component_base-ui_ui-toasts_ui-toasts_module_ts.js                                         | ui-toasts-ui-toasts-module                                   |  55.01 kB | 
+src_app_core-component_inventory_category_category_module_ts.js                                         | category-category-module                                     |  53.88 kB | 
+src_app_core-component_settings_other-settings_other-settings_module_ts.js                              | other-settings-other-settings-module                         |  52.35 kB | 
+src_app_core-component_base-ui_ui-buttons_ui-buttons_module_ts.js                                       | ui-buttons-ui-buttons-module                                 |  50.33 kB | 
+src_app_core-component_base-ui_ui-colors_ui-colors_module_ts.js                                         | ui-colors-ui-colors-module                                   |  49.53 kB | 
+src_app_core-component_base-ui_ui-grid_ui-grid_module_ts.js                                             | ui-grid-ui-grid-module                                       |  47.28 kB | 
+src_app_core-component_base-ui_ui-progress_ui-progress_module_ts.js                                     | ui-progress-ui-progress-module                               |  46.50 kB | 
+default-node_modules_ngx-pagination_fesm2020_ngx-pagination_mjs.js                                      | donation-management-donation-management-module               |  43.06 kB | 
+src_app_core-component_main_application_email_email_module_ts.js                                        | email-email-module                                           |  42.63 kB | 
+src_app_core-component_base-ui_ui-badges_ui-badges_module_ts.js                                         | ui-badges-ui-badges-module                                   |  38.41 kB | 
+src_app_core-component_base-ui_ui-offcanvas_ui-offcanvas_module_ts.js                                   | ui-offcanvas-ui-offcanvas-module                             |  34.63 kB | 
+src_app_core-component_base-ui_ui-breadcrumb_ui-breadcrumb_module_ts.js                                 | ui-breadcrumb-ui-breadcrumb-module                           |  33.77 kB | 
+src_app_core-component_base-ui_ui-carousel_ui-carousel_module_ts.js                                     | ui-carousel-ui-carousel-module                               |  31.91 kB | 
+src_app_core-component_base-ui_ui-tooltips_ui-tooltips_module_ts.js                                     | ui-tooltips-ui-tooltips-module                               |  31.52 kB | 
+src_app_core-component_advanced-ui_ui-ribbon_ui-ribbon_module_ts.js                                     | ui-ribbon-ui-ribbon-module                                   |  31.26 kB | 
+src_app_core-component_base-ui_ui-popovers_ui-popovers_module_ts.js                                     | ui-popovers-ui-popovers-module                               |  29.87 kB | 
+src_app_core-component_base-ui_ui-pagination_ui-pagination_module_ts.js                                 | ui-pagination-ui-pagination-module                           |  28.16 kB | 
+src_app_core-component_base-ui_ui-avatar_ui-avatar_module_ts.js                                         | ui-avatar-ui-avatar-module                                   |  26.40 kB | 
+common.js                                                                                               | common                                                       |  26.15 kB | 
+src_app_core-component_base-ui_ui-sweetalerts_ui-sweetalerts_module_ts.js                               | ui-sweetalerts-ui-sweetalerts-module                         |  25.11 kB | 
+src_app_core-component_advanced-ui_ui-drag-drop_ui-drag-drop_module_ts.js                               | ui-drag-drop-ui-drag-drop-module                             |  24.97 kB | 
+src_app_core-component_thank-you_thank-you_module_ts.js                                                 | thank-you-thank-you-module                                   |  24.10 kB | 
+src_app_core-component_base-ui_ui-spinner_ui-spinner_module_ts.js                                       | ui-spinner-ui-spinner-module                                 |  23.27 kB | 
+src_app_core-component_charts_chart-apex_chart-apex_module_ts.js                                        | chart-apex-chart-apex-module                                 |  22.50 kB | 
+default-src_app_core-component_currency-management_currency_currency_service_ts-src_app_core--531a5c.js | donation-management-donation-management-module               |  22.25 kB | 
+src_app_core-component_table_data-tables_data-tables_module_ts.js                                       | data-tables-data-tables-module                               |  20.29 kB | 
+src_app_core-component_base-ui_ui-placeholders_ui-placeholders_module_ts.js                             | ui-placeholders-ui-placeholders-module                       |  18.92 kB | 
+src_app_core-component_advanced-ui_ui-counter_ui-counter_module_ts.js                                   | ui-counter-ui-counter-module                                 |  18.71 kB | 
+src_app_core-component_base-ui_ui-media_ui-media_module_ts.js                                           | ui-media-ui-media-module                                     |  18.04 kB | 
+src_app_core-component_charts_prime-ng_prime-ng_module_ts.js                                            | prime-ng-prime-ng-module                                     |  17.70 kB | 
+src_app_core-component_payment-gateway-management_payment-gateway-management_module_ts.js               | payment-gateway-management-payment-gateway-management-module |  17.63 kB | 
+src_app_core-component_advanced-ui_ui-clipboard_ui-clipboard_module_ts.js                               | ui-clipboard-ui-clipboard-module                             |  17.12 kB | 
+src_app_core-component_charts_chart-ng2_chart-ng2_module_ts.js                                          | chart-ng2-chart-ng2-module                                   |  16.23 kB | 
+src_app_core-component_base-ui_ui-borders_ui-borders_module_ts.js                                       | ui-borders-ui-borders-module                                 |  16.10 kB | 
+default-node_modules_primeng_fesm2022_primeng-autofocus_mjs-node_modules_primeng_fesm2022_pri-1260a6.js | common-management-common-management-module                   |  15.89 kB | 
+src_app_core-component_advanced-ui_ui-scrollbar_ui-scrollbar_module_ts.js                               | ui-scrollbar-ui-scrollbar-module                             |  14.71 kB | 
+src_app_error-pages_error-pages_module_ts.js                                                            | error-pages-error-pages-module                               |  14.50 kB | 
+src_app_core-component_base-ui_base-ui_module_ts.js                                                     | base-ui-base-ui-module                                       |  14.07 kB | 
+default-src_app_core-component_categories-management_categories-management_service_ts.js                | lead-management-lead-management-module                       |  13.60 kB | 
+src_app_core-component_advanced-ui_ui-timeline_ui-timeline_module_ts.js                                 | ui-timeline-ui-timeline-module                               |  13.18 kB | 
+src_app_core-component_base-ui_ui-images_ui-images_module_ts.js                                         | ui-images-ui-images-module                                   |  12.46 kB | 
+src_app_core-component_base-ui_ui-lightbox_ui-lightbox_module_ts.js                                     | ui-lightbox-ui-lightbox-module                               |  11.70 kB | 
+src_app_core-component_base-ui_ui-video_ui-video_module_ts.js                                           | ui-video-ui-video-module                                     |  10.24 kB | 
+src_app_core-component_advanced-ui_ui-text-editor_ui-text-editor_module_ts.js                           | ui-text-editor-ui-text-editor-module                         |   9.64 kB | 
+src_app_core-component_advanced-ui_advanced-ui_module_ts.js                                             | advanced-ui-advanced-ui-module                               |   8.49 kB | 
+src_app_core-component_advanced-ui_ui-stickynote_ui-stickynote_module_ts.js                             | ui-stickynote-ui-stickynote-module                           |   8.44 kB | 
+src_app_core-component_settings_settings_module_ts.js                                                   | settings-settings-module                                     |   8.15 kB | 
+src_app_core-component_icons_icons_module_ts.js                                                         | icons-icons-module                                           |   8.15 kB | 
+src_app_core-component_charts_charts_module_ts.js                                                       | charts-charts-module                                         |   6.96 kB | 
+src_app_core-component_table_table_module_ts.js                                                         | table-table-module                                           |   6.12 kB | 
+src_app_core-component_promo_promo_module_ts.js                                                         | promo-promo-module                                           |   6.07 kB | 
+
+Build at: 2026-11-16T07:18:40.420Z - Hash: f67e695e5d20a6b8 - Time: 388785ms
+
+** Angular Live Development Server is listening on localhost:4200, open your browser on http://localhost:4200/ **
+
+
+√ Compiled successfully.
