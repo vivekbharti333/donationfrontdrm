@@ -285,6 +285,18 @@ export class SchoolManagementService {
     return this.http.post<any>(Constant.Site_Url + 'addStudentAcademic', request, options);
   }
 
+  getMonthlyFeeReport(sessionName: string, byFeeType = false): Observable<any> {
+    const token = this.getAuthenticationToken();
+    const currentUser = this.authenticationService.getLoginUser();
+    const request = { payload: {
+      sessionName,
+      superadminId: currentUser?.superadminId || this.cookieService.get('superadminId')
+    } };
+    const options = token ? { headers: new HttpHeaders({ Authorization: `Bearer ${token}` }) } : {};
+    const endpoint = byFeeType ? 'getMonthlyFeeTypeReport' : 'getMonthlyFeeReport';
+    return this.http.post<any>(Constant.Site_Url + endpoint, request, options);
+  }
+
   getFeeTypeDetails(): Observable<any> {
     const token = this.getAuthenticationToken();
     const currentUser = this.authenticationService.getLoginUser();

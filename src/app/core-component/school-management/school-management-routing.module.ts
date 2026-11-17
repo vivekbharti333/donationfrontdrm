@@ -1,3 +1,4 @@
+import { FeeReportComponent } from './report/fee-report/fee-report.component';
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { SchoolManagementComponent } from './school-management.component';
@@ -109,6 +110,9 @@ const routes: Routes = [
       {
         path: 'student-exam-result',
         component: StudentExamResultComponent,
+      },
+      {
+        path: 'fee-report', component: FeeReportComponent
       },
       {
         path: 'fee-due-report',

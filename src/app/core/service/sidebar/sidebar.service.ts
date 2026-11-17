@@ -394,6 +394,9 @@ export class SidebarService {
               permission: 'school-receipt-list',
             }, 
             {
+              menuValue: 'Monthly Fee Report', route: routes.feeReport, permission: 'generate-school-receipt'
+            },
+            {
               menuValue: 'Fee Due Report',
               route: routes.feeDueReport,
               permission: 'generate-school-receipt',

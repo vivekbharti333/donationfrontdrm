@@ -1,0 +1,56 @@
+:host { display: block; }
+.fee-report { color: #243247; }
+.table-heading p { color: #66758a; margin: 0; }
+.report-card { border: 1px solid #e5eaf1; border-radius: 12px; box-shadow: 0 3px 14px rgb(23 42 70 / 3%); overflow: hidden; }
+.report-filters { display: flex; align-items: flex-end; gap: 20px; flex-wrap: wrap; }
+.report-options { border: 0; padding: 0; margin: 0 auto 0 0; min-width: 0; }
+.report-options legend, .form-label { font-size: 13px; font-weight: 600; margin-bottom: 9px; }
+.view-switch { display: flex; gap: 4px; padding: 4px; background: #f2f5f9; border-radius: 9px; }
+.view-switch label { display: flex; align-items: center; gap: 8px; padding: 9px 14px; border: 1px solid transparent; border-radius: 7px; cursor: pointer; font-size: 13px; font-weight: 500; margin: 0; }
+.view-switch label.selected { color: #3157a5; background: white; border-color: #dce5f5; box-shadow: 0 2px 5px rgb(23 42 70 / 5%); }
+.view-switch label:focus-within { outline: 2px solid #557bcc; outline-offset: 2px; }
+.view-switch input { accent-color: #3157a5; }
+.year-filter { min-width: 170px; }
+.form-select, .refresh-button { min-height: 43px; border-radius: 8px; }
+.summary-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; margin-bottom: 24px; }
+.summary-card { display: flex; flex-direction: column; gap: 8px; padding: 22px; background: white; border: 1px solid #e5eaf1; border-top: 3px solid #5976bf; border-radius: 10px; }
+.summary-card > span { color: #66758a; font-size: 13px; font-weight: 600; }
+.summary-card strong { font-size: clamp(19px, 2vw, 27px); font-weight: 700; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
+.summary-card small { color: #788598; font-size: 12px; }
+.summary-card.due { border-top-color: #d8893c; }
+.summary-card.received { border-top-color: #2a9270; }
+.due-amount, .due strong { color: #b26421; }
+.received-amount, .received strong { color: #197b58; }
+.table-heading { padding: 22px 24px; border-bottom: 1px solid #e5eaf1; }
+.table-heading h4 { font-size: 16px; margin-bottom: 6px; font-weight: 600; }
+.table-heading p { font-size: 12px; }
+.fee-table { min-width: 600px; }
+.fee-table thead th { background: #f6f8fb; color: #69778b; font-size: 12px; font-weight: 600; white-space: nowrap; }
+.fee-table th, .fee-table td { padding: 15px 24px; border-color: #edf0f5; }
+.fee-table tbody td { font-size: 13px; }
+.fee-table .month-cell { background: #fafbfd; font-size: 13px; font-weight: 600; vertical-align: middle; white-space: nowrap; }
+.fee-table .month-start > * { border-top: 1px solid #dce3ed; }
+.fee-table tbody tr:hover td { background: #f8faff; }
+.fee-table tbody tr.month-coloured > td,
+.fee-table tbody tr.month-coloured > .month-cell {
+  background: var(--month-background);
+  --bs-table-bg: var(--month-background);
+  box-shadow: none;
+}
+.fee-table tbody tr.month-coloured.month-start > * { border-top: 2px solid #d4dce7; }
+.amount { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.fee-table tfoot { background: #f0f4fa; border-top: 2px solid #dce3ed; font-size: 13px; font-weight: 700; }
+.report-state { padding: 48px 24px !important; text-align: center; color: #66758a; }
+.report-state p { margin: 12px 0 0; font-size: 13px; }
+.report-notes { border-top: 1px solid #e5eaf1; padding: 16px 24px; font-size: 12px; color: #66758a; }
+.report-notes summary { cursor: pointer; font-weight: 500; }
+.report-notes p { margin: 12px 0 0; line-height: 1.8; max-width: 950px; }
+@media (max-width: 767px) {
+  .summary-grid { grid-template-columns: 1fr; gap: 12px; }
+  .summary-card { padding: 18px; }
+  .report-options, .year-filter { width: 100%; }
+  .view-switch { flex-wrap: wrap; }
+  .view-switch label { flex: 1; white-space: nowrap; justify-content: center; }
+  .refresh-button { width: 100%; }
+  .fee-table th, .fee-table td { padding: 13px 16px; }
+}

@@ -1,0 +1,69 @@
+<div class="fee-report">
+  <div class="page-header">
+    <div class="add-item d-flex">
+      <div class="page-title">
+        <h4>Fee Report</h4>
+        <h6>Track assigned fees, outstanding dues and collections by month.</h6>
+      </div>
+    </div>
+  </div>
+
+  <div class="card report-card">
+    <div class="card-body">
+      <form class="report-filters" (ngSubmit)="loadReport()">
+        <fieldset class="report-options">
+          <legend>Report view</legend>
+          <div class="view-switch">
+            <label [class.selected]="reportType === 'monthly'">
+              <input type="radio" name="reportType" value="monthly" [(ngModel)]="reportType" (ngModelChange)="loadReport()">
+              Monthly Summary
+            </label>
+            <label [class.selected]="reportType === 'feeType'">
+              <input type="radio" name="reportType" value="feeType" [(ngModel)]="reportType" (ngModelChange)="loadReport()">
+              Month and Fee Type
+            </label>
+          </div>
+        </fieldset>
+        <div class="year-filter">
+          <label for="fee-report-year" class="form-label">Academic year</label>
+          <select id="fee-report-year" name="sessionName" class="form-select" [(ngModel)]="sessionName" (ngModelChange)="loadReport()">
+            <option *ngFor="let year of academicYears" [value]="year.value">{{ year.name }}</option>
+          </select>
+        </div>
+        <button class="btn btn-primary refresh-button" type="submit" [disabled]="isLoading">
+          <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>{{ isLoading ? 'Loading...' : 'Refresh Report' }}
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <div class="summary-grid" *ngIf="!isLoading && !errorMessage && rows.length">
+    <div class="summary-card assigned"><span>Total Fee</span><strong>{{ total('totalFee') | currency:'INR':'symbol':'1.2-2' }}</strong><small>Assigned after discounts and fines</small></div>
+    <div class="summary-card due"><span>Due Fee</span><strong>{{ total('dueFee') | currency:'INR':'symbol':'1.2-2' }}</strong><small>Outstanding balance</small></div>
+    <div class="summary-card received"><span>Received Fee</span><strong>{{ total('receivedFee') | currency:'INR':'symbol':'1.2-2' }}</strong><small>Payments against assigned fees</small></div>
+  </div>
+
+  <section class="card report-card" [attr.aria-busy]="isLoading" aria-labelledby="report-table-title">
+    <div class="table-heading"><div><h4 id="report-table-title">{{ reportType === 'feeType' ? 'Monthly fees by type' : 'Monthly summary' }}</h4><p>April to March · All amounts in INR</p></div></div>
+    <div *ngIf="errorMessage" class="alert alert-danger m-3" role="alert">{{ errorMessage }}</div>
+    <div *ngIf="isLoading" class="report-state" role="status"><span class="spinner-border text-primary" aria-hidden="true"></span><p>Loading your fee report...</p></div>
+    <div class="table-responsive" *ngIf="!isLoading && !errorMessage">
+      <table class="table fee-table align-middle mb-0">
+        <caption class="visually-hidden">{{ reportType === 'feeType' ? 'Monthly fees grouped by fee type' : 'Monthly fee totals' }} for {{ sessionName }}, in Indian rupees.</caption>
+        <thead><tr><th scope="col">Month</th><th scope="col" *ngIf="reportType === 'feeType'">Fee Type</th><th scope="col" class="text-end">Total Fee</th><th scope="col" class="text-end">Due Fee</th><th scope="col" class="text-end">Received Fee</th></tr></thead>
+        <tbody>
+          <tr *ngFor="let row of rows; let i = index" [class.month-start]="i > 0 && monthRowSpan(i) > 0" [class.month-coloured]="reportType === 'feeType'" [style.--month-background]="monthColour(row.month)">
+            <th *ngIf="monthRowSpan(i) > 0" [attr.rowspan]="monthRowSpan(i)" [attr.scope]="reportType === 'feeType' ? 'rowgroup' : 'row'" class="month-cell">{{ row.month }}</th>
+            <td *ngIf="reportType === 'feeType'">{{ row.feeType }}</td>
+            <td class="text-end amount">{{ row.totalFee | number:'1.2-2' }}</td>
+            <td class="text-end amount due-amount">{{ row.dueFee | number:'1.2-2' }}</td>
+            <td class="text-end amount received-amount">{{ row.receivedFee | number:'1.2-2' }}</td>
+          </tr>
+          <tr *ngIf="!rows.length"><td [attr.colspan]="reportType === 'feeType' ? 5 : 4" class="report-state"><strong>No fee records found</strong><p>Choose another academic year or refresh the report.</p></td></tr>
+        </tbody>
+        <tfoot *ngIf="rows.length"><tr><th scope="row" [attr.colspan]="reportType === 'feeType' ? 2 : 1">Total (INR)</th><td class="text-end amount">{{ total('totalFee') | number:'1.2-2' }}</td><td class="text-end amount due-amount">{{ total('dueFee') | number:'1.2-2' }}</td><td class="text-end amount received-amount">{{ total('receivedFee') | number:'1.2-2' }}</td></tr></tfoot>
+      </table>
+    </div>
+    <details class="report-notes"><summary>How this report is calculated</summary><p>Total fee includes discounts and fines. Quarterly and half-yearly fees appear in their starting month; yearly and first-time school-life fees appear in April. Payments follow the installment month, regardless of payment date. Inactive, left, withdrawn, removed and deleted students are excluded.</p></details>
+  </section>
+</div>
