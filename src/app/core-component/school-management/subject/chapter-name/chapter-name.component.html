@@ -1,0 +1,56 @@
+<div class="page-header">
+  <div class="page-title"><h4>Chapter Names</h4><h6>Chapters by session, grade and subject</h6></div>
+  <button type="button" class="btn btn-primary" (click)="open()" [disabled]="loading">Add chapters</button>
+</div>
+<div class="row g-3 mb-3">
+  <label class="col-sm-4">Session
+    <select class="form-select" [(ngModel)]="filterSession" (ngModelChange)="filterGrade=''; filterSubject=''">
+      <option value="">All sessions</option>
+      <option *ngFor="let year of years" [value]="year.value">{{year.name}}</option>
+    </select>
+  </label>
+  <label class="col-sm-4">Grade
+    <select class="form-select" [(ngModel)]="filterGrade" (ngModelChange)="filterSubject=''">
+      <option value="">All grades</option>
+      <option *ngFor="let name of listGrades" [value]="name">{{name}}</option>
+    </select>
+  </label>
+  <label class="col-sm-4">Subject
+    <select class="form-select" [(ngModel)]="filterSubject">
+      <option value="">All subjects</option>
+      <option *ngFor="let name of listSubjects" [value]="name">{{name}}</option>
+    </select>
+  </label>
+</div>
+<p *ngIf="notice" role="status">{{notice}}</p>
+<p *ngIf="loading" role="status">Loading chapters…</p>
+<p *ngIf="listError" role="alert">{{listError}} <button class="btn btn-link" (click)="loadList()">Retry</button></p>
+<div class="chapter-list" *ngIf="!loading && !listError">
+  <section class="chapter-group" *ngFor="let group of visibleGroups">
+    <header class="group-heading">
+      <div><h5>{{group[0].subject}}</h5><p>Class {{group[0].grade}} · Session {{group[0].sessionName}}</p></div>
+      <span>{{group.length}} {{group.length === 1 ? 'chapter' : 'chapters'}}</span>
+    </header>
+    <ul class="chapter-rows">
+      <li *ngFor="let row of group"><span>{{row.chapter}}</span><span class="chapter-status" [class.active-status]="row.status === 'ACTIVE'"><span class="visually-hidden">Status: </span>{{row.status || 'Status unavailable'}}</span></li>
+    </ul>
+  </section>
+  <p *ngIf="!visibleGroups.length" class="empty-state">{{groups.length ? 'No chapters match the selected filters.' : 'No chapters added yet.'}}</p>
+</div>
+<dialog #editor aria-labelledby="chapter-title" (cancel)="busy && $event.preventDefault()">
+  <header class="d-flex justify-content-between align-items-center p-3 border-bottom"><h4 id="chapter-title" class="mb-0">Add chapters</h4><button class="btn-close" aria-label="Close" [disabled]="busy" (click)="editor.close()"></button></header>
+<form class="p-3" (ngSubmit)="save()"><fieldset [disabled]="busy">
+  <div class="row g-3">
+    <label class="col-md-4">Academic session<select name="session" class="form-select" [(ngModel)]="session" (ngModelChange)="grade=null; mapping=null; resetDraft()"><option value="">Select session</option><option *ngFor="let y of years" [value]="y.value">{{y.name}}</option></select></label>
+    <label class="col-md-4">Grade<select name="grade" class="form-select" [(ngModel)]="grade" (ngModelChange)="mapping=null; resetDraft()" [disabled]="!session"><option [ngValue]="null">Select grade</option><option *ngFor="let g of availableGrades" [ngValue]="g.id">{{g.gradeName}}</option></select></label>
+    <label class="col-md-4">Subject<select name="subject" class="form-select" [(ngModel)]="mapping" (ngModelChange)="resetDraft()" [disabled]="!grade"><option [ngValue]="null">Select subject</option><option *ngFor="let s of availableSubjects" [ngValue]="s.id">{{s.name}}</option></select></label>
+  </div>
+  <label class="w-100 my-3">Chapter names (one per line)<textarea name="chapters" class="form-control" rows="5" [(ngModel)]="draft" [disabled]="!mapping"></textarea></label>
+  <button type="button" class="btn btn-light me-2" (click)="editor.close()">Cancel</button><button class="btn btn-primary" [disabled]="!mapping || !draft.trim() || busy">Save chapters</button>
+</fieldset>
+<p *ngIf="message" class="mt-3" role="status">{{message}}</p>
+
+</form>
+</dialog>
+
+

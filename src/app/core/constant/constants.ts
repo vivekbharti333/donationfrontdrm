@@ -11,9 +11,14 @@ export class Constant {
       // ? Constant.LOCAL_SITE_URL
       // : Constant.PRODUCTION_SITE_URL;
  
-    public static Site_Url = "http://localhost/mycrm/";
+    public static Site_Url =
+      typeof window !== 'undefined' &&
+      ['localhost', '127.0.0.1', '[::1]'].includes(window.location.hostname) &&
+      window.location.port === '4200'
+        ? '/mycrm/'
+        : 'http://localhost/mycrm/';
     // public static Site_Url = "http://192.168.29.119/mycrm/";
-    // public static Site_Url = "https://datfuslab.in/drmapinew/";
+    // public static Site_Url = "https://datfuslab.in/drmapinew/"; 
     // public static Site_Url = "https://donexia.in/drmapinew/";
 
     // ['sale-dashboard','create-user','user-list','add-donation','all-donation-list','payment-mode-master','payment-mode','currency-master','currency','program','add-receipt-header','receipt-header-list','company-setting','create-lead','lead-list']

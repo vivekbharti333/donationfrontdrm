@@ -1,0 +1,45 @@
+label { display: block; margin-bottom: 12px; }
+td.notes { white-space: pre-wrap; overflow-wrap: anywhere; min-width: 150px; }
+dialog { width: min(640px, 94vw); max-height: 90dvh; padding: 0; border: 0; border-radius: 14px; color: inherit; box-shadow: 0 16px 64px #18263c38; }
+dialog[open], .entry-form { display: flex; flex-direction: column; overflow: hidden; }
+dialog::backdrop { background: #17233880; }
+.dialog-header, .dialog-actions { display: flex; align-items: center; flex-shrink: 0; padding: 16px 24px; }
+.dialog-header { justify-content: space-between; border-bottom: 1px solid #e2e7ed; }
+.dialog-header h4 { margin: 0; }
+.dialog-body { overflow-y: auto; padding: 20px 24px; }
+.dialog-body fieldset { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 18px; }
+.dialog-body label { margin: 0; font-weight: 600; }
+.dialog-body select, .dialog-body textarea { margin-top: 5px; font-weight: 400; }
+.dialog-body textarea { height: auto; resize: vertical; }
+.full-width { grid-column: 1 / -1; }
+.entry-form > .dialog-actions {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: flex-end;
+  gap: 8px;
+  border-top: 1px solid #e2e7ed;
+}
+.dialog-actions > .btn { flex: 0 0 auto; width: auto; margin: 0; white-space: nowrap; }
+@media (max-width: 540px) {
+  .dialog-body fieldset { grid-template-columns: 1fr; }
+  .dialog-body, .dialog-header, .dialog-actions { padding: 14px 16px; }
+}
+.diary-filters, .lesson-notes { display: grid; gap: 16px; }
+.diary-filters { grid-template-columns: repeat(3, minmax(0, 1fr)); margin-bottom: 20px; }
+.filter-field { font-weight: 600; margin: 0; }
+.filter-field select { margin-top: 5px; }
+.diary-list { display: grid; gap: 12px; }
+.lesson, .diary-state { padding: 16px 20px; border: 1px solid #dce3eb; border-radius: 8px; background: white; }
+.lesson-header { display: flex; justify-content: space-between; gap: 12px; border-bottom: 1px solid #e6eaf0; padding-bottom: 12px; }
+.lesson-header h5 { margin: 0; font-weight: 600; }
+.lesson-header p { color: #536479; margin: 4px 0 0; font-size: 13px; }
+.lesson-author { text-align: right; }
+.lesson-notes { grid-template-columns: repeat(2, minmax(0, 1fr)); margin: 12px 0 0; }
+.lesson-notes dt { font-size: 13px; color: #536479; }
+.lesson-notes dd { margin: 4px 0 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.lesson-header { overflow-wrap: anywhere; }
+@media (max-width: 640px) {
+  .diary-filters, .lesson-notes { grid-template-columns: 1fr; }
+  .lesson-header { flex-direction: column; }
+  .lesson-author { text-align: left; }
+}

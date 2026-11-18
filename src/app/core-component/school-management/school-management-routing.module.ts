@@ -84,7 +84,9 @@ const routes: Routes = [
         component: SubjectComponent,
       },
       {
-        path: 'grade-subject',
+        path: 'class-diary', loadComponent: () => import('./subject/class-diary/class-diary.component').then(m => m.ClassDiaryComponent) },
+      { path: 'chapter-name', loadComponent: () => import('./subject/chapter-name/chapter-name.component').then(m => m.ChapterNameComponent) },
+      { path: 'grade-subject',
         component: GradeSubjectComponent,
       },
       {

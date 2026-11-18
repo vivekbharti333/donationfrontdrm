@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { AuthenticationService } from 'src/app/auth/authentication.service';
 import { SidebarService, routes } from 'src/app/core/core.index';
 import { NavigationEnd, Router, Event as RouterEvent } from '@angular/router';
 import { url } from 'src/app/shared/model/sidebar.model';
@@ -30,6 +31,7 @@ export class SidebarOneComponent implements OnInit {
   constructor(
     private router: Router,
     private sidebar: SidebarService,
+    private authentication: AuthenticationService,
   ) {
     this.router.events.subscribe((event: RouterEvent) => {
       if (event instanceof NavigationEnd) {
@@ -40,7 +42,7 @@ export class SidebarOneComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.side_bar_data = this.sidebar.getFilteredSidebarData();
+    this.side_bar_data = this.sidebar.getFilteredSidebarData(this.authentication.getLoginUser()?.roleType);
   }
 
   private getRoutes(route: url): void {

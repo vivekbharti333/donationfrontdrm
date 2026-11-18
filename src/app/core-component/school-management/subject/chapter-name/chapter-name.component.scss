@@ -1,0 +1,18 @@
+dialog { width: min(680px, 94vw); max-height: 90vh; border: 0; padding: 0; border-radius: 12px; } dialog::backdrop { background: #17233880; }
+.chapter-list { display: grid; gap: 16px; }
+.chapter-group, .empty-state { border: 1px solid #dce3ea; border-radius: 10px; background: #fff; overflow: hidden; }
+.group-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 20px; background: #f5f7fa; border-bottom: 1px solid #dce3ea; }
+.group-heading h5 { margin: 0; font-size: 16px; font-weight: 600; overflow-wrap: anywhere; }
+.group-heading p, .group-heading span { color: #536477; font-size: 13px; }
+.group-heading p { margin: 4px 0 0; }
+.group-heading span { white-space: nowrap; }
+.chapter-rows { list-style: none; padding: 0; margin: 0; }
+.chapter-rows li { padding: 11px 20px; line-height: 1.5; overflow-wrap: anywhere; }
+.chapter-rows li + li { border-top: 1px solid #edf0f4; }
+.empty-state { padding: 22px; text-align: center; }
+@media (max-width: 540px) {
+  .group-heading, .chapter-rows li { padding-inline: 14px; }
+}
+.chapter-rows li { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.chapter-status { flex-shrink: 0; font-size: 12px; padding: 2px 8px; border-radius: 6px; background: #eef0f3; color: #465364; }
+.active-status { background: #e8f5ef; color: #216847; }

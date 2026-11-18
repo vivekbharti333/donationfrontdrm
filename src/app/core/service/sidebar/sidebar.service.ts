@@ -56,7 +56,7 @@ export class SidebarService {
     return parsePermissions(localStorage.getItem('menuPermission'));
   }
 
-  public getFilteredSidebarData() {
+  public getFilteredSidebarData(roleType = '') {
     const permissions = this.getPermissions();
     return this.sidebarData1
       .map(section => ({
@@ -65,7 +65,9 @@ export class SidebarService {
           .map(menuItem => ({
             ...menuItem,
             subMenus: menuItem.subMenus.filter(subMenuItem =>
-              hasMenuPermission(permissions, subMenuItem.permission)
+              subMenuItem.permission === 'class-diary'
+                ? ['TEACHER', 'ADMIN', 'SUPERADMIN', 'MAINADMIN'].includes(roleType)
+                : hasMenuPermission(permissions, subMenuItem.permission)
             ),
           }))
           .filter(menuItem => menuItem.subMenus.length > 0),
@@ -430,6 +432,12 @@ export class SidebarService {
               route: routes.subject,
               // permission: 'grade',
               permission:'fee-assignment',
+            },
+            {
+              menuValue: 'Class Diary', route: routes.schoolManagement + '/class-diary', permission: 'class-diary',
+            },
+            {
+              menuValue: 'Chapter Names', route: routes.schoolManagement + '/chapter-name', permission: 'fee-assignment',
             },
             {
               menuValue: 'Grade Subjects',

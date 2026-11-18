@@ -1,0 +1,46 @@
+<div class="page-header"><div class="page-title"><h4>Class Diary</h4><h6>Teaching and homework by lesson</h6></div>
+<div><button type="button" class="btn btn-primary" [disabled]="!teacher && !admin" (click)="open()">Add class work and homework</button>
+<small *ngIf="!teacher && !admin" class="d-block mt-1">Sign in with a teacher account to add work.</small></div></div>
+<div class="diary-filters">
+  <label class="filter-field">Session<select class="form-select" [(ngModel)]="filterSession" (ngModelChange)="filterGrade=''; filterSection=''"><option value="">All sessions</option><option *ngFor="let year of sessionOptions" [value]="year.value">{{year.name}}</option></select></label>
+  <label class="filter-field">Grade<select class="form-select" [(ngModel)]="filterGrade" (ngModelChange)="filterSection=''"><option value="">All grades</option><option *ngFor="let value of listGrades">{{value}}</option></select></label>
+  <label class="filter-field">Section<select class="form-select" [(ngModel)]="filterSection"><option value="">All sections</option><option *ngFor="let s of sectionOptions" [value]="s.value">{{s.name}}</option></select></label>
+</div>
+<p *ngIf="loading" class="diary-state" role="status">Loading entries…</p>
+<p *ngIf="error" class="alert alert-danger" role="alert">{{error}} <button class="btn btn-link" (click)="load()">Retry</button></p>
+<ng-container *ngIf="!loading && !error">
+  <div *ngIf="visibleEntries as lessons" class="diary-list">
+    <article *ngFor="let e of lessons" class="lesson">
+      <header class="lesson-header">
+        <div><h5>{{e.subject}} · {{e.chapter}}</h5>
+          <p>Grade {{e.grade}}<ng-container *ngIf="e.gradeSection"> · Section {{e.gradeSection}}</ng-container> · {{e.sessionName}}</p>
+        </div>
+        <div class="lesson-author"><time>{{e.lessonDate | date:'dd MMM yyyy'}}</time>
+          <p>Recorded by {{(e.firstName || e.lastName) ? (e.firstName || '') + ' ' + (e.lastName || '') : e.teacherLogin}}</p>
+        </div>
+      </header>
+      <dl class="lesson-notes">
+        <div><dt>Class work</dt><dd>{{e.classWork}}</dd></div>
+        <div><dt>Homework</dt><dd>{{e.homework || '—'}}</dd></div>
+      </dl>
+    </article>
+    <p *ngIf="!lessons.length" class="diary-state" role="status">No diary entries match your selection.</p>
+  </div>
+</ng-container>
+<dialog #editor aria-labelledby="entry-title" (cancel)="saving && $event.preventDefault()"><header class="dialog-header"><h4 id="entry-title">Add diary entry</h4><button type="button" class="btn-close" aria-label="Close diary entry" [disabled]="saving" (click)="editor.close()"></button></header>
+<form class="entry-form" (ngSubmit)="save()"><div class="dialog-body"><p *ngIf="loadingOptions" role="status">Loading class details…</p><fieldset [disabled]="saving || loadingOptions">
+<label>Session<select class="form-select" name="session" [(ngModel)]="session" (ngModelChange)="grade=null; subject=null; chapter=null"><option value="">Select session</option><option *ngFor="let year of sessionOptions" [value]="year.value">{{year.name}}</option></select></label>
+<label>Grade<select class="form-select" name="grade" [(ngModel)]="grade" (ngModelChange)="subject=null; chapter=null"><option [ngValue]="null">Select grade</option><option *ngFor="let g of grades" [ngValue]="g[0]">{{g[1]}}</option></select></label>
+<label>Section<select class="form-select" name="entrySection" required [(ngModel)]="entrySection"><option value="" disabled>Select section</option><option *ngFor="let s of sectionOptions" [value]="s.value">{{s.name}}</option></select></label><label>Subject<select class="form-select" name="subject" [(ngModel)]="subject" (ngModelChange)="chapter=null"><option [ngValue]="null">Select subject</option><option *ngFor="let s of subjects" [ngValue]="s[0]">{{s[1]}}</option></select></label>
+<label class="full-width">Chapter<select class="form-select" name="chapter" [(ngModel)]="chapter"><option [ngValue]="null">Select chapter</option><option *ngFor="let c of chapters" [ngValue]="c.id">{{c.chapter}}</option></select></label>
+<label class="full-width">What did you teach?<textarea rows="3" class="form-control" name="classWork" [(ngModel)]="classWork" required maxlength="4000"></textarea></label>
+<label class="full-width">Homework (optional)<textarea rows="2" class="form-control" name="homework" [(ngModel)]="homework" maxlength="4000"></textarea></label></fieldset>
+<p *ngIf="formError" class="alert alert-danger mt-3 mb-0" role="alert">{{formError}}</p></div><footer class="dialog-actions">
+<button type="button" class="btn btn-light" [disabled]="saving" (click)="editor.close()">Cancel</button>
+<button class="btn btn-primary" [disabled]="saving || loadingOptions || !entrySection || !chapter || !classWork.trim()">{{saving ? 'Saving…' : 'Save entry'}}</button></footer></form></dialog>
+
+
+
+
+
+
