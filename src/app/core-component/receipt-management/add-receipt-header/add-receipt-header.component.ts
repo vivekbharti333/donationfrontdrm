@@ -61,9 +61,6 @@ export class AddReceiptHeaderComponent implements OnInit, OnDestroy {
     if (!this.isSuperadmin) {
       this.getSuperadminList();
     }
-    if (this.superadminId) {
-      this.getInvoiceHeaderList(String(this.superadminId), 'BYSUPERADMINID');
-    }
   }
 
    editor!: Editor;

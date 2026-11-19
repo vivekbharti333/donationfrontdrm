@@ -20,22 +20,22 @@ export class CurrencyService {
     this.loginUser = this.authenticationService.getLoginUser();
   }
 
-  getCurrencyDetailBySuperadmin(): Observable<any> {
+  getCurrencyDetailBySuperadmin(superadminId = this.loginUser['superadminId']): Observable<any> {
     let request: any = {
       payload: {
         // token: this.loginUser['token'],
-        superadminId: this.loginUser['superadminId'],
+        superadminId,
       }
     };
     return this.http.post<any>(Constant.Site_Url + "getCurrencyDetailsBySuperadmin", request);
   }
   
 
-    addUpdateCurrencyBySuperadmin(ids: any): Observable<any> {
+  addUpdateCurrencyBySuperadmin(ids: string, superadminId = this.loginUser['superadminId']): Observable<any> {
     const request = {
       payload: {
         currencyMasterIds: ids,
-        superadminId: this.loginUser['superadminId'],
+        superadminId,
       }
     };
     return this.http.post<any>(Constant.Site_Url + 'addUpdateCurrencyBySuperadmin', request);

@@ -26,21 +26,20 @@ export class PaymentModeManagementService {
     return this.http.post<any>(Constant.Site_Url + "getMasterPaymentModeList", request);
   }
 
-  getPaymentModeListBySuperadminId(){
+  getPaymentModeListBySuperadminId(superadminId = this.loginUser['superadminId']){
       let request: any = {
         payload: {
-          superadminId: this.loginUser['superadminId'],
-          // superadminId: '1234567890',
+          superadminId,
         }
       };
       return this.http.post<any>(Constant.Site_Url + "getPaymentModeListBySuperadminId", request);
     }
 
-    addUpdatePaymentModeBySuperadmin(paymentModeIds :any){
+    addUpdatePaymentModeBySuperadmin(paymentModeIds :any, superadminId = this.loginUser['superadminId']){
       let request: any = {
         payload: {
           paymentModeIds: paymentModeIds,
-          superadminId: this.loginUser['superadminId'],
+          superadminId,
         }
       };
       return this.http.post<any>(Constant.Site_Url + "addOrUpdatePaymentModeBySuperadmin", request);

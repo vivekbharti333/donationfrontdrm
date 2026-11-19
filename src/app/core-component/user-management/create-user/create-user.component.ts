@@ -1,3 +1,4 @@
+import { userPermissionsForService } from '../user-service-permissions';
 import { Component } from '@angular/core';
 import { FormGroup, FormArray, FormBuilder, Validators} from '@angular/forms';
 import { SidebarService } from 'src/app/core/core.index'; // Ensure correct import path
@@ -39,7 +40,7 @@ export class CreateUserComponent {
   public sameAsCurrentAddress: boolean = false;
 
   public userList: any;
-  public userRoleList: any;
+  public userRoleList: data[] = [];
   public isMainAdmin: boolean = false;
   public isSuperadmin: boolean = false;
   public isAdmin: boolean = false;
@@ -67,7 +68,6 @@ export class CreateUserComponent {
     this.isMainAdmin = (this.loginUser?.roleType || this.cookieService.get('roleType')) === Constant.mainAdmin;
     this.createForms();
     // this.checkRoleType();
-    this.getUserRoleType();
   }
 
 
@@ -81,7 +81,7 @@ export class CreateUserComponent {
       alternateMobile: ['', [Validators.required, Validators.pattern('^[0-9]*$')]],
       emailId: ['', [Validators.required, Validators.email]],
       userPicture: [''],
-      service: [this.isMainAdmin ? '' : 'DONATION', Validators.required],
+      service: [this.isMainAdmin ? '' : this.loginUser?.service || '', Validators.required],
       dob: [''],
       gender: [''],
       adminId: [''],
@@ -93,7 +93,13 @@ export class CreateUserComponent {
         this.addressForm()]),
     });
 
+    this.getUserRoleType();
     this.addUserForm.get('service')?.valueChanges.subscribe(() => {
+      this.getUserRoleType();
+      const roleControl = this.addUserForm.get('roleType');
+      if (roleControl?.value && !this.userRoleList.some(role => role.value === roleControl.value)) {
+        roleControl.reset('');
+      }
       this.addUserForm.get('permissions')?.setValue([]);
     });
 
@@ -195,16 +201,38 @@ onPermissionChange(event: any) {
 
 
   getUserRoleType(){
-    if( this.cookieService.get('roleType') === Constant.mainAdmin){
+    const service = this.addUserForm.get('service')?.value;
+    if (service === 'SCHOOL') {
+      this.userRoleList = [
+        { value: Constant.admin, name: 'ADMIN' },
+        { value: 'ACCOUNTANT', name: 'ACCOUNTANT' },
+        { value: 'TEACHER', name: 'TEACHER' },
+      ];
+      return;
+    }
+    if (service === 'DONATION') {
+      this.userRoleList = [
+        { value: Constant.admin, name: 'Admin' },
+        { value: Constant.teamLeader, name: 'Team Leader' },
+        { value: Constant.fundraisingOfficer, name: 'Fundraising Officer' },
+        { value: Constant.donorExecutive, name: 'Donor Executive' },
+      ];
+      return;
+    }
+
+    const roleType = this.loginUser?.roleType || this.cookieService.get('roleType');
+    if (roleType === Constant.mainAdmin) {
       this.userRoleList = [{value: Constant.superAdmin, name: 'Superadmin'}, {value: Constant.admin, name: 'Admin'}, {value:Constant.teamLeader, name: 'Team Leader'}, { value: Constant.fundraisingOfficer, name: 'Fundrising Officer'}];
 
-    }else if( this.cookieService.get('roleType') === Constant.superAdmin){
+    } else if (roleType === Constant.superAdmin) {
       this.userRoleList = [{value: Constant.admin, name: 'Admin'}, {value:Constant.teamLeader, name: 'Team Leader'}, { value: Constant.fundraisingOfficer, name: 'Fundrising Officer'}, { value: Constant.donorExecutive, name: 'Donation Executive'}];
 
-    }else if( this.cookieService.get('roleType') === Constant.admin){
+    } else if (roleType === Constant.admin) {
       this.userRoleList = [{value: Constant.teamLeader, name: 'Team Leader'}, { value: Constant.fundraisingOfficer, name: 'Fundrising Officer'}];
-    }else if( this.cookieService.get('roleType') === Constant.teamLeader){
+    } else if (roleType === Constant.teamLeader) {
       this.userRoleList = [{ value: Constant.fundraisingOfficer, name: 'Fundrising Officer'}];
+    } else {
+      this.userRoleList = [];
     }
   }
 
@@ -246,8 +274,7 @@ onPermissionChange(event: any) {
 
   get permissionsList(): data[] {
     const service = this.addUserForm?.get('service')?.value;
-    return service === 'SCHOOL' ? this.schoolPermissionsList
-      : service === 'DONATION' ? this.donationPermissionsList : [];
+    return userPermissionsForService(service);
   }
 
   get allPermissionsSelected(): boolean {
@@ -262,37 +289,6 @@ onPermissionChange(event: any) {
     control?.markAsDirty();
     control?.markAsTouched();
   }
-
-  schoolPermissionsList: data[] = [
-    { value: 'school-dashboard', name: 'School Dashboard' },
-    { value: 'add-student', name: 'Add Student' },
-    { value: 'student-list', name: 'Student List' },
-    { value: 'generate-school-receipt', name: 'Generate School Receipt' },
-    { value: 'school-receipt-list', name: 'School Receipt List' },
-    { value: 'student-academic', name: 'Student Academic' },
-    { value: 'fee-type', name: 'Fee Type' },
-    { value: 'fee-structure', name: 'Fee Structure' },
-    { value: 'fee-assignment', name: 'Fee Assignment' },
-    { value: 'grade', name: 'Grade' },
-  ];
-
-  donationPermissionsList: data[] =[
-    { value: 'donation-dashboard', name: 'Donation Dashboard' },
-    { value: 'create-user', name: 'Create User' },
-    { value: 'user-list', name: 'User List' },
-    { value: 'add-donation', name: 'Add Donation' },
-    { value: 'all-donation-list', name: 'Donation List' },
-    { value: 'payment-mode', name: 'Payment Mode' },
-    { value: 'payment-report', name: 'Payment Report' },
-    { value: 'program', name: 'Donation Program' },
-
-    { value: 'admin-dashboard', name: 'Donation Lead Dashboard' },
-    { value: 'create-lead', name: 'Create Donation Lead' },
-    { value: 'lead-list', name: 'Donation Lead List' },
-
-    { value: 'general-setting', name: 'General Setting' },
-    { value: 'company-setting', name: 'NGO Invoice Setting' }
-  ];
 
   public isTeamLeaderFielsShow() {
     if (this.loginUser['roleType'] == Constant.admin) {

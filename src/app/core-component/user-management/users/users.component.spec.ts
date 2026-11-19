@@ -19,12 +19,18 @@ describe('UsersComponent list and address editing', () => {
   it('accepts numeric address response codes', () => {
     api.getAddressDetailsByUserId.and.returnValue(of({ responseCode: 200, listPayload: [{ addressType: 'CURRENT', addressLine: 'Saved' }] }));
     const callback = jasmine.createSpy(); component.getAddressDetailsByUserId({ id: 1 }, callback);
-    expect(callback).toHaveBeenCalled(); expect(component.userAddressList[0].addressLine).toBe('Saved');
+    expect(callback).toHaveBeenCalledWith([{ addressType: 'CURRENT', addressLine: 'Saved' }]);
   });
-  it('does not open an empty editor after address loading fails', () => {
+  it('accepts the API no-content response for users without addresses', () => {
+    api.getAddressDetailsByUserId.and.returnValue(of({ responseCode: 204 }));
+    const callback = jasmine.createSpy();
+    component.getAddressDetailsByUserId({ id: 1 }, callback);
+    expect(callback).toHaveBeenCalledWith([]);
+  });
+  it('distinguishes address request failures from empty address lists', () => {
     api.getAddressDetailsByUserId.and.returnValue(throwError(() => new Error('Unavailable')));
     const callback = jasmine.createSpy(); component.getAddressDetailsByUserId({ id: 1 }, callback);
-    expect(callback).not.toHaveBeenCalled(); expect(messages.add).toHaveBeenCalled();
+    expect(callback).toHaveBeenCalledWith(null);
   });
   it('keeps search results when changing pages', () => {
     component.ngOnInit();

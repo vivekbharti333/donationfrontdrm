@@ -486,20 +486,17 @@ export class SidebarService {
             {
               menuValue: 'Mark Attendance',
               route: routes.attendanceMark,
-              // permission: 'attendance-mark',
-              permission: 'fee-assignment',
+              permission: 'attendance-mark',
             },
             {
               menuValue: 'Attendance List',
               route: routes.attendanceList,
-              // permission: 'attendance-list',
-              permission: 'fee-assignment',
+              permission: 'attendance-list',
             },
             {
               menuValue: 'Attendance Report',
               route: routes.attendanceReport,
-              // permission: 'attendance-report',
-              permission: 'fee-assignment',
+              permission: 'attendance-report',
             },
           ],
         },

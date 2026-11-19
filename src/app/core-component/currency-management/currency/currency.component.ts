@@ -1,155 +1,128 @@
-import { Component, importProvidersFrom, TemplateRef } from '@angular/core';
-import { Sort } from '@angular/material/sort';
-import { MatTableDataSource } from '@angular/material/table';
-import { Router } from '@angular/router';
-import {
-  DataService,
-  pageSelection,
-  apiResultFormat,
-  SidebarService,
-} from 'src/app/core/core.index';
-import { routes } from 'src/app/core/helpers/routes';
-import { PaginationService, tablePageSize } from 'src/app/shared/shared.index';
-import Swal from 'sweetalert2';
-import { MessageService } from 'primeng/api';
-import { MatDialog } from '@angular/material/dialog';
-
-import { MatTabsModule } from '@angular/material/tabs';
-import { CurrencyService } from './currency.service';
+import { Component } from '@angular/core';
+import { finalize } from 'rxjs';
+import { AuthenticationService } from 'src/app/auth/authentication.service';
+import { Constant } from 'src/app/core/constant/constants';
+import { UserManagementService } from '../../user-management/user-management.service';
 import { CurrencyMasterService } from '../currency-master/currency-master.service';
+import { CurrencyService } from './currency.service';
 
-interface PaymentMode {
-  id: number;
-  paymentMode: string;
-  status: string;
-  createdAt: number;
+interface SuperadminOption {
+  loginId: string;
+  firstName: string;
+  lastName: string;
 }
+
 @Component({
   selector: 'app-currency',
   templateUrl: './currency.component.html',
   styleUrl: './currency.component.scss'
 })
 export class CurrencyComponent {
- public currencyMasterList: any;
-  public selectedIds: number[] = [];
-  // public paymentModeList:  any;
-  public paymentModeList: any[] = [];
-
+  readonly isMainAdmin: boolean;
+  superadminList: SuperadminOption[] = [];
+  selectedSuperadminId?: string;
+  currencyMasterList: { id: number; currencyName: string; unicode: string }[] = [];
+  selectedIds: number[] = [];
+  loading = false;
+  saving = false;
+  selectionLoaded = false;
+  superadminError = '';
+  catalogStatus = 'Loading currencies…';
+  currencyError = '';
 
   constructor(
-      private pagination: PaginationService,
-      private router: Router,
-      private sidebar: SidebarService,
-      private currencyMasterService: CurrencyMasterService,
-      private currencyService: CurrencyService,
-
-    ) {}
-  
-    ngOnInit() {
-      this.getCurrencyMasterList();
-      this.getCurrencyDetailBySuperadmin();
-      this.initializeSelectedIds();
-    }
-
-  
-    initializeSelectedIds(): void {
-      this.selectedIds = [...this.paymentModeList];
-    }
-  
-    isChecked(id: number): boolean {
-      return this.selectedIds.includes(id);
-    }
-
-    toggleSelection(id: number): void {
-      if (this.selectedIds.includes(id)) {
-        this.selectedIds = this.selectedIds.filter((selectedId) => selectedId !== id);
-      } else {
-        this.selectedIds.push(id);
-      }
-      console.log("1 : "+this.selectedIds);
-
-      this.selectedIds.join(',')
-
-      this.addUpdateCurrency(this.selectedIds.join(','));
-    }
-
-  updateSelectedIds(data: any): void {
-    if (data.checked) {
-      // Add the ID if checked
-      this.selectedIds.push(data.id);
-    } else {
-      // Remove the ID if unchecked
-      this.selectedIds = this.selectedIds.filter(id => id !== data.id);
-    }
-    
-     // Log or process the selected IDs
-    
+    authenticationService: AuthenticationService,
+    private userManagementService: UserManagementService,
+    private currencyMasterService: CurrencyMasterService,
+    private currencyService: CurrencyService,
+  ) {
+    this.isMainAdmin = authenticationService.getLoginUser()?.roleType === Constant.mainAdmin;
   }
 
-  public getCurrencyMasterList() {
+  ngOnInit(): void {
     this.currencyMasterService.getCurrencyMasterList().subscribe({
-      next: (response: any) => {
-        if (response['responseCode'] == '200') {
-          this.currencyMasterList = JSON.parse(JSON.stringify(response.listPayload));
+      next: response => {
+        if (Number(response?.responseCode) === 200 && Array.isArray(response?.listPayload)) {
+          this.currencyMasterList = response.listPayload;
         }
+        this.catalogStatus = [200, 204].includes(Number(response?.responseCode))
+          ? 'No currencies available.'
+          : 'Unable to load available currencies.';
       },
-     
+      error: () => this.catalogStatus = 'Unable to load available currencies.',
     });
-  }
 
-  public getCurrencyDetailBySuperadmin() {
-    this.currencyService.getCurrencyDetailBySuperadmin().subscribe({
-      next: (response: any) => {
-        if (response['responseCode'] == '200') {
-          this.paymentModeList = JSON.parse(JSON.stringify(response.listPayload));
-          
-          // Explicitly define the item type as PaymentMode
-          const ids = this.paymentModeList.map((item: PaymentMode) => item.id);
-          this.selectedIds = ids;  // Log the array of ids for testing
-         
-        }
-      },
-      error: (error) => {
-        console.error('Error fetching payment mode list:', error);
-      }
-    });
-  }
-  
-  addUpdateCurrency(paymentModeIds:any) {
-    console.log("Updated ")
-    this.currencyService.addUpdateCurrencyBySuperadmin(paymentModeIds).subscribe({
-      next: (response: any) => {
-        if (response['responseCode'] == '200') {
-          if (response['payload']['respCode'] == '200') {
-            // form.reset();
-            // this.messageService.add({
-            //   summary: response['payload']['respCode'],
-            //   detail: response['payload']['respMesg'],
-            //   styleClass: 'success-background-popover',
-            // });
-          } else {
-            // this.messageService.add({
-            //   summary: response['payload']['respCode'],
-            //   detail: response['payload']['respMesg'],
-            //   styleClass: 'danger-background-popover',
-            // });
+    if (this.isMainAdmin) {
+      this.userManagementService.getUserDetailsList().subscribe({
+        next: response => {
+          if (Number(response?.responseCode) === 200 && Array.isArray(response?.listPayload)) {
+            this.superadminList = response.listPayload;
+          } else if (Number(response?.responseCode) !== 204) {
+            this.superadminError = 'Unable to load Superadmins.';
           }
+        },
+        error: () => this.superadminError = 'Unable to load Superadmins.',
+      });
+    } else {
+      this.getCurrencyDetailBySuperadmin();
+    }
+  }
+
+  getCurrencyDetailBySuperadmin(superadminId?: string): void {
+    if (this.loading || this.saving || (this.isMainAdmin && !superadminId)) return;
+
+    this.selectedSuperadminId = superadminId;
+    this.selectedIds = [];
+    this.selectionLoaded = false;
+    this.currencyError = '';
+    this.loading = true;
+
+    this.currencyService.getCurrencyDetailBySuperadmin(superadminId).pipe(
+      finalize(() => this.loading = false),
+    ).subscribe({
+      next: response => {
+        const code = Number(response?.responseCode);
+        if (code === 200 && Array.isArray(response?.listPayload)) {
+          this.selectedIds = response.listPayload.map((currency: { id: number }) => currency.id);
+          this.selectionLoaded = true;
+        } else if (code === 204) {
+          this.selectionLoaded = true;
         } else {
-          // this.messageService.add({
-          //   summary: response['payload']['respCode'],
-          //   detail: response['payload']['respMesg'],
-          //   styleClass: 'danger-background-popover',
-          // });
+          this.currencyError = 'Unable to load currency selections.';
         }
       },
-      // error: () =>
-      //   this.messageService.add({
-      //     summary: '500',
-      //     detail: 'Server Error',
-      //   }),
+      error: () => this.currencyError = 'Unable to load currency selections.',
     });
   }
-  
 
+  isChecked(id: number): boolean {
+    return this.selectedIds.includes(id);
+  }
+
+  toggleSelection(id: number): void {
+    if (!this.selectionLoaded || this.loading || this.saving) return;
+
+    const previousIds = this.selectedIds;
+    this.selectedIds = this.isChecked(id)
+      ? previousIds.filter(selectedId => selectedId !== id)
+      : [...previousIds, id];
+    this.currencyError = '';
+    this.saving = true;
+
+    this.currencyService.addUpdateCurrencyBySuperadmin(this.selectedIds.join(','), this.selectedSuperadminId).pipe(
+      finalize(() => this.saving = false),
+    ).subscribe({
+      next: response => {
+        if (Number(response?.responseCode) !== 200 || Number(response?.payload?.respCode) !== 200) {
+          this.restoreSelection(previousIds);
+        }
+      },
+      error: () => this.restoreSelection(previousIds),
+    });
+  }
+
+  private restoreSelection(previousIds: number[]): void {
+    this.selectedIds = previousIds;
+    this.currencyError = 'Unable to save currency selections.';
+  }
 }
-

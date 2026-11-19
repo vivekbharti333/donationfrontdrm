@@ -1,41 +1,38 @@
-<div class="card">
+<section class="card currency-card" aria-labelledby="currency-title">
   <div class="card-body">
-    <div class="new-employee-field">
-      <div class="card-title-head">
-        <h6>
-          <span><i class="feather icon-info feather-edit"></i></span>Add Currency
-        </h6>
+    <header class="currency-header">
+      <div>
+        <h5 id="currency-title">Currencies</h5>
+        <p>Select the currencies your organisation uses.</p>
       </div>
+    </header>
 
-      <div class="row">
-        <div class="col-lg-6 col-sm-6 col-12">
-          <div class="table-responsive">
-            <table matSort class="table datanew">
-              <thead>
-                <tr>
-                  <th></th>
-                  <th mat-sort-header="userName">Mode</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let data of currencyMasterList">
-                  <td></td>
-                  <td>
-                    <mat-checkbox [checked]="isChecked(data.id)" (change)="toggleSelection(data.id)">
-                      {{ data.currencyName }} ({{data.unicode}})
-                    </mat-checkbox>
-                  </td>
-                  
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
-
-
-
+    <div *ngIf="isMainAdmin" class="mb-3">
+      <label class="form-label" id="currency-superadmin-label">Superadmin</label>
+      <mat-select class="space-select select" placeholder="Select Superadmin"
+        aria-labelledby="currency-superadmin-label" [value]="selectedSuperadminId"
+        [disabled]="loading || saving" (selectionChange)="getCurrencyDetailBySuperadmin($event.value)">
+        <mat-option *ngFor="let user of superadminList" [value]="user.loginId">
+          {{ user.firstName }} {{ user.lastName }}
+        </mat-option>
+      </mat-select>
+      <p *ngIf="superadminError" class="text-danger mt-2" role="alert">{{ superadminError }}</p>
     </div>
+
+    <p *ngIf="loading" class="currency-empty" role="status">Loading currency selections…</p>
+    <p *ngIf="currencyError" class="text-danger" role="alert">{{ currencyError }}</p>
+
+    <ul *ngIf="selectionLoaded && currencyMasterList.length" class="currency-list">
+      <li *ngFor="let currency of currencyMasterList" class="currency-option"
+        [class.currency-option-selected]="isChecked(currency.id)">
+        <span class="currency-symbol" aria-hidden="true">{{ currency.unicode || '—' }}</span>
+        <span class="currency-name" [id]="'currency-name-' + currency.id">{{ currency.currencyName }}</span>
+        <mat-checkbox [aria-labelledby]="'currency-name-' + currency.id"
+          [checked]="isChecked(currency.id)" [disabled]="saving" (change)="toggleSelection(currency.id)">
+        </mat-checkbox>
+      </li>
+    </ul>
+
+    <p *ngIf="selectionLoaded && !currencyMasterList.length" class="currency-empty" role="status">{{ catalogStatus }}</p>
   </div>
-</div>
+</section>

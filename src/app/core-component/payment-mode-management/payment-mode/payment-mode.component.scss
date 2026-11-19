@@ -16,6 +16,25 @@
 .panel-heading p { font-size: 13px; }
 .auto-save { display: inline-flex; align-items: center; gap: 6px; color: #687383; font-size: 11px; font-weight: 700; white-space: nowrap; }
 .auto-save i { color: var(--brand); }
+.payment-superadmin {
+  padding: 16px 24px 0;
+
+  label { display: block; }
+
+  mat-select {
+    display: inline-flex;
+    align-items: center;
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 24rem;
+    min-height: 48px;
+    min-width: 0;
+    font-size: 16px;
+
+    &:focus-visible { outline: 2px solid var(--brand-hover); outline-offset: 2px; }
+  }
+}
+.payment-superadmin-name { white-space: normal; overflow-wrap: anywhere; }
 .payment-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; padding: 24px; }
 .method-card { position: relative; display: flex; min-height: 82px; align-items: center; gap: 13px; padding: 15px 17px; border: 1px solid #e0e4ea; border-radius: 13px; background: #fff; cursor: pointer; transition: border-color .18s, background .18s, box-shadow .18s, transform .18s; }
 .method-card:hover { transform: translateY(-1px); border-color: #ffc891; box-shadow: 0 7px 18px rgba(35, 43, 54, .06); }
@@ -54,4 +73,9 @@
   .panel-heading { align-items: flex-start; flex-direction: column; }
   .payment-grid { grid-template-columns: 1fr; padding: 18px; }
   .panel-heading, .panel-footer { padding-right: 18px; padding-left: 18px; }
+  .payment-superadmin {
+    padding-inline: 18px;
+
+    mat-select { max-width: none; }
+  }
 }

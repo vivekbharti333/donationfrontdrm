@@ -1,3 +1,4 @@
+import { userPermissionsForService } from '../user-service-permissions';
 import { Component, importProvidersFrom, TemplateRef } from '@angular/core';
 import { Sort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
@@ -65,7 +66,8 @@ export class UsersComponent {
   public userRoleList!: any;
   public userPhoto: any;
   public editUserSuperadminId = '';
-  public userAddressList: any;
+  public addressesUnavailable = false;
+  public sameAsCurrentAddress = false;
   public loginId :any;
 
    public roleTypes = [
@@ -154,34 +156,24 @@ export class UsersComponent {
     }
   }
 
-  public permissionsList: data[] = [];
-  private readonly donationPermissionOptions: data[] = [
-    { value: 'donation-dashboard', name: 'Donation Dashboard' },
-    { value: 'create-user', name: 'Create User' },
-    { value: 'user-list', name: 'User List' },
-    { value: 'add-donation', name: 'Add Donation' },
-    { value: 'all-donation-list', name: 'Donation List' },
-    { value: 'payment-mode', name: 'Payment Mode' },
-    { value: 'payment-report', name: 'Payment Report' },
-    { value: 'program', name: 'Donation Program' },
-    { value: 'admin-dashboard', name: 'Donation Lead Dashboard' },
-    { value: 'create-lead', name: 'Create Donation Lead' },
-    { value: 'lead-list', name: 'Donation Lead List' },
-    { value: 'general-setting', name: 'General Setting' },
-    { value: 'company-setting', name: 'NGO Invoice Setting' }
-  ];
-  private readonly schoolPermissionOptions: data[] = [
-    { value: 'school-dashboard', name: 'School Dashboard' },
-    { value: 'add-student', name: 'Add Student' },
-    { value: 'student-list', name: 'Student List' },
-    { value: 'generate-school-receipt', name: 'Generate School Receipt' },
-    { value: 'school-receipt-list', name: 'School Receipt List' },
-    { value: 'student-academic', name: 'Student Academic' },
-    { value: 'fee-type', name: 'Fee Type' },
-    { value: 'fee-structure', name: 'Fee Structure' },
-    { value: 'fee-assignment', name: 'Fee Assignment' },
-    { value: 'grade', name: 'Grade' }
-  ];
+  private retainedPermissions: string[] = [];
+
+  get permissionsList() {
+    return userPermissionsForService(this.editUserForm?.get('service')?.value);
+  }
+
+  get allPermissionsSelected(): boolean {
+    const selected: string[] = this.editUserForm.get('permissions')?.value || [];
+    return this.permissionsList.length > 0
+      && this.permissionsList.every(permission => selected.includes(permission.value));
+  }
+
+  toggleAllPermissions(checked: boolean): void {
+    const control = this.editUserForm.get('permissions');
+    control?.setValue(checked ? this.permissionsList.map(permission => permission.value) : []);
+    control?.markAsDirty();
+    control?.markAsTouched();
+  }
 
 
   onRoleTypeChange(event: any) {
@@ -227,9 +219,10 @@ export class UsersComponent {
       firstName: ['', [Validators.required, Validators.pattern('^[A-Za-z]+(?:[ .][A-Za-z]+)*$')]],
       lastName: ['', [Validators.required, Validators.pattern('^[A-Za-z]+(?:[ .][A-Za-z]+)*$')]],
       roleType: ['', Validators.required],
+      service: [''],
       mobileNo: ['', [Validators.required, Validators.pattern('^[0-9]*$')]],
       alternateMobile: ['', [Validators.required, Validators.pattern('^[0-9]*$')]],
-      emailId: ['', [Validators.required, Validators.email]],
+      emailId: ['', Validators.email],
       dob: [''],
       permissions: [''],
       userPicture:[''],
@@ -237,6 +230,9 @@ export class UsersComponent {
       addressList: this.fb.array([
         this.addressForm(),
         this.addressForm()]),
+    });
+    this.addressList.valueChanges.pipe(takeUntil(this.destroyed$)).subscribe(() => {
+      if (this.sameAsCurrentAddress) this.copyCurrentAddressToPermanent();
     });
     this.teamLeaderForm = this.fb.group({
       teamLeaderId: [''],
@@ -247,6 +243,27 @@ export class UsersComponent {
 
   get addressList(): FormArray {
     return this.editUserForm.get("addressList") as FormArray
+  }
+
+  onSameAddressChange(checked: boolean): void {
+    const permanentAddress = this.addressList.at(1);
+    if (!permanentAddress) return;
+
+    this.sameAsCurrentAddress = checked;
+    if (checked) {
+      this.copyCurrentAddressToPermanent();
+      permanentAddress.disable({ emitEvent: false });
+    } else {
+      permanentAddress.enable({ emitEvent: false });
+    }
+  }
+
+  private copyCurrentAddressToPermanent(): void {
+    const currentAddress = this.addressList.at(0).getRawValue();
+    this.addressList.at(1).patchValue({
+      ...currentAddress,
+      addressType: 'PERMANENT',
+    }, { emitEvent: false });
   }
 
   addressForm() {
@@ -263,16 +280,15 @@ export class UsersComponent {
   }
 
   openEditModal(templateRef: TemplateRef<any>, user: any): void {
-    this.permissionsList = String(user?.service || '').toUpperCase().includes('SCHOOL')
-      ? this.schoolPermissionOptions
-      : this.donationPermissionOptions;
     this.editUserSuperadminId = String(
       user?.superadminId || this.loginUser?.superadminId || this.loginUser?.loginId || ''
     );
-    this.getAddressDetailsByUserId(user, () => {
+    this.getAddressDetailsByUserId(user, addresses => {
+      this.addressesUnavailable = addresses === null;
+      this.sameAsCurrentAddress = false;
       const addressMap = new Map<string, any>();
-      if (Array.isArray(this.userAddressList)) {
-        this.userAddressList.forEach(addr => {
+      if (addresses) {
+        addresses.forEach(addr => {
           if (addr?.addressType) {
             const type = String(addr.addressType).trim().toUpperCase();
             if (!addressMap.has(type)) addressMap.set(type, addr);
@@ -283,8 +299,7 @@ export class UsersComponent {
       // Clear existing addressList FormArray
       this.addressList.clear();
 
-      // Always provide Current and Permanent address forms
-      const addressTypes = ['CURRENT', 'PERMANENT'];
+      const addressTypes = addresses ? ['CURRENT', 'PERMANENT'] : [];
       addressTypes.forEach(type => {
         const existing = addressMap.get(type);
         const addressGroup = this.addressForm();
@@ -302,19 +317,24 @@ export class UsersComponent {
       });
 
       const formattedDob = this.formatValidityDateForInput(user['dob']);
+      const service = user.service || this.loginUser?.service || '';
+      const savedPermissions = parsePermissions(user.permissions);
+      const availablePermissions = new Set(userPermissionsForService(service).map(option => option.value));
+      this.retainedPermissions = savedPermissions.filter(permission => !availablePermissions.has(permission));
   
       this.editUserForm.patchValue({
         loginId: user['loginId'],
         firstName: user['firstName'],
         lastName: user['lastName'],
         roleType: user['roleType'],
+        service,
         mobileNo: user['mobileNo'],
         alternateMobile: user['alternateMobile'],
         emailId: user['emailId'],
         dob: formattedDob,
         userPicture: user['userPicture'],
         createdBy: user['createdBy'],
-        permissions: parsePermissions(user['permissions'])
+        permissions: savedPermissions.filter(permission => availablePermissions.has(permission))
       });
   
       this.userPhoto = this.userImageUrl(user);
@@ -613,22 +633,22 @@ export class UsersComponent {
   //     });
   // }
 
-  public getAddressDetailsByUserId(user: any, callback: () => void): void {
+  public getAddressDetailsByUserId(user: any, callback: (addresses: any[] | null) => void): void {
     const requestId = ++this.addressRequestId;
-    this.userAddressList = [];
     this.userManagementService.getAddressDetailsByUserId(user).pipe(takeUntil(this.destroyed$)).subscribe({
       next: (response: any) => {
         if (requestId !== this.addressRequestId) return;
-        if (Number(response?.responseCode) !== 200 || !Array.isArray(response?.listPayload)) {
-          this.messageService.add({ severity: 'error', summary: 'Unable to load addresses', detail: 'Please retry opening this user. No changes have been saved.' });
+        const responseCode = Number(response?.responseCode);
+        if (responseCode === 204) {
+          callback([]);
           return;
         }
-        this.userAddressList = response.listPayload;
-        callback();
+        const addresses = response?.listPayload;
+        callback(responseCode === 200 && Array.isArray(addresses) ? addresses : null);
       },
       error: () => {
         if (requestId !== this.addressRequestId) return;
-        this.messageService.add({ severity: 'error', summary: 'Unable to load addresses', detail: 'Please retry opening this user. No changes have been saved.' });
+        callback(null);
       }
     });
   }
@@ -762,11 +782,14 @@ export class UsersComponent {
     if (this.isUpdatingUser) return;
     if (this.editUserForm.invalid) {
       this.editUserForm.markAllAsTouched();
-      this.messageService.add({ severity: 'error', summary: 'Check user details', detail: 'Enter valid names, mobile numbers, email and role before saving.' });
+      this.messageService.add({ severity: 'error', summary: 'Check user details', detail: 'Check the required names, mobile numbers and role. If you entered an email address, check its format.' });
       return;
     }
     this.isUpdatingUser = true;
-    this.userManagementService.updateUserDetails(this.editUserForm.getRawValue()).subscribe({
+    const userDetails = this.editUserForm.getRawValue();
+    userDetails.permissions = [...this.retainedPermissions, ...(userDetails.permissions || [])];
+    if (this.addressesUnavailable) delete userDetails.addressList;
+    this.userManagementService.updateUserDetails(userDetails).subscribe({
       next: response => {
         this.isUpdatingUser = false;
         const success = Number(response?.responseCode) === 200 && Number(response?.payload?.respCode) === 200;

@@ -347,8 +347,23 @@
 
                 <div class="col-lg-4 col-md-6">
                   <div class="mb-3">
-                    <label class="form-label requiredField">Permission</label>
-                    <mat-select class="space-select select" formControlName="permissions" placeholder="Select Permission" multiple>
+                    <label class="form-label" for="edit-user-service">Service</label>
+                    <input id="edit-user-service" type="text" class="form-control" formControlName="service" readonly>
+                  </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6">
+                  <div class="mb-3">
+                    <label class="form-label" id="edit-user-permissions-label">Permission (optional)</label>
+                    <mat-select class="space-select select" formControlName="permissions" placeholder="Select Permission"
+                      multiple panelClass="create-user-permissions-panel" aria-labelledby="edit-user-permissions-label">
+                      <label class="permission-select-all" *ngIf="permissionsList.length"
+                        (click)="$event.stopPropagation()" (keydown)="$event.stopPropagation()">
+                        <input type="checkbox" [checked]="allPermissionsSelected"
+                          [indeterminate]="!allPermissionsSelected && !!editUserForm.get('permissions')?.value?.length"
+                          (change)="toggleAllPermissions($any($event.target).checked)">
+                        <span>Select All Permissions</span>
+                      </label>
                       <mat-option *ngFor="let data of permissionsList" [value]="data.value">
                         {{ data.name }}
                       </mat-option>
@@ -399,8 +414,14 @@
 
                 <div class="col-lg-4 col-md-6">
                   <div class="mb-3">
-                    <label class="form-label requiredField">Email Id</label>
-                    <input type="text" class="form-control" formControlName="emailId" required>
+                    <label class="form-label" for="edit-user-email">Email ID (optional)</label>
+                    <input id="edit-user-email" type="email" class="form-control" formControlName="emailId"
+                      [class.is-invalid]="editUserForm.get('emailId')?.touched && editUserForm.get('emailId')?.invalid"
+                      [attr.aria-describedby]="editUserForm.get('emailId')?.touched && editUserForm.get('emailId')?.invalid ? 'edit-user-email-error' : null">
+                    <small id="edit-user-email-error" class="invalid-feedback"
+                      *ngIf="editUserForm.get('emailId')?.touched && editUserForm.get('emailId')?.invalid">
+                      Enter a valid email address.
+                    </small>
                   </div>
                 </div>
 
@@ -420,6 +441,9 @@
 
               <div class="other-info">
 
+                <p *ngIf="addressesUnavailable" class="text-warning" role="status">
+                  Addresses could not be loaded. Reopen this user to retry editing addresses.
+                </p>
                 <div formArrayName="addressList">
                   <div *ngFor="let address of addressList.controls; let i=index">
                     <div class="card-title-head address-section">
@@ -430,6 +454,11 @@
                         <div class="inner-header" *ngIf="i === 1">
                           <h6><span><i class="feather icon-map-pin"></i></span>Permanent Address</h6>
                         </div>
+                        <label *ngIf="i === 1" class="d-inline-flex align-items-center gap-2 mb-3">
+                          <input type="checkbox" [checked]="sameAsCurrentAddress"
+                            (change)="onSameAddressChange($any($event.target).checked)">
+                          <span>Same as Current Address</span>
+                        </label>
 
                         <div class="row">
                           <input class="form-control" *ngIf="i === 0" type="text" pInputText value="CURRENT" formControlName="addressType" hidden>

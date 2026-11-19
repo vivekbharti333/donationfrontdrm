@@ -5,7 +5,7 @@
       <h1>Payment modes</h1>
       <p>Choose the payment methods available for collecting donations.</p>
     </div>
-    <div class="enabled-summary">
+    <div class="enabled-summary" *ngIf="selectionLoaded">
       <span class="summary-icon"><i class="feather icon-credit-card"></i></span>
       <span><strong>{{ selectedIds.length }}</strong><small>methods enabled</small></span>
     </div>
@@ -20,11 +20,25 @@
       <span class="auto-save"><i class="feather icon-check-circle"></i> Auto-save</span>
     </div>
 
-    <div *ngIf="isLoading" class="payment-grid" aria-label="Loading payment methods">
+    <div *ngIf="isMainAdmin" class="payment-superadmin">
+      <label id="payment-superadmin-label" class="form-label">Superadmin</label>
+      <mat-select class="space-select select" placeholder="Select Superadmin"
+        aria-labelledby="payment-superadmin-label" [value]="selectedSuperadminId"
+        [disabled]="loadingSelection || savingId !== null"
+        (selectionChange)="getPaymentModeListBySuperadminId($event.value)">
+        <mat-option *ngFor="let user of superadminList" [value]="user.loginId">
+          <span class="payment-superadmin-name">{{ user.firstName }} {{ user.lastName }}</span>
+        </mat-option>
+      </mat-select>
+      <p *ngIf="superadminError" class="text-danger mt-2" role="alert">{{ superadminError }}</p>
+    </div>
+    <p *ngIf="selectionError" class="text-danger" role="alert">{{ selectionError }}</p>
+
+    <div *ngIf="loadingSelection || (isLoading && selectionLoaded)" class="payment-grid" aria-label="Loading payment methods">
       <div class="method-skeleton" *ngFor="let item of [1, 2, 3, 4]"></div>
     </div>
 
-    <div *ngIf="!isLoading && masterPaymentModeList.length" class="payment-grid">
+    <div *ngIf="selectionLoaded && !isLoading && masterPaymentModeList.length" class="payment-grid">
       <label class="method-card" *ngFor="let mode of masterPaymentModeList"
         [class.method-card--active]="isChecked(mode.id)"
         [class.method-card--saving]="savingId === mode.id">
@@ -43,13 +57,13 @@
       </label>
     </div>
 
-    <div *ngIf="!isLoading && !masterPaymentModeList.length" class="empty-state">
+    <div *ngIf="selectionLoaded && !isLoading && !masterPaymentModeList.length && !selectionError" class="empty-state">
       <span><i class="feather icon-credit-card"></i></span>
       <h3>No payment modes found</h3>
       <p>Add payment modes in Payment Mode Master, then return here to enable them.</p>
     </div>
 
-    <footer class="panel-footer" *ngIf="!isLoading && masterPaymentModeList.length">
+    <footer class="panel-footer" *ngIf="selectionLoaded && !isLoading && masterPaymentModeList.length">
       <i class="feather icon-info"></i>
       Disabled methods will no longer appear as payment options on new donations.
     </footer>
