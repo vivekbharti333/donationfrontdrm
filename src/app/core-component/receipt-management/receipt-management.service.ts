@@ -73,6 +73,7 @@ export class ReceiptManagementService {
         alternateMobile: invoiceHeader.alternateMobile,
         emailId: invoiceHeader.emailId,
         website: invoiceHeader.website,
+        receiptDownloadUrl: invoiceHeader.receiptDownloadUrl,
         gstNumber: invoiceHeader.gstNumber,
         panNumber: invoiceHeader.panNumber,
         invoiceEmail: invoiceHeader.invoiceEmail,

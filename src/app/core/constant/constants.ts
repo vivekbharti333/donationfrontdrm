@@ -17,10 +17,10 @@ export class Constant {
     //   window.location.port === '4200'
     //     ? '/mycrm/'
     //     : 'http://localhost/mycrm/'; 
-    // public static Site_Url = 'http://localhost/mycrm/';
+    public static Site_Url = 'http://localhost/mycrm/';
     // public static Site_Url = "http://192.168.29.119/mycrm/";
     // public static Site_Url = "https://datfuslab.in/drmapinew/"; 
-    public static Site_Url = "https://donexia.in/drmapinew/";
+    // public static Site_Url = "https://donexia.in/drmapinew/";
 
     // ['sale-dashboard','create-user','user-list','add-donation','all-donation-list','payment-mode-master','payment-mode','currency-master','currency','program','add-receipt-header','receipt-header-list','company-setting','create-lead','lead-list']
     //  ['school-dashboard','add-student','student-list','generate-school-receipt','school-receipt-list','student-academic','fee-type','fee-structure','fee-assignment','grade','whats-app-integration','attendance-mark','attendance-list','attendance-report']

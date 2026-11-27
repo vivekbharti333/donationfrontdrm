@@ -110,6 +110,7 @@ export class AddReceiptHeaderComponent implements OnInit, OnDestroy {
       alternateMobile: ['', [Validators.required, Validators.pattern('^[0-9]*$')]],
       emailId: ['', [Validators.required, Validators.email]],
       website: ['', Validators.required],
+      receiptDownloadUrl: [''],
       gstNumber: ['', Validators.required],
       panNumber: ['', Validators.required],
       invoiceEmail: [''],

@@ -152,12 +152,16 @@
                     </div>
                     <div class="col-lg-4 col-md-4" *ngIf="showFundrisingOfficerList">
                         <div class="mb-3">
-                            <label class="form-label">Fundrising Officer</label>
-                            <mat-select class="space-select select" formControlName="createdBy"  placeholder="Select Fundrising Officer" >
+                            <label class="form-label">Fundrising Officer <span class="text-danger">*</span></label>
+                            <mat-select class="space-select select" formControlName="createdBy" placeholder="Select Fundrising Officer" aria-label="Fundrising Officer" [required]="showFundrisingOfficerList">
                                 <mat-option *ngFor="let fundRisingOffcer of fundRisingOffcerList" [value]="fundRisingOffcer.loginId">
                                     {{fundRisingOffcer.firstName}} {{fundRisingOffcer.lastName}}
                                 </mat-option>
                               </mat-select>
+                            <small class="text-danger" role="alert"
+                                *ngIf="addDonationForm.get('createdBy')?.touched && addDonationForm.get('createdBy')?.hasError('required')">
+                                Please select a Fundrising Officer.
+                            </small>
                         </div>
                     </div>
                     

@@ -95,6 +95,14 @@ export class AddDonationComponent {
     } else if(this.loginUser['roleType'] == Constant.fundraisingOfficer){
       this.showFundrisingOfficerList = false;
     }
+    const officer = this.addDonationForm.controls['createdBy'];
+    if (this.showFundrisingOfficerList) {
+      officer.setValidators(Validators.required);
+      if (officer.value === 'N/A') officer.setValue('');
+    } else {
+      officer.clearValidators();
+    }
+    officer.updateValueAndValidity();
   }
 
   showSuccess() {
@@ -107,7 +115,7 @@ export class AddDonationComponent {
 
   createForms() {
     this.addDonationForm = this.fb.group({
-      createdBy: ['N/A'],
+      createdBy: [this.showFundrisingOfficerList ? '' : 'N/A', this.showFundrisingOfficerList ? Validators.required : []],
       invoiceHeaderDetailsId: ['', Validators.required],
       donorName: ['', [Validators.required, Validators.pattern('[A-Za-z ]{3,150}')]],
       mobileNumber: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
@@ -290,7 +298,9 @@ export class AddDonationComponent {
       this.messageService.add({
         severity: 'warn',
         summary: 'Required Fields',
-        detail: 'Please fill in all mandatory fields correctly before submitting.',
+        detail: this.showFundrisingOfficerList && this.addDonationForm.controls['createdBy'].hasError('required')
+          ? 'Please select a Fundrising Officer before submitting.'
+          : 'Please fill in all mandatory fields correctly before submitting.',
       });
       return;
     }

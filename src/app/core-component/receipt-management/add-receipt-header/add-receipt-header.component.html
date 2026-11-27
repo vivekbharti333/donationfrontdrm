@@ -35,7 +35,7 @@
                     <div class="col-sm-4 form-group">
                         <mat-select class="space-select select" formControlName="superadminId"  (selectionChange)="getInvoiceHeaderList($event.value, 'BYSUPERADMINID')" placeholder="Select Superadmin">
                             <mat-option *ngFor="let userList of superadminList" [value]="userList.loginId">
-                                {{ userList.firstName + ' ' + userList.lastName }}
+                                {{ userList.firstName }} {{ userList.lastName }} ({{ userList.loginId }})
                             </mat-option>
                         </mat-select>
                     </div>
@@ -179,6 +179,14 @@
                     <div class="col-sm-4 form-group">
                         <label class="form-label">Website <span class="text-danger">*</span></label>
                         <input class="form-control" pInputText type="text" formControlName="website" maxlength="50">
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-12 form-group">
+                        <label for="receiptDownloadUrl" class="form-label">Receipt Download URL</label>
+                        <input id="receiptDownloadUrl" class="form-control" pInputText type="url"
+                            formControlName="receiptDownloadUrl" placeholder="Enter receipt download URL">
                     </div>
                 </div>
 
